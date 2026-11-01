@@ -539,7 +539,7 @@ header{position:relative}
   <!-- MATCHES -->
   <div id="view-matches" role="tabpanel" aria-labelledby="tab-matches" class="wrap" style="gap:12px">
     <div class="frows"><div class="hscroll" id="mFilter" role="group" aria-label="Day"></div><div class="daystrip" id="dayStrip" hidden></div><div class="hscroll" id="lFilter" role="group" aria-label="Leagues"></div></div>
-    <div class="demorow"><button type="button" class="btn sec" id="demoSmall">⚽ Goal</button><button type="button" class="btn sec" id="demoGoal">💰 Goal lands tip</button><button type="button" class="btn sec" id="demoCalled">🎯 Called it</button></div>
+    <div class="demorow"><button type="button" class="btn sec" id="demoSmall">⚽ Goal</button><button type="button" class="btn sec" id="demoGoal">💰 Goal lands tip</button><button type="button" class="btn sec" id="demoFT">🏁 Win at full time</button><button type="button" class="btn sec" id="demoCalled">🎯 Called it</button></div>
     <input class="search" id="q" type="search" placeholder="Search team or league" aria-label="Search team or league">
     <div class="legend"><span>Last 5, older → newer:</span><span><span class="fb"><i class="fW"></i></span> Win</span><span><span class="fb"><i class="fD"></i></span> Draw</span><span><span class="fb"><i class="fL"></i></span> Loss</span></div>
     <p class="hint" style="margin:0">Tap a tip to add it to your slip. Tap the row for table position, form, our model, odds, absences and news.</p>
@@ -1195,9 +1195,9 @@ function goalFx(mid,side){
 $("demoGoal").addEventListener("click",function(){
   var m=MATCHES.filter(function(x){return x.open&&x.tips.some(function(t){return t.sel==="Over 2.5"&&(t.tier==="free"||vipMember);});})[0];
   if(!m){toast("No open Over 2.5 tip to demo");return;}
-  m.type="inprogress";m.live=true;m.open=false;m.score="1-1";m.min=71;mFilter="live";q="";$("q").value="";renderFilters();renderMatches();
+  m.type="inprogress";m.live=true;m.open=false;m.score="1-1";m.min=71;mFilter="live";q="";$("q").value="";renderFilters();renderMatches();renderClose();
   var row=document.querySelector('details.mrow[data-mid="'+m.id+'"]');if(row)row.scrollIntoView({block:"center"});
-  setTimeout(function(){m.score="2-1";m.min=74;m._hold=true;renderMatches();goalFx(m.id,"h");setTimeout(function(){m._hold=false;m._justPaid=true;renderMatches();var s=document.querySelector('details.mrow[data-mid="'+m.id+'"] .r-score');if(s)s.classList.add("goalflash");},1300);toast("⚽ Goal! "+m.home+" v "+m.away+" 2-1 · Over 2.5 landed");setTimeout(function(){m._justPaid=false;},2200);},1600);
+  setTimeout(function(){m.score="2-1";m.min=74;m._hold=true;renderMatches();goalFx(m.id,"h");setTimeout(renderClose,1300);setTimeout(function(){m._hold=false;m._justPaid=true;renderMatches();var s=document.querySelector('details.mrow[data-mid="'+m.id+'"] .r-score');if(s)s.classList.add("goalflash");},1300);toast("⚽ Goal! "+m.home+" v "+m.away+" 2-1 · Over 2.5 landed");setTimeout(function(){m._justPaid=false;},2200);},1600);
 });
 $("demoSmall").addEventListener("click",function(){
   var m=MATCHES.filter(function(x){return x.open&&!x._demo&&!x.tips.length;})[0];if(!m){toast("Nothing left to demo, refresh the page");return;}
@@ -1205,6 +1205,16 @@ $("demoSmall").addEventListener("click",function(){
   var row=document.querySelector('details.mrow[data-mid="'+m.id+'"]');if(row)row.scrollIntoView({block:"center"});
   setTimeout(function(){m.score="0-1";m.min=14;renderMatches();goalFxSmall(m.id,"a");},1100);
   setTimeout(function(){m.score="1-1";m.min=17;renderMatches();goalFxSmall(m.id,"h");},3000);
+});
+$("demoFT").addEventListener("click",function(){
+  var m=null,tp=null;MATCHES.forEach(function(x){if(m||!x.open||x._demo)return;x.tips.forEach(function(t){if(!tp&&(t.sel==="Home"||t.sel==="Away")&&(t.tier==="free"||vipMember)){m=x;tp=t;}});});
+  if(!m){toast("Nothing left to demo, refresh the page");return;}
+  var sc=tp.sel==="Home"?"1-0":"0-1";
+  m._demo=true;m.type="inprogress";m.live=true;m.open=false;m.score=sc;m.min=89;mFilter="live";q="";$("q").value="";renderFilters();renderMatches();renderClose();
+  var row=document.querySelector('details.mrow[data-mid="'+m.id+'"]');if(row)row.scrollIntoView({block:"center"});
+  toast("⏱ 89' "+m.home+" v "+m.away+" "+sc+" · "+tp.sel);
+  setTimeout(function(){m.type="finished";m.live=false;m.done=true;m.min=90;m._justPaid=true;renderMatches();renderClose();toast("🏁 FT "+m.home+" v "+m.away+" "+sc+" · tip landed");
+    var s=document.querySelector('details.mrow[data-mid="'+m.id+'"] .r-score');if(s)s.classList.add("goalflash");setTimeout(function(){m._justPaid=false;},2200);},2500);
 });
 $("demoCalled").addEventListener("click",function(){
   var pool=MATCHES.filter(function(x){return x.open&&x.bz&&!x._demo;});if(pool.length<8){toast("Nothing left to demo, refresh the page");return;}
