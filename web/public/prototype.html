@@ -441,8 +441,11 @@ body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .cbig{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(circle,rgba(182,242,58,.28),rgba(12,15,13,0) 62%);animation:cbg 3s ease forwards}
 .cbig-in{display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 34px;border:3px solid var(--lime);border-radius:20px;background:rgba(12,15,13,.94);box-shadow:0 0 70px rgba(182,242,58,.65),inset 0 0 30px rgba(182,242,58,.15);animation:cbpop .65s cubic-bezier(.2,1.6,.4,1) both,cbglow 1s ease-in-out .7s 2}
 .cbig-t{font:800 clamp(1.6rem,6vw,2.6rem)/1 var(--f-display);color:var(--lime);letter-spacing:.05em;text-transform:uppercase;text-align:center}
-.cbig b{font-size:clamp(2.4rem,10vw,3.6rem);color:#fff;text-shadow:0 0 18px rgba(182,242,58,.7)}
-.cbig small{color:var(--muted);font-weight:700;font-size:.95rem;text-align:center}
+.cbig b{font-size:clamp(2.4rem,10vw,3.6rem);color:#fff;text-shadow:0 0 18px rgba(182,242,58,.7);flex:none}
+.cbig-m{display:flex;align-items:center;gap:16px;max-width:min(92vw,720px)}
+.cbig-h,.cbig-a{font:800 clamp(1.1rem,4.5vw,1.7rem)/1.1 var(--f-display);color:#fff;letter-spacing:.02em;text-transform:uppercase;flex:1;min-width:0}
+.cbig-h{text-align:right}.cbig-a{text-align:left}
+.cbig small{color:var(--muted);font-weight:700;font-size:.9rem;text-align:center;text-transform:uppercase;letter-spacing:.08em}
 @keyframes cbpop{0%{transform:scale(3) rotate(-15deg);opacity:0}100%{transform:scale(1) rotate(-4deg);opacity:1}}
 @keyframes cbglow{0%,100%{box-shadow:0 0 70px rgba(182,242,58,.65)}50%{box-shadow:0 0 120px rgba(182,242,58,.95)}}
 @keyframes cbg{0%,82%{opacity:1}100%{opacity:0}}
@@ -1142,7 +1145,7 @@ function thud(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)(
 /* σωστό σκορ: μεγάλο πανηγύρι σε όλη την οθόνη (απόφαση Owner: «ακόμα πιο έντονο») */
 function calledBig(m){
   var o=document.createElement("div");o.className="cbig";o.setAttribute("role","status");
-  o.innerHTML='<div class="cbig-in"><span class="cbig-t">🎯 <span>We called the score!</span></span><b class="mono">'+esc(m.score||"")+'</b><small>'+esc(m.home)+' v '+esc(m.away)+'</small></div>';
+  o.innerHTML='<div class="cbig-in"><span class="cbig-t">🎯 <span>We called the score!</span></span><span class="cbig-m"><span class="cbig-h">'+esc(m.home)+'</span><b class="mono">'+esc(m.score||"")+'</b><span class="cbig-a">'+esc(m.away)+'</span></span><small>'+esc(m.country)+' · '+esc(m.league)+'</small></div>';
   document.body.appendChild(o);
   var W=window.innerWidth,H=window.innerHeight;
   [[W*.5,H*.4],[W*.15,H*.7],[W*.85,H*.7]].forEach(function(p,i){setTimeout(function(){confetti(p[0],p[1],true);},i*250);});
