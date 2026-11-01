@@ -16,7 +16,8 @@ const DONE = new Set(["FT", "AET", "PEN"]);
 // Χώρες όπου το online στοίχημα είναι 21+ (Ελλάδα: ν. 4002/2011 όπως ισχύει). Εκεί δείχνουμε «21+» αντί «18+».
 // Σε αμφίβολες περιπτώσεις βάζουμε το αυστηρότερο. Τα ελληνικά δείχνουν πάντα 21+ (και για τον Googlebot).
 const AGE21 = new Set(["GR", "EE", "LV", "LT", "BE", "US"]);
-const age21 = (req, lang) => lang === "el" || AGE21.has(req.cf?.country);
+// Κύπρος: ελληνόφωνη αλλά 18+ (Εθνική Αρχή Στοιχημάτων) — ο Κύπριος βλέπει 18+ και στα ελληνικά.
+const age21 = (req, lang) => (lang === "el" && req.cf?.country !== "CY") || AGE21.has(req.cf?.country);
 const PAGES = new Map(); // μνήμη σελίδων ανά γλώσσα
 const CSS = `
 :root{--bg:#0c0f0d;--c1:#141a16;--c2:#1b231e;--ln:#2a352e;--lime:#b6f23a;--gold:#e8b931;--tx:#e9efe9;--mu:#8b9a90}

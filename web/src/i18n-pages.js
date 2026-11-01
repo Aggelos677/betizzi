@@ -337,12 +337,14 @@ If you think you may be harming yourself or are in danger, call your local emerg
 
 ## Πού θα βρεις βοήθεια
 - Ελλάδα: Γραμμή βοήθειας ΚΕΘΕΑ **210 9237777** · [kethea.gr](https://www.kethea.gr).
-- Κύπρος: [Εθνική Αρχή Στοιχημάτων](https://nba.gov.cy).
+- Κύπρος: [safergambling.gov.cy](https://safergambling.gov.cy) (υπεύθυνο παιχνίδι, Εθνική Πλατφόρμα Αυτοαποκλεισμού) · [Εθνική Αρχή Στοιχημάτων](https://nba.gov.cy).
 - [Gambling Therapy](https://www.gamblingtherapy.org) — δωρεάν, εμπιστευτική υποστήριξη online.
 - [Find a Helpline](https://findahelpline.com) — δωρεάν τοπικές γραμμές βοήθειας στη χώρα σου.
 
 ## Παίξε νόμιμα
 Στην Ελλάδα παίξε μόνο σε εταιρείες με άδεια της ΕΕΕΠ (Επιτροπή Εποπτείας και Ελέγχου Παιγνίων). Τη λίστα θα τη βρεις στο [hgc.gov.gr](https://www.hgc.gov.gr). Όλες οι νόμιμες εταιρείες δίνουν όρια κατάθεσης και αυτοαποκλεισμό.
+
+Στην Κύπρο παίξε μόνο σε εταιρείες με άδεια της Εθνικής Αρχής Στοιχημάτων (ΕΑΣ)· τη λίστα θα τη βρεις στο [nba.gov.cy](https://nba.gov.cy). Στην Κύπρο το όριο ηλικίας είναι 18 ετών και το online καζίνο δεν επιτρέπεται.
 
 Αν νομίζεις ότι κινδυνεύεις, κάλεσε τον αριθμό έκτακτης ανάγκης της χώρας σου.`,
       es: `betizzi es solo para adultos: al menos 18 años, o 21 donde la ley lo exija (por ejemplo, Grecia). Los tips son opiniones basadas en estadísticas, no una garantía. Cada selección extra en una combinada reduce su probabilidad de ganar.
