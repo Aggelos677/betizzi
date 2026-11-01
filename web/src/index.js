@@ -12,6 +12,7 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const LIVE = new Set(["1H", "2H", "HT", "ET", "BT", "P", "LIVE"]);
 const DONE = new Set(["FT", "AET", "PEN"]);
 
+const PAGES = new Map(); // μνήμη σελίδων ανά γλώσσα
 const CSS = `
 :root{--bg:#0c0f0d;--c1:#141a16;--c2:#1b231e;--ln:#2a352e;--lime:#b6f23a;--gold:#e8b931;--tx:#e9efe9;--mu:#8b9a90}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 Manrope,system-ui,sans-serif}
@@ -51,7 +52,7 @@ function ymdIn(tz, ts = Date.now()) {
 }
 
 export default {
-  async fetch(req, env) {
+  async fetch(req, env, ctx) {
     const url = new URL(req.url);
     const p = url.pathname;
     if (p === "/") return Response.redirect(url.origin + "/en/", 301);
@@ -61,7 +62,14 @@ export default {
     }
     const m = p.match(/^\/([a-z]{2})\/$/);
     if (m && LANGS.includes(m[1])) {
-      try { return html(await todayPage(env, m[1], url)); }
+      // Γρήγορη φόρτωση: έτοιμη σελίδα από τη μνήμη (έως 60΄΄), ανανέωση στο παρασκήνιο.
+      // Τα live σκορ έρχονται έτσι κι αλλιώς από το /live.json κάθε 30΄΄.
+      const key = m[1] + (url.searchParams.has("demo") ? "?demo" : "");
+      const hit = PAGES.get(key), age = hit ? Date.now() - hit.t : Infinity;
+      const build = () => todayPage(env, m[1], url).then((b) => { PAGES.set(key, { t: Date.now(), b }); return b; });
+      if (hit && age < 60000) return html(hit.b);
+      if (hit && age < 15 * 60000) { ctx.waitUntil(build().catch(() => {})); return html(hit.b); }
+      try { return html(await build()); }
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
     }
     const mm = p.match(/^\/([a-z]{2})\/([a-z0-9-]+)-(\d{4}-\d{2}-\d{2})-(\d+)$/);
