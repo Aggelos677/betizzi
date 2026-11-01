@@ -12,6 +12,10 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const LIVE = new Set(["1H", "2H", "HT", "ET", "BT", "P", "LIVE"]);
 const DONE = new Set(["FT", "AET", "PEN"]);
 
+// Χώρες όπου το online στοίχημα είναι 21+ (Ελλάδα: ν. 4002/2011 όπως ισχύει). Εκεί δείχνουμε «21+» αντί «18+».
+// Σε αμφίβολες περιπτώσεις βάζουμε το αυστηρότερο. Τα ελληνικά δείχνουν πάντα 21+ (και για τον Googlebot).
+const AGE21 = new Set(["GR", "EE", "LV", "LT", "BE", "US"]);
+const age21 = (req, lang) => lang === "el" || AGE21.has(req.cf?.country);
 const PAGES = new Map(); // μνήμη σελίδων ανά γλώσσα
 const CSS = `
 :root{--bg:#0c0f0d;--c1:#141a16;--c2:#1b231e;--ln:#2a352e;--lime:#b6f23a;--gold:#e8b931;--tx:#e9efe9;--mu:#8b9a90}
@@ -69,9 +73,10 @@ export default {
       const key = m[1] + (url.searchParams.has("demo") ? "?demo" : "") + (dq ? "|" + dq : "");
       const hit = PAGES.get(key), age = hit ? Date.now() - hit.t : Infinity;
       const build = () => todayPage(env, m[1], url).then((b) => { PAGES.set(key, { t: Date.now(), b }); return b; });
-      if (hit && age < 60000) return html(hit.b);
-      if (hit && age < 15 * 60000) { ctx.waitUntil(build().catch(() => {})); return html(hit.b); }
-      try { return html(await build()); }
+      const a21 = age21(req, m[1]);
+      if (hit && age < 60000) return html(hit.b, 200, a21);
+      if (hit && age < 15 * 60000) { ctx.waitUntil(build().catch(() => {})); return html(hit.b, 200, a21); }
+      try { return html(await build(), 200, a21); }
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
     }
     const mm = p.match(/^\/([a-z]{2})\/([a-z0-9-]+)-(\d{4}-\d{2}-\d{2})-(\d+)$/);
@@ -80,15 +85,15 @@ export default {
       if (!x) return html("<!doctype html><title>404</title>", 404);
       const want = matchPath(mm[1], x);
       if (want !== p) return Response.redirect(url.origin + want, 301); // σταθερό id, το slug διορθώνεται
-      return html(matchPage(mm[1], x));
+      return html(matchPage(mm[1], x), 200, age21(req, mm[1]));
     }
     const rm = p.match(/^\/([a-z]{2})\/([a-z-]+)(?:\/(\d{4}-\d{2}|all))?$/);
     if (rm && LANGS.includes(rm[1]) && Object.values(REC).some((r) => r.slug === rm[2])) {
       if (rm[2] !== REC[rm[1]].slug) return Response.redirect(url.origin + `/${rm[1]}/${REC[rm[1]].slug}${rm[3] ? "/" + rm[3] : ""}${url.search}`, 301);
       const mq = rm[3] || "", tq = ["free", "vip"].includes(url.searchParams.get("t")) ? url.searchParams.get("t") : "";
       const key = `rec|${rm[1]}|${mq}|${tq}`, hit = PAGES.get(key);
-      if (hit && Date.now() - hit.t < 5 * 60000) return html(hit.b);
-      try { const b = recordPage(rm[1], await getRecord(env), mq, tq); PAGES.set(key, { t: Date.now(), b }); return html(b); }
+      if (hit && Date.now() - hit.t < 5 * 60000) return html(hit.b, 200, age21(req, rm[1]));
+      try { const b = recordPage(rm[1], await getRecord(env), mq, tq); PAGES.set(key, { t: Date.now(), b }); return html(b, 200, age21(req, rm[1])); }
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
     }
     if (m === null && /^\/[a-z]{2}$/.test(p) && LANGS.includes(p.slice(1))) return Response.redirect(url.origin + p + "/", 301);
@@ -96,7 +101,8 @@ export default {
   },
 };
 
-function html(body, status = 200) {
+function html(body, status = 200, a21 = false) {
+  if (a21) body = body.replace(/18\+/g, "21+");
   return new Response(body, {
     status,
     headers: {

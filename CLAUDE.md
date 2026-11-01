@@ -49,7 +49,7 @@
 - AI crawlers: όλοι ανοιχτοί (μαζί με GPTBot), μόλις ανοίξει το site. Ο ιδιοκτήτης μπορεί να το αλλάξει.
 - Schema: SportsEvent, Organization (sameAs), BreadcrumbList, FAQPage, Dataset για το Record.
 - E-E-A-T: σελίδες About, Μεθοδολογία, Record, Υπεύθυνο παιχνίδι, Επικοινωνία, Affiliate disclosure, με όνομα/ημερομηνία ενημέρωσης.
-- Affiliate: `rel="sponsored nofollow"`, μόνο σε χώρες όπου ο bookmaker έχει άδεια. Ιταλία: κανένα affiliate/διαφήμιση στοιχήματος (Decreto Dignità). Ηλικία ανά χώρα (Ελλάδα: να επιβεβαιωθεί 21+).
+- Affiliate: `rel="sponsored nofollow"`, μόνο σε χώρες όπου ο bookmaker έχει άδεια. Ιταλία: κανένα affiliate/διαφήμιση στοιχήματος (Decreto Dignità). Ηλικία ανά χώρα: «21+» αντί «18+» σε Ελλάδα (επιβεβαιωμένο, ν. 4002/2011), Εσθονία, Λετονία, Λιθουανία, Βέλγιο, ΗΠΑ (λίστα AGE21 στο web/src/index.js, χώρα από Cloudflare). Τα ελληνικά δείχνουν πάντα 21+. Σε αμφιβολία, το αυστηρότερο.
 - Ποτέ λέξεις «σίγουρο», «κλειδωμένο», «εγγυημένο», «fixed».
 
 ## Κοινός λογαριασμός Cloudflare με MODIX90 (01/11/2026)
