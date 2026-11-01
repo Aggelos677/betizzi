@@ -594,7 +594,11 @@ MATCHES.forEach(function(m){
   if(!cand.length)M.forEach(function(row,i){row.forEach(function(p,j){if(i<=5&&j<=5&&fits(i,j))cand.push({s:i+"-"+j,p:p,g:i+j});});});
   cand.sort(function(a,c){return c.p-a.p;});var best=cand[0];
   var wild=cand.slice(2,9).filter(function(c){var q=c.s.split("-"),i=+q[0],j=+q[1];return c.g>=4&&c.p>=.012&&i>0&&j>0&&Math.abs(i-j)<=2;});
-  var pool=(L>=2.9&&wild.length&&R()<.45)?wild:cand.slice(0,3);
+  // τρελό σκορ μόνο αν το λένε ΚΑΙ η αγορά ΚΑΙ η φόρμα (μέσος όρος γκολ στα τελευταία 5 ≥ 3), ποτέ ισοπαλία πάνω από 2-2
+  var fg=(m.hfd||[]).concat(m.afd||[]).map(function(g){var q=String(g[1]||"").split("-");return q.length===2?(+q[0])+(+q[1]):null;}).filter(function(v){return v!=null&&!isNaN(v);});
+  var formGoals=fg.length?fg.reduce(function(a,b){return a+b;},0)/fg.length:null;
+  wild=wild.filter(function(c){var q=c.s.split("-");return q[0]!==q[1]||+q[0]<=2;});
+  var pool=(L>=2.9&&(formGoals==null||formGoals>=3)&&wild.length&&R()<.45)?wild:cand.slice(0,3);
   var sum=pool.reduce(function(a,c){return a+c.p;},0),x=R()*sum;m.bz=pool[0]?pool[0].s:"";
   for(var k=0;k<pool.length;k++){x-=pool[k].p;if(x<=0){m.bz=pool[k].s;break;}}
   m.bzTop=best?best.s:"";
