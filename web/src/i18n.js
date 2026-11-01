@@ -396,5 +396,9 @@ export const UI = {
   "From our tips basket": ["Από το καλάθι με τα tips μας", "De nuestra cesta de tips", "Da nossa cesta de tips", "Depuis notre panier de tips", "Aus unserem Tipp-Korb", "Din coșul nostru de ponturi", "Iz naše korpe tipova", "От нашата кошница с прогнози"],
   "Your slip is built only from these, never at random.": ["Το δελτίο σου φτιάχνεται μόνο από αυτά, ποτέ στην τύχη.", "Tu apuesta se arma solo con estos, nunca al azar.", "Seu bilhete é montado só com estes, nunca ao acaso.", "Ton ticket est construit uniquement avec eux, jamais au hasard.", "Dein Schein entsteht nur daraus, nie zufällig.", "Biletul tău se face doar din acestea, niciodată la întâmplare.", "Tvoj tiket se pravi samo od njih, nikad nasumično.", "Фишът ти се прави само от тях, никога случайно."],
   "Every pick is one of our tips": ["Κάθε επιλογή είναι tip μας", "Cada selección es un tip nuestro", "Cada escolha é um tip nosso", "Chaque choix est un de nos tips", "Jede Auswahl ist ein Tipp von uns", "Fiecare selecție e un pont de-al nostru", "Svaki izbor je naš tip", "Всеки избор е наша прогноза"],
+  "Yesterday": ["Χθες", "Ayer", "Ontem", "Hier", "Gestern", "Ieri", "Juče", "Вчера"],
+  "Today": ["Σήμερα", "Hoy", "Hoje", "Aujourd'hui", "Heute", "Azi", "Danas", "Днес"],
+  "Tomorrow": ["Αύριο", "Mañana", "Amanhã", "Demain", "Morgen", "Mâine", "Sutra", "Утре"],
+  "Pick your leagues in Build → My leagues": ["Διάλεξε τα πρωταθλήματά σου στο Φτιάξε → Τα πρωταθλήματά μου", "Elige tus ligas en Crear → Mis ligas", "Escolha suas ligas em Montar → Minhas ligas", "Choisis tes ligues dans Créer → Mes ligues", "Wähle deine Ligen unter Bauen → Meine Ligen", "Alege-ți ligile în Creează → Ligile mele", "Izaberi lige u Napravi → Moje lige", "Избери лигите си в Създай → Моите лиги"],
   "Upcoming": ["Επόμενοι", "Próximos", "Próximos", "À venir", "Demnächst", "Urmează", "Predstoje", "Предстоящи"],
 };

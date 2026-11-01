@@ -64,7 +64,8 @@ export default {
     if (m && LANGS.includes(m[1])) {
       // Γρήγορη φόρτωση: έτοιμη σελίδα από τη μνήμη (έως 60΄΄), ανανέωση στο παρασκήνιο.
       // Τα live σκορ έρχονται έτσι κι αλλιώς από το /live.json κάθε 30΄΄.
-      const key = m[1] + (url.searchParams.has("demo") ? "?demo" : "");
+      const dq = url.searchParams.get("d") || "";
+      const key = m[1] + (url.searchParams.has("demo") ? "?demo" : "") + (dq ? "|" + dq : "");
       const hit = PAGES.get(key), age = hit ? Date.now() - hit.t : Infinity;
       const build = () => todayPage(env, m[1], url).then((b) => { PAGES.set(key, { t: Date.now(), b }); return b; });
       if (hit && age < 60000) return html(hit.b);
@@ -98,13 +99,30 @@ function html(body, status = 200) {
 
 async function todayPage(env, lang, url) {
   const t = T[lang], tz = TZ[lang];
-  const date = ymdIn(tz);
-  const day = await getDay(env, date);
-  // ο engine μετράει μέρα σε UTC· κρατάμε τους αγώνες που πέφτουν σήμερα στην ώρα της χώρας
-  const matches = day.matches.filter((x) => ymdIn(tz, x.ts * 1000) === date);
+  const today = ymdIn(tz);
+  // ?d=ΗΗΗΗ-ΜΜ-ΗΗ: από 7 μέρες πίσω έως 2 μπροστά (ο engine έχει αγώνες για 3 μέρες)
+  const shift = (d, n) => { const [y, mo, da] = d.split("-").map(Number); return new Date(Date.UTC(y, mo - 1, da + n)).toISOString().slice(0, 10); };
+  const dq = url.searchParams.get("d");
+  const okD = dq && /^\d{4}-\d{2}-\d{2}$/.test(dq) && dq >= shift(today, -7) && dq <= shift(today, 2);
+  const date = okD ? dq : today, isToday = date === today;
+  // ο engine μετράει μέρα σε UTC: παίρνουμε και τη γειτονική μέρα UTC, για να μη χάνονται αγώνες τα ξημερώματα
+  const [y0, m0, d0] = date.split("-").map(Number);
+  const nb = ymdIn(tz, Date.UTC(y0, m0 - 1, d0)) === date ? shift(date, -1) : shift(date, 1);
+  const [day, day2] = await Promise.all([getDay(env, date), getDay(env, nb).catch(() => null)]);
+  const seen = new Set(), all = [];
+  for (const x of [...day.matches, ...(day2 ? day2.matches : [])]) if (!seen.has(x.id)) { seen.add(x.id); all.push(x); }
+  // κρατάμε τους αγώνες που πέφτουν αυτή τη μέρα στην ώρα της χώρας
+  const matches = all.filter((x) => ymdIn(tz, x.ts * 1000) === date);
+  const noon = Date.UTC(y0, m0 - 1, d0, 12);
+  const title = isToday ? t.title : t.title.replace(/\s+\S+$/, "");
+  const nav = [-1, 0, 1, 2].map((n) => {
+    const d = shift(today, n), [yy, mm, dd] = d.split("-").map(Number), ts = Date.UTC(yy, mm - 1, dd, 12);
+    const lbl = n === -1 ? "Yesterday" : n === 0 ? "Today" : n === 1 ? "Tomorrow" : new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "short", day: "numeric", month: "numeric" }).format(ts);
+    return { d, n, lbl, href: n === 0 ? `/${lang}/` : `/${lang}/?d=${d}` };
+  });
   const tipsFree = matches.reduce((a, x) => a + x.tips.filter((y) => y.tier === "free").length, 0);
   const tipsVip = matches.reduce((a, x) => a + x.tips.filter((y) => y.tier === "vip").length, 0);
-  const dLong = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, day: "numeric", month: "long", year: "numeric" }).format(Date.now());
+  const dLong = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(noon);
   const hm = (ts) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(ts * 1000);
 
   // ομαδοποίηση ανά λίγκα
@@ -146,7 +164,7 @@ async function todayPage(env, lang, url) {
     return open ? `<section class="lg">${head}${body}</section>` : `<details class="lg"><summary>${head}</summary>${body}</details>`;
   }).join("");
 
-  const canonical = `${SITE}/${lang}/`;
+  const canonical = isToday ? `${SITE}/${lang}/` : `${SITE}/${lang}/?d=${date}`;
   const alt = LANGS.map((l) => `<link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE}/${l}/">`).join("") + `<link rel="alternate" hreflang="x-default" href="${SITE}/en/">`;
   const answer = t.answer(dLong, matches.length, tipsFree, tipsVip);
   const nowIso = new Date().toISOString();
@@ -154,7 +172,7 @@ async function todayPage(env, lang, url) {
   const ld = [
     { "@context": "https://schema.org", "@type": "Organization", "@id": SITE + "/#org", name: "betizzi", url: SITE, logo: SITE + "/logo.png", description: t.desc },
     {
-      "@context": "https://schema.org", "@type": "WebPage", name: `${t.title} — ${dLong}`, url: canonical, inLanguage: HREFLANG[lang], dateModified: nowIso,
+      "@context": "https://schema.org", "@type": "WebPage", name: `${title} — ${dLong}`, url: canonical, inLanguage: HREFLANG[lang], dateModified: nowIso,
       publisher: { "@id": SITE + "/#org" }, description: answer,
       mainEntity: {
         "@type": "ItemList", numberOfItems: tipped.length,
@@ -171,13 +189,13 @@ async function todayPage(env, lang, url) {
   ];
   const langNav = LANGS.map((l) => `<a href="/${l}/" hreflang="${HREFLANG[l]}"${l === lang ? ' aria-current="page"' : ""}>${l.toUpperCase()}</a>`).join("");
 
-  const ssr = `<h1 class="ssrh">${esc(t.title)}</h1><p class="ssra">${esc(answer)}</p>`;
-  const head = `<title>${esc(t.title)} — ${esc(dLong)} | betizzi</title>
+  const ssr = `<h1 class="ssrh">${esc(title)}</h1><p class="ssra">${esc(answer)}</p>`;
+  const head = `<title>${esc(title)} — ${esc(dLong)} | betizzi</title>
 <meta name="description" content="${esc(t.desc)}">
 <link rel="canonical" href="${canonical}">
 ${alt}
 <meta property="og:type" content="website"><meta property="og:site_name" content="betizzi">
-<meta property="og:title" content="${esc(t.title)} — ${esc(dLong)}"><meta property="og:description" content="${esc(answer)}">
+<meta property="og:title" content="${esc(title)} — ${esc(dLong)}"><meta property="og:description" content="${esc(answer)}">
 <meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>
 <style>.ssrh{font:800 1.15rem/1.15 "Fira Sans Extra Condensed",sans-serif;margin:4px 0 2px;text-transform:none;letter-spacing:0}.ssra{font-size:.8rem;color:var(--muted);margin:0 0 8px}
@@ -189,12 +207,12 @@ ${alt}
   tpl = tpl.replace('<html lang="en">', `<html lang="${HREFLANG[lang]}">`)
     .replace(/<title>[\s\S]*?<\/title>/, () => head)
     .replace(/var RAW = \[[\s\S]*?\];\n/, () => "var RAW = " + JSON.stringify(raw).replace(/</g, "\\u003c") + ";\n")
-    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";")
+    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";")
     .replace('<div class="hscroll" id="mFilter"', () => ssr + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml)
     .replace("<!--datanote-->", () => `<nav class="langs" aria-label="Language">${langNav}</nav>`);
   // μετάφραση της εφαρμογής + σωστή ημερομηνία στη γλώσσα της σελίδας
-  const dShort = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, weekday: "long", day: "numeric", month: "long" }).format(Date.now());
+  const dShort = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "long", day: "numeric", month: "long" }).format(noon);
   tpl = tpl.replace('"today").textContent="Sunday 1 November"', () => '"today").textContent=' + JSON.stringify(dShort));
   if (lang !== "en") {
     const i = UI_ORDER.indexOf(lang), dict = {};

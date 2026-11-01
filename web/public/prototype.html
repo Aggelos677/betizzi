@@ -435,6 +435,19 @@ body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
   .side .card{margin:0}
 }
 
+/* φίλτρα σε δύο γραμμές */
+.frows{display:flex;flex-direction:column;gap:8px}
+#mFilter a.chip,#lFilter a.chip{text-decoration:none;display:inline-flex;align-items:center}
+.chip .ldot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--bad);margin-right:6px;animation:ldot 1.6s infinite}
+.livechip{border-color:rgba(255,107,107,.5)}
+.calchip{min-width:44px}
+.fsep{flex:none;width:1px;align-self:stretch;background:var(--line);margin:4px 4px}
+.chip.tog{font-size:.8rem}
+.daystrip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.daystrip::-webkit-scrollbar{display:none}
+.dayb{flex:none;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:64px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);color:var(--fg);text-decoration:none;font:700 .82rem var(--f-body)}
+.dayb small{font-size:.68rem;color:var(--muted)}
+.dayb.on{border-color:rgba(182,242,58,.55);background:var(--lime-soft);color:var(--lime)}
 /* γλώσσες */
 header{position:relative}
 .langs{display:flex;gap:4px;flex-wrap:wrap;font:700 .72rem var(--f-mono)}
@@ -512,7 +525,7 @@ header{position:relative}
 
   <!-- MATCHES -->
   <div id="view-matches" role="tabpanel" aria-labelledby="tab-matches" class="wrap" style="gap:12px">
-    <div class="hscroll" id="mFilter" role="group" aria-label="Filter matches"></div>
+    <div class="frows"><div class="hscroll" id="mFilter" role="group" aria-label="Day"></div><div class="daystrip" id="dayStrip" hidden></div><div class="hscroll" id="lFilter" role="group" aria-label="Leagues"></div></div>
     <div class="demorow"><button type="button" class="btn sec" id="demoSmall">⚽ Goal</button><button type="button" class="btn sec" id="demoGoal">💰 Goal lands tip</button><button type="button" class="btn sec" id="demoCalled">🎯 Called it</button></div>
     <input class="search" id="q" type="search" placeholder="Search team or league" aria-label="Search team or league">
     <div class="legend"><span>Last 5, older → newer:</span><span><span class="fb"><i class="fW"></i></span> Win</span><span><span class="fb"><i class="fD"></i></span> Draw</span><span><span class="fb"><i class="fL"></i></span> Loss</span></div>
@@ -944,14 +957,37 @@ function tierTag(t){return t.tier==="vip"?'<span class="tag vip">VIP</span>':'<s
 
 /* ---------- matches ---------- */
 var mFilter="all", q="";
-var FILTERS=[["all","All"],["called","🎯 Called"],["tips","With tip"],["top","Top 30"],["live","Live"],["upcoming","Upcoming"]];
-function countFilter(f){return MATCHES.filter(function(m){return passF(m,f);}).length;}
+/* φίλτρα: γραμμή 1 = χρόνος (Live · Σήμερα · Αύριο · 📅), γραμμή 2 = λίγκες (Top 5 · Top 30 · Όλα · Οι δικές μου) │ Με tip · 🎯 */
+var DN=(typeof DAYNAV!=="undefined"&&DAYNAV)||{date:"",today:"",nav:[]},IS_TODAY=!DN.date||DN.date===DN.today;
+var lFil=load("ko-lfil","all");if(["top5","top30","all","mine"].indexOf(lFil)<0)lFil="all";
+var tipF=false,calF=false,stripOpen=false;
+function isTop5(k){return TOP5.indexOf(k)>=0||k==="Spain|La Liga";}
+function passL(m,l){if(l==="top5")return isTop5(m.key);if(l==="top30")return topIx(m.key)<999;if(l==="mine")return typeof bLg!=="undefined"&&bLg.has(m.key);return true;}
 function passF(m,f){ if(f==="called")return !!m.hit; if(f==="tips")return m.tips.length>0; if(f==="top")return topIx(m.key)<999; if(f==="live")return m.live; if(f==="upcoming")return m.open; return true; }
+function passAll(m,o){o=o||{};var tf=o.t!=null?o.t:mFilter,lf=o.l!=null?o.l:lFil,tp=o.tip!=null?o.tip:tipF,cf=o.c!=null?o.c:calF;
+  return (tf!=="live"||m.live)&&passL(m,lf)&&(!tp||m.tips.length>0)&&(!cf||m.hit);}
+function countFilter(f){return MATCHES.filter(function(m){return passF(m,f);}).length;}
+function cnt(o){return MATCHES.filter(function(m){return passAll(m,o);}).length;}
+function chipEl(html,on,fn,cls,href){var b=document.createElement(href?"a":"button");if(href)b.href=href;else b.type="button";b.className="chip"+(cls?" "+cls:"");b.setAttribute("aria-pressed",on?"true":"false");b.innerHTML=html;if(fn)b.addEventListener("click",fn);return b;}
 function renderFilters(){
   var nl=MATCHES.filter(function(m){return m.live;}).length,lb=$("liveBdg");lb.hidden=!nl;lb.textContent=nl+" live";
   var box=$("mFilter");box.innerHTML="";
-  FILTERS.forEach(function(f){if(f[0]==="called"&&!countFilter("called"))return;var b=document.createElement("button");if(f[0]==="called")b.className="chip calledchip";b.type="button";b.className="chip";b.setAttribute("aria-pressed",mFilter===f[0]?"true":"false");
-    b.innerHTML=esc(f[1])+' <span class="c">'+countFilter(f[0])+'</span>';b.addEventListener("click",function(){mFilter=f[0];renderFilters();renderMatches();});box.appendChild(b);});
+  if(IS_TODAY&&nl)box.appendChild(chipEl('<span class="ldot"></span>Live <span class="c">'+cnt({t:"live"})+'</span>',mFilter==="live",function(){mFilter=mFilter==="live"?"all":"live";renderFilters();renderMatches();},"livechip"));
+  DN.nav.forEach(function(d){if(d.n!==0&&d.n!==1)return;var on=d.d===DN.date&&mFilter!=="live";
+    box.appendChild(chipEl('<span>'+esc(d.lbl)+'</span>'+(on?' <span class="c">'+cnt({t:"all"})+'</span>':''),on,on?function(e){e.preventDefault();mFilter="all";renderFilters();renderMatches();}:null,"",on?"#":d.href));});
+  var other=DN.nav.filter(function(d){return d.d===DN.date&&d.n!==0&&d.n!==1;})[0];
+  if(other)box.appendChild(chipEl('<span>'+esc(other.lbl)+'</span> <span class="c">'+cnt({t:"all"})+'</span>',true,null,""));
+  box.appendChild(chipEl("📅",stripOpen,function(){stripOpen=!stripOpen;renderFilters();},"calchip"));
+  var st=$("dayStrip");st.hidden=!stripOpen;
+  st.innerHTML=DN.nav.map(function(d){return '<a class="dayb'+(d.d===DN.date?' on':'')+'" href="'+esc(d.href)+'"><span>'+esc(d.lbl)+'</span><small class="mono">'+esc(d.d.slice(8,10)+"/"+d.d.slice(5,7))+'</small></a>';}).join("");
+  var lb2=$("lFilter");lb2.innerHTML="";
+  [["top5","Top 5"],["top30","Top 30"],["all","All"],["mine","My leagues"]].forEach(function(f){
+    lb2.appendChild(chipEl('<span>'+esc(f[1])+'</span> <span class="c">'+cnt({l:f[0]})+'</span>',lFil===f[0],function(){
+      if(f[0]==="mine"&&(typeof bLg==="undefined"||!bLg.size)){toast("Pick your leagues in Build → My leagues");return;}
+      lFil=f[0];store("ko-lfil",lFil);renderFilters();renderMatches();}));});
+  var sep=document.createElement("span");sep.className="fsep";sep.setAttribute("aria-hidden","true");lb2.appendChild(sep);
+  lb2.appendChild(chipEl('<span>With tip</span> <span class="c">'+cnt({tip:true})+'</span>',tipF,function(){tipF=!tipF;renderFilters();renderMatches();},"tog"));
+  var nc=cnt({c:true});if(nc)lb2.appendChild(chipEl('<span>🎯 Called</span> <span class="c">'+nc+'</span>',calF,function(){calF=!calF;renderFilters();renderMatches();},"tog calledchip"));
 }
 /* live: is a tip already settled? Over/GG can land before full time; Under/NG can be lost early */
 function tipState(t,m){
@@ -1009,7 +1045,7 @@ function detailHTML(m){
   return h;
 }
 function renderMatches(){
-  var list=MATCHES.filter(function(m){return passF(m,mFilter);});
+  var list=MATCHES.filter(function(m){return passAll(m);});
   if(q){var s=q.toLowerCase();list=list.filter(function(m){return (m.home+" "+m.away+" "+m.league+" "+m.country).toLowerCase().indexOf(s)>=0;});}
   if(!list.length){$("matchList").innerHTML='<div class="empty" style="border:0">No matches for this filter.</div>';return;}
   var h="",cur="";
