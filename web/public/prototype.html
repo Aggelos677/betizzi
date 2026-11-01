@@ -892,13 +892,18 @@ function renderSide(){var p=$("sidePanel");if(!p)return;renderClose();var tab=cu
 }
 var CLPREV={};
 function clState(t,m){var sc=(m.score||"0-0").split("-").map(Number),h=sc[0]||0,a=sc[1]||0,g=h+a,min=m.min||0,s=t.sel||"",n;
-  if((n=s.match(/^Over ([\d.]+)/))){var L=parseFloat(n[1]);return g>L?"won":(L-g<1?"close":"wait");}
-  if(s==="GG")return h>0&&a>0?"won":(h>0||a>0?"close":"wait");
-  var hold=s==="Home"?h>a:s==="Away"?a>h:s==="Draw"?h===a:s==="1X"?h>=a:s==="X2"?a>=h:s==="12"?h!==a:(n=s.match(/^Under ([\d.]+)/))?g<parseFloat(n[1]):s==="NG"?(h===0||a===0):false;
-  return hold&&min>=70?"close":"wait";}
+  /* κοντά στη νίκη: Over → θέλει 1 γκολ και είμαστε ως το 60΄ · 1/X/2 → το σκορ μας ευνοεί από το 85΄ · Under → θέλει έως 1 γκολ ακόμα «χώρο» από το 85΄
+     GG → η μία έχει σκοράρει ως το 60΄ · NG → 0-0 μετά το 60΄ ή σκόραρε μόνο η μία από το 85΄ */
+  if((n=s.match(/^Over ([\d.]+)/))){var L=parseFloat(n[1]);return g>L?"won":(g===L-0.5&&min<=60?"close":"wait");}
+  if(s==="GG")return h>0&&a>0?"won":((h>0||a>0)&&min<=60?"close":"wait");
+  if((n=s.match(/^Under ([\d.]+)/)))return g<parseFloat(n[1])-1&&min>=85?"close":"wait";
+  if(s==="NG")return (g===0&&min>60)||((h===0||a===0)&&g>0&&min>=85)?"close":"wait";
+  var hold=s==="Home"?h>a:s==="Away"?a>h:s==="Draw"?h===a:s==="1X"?h>=a:s==="X2"?a>=h:s==="12"?h!==a:false;
+  return hold&&min>=85?"close":"wait";}
 function renderClose(){var box=$("closeBox");if(!box)return;var it=[],ms={};
   MATCHES.forEach(function(m){if(!m.live)return;m.tips.forEach(function(t){if(!t.sel||(t.tier==="vip"&&!vipMember))return;ms[m.id]=1;it.push({m:m,t:t,s:clState(t,m)});});});
-  if(Object.keys(ms).length<3){box.hidden=true;return;}
+  it=it.filter(function(x){return x.s!=="wait";});
+  if(Object.keys(ms).length<3||!it.length){box.hidden=true;return;}
   var rk={won:0,close:1,wait:2};it.sort(function(a,b){return rk[a.s]-rk[b.s]||(b.m.min||0)-(a.m.min||0);});it=it.slice(0,6);
   var fresh=[];
   var h=it.map(function(x){var k=x.m.id+"|"+x.t.sel,jw=x.s==="won"&&CLPREV[k]&&CLPREV[k]!=="won";if(jw)fresh.push(k);CLPREV[k]=x.s;
