@@ -534,7 +534,7 @@ header{position:relative}
   </div>
 
   <!-- TIPS -->
-  <aside id="sidePanel" class="side" aria-label="Side panel"><section class="card closebox" id="closeBox" hidden><div class="secthead"><h2>Close to winning</h2><span class="livedot" aria-hidden="true"></span></div><div id="closeList"></div></section><section class="card" data-side="coupons"><div class="secthead"><h2>Parlay picks today</h2></div><div id="bzcSide" class="bzc-list"></div></section><section class="card" data-side="tips" hidden><div class="secthead"><h2>Our biggest wins today</h2></div><div id="winsSide" style="display:flex;flex-direction:column;gap:10px"></div></section><section class="card" data-side="build" hidden><div class="secthead"><h2>My slip</h2></div><div id="slipSide" style="display:flex;flex-direction:column;gap:12px"></div></section></aside>
+  <aside id="sidePanel" class="side" aria-label="Side panel"><section class="card closebox" id="closeBox" hidden><div class="secthead"><h2>Cash it in!</h2><span class="livedot" aria-hidden="true"></span></div><div id="closeList"></div></section><section class="card" data-side="coupons"><div class="secthead"><h2>Parlay picks today</h2></div><div id="bzcSide" class="bzc-list"></div></section><section class="card" data-side="tips" hidden><div class="secthead"><h2>Our biggest wins today</h2></div><div id="winsSide" style="display:flex;flex-direction:column;gap:10px"></div></section><section class="card" data-side="build" hidden><div class="secthead"><h2>My slip</h2></div><div id="slipSide" style="display:flex;flex-direction:column;gap:12px"></div></section></aside>
   <div id="view-tips" role="tabpanel" aria-labelledby="tab-tips" class="wrap" hidden>
     <label class="sw" hidden><input type="checkbox" id="vipMember"> Show as registered user (untick to see what a visitor sees)</label>
     <section class="card" aria-labelledby="bzc-title"><div class="secthead"><h2 id="bzc-title">Parlay picks today</h2><span class="tag lime" id="bzcCount"></span></div><div id="bzcList" class="bzc-list"></div></section>
@@ -925,18 +925,19 @@ function clState(t,m){var sc=(m.score||"0-0").split("-").map(Number),h=sc[0]||0,
 var WONAT={};
 function renderClose(){var box=$("closeBox");if(!box)return;var it=[],now=Date.now(),fresh=[];
   /* όλα τα live tips: κρατάμε την προηγούμενη κατάσταση για να πιάσουμε τη στιγμή που ένα tip «μπαίνει» */
-  MATCHES.forEach(function(m){if(!m.live)return;m.tips.forEach(function(t){if(!t.sel)return; /* VIP: φαίνονται όταν τα ανοίξει ο server (10΄ μετά τη σέντρα) */
-    var k=m.id+"|"+t.sel,s=clState(t,m);
+  /* απόφαση Owner: μόνο tips που ΜΟΛΙΣ κέρδισαν, είτε πριν τη λήξη (Over/GG) είτε στο τέλος του αγώνα. Χωρίς «Κοντά». */
+  MATCHES.forEach(function(m){if(!m.live&&!m.done)return;m.tips.forEach(function(t){if(!t.sel)return; /* VIP: φαίνονται όταν τα ανοίξει ο server (10΄ μετά τη σέντρα) */
+    var k=m.id+"|"+t.sel,s=m.done?(tipState(t,m)==="won"?"won":"lost"):(clState(t,m)==="won"?"won":"wait");
     if(s==="won"&&CLPREV[k]&&CLPREV[k]!=="won"&&!WONAT[k]){WONAT[k]=now;fresh.push(k);}
     CLPREV[k]=s;
     /* «Μπήκε»: ανεβαίνει δεξιά με εφέ τη στιγμή του γκολ και φεύγει μετά από 2΄ (απόφαση Owner) */
     if(s==="won"&&!(WONAT[k]&&now-WONAT[k]<120000))return;
-    if(s==="wait")return;
+    if(s!=="won")return;
     it.push({m:m,t:t,s:s,k:k});});});
   if(!it.length){box.hidden=true;return;}
-  var rk={won:0,close:1};it.sort(function(a,b){return rk[a.s]-rk[b.s]||(b.m.min||0)-(a.m.min||0);});it=it.slice(0,6);
+  var rk={won:0,close:1};it.sort(function(a,b){return rk[a.s]-rk[b.s]||(WONAT[b.k]||0)-(WONAT[a.k]||0);});it=it.slice(0,6);
   var h=it.map(function(x){var jw=fresh.indexOf(x.k)>=0;
-    return '<div class="clrow '+x.s+(jw?' justwon':'')+'" data-k="'+esc(x.k)+'"><span class="clmin"><b>'+esc(x.m.score||"0-0")+'</b>'+(x.m.min||0)+'\'</span><span class="clm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+'</small></span><span class="clst"><span class="mono">'+(x.t.odds?x.t.odds.toFixed(2):'')+'</span>'+(x.s==="won"?'<span class="clbdg">✓ <span>Landed</span></span>':'<span class="clbdg"><span>Close</span></span>')+'</span></div>';}).join("");
+    return '<div class="clrow '+x.s+(jw?' justwon':'')+'" data-k="'+esc(x.k)+'"><span class="clmin"><b>'+esc(x.m.score||"0-0")+'</b>'+(x.m.done?'FT':(x.m.min||0)+"'")+'</span><span class="clm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+'</small></span><span class="clst"><span class="mono">'+(x.t.odds?x.t.odds.toFixed(2):'')+'</span>'+(x.s==="won"?'<span class="clbdg">✓ <span>Landed</span></span>':'<span class="clbdg"><span>Close</span></span>')+'</span></div>';}).join("");
   var L=$("closeList");if(L._h!==h||fresh.length){L._h=h;L.innerHTML=h;}box.hidden=false;
   fresh.forEach(function(k){var row=L.querySelector('[data-k="'+k.replace(/"/g,'\\"')+'"]');if(!row)return;
     for(var i=0;i<18;i++){var c=document.createElement("i");c.className="conf";c.style.background=["#b6f23a","#3ccf6e","#fff","#e8b931"][i%4];c.style.setProperty("--x",(Math.random()*-220)+"px");c.style.setProperty("--y",(Math.random()*90-45)+"px");c.style.animationDelay=(Math.random()*.2)+"s";row.appendChild(c);}
