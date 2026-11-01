@@ -449,6 +449,8 @@ body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 @keyframes cbg{0%,82%{opacity:1}100%{opacity:0}}
 body.cshake .wrap.app{animation:cshk .5s ease .15s}
 @keyframes cshk{0%,100%{transform:none}20%{transform:translate(-6px,2px)}40%{transform:translate(6px,-2px)}60%{transform:translate(-4px,1px)}80%{transform:translate(3px,0)}}
+.pnote{font-size:.78rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px;margin-top:2px;line-height:1.5}
+.pnote b{color:var(--fg)}.pnote .below{color:var(--warn)}
 /* ο bookmaker μου */
 .bkrow{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
 .bkchips .chip{min-height:36px;padding:6px 11px;font-size:.8rem}
@@ -641,7 +643,7 @@ var MATCHES = RAW.map(function(r){
     hf:r[11].split("").reverse().join(""),af:r[12].split("").reverse().join(""),hfd:(r[18]||[]).slice().reverse(),afd:(r[19]||[]).slice().reverse(),ex:r[20]||{},
     o:{h:r[13][0],x:r[13][1],a:r[13][2],o25:r[13][3],u25:r[13][4],gg:r[13][5],ng:r[13][6]},
     p:{h:r[14][0],x:r[14][1],a:r[14][2],o25:r[14][3],score:r[14][4]},
-    tips:r[15].map(function(t){return {sel:t[0],odds:t[1],tier:t[2],why:t[3],r:t[5],book:t[7]};})};
+    tips:r[15].map(function(t){return {sel:t[0],odds:t[1],tier:t[2],why:t[3],r:t[5],book:t[7],min:t[9]||0,at:t[10]||""};})};
   m.bk=r[21]||[];
   if(r[17])m.min=r[17]; m.live=m.type==="inprogress"; m.done=m.type==="finished"; m.open=m.type==="notstarted";
   return m;
@@ -687,6 +689,12 @@ function applyBook(){
     s.low=!!(my&&myBook!=="Pinnacle"&&p&&pin&&p<pin*LOWBK);});
   MATCHES.forEach(function(m){m.tips.forEach(function(t){if(t.best==null)t.best=t.odds;var s=t.key&&SEL[t.key];if(s&&t.best){t.odds=s.odd;t.nobk=s.nobk;t.low=s.low;t.pin=s.pin;}});});
 }
+/* απόφαση Owner: η τιμή του tip είναι η τιμή τη στιγμή της έκδοσης· κάτω από τον «πάτο» δεν το προτείνουμε */
+function priceNote(t){var ip=t.best!=null?t.best:t.odds;if(!ip)return "";
+  var h='<div class="pnote"><span>Price when issued</span> <b class="mono">'+ip.toFixed(2)+'</b>'+(t.at?' · '+esc(t.at):'');
+  if(t.min)h+='<br><span>We recommend it down to</span> <b class="mono">'+t.min.toFixed(2)+'</b>. <span>Below that we don\'t recommend it.</span>';
+  if(t.min&&t.odds&&t.odds<t.min)h+='<br><b class="below">⚠ <span>The price is now below our limit</span></b>';
+  return h+'</div>';}
 function oddTxt(t){return t.odds?t.odds.toFixed(2)+(t.low?' <i class="lowbk" title="Low price at your bookmaker">⚠</i>':''):"🔒";}
 function bookRowHTML(){return '<div class="bkrow"><span class="label">My bookmaker</span><div class="hscroll bkchips">'
   +[["best","Best price"]].concat(BOOKS.map(function(b){return [b,b];})).map(function(x){return '<button type="button" class="chip" data-book="'+esc(x[0])+'" aria-pressed="'+(myBook===x[0])+'">'+(x[0]==="best"?'<span>'+esc(x[1])+'</span>':esc(x[1]))+'</button>';}).join("")+'</div></div>';}
@@ -1091,7 +1099,7 @@ function detailHTML(m){
     var locked=t.tier==="vip"&&!vipMember&&!t.sel;
     h+='<div class="tipbox'+(t.tier==="vip"?' vip':'')+'"><div class="tiprow">'+tierTag(t)+'<span class="label">Our tip</span>'+resTag(t,m)+'</div>'
       +(locked?'<div class="tiprow"><span class="hint">This is a VIP tip.</span><button type="button" class="btn vipb" data-unlock="1">Sign up free</button></div>'
-      :'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+oddTxt(t)+'</span><span class="hint">'+esc(t.book)+'</span></div><div class="why">'+esc(t.why)+'</div>')+'</div>';
+      :'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+oddTxt(t)+'</span><span class="hint">'+esc(t.book)+'</span></div><div class="why">'+esc(t.why)+'</div>'+priceNote(t))+'</div>';
   });
   h+='<div class="tm2"><div class="tbox"><div class="nm">'+esc(m.home)+'</div><div class="pos">'+(m.hr||"–")+'<small>'+(m.nt?'of '+m.nt:'')+'</small></div>'+squares(m.hfd)+'</div>'
     +'<div class="tbox"><div class="nm">'+esc(m.away)+'</div><div class="pos">'+(m.ar||"–")+'<small>'+(m.nt?'of '+m.nt:'')+'</small></div>'+squares(m.afd)+'</div></div>'
@@ -1315,7 +1323,7 @@ function tipCard(m,t){
     +'<div class="mt">'+esc(m.home)+' v '+esc(m.away)+'</div>'
     +'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+oddTxt(t)+'</span>'
     +(locked?'<button type="button" class="btn vipb" data-unlock="1" style="margin-left:auto">Sign up free</button>':(m.open?'<button type="button" class="btn sec" data-key="'+esc(t.key)+'" aria-pressed="false" style="margin-left:auto;min-height:40px;padding:6px 12px">Add</button><button type="button" class="btn quiet" data-track="'+esc(t.key)+'" title="Track this pick" aria-label="Track this pick" style="min-height:40px;padding:6px 10px">🎟️</button>':''))+'</div>'
-    +'<div class="why" style="font-size:.82rem;color:var(--muted)">'+(locked?'Free sign-up to see the pick and the reason.':esc(t.why))+'</div></div>';
+    +'<div class="why" style="font-size:.82rem;color:var(--muted)">'+(locked?'Free sign-up to see the pick and the reason.':esc(t.why))+'</div>'+(locked?'':priceNote(t))+'</div>';
 }
 /* έτοιμα κουπόνια του betizzi (βγαίνουν από τον server μία φορά τη μέρα) */
 var BZC_SEL={"1":"1","2":"2","X":"X","O25":"Over 2.5","U25":"Under 2.5","O15":"Over 1.5","GG":"GG","NG":"NG"};

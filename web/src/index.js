@@ -252,7 +252,7 @@ function rawRow(x, hm) {
     [o["1"] || null, o.X || null, o["2"] || null, o.O25 || null, o.U25 || null, o.GG || null, o.NG || null],
     md ? [pc(md.p1), pc(md.px), 100 - pc(md.p1) - pc(md.px), pc(md.over25), md.score.join("-")] : [null, null, null, null, ""],
     x.tips.map((tp) => tp.locked ? ["", 0, "vip", "", 0, -1, 0, "", "A"]
-      : [SELNAME[tp.sel] || tp.sel, tp.price, tp.tier, tp.reason, 0, tp.result == null ? -1 : tp.result, 0, "best price", "A"]),
+      : [SELNAME[tp.sel] || tp.sel, tp.price, tp.tier, tp.reason, 0, tp.result == null ? -1 : tp.result, 0, "best price", "A", tp.min || 0, tp.at ? hm(tp.at) : ""]),
     x.status, x.minute || 0, x.home.form, x.away.form,
     { cr: null, yc: null, bts: gg.length ? Math.round((gg.reduce((a, b) => a + b, 0) / gg.length) * 100) : null },
     BOOKS.map((b) => (x.books && x.books[b]) || 0), // [1,X,2,O25,U25,GG,NG] ανά bookmaker, σειρά BOOKS

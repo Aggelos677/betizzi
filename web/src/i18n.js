@@ -411,5 +411,9 @@ export const UI = {
   "Not offered by your bookmaker": ["Δεν το έχει ο bookmaker σου", "Tu casa no la ofrece", "Sua casa não oferece", "Pas proposé par ton bookmaker", "Nicht bei deinem Buchmacher", "Casa ta nu o oferă", "Tvoja kladionica ga nema", "Твоят букмейкър го няма"],
   "Prices from": ["Τιμές από", "Cuotas de", "Odds da", "Cotes de", "Quoten von", "Cote de la", "Kvote od", "Коефициенти от"],
   "Showing the best price": ["Δείχνουμε την καλύτερη τιμή", "Mostramos la mejor cuota", "Mostrando a melhor odd", "Meilleure cote affichée", "Beste Quote wird gezeigt", "Arătăm cea mai bună cotă", "Prikazujemo najbolju kvotu", "Показваме най-добрия коефициент"],
+  "Price when issued": ["Τιμή κατά την έκδοση", "Cuota al publicar", "Odd na publicação", "Cote à la publication", "Quote bei Veröffentlichung", "Cotă la publicare", "Kvota pri objavi", "Коефициент при публикуване"],
+  "We recommend it down to": ["Το προτείνουμε μέχρι", "Lo recomendamos hasta", "Recomendamos até", "Nous le conseillons jusqu'à", "Wir empfehlen es bis", "Îl recomandăm până la", "Preporučujemo do", "Препоръчваме до"],
+  "Below that we don't recommend it.": ["Πιο κάτω δεν το προτείνουμε.", "Por debajo no lo recomendamos.", "Abaixo disso não recomendamos.", "En dessous, nous ne le conseillons pas.", "Darunter empfehlen wir es nicht.", "Sub atât nu îl recomandăm.", "Ispod toga ga ne preporučujemo.", "Под това не го препоръчваме."],
+  "The price is now below our limit": ["Η τιμή είναι τώρα κάτω από το όριό μας", "La cuota está ahora por debajo de nuestro límite", "A odd está agora abaixo do nosso limite", "La cote est maintenant sous notre limite", "Die Quote liegt jetzt unter unserem Limit", "Cota e acum sub limita noastră", "Kvota je sada ispod naše granice", "Коефициентът вече е под нашата граница"],
   "Upcoming": ["Επόμενοι", "Próximos", "Próximos", "À venir", "Demnächst", "Urmează", "Predstoje", "Предстоящи"],
 };

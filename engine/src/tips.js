@@ -1,7 +1,7 @@
 // Κανόνες tips betizzi (01/11/2026). Όλα τα όρια εδώ, σε ένα σημείο.
 // Ομάδες που δεν παίρνουν ποτέ tip/κουπόνι (κανόνας λιγκών): Β ομάδες, reserves, νέοι, γυναικείες.
 export const NOT_FIRST_TEAM = /(^Jong | II$| III$| B$| C$|\bU-?(1[6-9]|2[0-3])\b|\bReserves?\b|\(W\)| W$|\bWomen\b|\bYouth\b)/i;
-export const MODEL_VERSION = "rules-2026-11-01";
+export const MODEL_VERSION = "rules-2026-11-01b";
 async function sha256(s) {
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
@@ -10,6 +10,7 @@ export const RULES = {
   freeShare: 0.25,          // free ≈ 1 στους 4 αγώνες με αποδόσεις
   vipShare: 1 / 8,          // VIP ≈ 1 στους 8
   free: { min: 1.40, max: 4.00 },
+  freeBelowVip: 0.97,       // απόφαση Owner 01/11: το Free θέλει τιμή έως 3% κάτω από τον «πάτο» του VIP
   vip: { max: 3.50, floor: 1.50 },
   vipTarget: {              // ελάχιστη απόδοση VIP ανά ισχύ σήματος (7..10 στα 10)
     O25: { 7: 2.00, 8: 1.80, 9: 1.60, 10: 1.50 },
@@ -57,22 +58,30 @@ export async function makeTips(env, now) {
       "1": fair(o["1"], o["1"], o["X"], o["2"]), "X": fair(o["X"], o["1"], o["X"], o["2"]), "2": fair(o["2"], o["1"], o["X"], o["2"]),
       O25: fair(o.O25, o.O25, o.U25), U25: fair(o.U25, o.O25, o.U25), GG: fair(o.GG, o.GG, o.NG), NG: fair(o.NG, o.GG, o.NG),
     };
+    // «Πάτος» τιμής: κάτω από αυτόν δεν το προτείνουμε (VIP = ο πάτος, Free = 3% κάτω από τον πάτο του VIP, τουλάχιστον 1.40)
+    const freeMin = (fl) => Math.max(RULES.free.min, Math.round(fl * RULES.freeBelowVip * 100) / 100);
     for (const k of ["O25", "U25", "GG", "NG"]) {
       const s = sig[k], p = o[k]; if (s < 7 || !p) continue;
-      const vip = p >= Math.max(RULES.vip.floor, RULES.vipTarget[k][s]) && p <= RULES.vip.max;
-      cands.push({ f, k, s, p, vip, level: s >= 9 ? "A" : s === 8 ? "B" : "C", prob: prob[k], why: `${s}/10 games` });
+      const fl = Math.max(RULES.vip.floor, RULES.vipTarget[k][s]);
+      const vip = p >= fl && p <= RULES.vip.max;
+      if (!vip && p < freeMin(fl)) continue;
+      cands.push({ f, k, s, p, vip, fl, fmin: freeMin(fl), level: s >= 9 ? "A" : s === 8 ? "B" : "C", prob: prob[k], why: `${s}/10 games` });
     }
     const hp = pts(H), ap = pts(A);
     for (const [side, me, ot, th] of [["1", hp, ap, 10], ["2", ap, hp, 11]]) {
       const diff = me - ot, p = o[side];
+      // απόφαση Owner 01/11: όχι tip νίκης όταν ο αντίπαλος είναι καθαρό φαβορί (απόδοση έως 1.70)
+      const opp = o[side === "1" ? "2" : "1"]; if (opp && opp <= 1.70) continue;
       if (me >= th && diff >= 6 && p) {
-        const vip = p >= Math.max(RULES.vip.floor, RULES.vipTarget12(side, diff)) && p <= RULES.vip.max;
-        cands.push({ f, k: side, s: 100 + diff, p, vip, level: me >= 13 && diff >= 9 ? "A" : "B", prob: prob[side], why: `form ${hp}-${ap} pts` });
+        const fl = Math.max(RULES.vip.floor, RULES.vipTarget12(side, diff));
+        const vip = p >= fl && p <= RULES.vip.max;
+        if (!vip && p < freeMin(fl)) continue;
+        cands.push({ f, k: side, s: 100 + diff, p, vip, fl, fmin: freeMin(fl), level: me >= 13 && diff >= 9 ? "A" : "B", prob: prob[side], why: `form ${hp}-${ap} pts` });
       }
     }
     const px = o["X"];
-    if (px && dr >= 7 && px >= 3.20 && px <= 3.50) cands.push({ f, k: "X", s: dr, p: px, vip: true, level: "A", prob: prob["X"], why: `${dr}/10 draws` });
-    else if (px && Math.abs(hp - ap) <= 1 && dr >= 4 && px >= 3.25) cands.push({ f, k: "X", s: dr, p: px, vip: false, level: "A", prob: prob["X"], why: `${dr}/10 draws` });
+    if (px && dr >= 7 && px >= 3.20 && px <= 3.50) cands.push({ f, k: "X", s: dr, p: px, vip: true, fl: 3.20, fmin: 3.10, level: "A", prob: prob["X"], why: `${dr}/10 draws` });
+    else if (px && Math.abs(hp - ap) <= 1 && dr >= 4 && px >= 3.25) cands.push({ f, k: "X", s: dr, p: px, vip: false, fl: 3.25, fmin: 3.25, level: "A", prob: prob["X"], why: `${dr}/10 draws` });
   }
 
   const used = {}; const take = (c) => {
@@ -108,12 +117,14 @@ export async function makeTips(env, now) {
   const old = (await env.DB.prepare("SELECT fixture_id, market, sel FROM tips WHERE status='active' AND result IS NULL AND fixture_id IN (SELECT id FROM fixtures WHERE ts > ? AND status IN ('NS','TBD'))").bind(now + 15 * 60).all()).results;
   const st = old.filter((t) => !keep.has(t.fixture_id + "|" + t.market + "|" + t.sel))
     .map((t) => env.DB.prepare("UPDATE tips SET status='withdrawn', withdrawn_at=? WHERE fixture_id=? AND market=? AND sel=?").bind(now, t.fixture_id, t.market, t.sel));
+  try { await env.DB.prepare("ALTER TABLE tips ADD COLUMN min_price REAL").run(); } catch (e) { /* υπάρχει ήδη */ }
   for (const [tier, list] of [["vip", VIP], ["free", FREE]])
     for (const c of list) {
-      const hash = await sha256([c.f.id, MARKET[c.k], c.k, tier, c.p, c.prob, now, MODEL_VERSION].join("|"));
-      st.push(env.DB.prepare(`INSERT OR IGNORE INTO tips(fixture_id,market,sel,tier,strength,level,price,prob,reason,created_at,status,model_version,hash)
-        VALUES(?,?,?,?,?,?,?,?,?,?,'active',?,?)`)
-        .bind(c.f.id, MARKET[c.k], c.k, tier, c.s, c.level, c.p, c.prob, c.why, now, MODEL_VERSION, hash));
+      const minp = tier === "vip" ? c.fl : c.fmin;
+      const hash = await sha256([c.f.id, MARKET[c.k], c.k, tier, c.p, c.prob, now, MODEL_VERSION, minp].join("|"));
+      st.push(env.DB.prepare(`INSERT OR IGNORE INTO tips(fixture_id,market,sel,tier,strength,level,price,prob,reason,created_at,status,model_version,hash,min_price)
+        VALUES(?,?,?,?,?,?,?,?,?,?,'active',?,?,?)`)
+        .bind(c.f.id, MARKET[c.k], c.k, tier, c.s, c.level, c.p, c.prob, c.why, now, MODEL_VERSION, hash, minp ?? null));
     }
   for (let i = 0; i < st.length; i += 90) await env.DB.batch(st.slice(i, i + 90));
   return { fixtures: fx.length, with_odds: withOdds, candidates: cands.length, vip: VIP.length, free: FREE.length };
