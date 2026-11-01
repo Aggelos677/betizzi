@@ -336,10 +336,13 @@ If you think you may be harming yourself or are in danger, call your local emerg
 Ξοδεύεις περισσότερα απ' όσα σκόπευες, κρύβεις το στοίχημα από δικούς σου ανθρώπους, δανείζεσαι για να παίξεις, ή αγχώνεσαι όταν δεν μπορείς να παίξεις.
 
 ## Πού θα βρεις βοήθεια
-- Ελλάδα: [ΚΕΘΕΑ](https://www.kethea.gr) (πρόγραμμα για τον τζόγο).
+- Ελλάδα: Γραμμή βοήθειας ΚΕΘΕΑ **210 9237777** · [kethea.gr](https://www.kethea.gr).
 - Κύπρος: [Εθνική Αρχή Στοιχημάτων](https://nba.gov.cy).
 - [Gambling Therapy](https://www.gamblingtherapy.org) — δωρεάν, εμπιστευτική υποστήριξη online.
 - [Find a Helpline](https://findahelpline.com) — δωρεάν τοπικές γραμμές βοήθειας στη χώρα σου.
+
+## Παίξε νόμιμα
+Στην Ελλάδα παίξε μόνο σε εταιρείες με άδεια της ΕΕΕΠ (Επιτροπή Εποπτείας και Ελέγχου Παιγνίων). Τη λίστα θα τη βρεις στο [hgc.gov.gr](https://www.hgc.gov.gr). Όλες οι νόμιμες εταιρείες δίνουν όρια κατάθεσης και αυτοαποκλεισμό.
 
 Αν νομίζεις ότι κινδυνεύεις, κάλεσε τον αριθμό έκτακτης ανάγκης της χώρας σου.`,
       es: `betizzi es solo para adultos: al menos 18 años, o 21 donde la ley lo exija (por ejemplo, Grecia). Los tips son opiniones basadas en estadísticas, no una garantía. Cada selección extra en una combinada reduce su probabilidad de ganar.
