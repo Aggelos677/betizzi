@@ -73,12 +73,21 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
     const used = (usedBy[kind] ||= new Set()); // ίδιο μέγεθος κουπονιού: διαφορετικοί αγώνες
     // ταξινόμηση: tips μας πρώτα, μετά πιθανότητα, με λίγη τύχη για ποικιλία
     p = p.filter((c) => !used.has(c.f)).map((c) => ({ c, s: (c.src === "model" ? 0 : 0.15) + c.prob + rnd() * 0.12 })).sort((a, b) => b.s - a.s).map((x) => x.c);
+    // χτίσιμο: καλύτερες επιλογές πρώτα, και η τελευταία διαλέγεται ώστε να «κλείσει» κοντά στον στόχο
     const legs = [], fxIn = new Set(); let tot = 1;
-    for (const c of p) {
-      if (fxIn.has(c.f)) continue;
-      if (tot * c.price > target * 1.15) continue;
-      legs.push(c); fxIn.add(c.f); tot *= c.price;
-      if (tot >= target * 0.85 || legs.length >= 12) break;
+    const free = () => p.filter((c) => !fxIn.has(c.f));
+    const take = (c) => { legs.push(c); fxIn.add(c.f); tot *= c.price; };
+    while (legs.length < 12) {
+      const need = target / tot;
+      if (need <= hi * 1.15 && need >= lo * 0.87 && legs.length >= 1) {
+        const fin = free().filter((c) => tot * c.price >= target * 0.85 && tot * c.price <= target * 1.15)
+          .sort((a, b) => Math.abs(a.price - need) - Math.abs(b.price - need))[0];
+        if (fin) { take(fin); break; }
+      }
+      const nxt = free().find((c) => tot * c.price * lo <= target * 1.15);
+      if (!nxt) break;
+      take(nxt);
+      if (tot >= target * 0.85) break;
     }
     if (tot < target * 0.85 || legs.length < 2) continue; // δεν βγαίνει σήμερα
     legs.forEach((l) => used.add(l.f));
