@@ -137,6 +137,47 @@ async function apiDay(env, date) {
   return { date, fixtures: fx.results, tips: out };
 }
 
+// Ένας αγώνας: στοιχεία, tips (VIP κρυφό ως τη σέντρα), αποδόσεις, φόρμα 10 αγώνων, πιθανότητες και πιθανό σκορ.
+async function apiMatch(env, id) {
+  const f = await env.DB.prepare(`SELECT f.*, l.name league, l.country, h.name home, h.logo home_logo, a.name away, a.logo away_logo
+    FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id WHERE f.id=?`).bind(id).first();
+  if (!f) return { error: "not found" };
+  const tips = (await env.DB.prepare("SELECT * FROM tips WHERE fixture_id=? AND status='active'").bind(id).all()).results
+    .map((t) => (t.tier === "vip" && f.ts > now() ? { fixture_id: id, tier: "vip", status: t.status, locked: true } : t));
+  const odds = {};
+  for (const o of (await env.DB.prepare("SELECT market, sel, price FROM odds WHERE fixture_id=?").bind(id).all()).results) odds[o.sel] = o.price;
+  const form = async (team) => (await env.DB.prepare("SELECT fixture_id, ts, is_home, gf, ga FROM results WHERE team_id=? AND ts < ? ORDER BY ts DESC LIMIT 10").bind(team, f.ts).all()).results;
+  const model = scoreModel(odds, tips);
+  return { fixture: f, tips, odds, form: { home: await form(f.home_id), away: await form(f.away_id) }, model };
+}
+
+// Μοντέλο: πιθανότητες από τις αποδόσεις (χωρίς το περιθώριο του bookmaker) και Poisson για το σκορ.
+// Το πιθανό σκορ δεν αντιφάσκει ποτέ με τα tips του αγώνα.
+function scoreModel(o, tips) {
+  if (!o["1"] || !o["X"] || !o["2"]) return null;
+  const inv = [1 / o["1"], 1 / o["X"], 1 / o["2"]], s = inv[0] + inv[1] + inv[2];
+  const p1 = inv[0] / s, px = inv[1] / s, p2 = inv[2] / s;
+  let pO = null;
+  if (o.O25 && o.U25) { const a = 1 / o.O25, b = 1 / o.U25; pO = a / (a + b); }
+  const pois = (l, k) => { let r = Math.exp(-l); for (let i = 1; i <= k; i++) r *= l / i; return r; };
+  const grid = (lh, la) => { const g = []; for (let i = 0; i <= 7; i++) for (let j = 0; j <= 7; j++) g.push([i, j, pois(lh, i) * pois(la, j)]); return g; };
+  const over = (g) => g.reduce((a, [i, j, p]) => a + (i + j > 2 ? p : 0), 0);
+  const diff = (g) => g.reduce((a, [i, j, p]) => a + (i > j ? p : i < j ? -p : 0), 0);
+  // συνολικά γκολ: από Over 2.5 αν υπάρχει, αλλιώς 2.6
+  let L = 2.6;
+  if (pO) { let lo = 0.5, hi = 6; for (let k = 0; k < 40; k++) { L = (lo + hi) / 2; over(grid(L / 2, L / 2)) < pO ? (lo = L) : (hi = L); } }
+  // μοίρασμα ανάμεσα στις ομάδες ώστε 1 − 2 να ταιριάζει με την αγορά
+  let lo = 0.05, hi = 0.95, r = 0.5;
+  for (let k = 0; k < 40; k++) { r = (lo + hi) / 2; diff(grid(L * r, L * (1 - r))) < p1 - p2 ? (lo = r) : (hi = r); }
+  const g = grid(L * r, L * (1 - r));
+  const ok = ([i, j]) => tips.every((t) => !t.sel || ({
+    "1": i > j, X: i === j, "2": i < j, "1X": i >= j, X2: i <= j, "12": i !== j,
+    O15: i + j > 1, O25: i + j > 2, O35: i + j > 3, U25: i + j < 3, U35: i + j < 4, GG: i > 0 && j > 0, NG: i === 0 || j === 0,
+  })[t.sel] !== false);
+  const best = g.filter(ok).sort((a, b) => b[2] - a[2])[0] || g.sort((a, b) => b[2] - a[2])[0];
+  return { p1, px, p2, over25: pO ?? over(g), score: [best[0], best[1]] };
+}
+
 async function status(env) {
   const q = (s) => env.DB.prepare(s).first();
   return {
@@ -156,6 +197,7 @@ export default {
     const u = new URL(req.url);
     try {
       if (u.pathname === "/" || u.pathname === "/status") return json(await status(env));
+      if (u.pathname === "/api/match") return json(await apiMatch(env, +u.searchParams.get("id")));
       if (u.pathname === "/api/day") return json(await apiDay(env, u.searchParams.get("date") || ymd(now())));
       if (u.pathname === "/run") {
         if (!env.ADMIN_TOKEN || u.searchParams.get("t") !== env.ADMIN_TOKEN) return json({ error: "unauthorized" }, 401);
