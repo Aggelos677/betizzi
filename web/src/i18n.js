@@ -387,10 +387,7 @@ export const UI = {
   "· Home": ["· 1", "· 1", "· 1", "· 1", "· 1", "· 1", "· 1", "· 1"],
   "· Away": ["· 2", "· 2", "· 2", "· 2", "· 2", "· 2", "· 2", "· 2"],
   "· Draw": ["· X", "· X", "· X", "· X", "· X", "· X", "· X", "· X"],
-  "Wall of wins": ["Οι νίκες μας", "Nuestras victorias", "Nossas vitórias", "Nos victoires", "Unsere Treffer", "Victoriile noastre", "Naše pobede", "Нашите победи"],
-  "Today's record": ["Απολογισμός σήμερα", "Balance de hoy", "Balanço de hoje", "Bilan du jour", "Bilanz heute", "Bilanțul de azi", "Današnji učinak", "Резултат за днес"],
-  "Coupons": ["Κουπόνια", "Cupones", "Bilhetes", "Tickets", "Scheine", "Bilete", "Tiketi", "Фишове"],
+  "Our biggest wins today": ["Οι πιο μεγάλες νίκες μας σήμερα", "Nuestras mayores victorias de hoy", "Nossas maiores vitórias hoje", "Nos plus belles victoires du jour", "Unsere größten Treffer heute", "Cele mai mari victorii ale noastre azi", "Naše najveće pobede danas", "Най-големите ни победи днес"],
   "No wins yet today. Matches are still running.": ["Καμία νίκη ακόμα σήμερα. Οι αγώνες συνεχίζονται.", "Aún no hay aciertos hoy. Los partidos siguen.", "Ainda sem acertos hoje. Os jogos continuam.", "Pas encore de gain aujourd'hui. Les matchs continuent.", "Heute noch kein Treffer. Die Spiele laufen noch.", "Încă nicio victorie azi. Meciurile continuă.", "Još nema pogodaka danas. Utakmice traju.", "Още няма познати днес. Мачовете продължават."],
-  "We show every result, wins and losses.": ["Δείχνουμε όλα τα αποτελέσματα, νίκες και ήττες.", "Mostramos todos los resultados, aciertos y fallos.", "Mostramos todos os resultados, acertos e erros.", "Nous montrons tous les résultats, gains et pertes.", "Wir zeigen alle Ergebnisse, Treffer und Nieten.", "Arătăm toate rezultatele, victorii și înfrângeri.", "Prikazujemo sve rezultate, pogotke i promašaje.", "Показваме всички резултати, познати и грешни."],
   "Upcoming": ["Επόμενοι", "Próximos", "Próximos", "À venir", "Demnächst", "Urmează", "Predstoje", "Предстоящи"],
 };
