@@ -30,6 +30,7 @@ export function apifStats(env) {
     home: { id: f.teams.home.id, name: f.teams.home.name, logo: f.teams.home.logo },
     away: { id: f.teams.away.id, name: f.teams.away.name, logo: f.teams.away.logo },
     gh: f.goals.home, ga: f.goals.away, hth: f.score.halftime.home, hta: f.score.halftime.away,
+    fth: f.score.fulltime?.home ?? null, fta: f.score.fulltime?.away ?? null, // σκορ 90λέπτου (χωρίς παράταση)
   });
   return {
     name: "apif",

@@ -49,10 +49,10 @@ async function syncFixtures(env, days = 3) {
 async function saveFixtures(env, list) {
   const st = [];
   for (const f of list) {
-    st.push(env.DB.prepare(`INSERT INTO fixtures(id,ts,league_id,season,round,home_id,away_id,status,elapsed,gh,ga,hth,hta,updated)
-      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-      ON CONFLICT(id) DO UPDATE SET ts=excluded.ts,status=excluded.status,elapsed=excluded.elapsed,gh=excluded.gh,ga=excluded.ga,hth=excluded.hth,hta=excluded.hta,updated=excluded.updated`)
-      .bind(f.id, f.ts, f.league_id, f.season, f.round, f.home.id, f.away.id, f.status, f.elapsed, f.gh, f.ga, f.hth, f.hta, now()));
+    st.push(env.DB.prepare(`INSERT INTO fixtures(id,ts,league_id,season,round,home_id,away_id,status,elapsed,gh,ga,hth,hta,fth,fta,updated)
+      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      ON CONFLICT(id) DO UPDATE SET ts=excluded.ts,status=excluded.status,elapsed=excluded.elapsed,gh=excluded.gh,ga=excluded.ga,hth=excluded.hth,hta=excluded.hta,fth=excluded.fth,fta=excluded.fta,updated=excluded.updated`)
+      .bind(f.id, f.ts, f.league_id, f.season, f.round, f.home.id, f.away.id, f.status, f.elapsed, f.gh, f.ga, f.hth, f.hta, f.fth ?? null, f.fta ?? null, now()));
     for (const t of [f.home, f.away])
       st.push(env.DB.prepare("INSERT OR REPLACE INTO teams(id,name,country,logo) VALUES(?,?,?,?)").bind(t.id, t.name, f.country, t.logo));
   }
@@ -140,10 +140,13 @@ async function formFromOurResults(env) {
       WHERE status IN ('FT','AET','PEN') AND gh IS NOT NULL AND ts > ?`).bind(since).run();
 }
 
-// Κλείσιμο tips: μόνο σε κανονική λήξη (FT). Το αποτέλεσμα γράφεται μία φορά.
+// Κλείσιμο tips: στο σκορ του 90λέπτου (όπως οι bookmakers). FT → τελικό σκορ· AET/PEN → σκορ 90΄ (fth/fta).
+// Το αποτέλεσμα γράφεται μία φορά.
 async function settleTips(env) {
-  const rows = (await env.DB.prepare(`SELECT t.fixture_id, t.market, t.sel, f.gh, f.ga FROM tips t JOIN fixtures f ON f.id=t.fixture_id
-    WHERE t.result IS NULL AND t.status='active' AND f.status='FT'`).all()).results;
+  const rows = (await env.DB.prepare(`SELECT t.fixture_id, t.market, t.sel,
+      CASE WHEN f.status='FT' THEN f.gh ELSE f.fth END gh, CASE WHEN f.status='FT' THEN f.ga ELSE f.fta END ga
+    FROM tips t JOIN fixtures f ON f.id=t.fixture_id
+    WHERE t.result IS NULL AND t.status='active' AND (f.status='FT' OR (f.status IN ('AET','PEN') AND f.fth IS NOT NULL))`).all()).results;
   const won = (s, i, j) => ({ "1": i > j, X: i === j, "2": i < j, "1X": i >= j, X2: i <= j, "12": i !== j, O15: i + j > 1, O25: i + j > 2, O35: i + j > 3,
     U25: i + j < 3, U35: i + j < 4, GG: i > 0 && j > 0, NG: i === 0 || j === 0 })[s];
   const st = rows.filter((r) => won(r.sel, r.gh, r.ga) !== undefined)
@@ -210,6 +213,18 @@ async function apiDay(env, date) {
 }
 
 // Ένας αγώνας: στοιχεία, tips (VIP κρυφό ως τη σέντρα), αποδόσεις, φόρμα 10 αγώνων, πιθανότητες και πιθανό σκορ.
+// Record: όλα τα tips που κρίθηκαν (κερδισμένα και χαμένα) + όσα αποσύρθηκαν πριν τη σέντρα. Τίποτα δεν σβήνεται.
+async function apiRecord(env) {
+  const q = `SELECT t.fixture_id, t.market, t.sel, t.tier, t.price, t.result, t.status, t.created_at, t.withdrawn_at, t.model_version, t.hash,
+      f.ts, f.gh, f.ga, f.league_id, l.name league, l.country, h.name home, a.name away
+    FROM tips t JOIN fixtures f ON f.id=t.fixture_id JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id`;
+  const settled = (await env.DB.prepare(q + " WHERE t.status='active' AND t.result IS NOT NULL ORDER BY f.ts DESC").all()).results;
+  const withdrawn = (await env.DB.prepare(q + " WHERE t.status='withdrawn' AND f.ts < ? ORDER BY f.ts DESC LIMIT 200").bind(now() + 86400).all()).results;
+  const pending = (await env.DB.prepare("SELECT COUNT(*) n FROM tips WHERE status='active' AND result IS NULL").first()).n;
+  const first = (await env.DB.prepare("SELECT MIN(created_at) t FROM tips").first()).t;
+  return { since: first, pending, settled, withdrawn, updated: now() };
+}
+
 async function apiMatch(env, id) {
   const f = await env.DB.prepare(`SELECT f.*, l.name league, l.country, h.name home, h.logo home_logo, a.name away, a.logo away_logo
     FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id WHERE f.id=?`).bind(id).first();
@@ -283,6 +298,7 @@ export default {
         return json(r.results.map((f) => [f.id, f.status, f.elapsed, f.gh, f.ga]));
       }
       if (u.pathname === "/api/coupons") return json(await apiCoupons(env, u.searchParams.get("date") || ymd(now())));
+      if (u.pathname === "/api/record") return json(await apiRecord(env));
       if (u.pathname === "/api/match") return json(await apiMatch(env, +u.searchParams.get("id")));
       if (u.pathname === "/api/day") {
         // έτοιμο από το cron (κάθε 2΄) → γρήγορη απάντηση· αλλιώς υπολογισμός επί τόπου

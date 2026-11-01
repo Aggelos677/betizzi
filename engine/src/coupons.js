@@ -118,7 +118,7 @@ export async function apiCoupons(env, date) {
   const fx = {};
   for (let i = 0; i < ids.length; i += 90) {
     const part = ids.slice(i, i + 90);
-    for (const f of (await env.DB.prepare(`SELECT f.id, f.ts, f.status, f.gh, f.ga, l.name league, h.name home, a.name away FROM fixtures f
+    for (const f of (await env.DB.prepare(`SELECT f.id, f.ts, f.status, f.gh, f.ga, f.fth, f.fta, l.name league, h.name home, a.name away FROM fixtures f
       JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id WHERE f.id IN (${part.map(() => "?").join(",")})`).bind(...part).all()).results) fx[f.id] = f;
   }
   const won = (s, i, j) => ({ "1": i > j, X: i === j, "2": i < j, O15: i + j > 1, O25: i + j > 2, U25: i + j < 3, GG: i > 0 && j > 0, NG: i === 0 || j === 0 })[s];
@@ -126,7 +126,8 @@ export async function apiCoupons(env, date) {
     const legs = JSON.parse(r.legs).map(([f, sel, price, prob, src]) => {
       const m = fx[f] || {};
       const hide = src === "vip" && m.ts + 600 > now(); // VIP ανοίγουν 10΄ μετά τη σέντρα
-      const res = m.status === "FT" ? (won(sel, m.gh, m.ga) ? 1 : 0) : null;
+      const s90 = m.status === "FT" ? [m.gh, m.ga] : (m.status === "AET" || m.status === "PEN") && m.fth != null ? [m.fth, m.fta] : null;
+      const res = s90 ? (won(sel, s90[0], s90[1]) ? 1 : 0) : null;
       return { fixture_id: f, home: m.home, away: m.away, league: m.league, ts: m.ts, status: m.status, gh: m.gh, ga: m.ga,
         sel: hide ? null : sel, price: hide ? null : price, prob: hide ? null : prob, vip: src === "vip", locked: hide, result: res };
     });

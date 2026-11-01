@@ -33,6 +33,8 @@
 - Μυστικά (API keys) μόνο ως Cloudflare Secrets, ποτέ στον κώδικα.
 
 ## Ιστορικό
+- 01/11/2026 (βράδυ): **Σελίδα Record** σε 9 γλώσσες (/el/istoriko-tips, /en/record, /es/historial, /pt/historico, /fr/historique, /de/bilanz, /ro/istoric, /sr/istorija, /bg/istoria). Engine: /api/record (κρίθηκαν + αποσυρμένα + σε αναμονή). Δείχνει: σύνοψη-απάντηση, Όλα/Free/VIP, μεγαλύτερες νίκες (έντονα γραφικά), ανά μήνα/αγορά/λίγκα, όλα τα αποτελέσματα (νίκες φωτεινές, ήττες αχνές), αποσυρμένα, «Πώς μετράμε», Dataset schema. Link από αρχική και σελίδες αγώνων.
+- 01/11/2026: Κλείσιμο tips/κουπονιών στο **σκορ 90λέπτου**: νέες στήλες fixtures.fth/fta (score.fulltime). AET/PEN πριν έμεναν ανοιχτά για πάντα.
 
 - 01/11/2026: betizzi-engine v1 (adapters API-Football για stats και προσωρινά για αποδόσεις, tips με τους νέους κανόνες). Τοπικό τεστ: 754 αγώνες, 5.561 τιμές, 91 tips με φόρμα για 400 ομάδες.
 - 01/11/2026: πρώτο ανέβασμα, πρωτότυπο ως στατική σελίδα. Σύνδεση Cloudflare Workers Builds (betizzi-web, root /web).

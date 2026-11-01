@@ -41,3 +41,18 @@ export async function getMatch(env, id) {
     odds: d.odds, model: d.model,
   };
 }
+
+// Record: tips που κρίθηκαν + αποσυρμένα. Ίδιο σχήμα όποια κι αν είναι η πηγή.
+export async function getRecord(env) {
+  const r = env.ENGINE
+    ? await env.ENGINE.fetch("https://engine/api/record")
+    : await fetch("https://betizzi-engine.bettipsters79.workers.dev/api/record");
+  if (!r.ok) throw new Error("engine " + r.status);
+  const d = await r.json();
+  const row = (t) => ({
+    id: t.fixture_id, ts: t.ts, tier: t.tier, market: t.market, sel: t.sel, price: t.price, result: t.result,
+    league: t.league, country: t.country, home: t.home, away: t.away, score: t.gh == null ? null : [t.gh, t.ga],
+    at: t.created_at, wdAt: t.withdrawn_at, model: t.model_version, hash: t.hash,
+  });
+  return { since: d.since, pending: d.pending, updated: d.updated, settled: d.settled.map(row), withdrawn: d.withdrawn.map(row) };
+}
