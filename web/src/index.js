@@ -68,6 +68,12 @@ async function todayPage(env, lang) {
     ? `<span class="tip vip" title="${esc(t.vipLock)}">VIP 🔒</span>`
     : `<span class="tip ${tp.tier}">${tp.tier === "vip" ? "VIP " : "TIP "}<b>${esc(SEL[tp.sel] || tp.sel)}</b> <i>${tp.price ? tp.price.toFixed(2) : ""}</i>${tp.result === 1 ? " ✓" : tp.result === 0 ? " ✗" : ""}</span>`;
 
+  // Στη γραμμή: μόνο το πιο δυνατό tip + σήμα «+N». Όλα φαίνονται στη σελίδα του αγώνα.
+  const topTip = (tips) => {
+    if (!tips.length) return "";
+    const s = [...tips].sort((a, b) => (b.prob || 0) - (a.prob || 0));
+    return tipHtml(s[0]) + (s.length > 1 ? `<span class="more">+${s.length - 1}</span>` : "");
+  };
   const row = (x) => {
     const live = LIVE.has(x.status), done = DONE.has(x.status);
     const mid = x.score && (live || done)
@@ -75,7 +81,7 @@ async function todayPage(env, lang) {
       : `<time datetime="${new Date(x.ts * 1000).toISOString()}">${hm(x.ts)}</time>`;
     const st = live ? `<span class="min">${x.status === "HT" ? "HT" : esc(x.minute) + "'"}</span>` : done ? `<span class="min">${t.ft}</span>` : "";
     const team = (s) => `<span class="tm"><img src="${esc(s.logo)}" alt="" width="18" height="18" loading="lazy" decoding="async">${esc(s.name)}</span>`;
-    return `<li class="m${x.tips.length ? " has" : ""}"><div class="t">${mid}${st}</div><div class="teams">${team(x.home)}${team(x.away)}</div><div class="tips">${x.tips.map(tipHtml).join("")}</div></li>`;
+    return `<li class="m${x.tips.length ? " has" : ""}"><div class="t">${mid}${st}</div><div class="teams">${team(x.home)}${team(x.away)}</div><div class="tips">${topTip(x.tips)}</div></li>`;
   };
 
   const leaguesHtml = order.map((g, i) => {
@@ -144,7 +150,7 @@ ul{list-style:none;margin:0;padding:0}
 .t{display:flex;flex-direction:column;align-items:center;font:500 13px "JetBrains Mono",monospace;color:var(--mu)}
 .sc{color:#fff;font-weight:700}.sc.lv{color:var(--lime)}.min{font-size:11px;color:var(--lime)}
 .teams{display:flex;flex-direction:column;gap:3px;min-width:0}.tm{display:flex;gap:6px;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm img{flex:none;border-radius:3px}
-.tips{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.tips{display:flex;gap:4px;align-items:center}.more{font:700 11px "JetBrains Mono",monospace;color:var(--lime);border:1px solid var(--ln);border-radius:6px;padding:3px 5px}
 .tip{font:700 12px "JetBrains Mono",monospace;padding:6px 8px;border-radius:8px;white-space:nowrap}.tip.free{background:var(--lime);color:#0c0f0d}.tip.vip{background:var(--gold);color:#0c0f0d}.tip i{font-style:normal;opacity:.75}
 .how{color:var(--mu)}footer{color:var(--mu);font-size:13px;text-align:center;padding:22px 14px 40px;border-top:1px solid var(--ln);margin-top:20px}
 </style>
