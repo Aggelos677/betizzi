@@ -900,7 +900,9 @@ function couponWin(c){
   setTimeout(function(){w.classList.add("out");},3200);setTimeout(function(){w.remove();},3700);
 }
 var TABS=["matches","tips","build","coupons"];
-function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-selected",t===name?"true":"false");$("view-"+t).hidden=t!==name;});store("ko-tab",name);renderSide();window.scrollTo(0,0);}
+function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-selected",t===name?"true":"false");$("view-"+t).hidden=t!==name;});store("ko-tab",name);renderSide();
+  /* χωρίς πήδημα: αν έχεις κατέβει, η νέα καρτέλα ξεκινά ακριβώς κάτω από το μενού· αλλιώς η σελίδα μένει όπου είναι */
+  var hd=document.querySelector(".wrap.app>header"),top=hd?hd.offsetTop+hd.offsetHeight:0;if(window.scrollY>top)window.scrollTo(0,top);}
 TABS.forEach(function(t){$("tab-"+t).addEventListener("click",function(){showTab(t);});});
 /* ---------- πλαϊνό (PC): αλλάζει ανάλογα με την καρτέλα ---------- */
 function sideOn(){return !!(window.matchMedia&&window.matchMedia("(min-width:1100px)").matches);}
@@ -971,6 +973,7 @@ function cnt(o){return MATCHES.filter(function(m){return passAll(m,o);}).length;
 function chipEl(html,on,fn,cls,href){var b=document.createElement(href?"a":"button");if(href)b.href=href;else b.type="button";b.className="chip"+(cls?" "+cls:"");b.setAttribute("aria-pressed",on?"true":"false");b.innerHTML=html;if(fn)b.addEventListener("click",fn);return b;}
 function renderFilters(){
   var nl=MATCHES.filter(function(m){return m.live;}).length,lb=$("liveBdg");lb.hidden=!nl;lb.textContent=nl+" live";
+  var _sl1=$("mFilter").scrollLeft,_sl2=$("lFilter").scrollLeft;
   var box=$("mFilter");box.innerHTML="";
   if(IS_TODAY&&nl)box.appendChild(chipEl('<span class="ldot"></span>Live <span class="c">'+cnt({t:"live"})+'</span>',mFilter==="live",function(){mFilter=mFilter==="live"?"all":"live";renderFilters();renderMatches();},"livechip"));
   DN.nav.forEach(function(d){if(d.n!==0&&d.n!==1)return;var on=d.d===DN.date&&mFilter!=="live";
@@ -989,6 +992,7 @@ function renderFilters(){
   var sep=document.createElement("span");sep.className="fsep";sep.setAttribute("aria-hidden","true");lb2.appendChild(sep);
   lb2.appendChild(chipEl('<span>With tip</span> <span class="c">'+cnt({tip:true})+'</span>',tipF,function(){tipF=!tipF;renderFilters();renderMatches();},"tog"));
   var nc=cnt({c:true});if(nc)lb2.appendChild(chipEl('<span>🎯 Called</span> <span class="c">'+nc+'</span>',calF,function(){calF=!calF;renderFilters();renderMatches();},"tog calledchip"));
+  box.scrollLeft=_sl1;lb2.scrollLeft=_sl2;
 }
 /* live: is a tip already settled? Over/GG can land before full time; Under/NG can be lost early */
 function tipState(t,m){
