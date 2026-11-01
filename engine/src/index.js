@@ -60,13 +60,18 @@ async function saveFixtures(env, list) {
 // Φόρμα: τελευταίοι 10 αγώνες κάθε ομάδας που παίζει τις επόμενες 3 μέρες. Λίγες ομάδες ανά εκτέλεση.
 async function syncForm(env, batch = 40) {
   const src = sources(env).stats;
+  // Πρώτα οι ομάδες των αγώνων που έχουν αποδόσεις (μόνο εκεί βγαίνει tip), με τη σειρά της σέντρας.
   const { results } = await env.DB.prepare(`
-    SELECT t.team FROM (SELECT home_id team FROM fixtures WHERE ts BETWEEN ?1 AND ?2 UNION SELECT away_id FROM fixtures WHERE ts BETWEEN ?1 AND ?2) t
+    SELECT t.team, MIN(t.ts) ts FROM (
+      SELECT home_id team, ts FROM fixtures f WHERE ts BETWEEN ?1 AND ?2 AND EXISTS (SELECT 1 FROM odds o WHERE o.fixture_id=f.id)
+      UNION ALL SELECT away_id, ts FROM fixtures f WHERE ts BETWEEN ?1 AND ?2 AND EXISTS (SELECT 1 FROM odds o WHERE o.fixture_id=f.id)) t
     LEFT JOIN (SELECT team_id, MAX(fetched) f FROM form_fetch GROUP BY team_id) ff ON ff.team_id=t.team
-    WHERE ff.f IS NULL OR ff.f < ?3 LIMIT ?4`).bind(now(), now() + 3 * DAY, now() - 20 * 3600, batch).all();
+    WHERE ff.f IS NULL OR ff.f < ?3 GROUP BY t.team ORDER BY ts LIMIT ?4`).bind(now(), now() + 3 * DAY, now() - 20 * 3600, batch).all();
   let calls = 0;
   for (const r of results) {
-    const games = await src.lastResults(r.team, 10); calls++;
+    let games;
+    try { games = await src.lastResults(r.team, 10); calls++; } catch (e) { break; } // όριο API: συνεχίζει στο επόμενο λεπτό
+
     const st = games.map((g) => env.DB.prepare("INSERT OR REPLACE INTO results(team_id,fixture_id,ts,is_home,gf,ga,ht_gf,ht_ga) VALUES(?,?,?,?,?,?,?,?)")
       .bind(r.team, g.id, g.ts, g.is_home, g.gf, g.ga, g.ht_gf, g.ht_ga));
     st.push(env.DB.prepare("INSERT OR REPLACE INTO form_fetch(team_id,fetched) VALUES(?,?)").bind(r.team, now()));
