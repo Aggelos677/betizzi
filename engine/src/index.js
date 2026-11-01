@@ -85,6 +85,7 @@ async function syncForm(env, batch = 40) {
 // Αποδόσεις σε κομμάτια: έως 8 σελίδες ανά τρέξιμο, με δείκτη στη D1. Κάθε μέρα ξαναρχίζει κάθε 12 ώρες.
 async function syncOdds(env, maxPages = 8) {
   const src = sources(env).odds;
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS odds_bk(fixture_id INTEGER, bk TEXT, market TEXT, sel TEXT, price REAL, updated INTEGER, PRIMARY KEY(fixture_id, bk, market, sel))").run();
   await env.DB.prepare("CREATE TABLE IF NOT EXISTS odds_cursor(date TEXT PRIMARY KEY, next_page INTEGER, total INTEGER, started INTEGER, done INTEGER)").run();
   let calls = 0, n = 0;
   for (let d = 0; d < 2 && calls < maxPages; d++) {
@@ -92,7 +93,11 @@ async function syncOdds(env, maxPages = 8) {
     let c = await env.DB.prepare("SELECT * FROM odds_cursor WHERE date=?").bind(date).first();
     if (!c || (c.done && now() - c.started > 12 * 3600)) c = { date, next_page: 1, total: 1, started: now(), done: 0 };
     while (!c.done && calls < maxPages) {
-      const { rows, total } = await src.oddsPage(date, c.next_page, LEAGUE_IDS); calls++;
+      const { rows, perBook = [], total } = await src.oddsPage(date, c.next_page, LEAGUE_IDS); calls++;
+      // τιμή ανά bookmaker (για «καλύτερο παρολί» και «ο bookmaker μου»)
+      const sb = perBook.map((o) => env.DB.prepare("INSERT OR REPLACE INTO odds_bk(fixture_id,bk,market,sel,price,updated) VALUES(?,?,?,?,?,?)")
+        .bind(o.fixture_id, o.bk, o.market, o.sel, o.price, now()));
+      for (let i = 0; i < sb.length; i += 90) await env.DB.batch(sb.slice(i, i + 90));
       const st = rows.map((o) => env.DB.prepare("INSERT OR REPLACE INTO odds(fixture_id,source,market,sel,price,bookmaker,updated) VALUES(?,?,?,?,?,?,?)")
         .bind(o.fixture_id, src.name, o.market, o.sel, o.price, o.bookmaker, o.updated));
       for (let i = 0; i < st.length; i += 90) await env.DB.batch(st.slice(i, i + 90));

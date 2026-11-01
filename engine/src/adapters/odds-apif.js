@@ -14,7 +14,10 @@ async function apifFetch(url, key) {
   }
   throw new Error("apif 429 " + url);
 }
-const BOOKS = new Set(["Pinnacle", "Bet365", "1xBet"]);
+// 3–5 καλοί bookmakers (απόφαση Owner 01/11/2026). Κρατάμε την τιμή ΚΑΘΕ bookmaker,
+// ώστε να δείχνουμε πού είναι το καλύτερο παρολί, ή μόνο τον bookmaker του χρήστη.
+export const BOOKS = ["Bet365", "Pinnacle", "1xBet", "Unibet", "Bwin"];
+const BOOKSET = new Set(BOOKS);
 const MAP = {
   "Match Winner": { market: "1X2", sel: { Home: "1", Draw: "X", Away: "2" } },
   "Goals Over/Under": { market: "OU", sel: { "Over 2.5": "O25", "Under 2.5": "U25", "Over 1.5": "O15", "Under 3.5": "U35", "Over 3.5": "O35" } },
@@ -27,7 +30,7 @@ export function apifOdds(env) {
     name: "apif",
     // Μία σελίδα τη φορά, για να μοιράζεται η δουλειά σε πολλά σύντομα τρεξίματα.
     async oddsPage(date, page, leagueIds) {
-      const rows = [];
+      const rows = [], perBook = [];
       {
         const r = await apifFetch(`${BASE}odds?date=${date}&page=${page}`, env.APIF_KEY);
         const j = await r.json();
@@ -36,12 +39,13 @@ export function apifOdds(env) {
           if (!leagueIds.has(o.league.id)) continue;
           const best = {};
           for (const b of o.bookmakers) {
-            if (!BOOKS.has(b.name)) continue;
+            if (!BOOKSET.has(b.name)) continue;
             for (const bet of b.bets) {
               const m = MAP[bet.name]; if (!m) continue;
               for (const v of bet.values) {
                 const sel = m.sel[v.value]; if (!sel) continue;
                 const p = parseFloat(v.odd); const k = m.market + "|" + sel;
+                perBook.push({ fixture_id: o.fixture.id, bk: b.name, market: m.market, sel, price: p });
                 if (!best[k] || p > best[k].price) best[k] = { fixture_id: o.fixture.id, market: m.market, sel, price: p, bookmaker: b.name, updated: Math.floor(Date.parse(o.update) / 1000) };
               }
             }
@@ -49,7 +53,7 @@ export function apifOdds(env) {
           rows.push(...Object.values(best));
         }
       }
-      return { rows, total };
+      return { rows, perBook, total };
     },
   };
 }
