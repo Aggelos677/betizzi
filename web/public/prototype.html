@@ -1036,19 +1036,19 @@ function cbNext(){var c=CBQ.shift();if(!c){CBON=false;return;}CBON=true;showCB(c
 function showCB(c){
   var big=c.odds>=10,closed=false;
   function done(){if(closed)return;closed=true;o.remove();document.body.classList.remove("cshake");setTimeout(cbNext,400);}
-  var cr=Math.round(c.odds*10);
+  var cr=c.odds>=50?500:200; /* απόφαση Owner: share νικητήριου παρολί μας = 200 credits, x50 = 500 */
   var o=document.createElement("div");o.className="cbig"+(big?" cbig-long":"");o.setAttribute("role","status");
   o.innerHTML='<div class="cbig-in cpbig"><span class="cbig-t">🏆 WINNER</span><span class="cbig-m">betizzi · '+esc(c.kind)+' · '+esc(BZC_VAR[c.variant]||c.variant)+'</span><b class="mono">x'+c.odds.toFixed(2)+'</b><div class="cpl">'
     +c.legs.map(function(l){return '<div><i>✓</i><span>'+esc(l.home||"")+' – '+esc(l.away||"")+'</span><em>'+(l.locked?'VIP':esc(BZC_SEL[l.sel]||l.sel))+'</em></div>';}).join("")+'</div><small>Cash it in!</small>'
-    +(big?'<div class="cbshare"><span><span>Share it with your friends and win</span> <b class="mono">'+cr+'</b> <span>credits</span></span><button type="button" class="btn" data-sh="1">📤 <span>Share</span></button></div><button type="button" class="cbx" data-x="1" aria-label="Close">×</button>':'')+'</div>';
+    +('<div class="cbshare"><span><span>Share it with your friends and win</span> <b class="mono">'+cr+'</b> <span>credits</span></span><button type="button" class="btn" data-sh="1">📤 <span>Share</span></button></div><button type="button" class="cbx" data-x="1" aria-label="Close">×</button>')+'</div>';
   document.body.appendChild(o);
-  if(big)o.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;if(b.dataset.sh)shareBz(c);if(b.dataset.x)done();});
+  o.style.pointerEvents="auto";o.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;if(b.dataset.sh)shareBz(c);if(b.dataset.x)done();});
   var W=window.innerWidth,H=window.innerHeight;
   [[W*.5,H*.35],[W*.15,H*.7],[W*.85,H*.7],[W*.3,H*.2],[W*.7,H*.2]].forEach(function(p,i){setTimeout(function(){confetti(p[0],p[1],true);},i*220);});
   setTimeout(function(){confetti(W*.5,H*.5,true);},1300);
   try{fanfare();}catch(e){}
   document.body.classList.remove("cshake");void document.body.offsetWidth;document.body.classList.add("cshake");
-  setTimeout(done,big?20000:4200);
+  setTimeout(done,big?20000:10000);
 }
 function renderClose(){var box=$("closeBox");if(!box)return;var it=[],now=Date.now(),fresh=[];
   /* όλα τα live tips: κρατάμε την προηγούμενη κατάσταση για να πιάσουμε τη στιγμή που ένα tip «μπαίνει» */
