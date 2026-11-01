@@ -113,7 +113,15 @@ async function apiDay(env, date) {
       FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id
       WHERE f.ts BETWEEN ? AND ? ORDER BY l.tier, l.country, f.ts`).bind(from, to).all();
   const tips = await env.DB.prepare(`SELECT t.* FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE f.ts BETWEEN ? AND ?`).bind(from, to).all();
-  return { date, fixtures: fx.results, tips: tips.results };
+  // VIP: η επιλογή/απόδοση/αιτιολόγηση ΔΕΝ φεύγουν δημόσια μέχρι τη σέντρα (μετά φαίνονται για το record).
+  // Όταν μπει login, ο συνδεδεμένος χρήστης θα παίρνει πλήρη VIP από ξεχωριστό endpoint.
+  const t0 = now();
+  const out = tips.results.map((t) => {
+    const f = fx.results.find((x) => x.id === t.fixture_id);
+    if (t.tier === "vip" && f && f.ts > t0) return { fixture_id: t.fixture_id, tier: "vip", status: t.status, locked: true };
+    return t;
+  });
+  return { date, fixtures: fx.results, tips: out };
 }
 
 async function status(env) {

@@ -1,4 +1,9 @@
 // Κανόνες tips betizzi (01/11/2026). Όλα τα όρια εδώ, σε ένα σημείο.
+export const MODEL_VERSION = "rules-2026-11-01";
+async function sha256(s) {
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
+}
 export const RULES = {
   freeShare: 0.25,          // free ≈ 1 στους 4 αγώνες με αποδόσεις
   vipShare: 1 / 8,          // VIP ≈ 1 στους 8
@@ -93,16 +98,19 @@ export async function makeTips(env, now) {
   for (const c of pool) tryFree(c, true);
   for (const c of pool) if (!FREE.includes(c)) tryFree(c, false);
 
-  // κρατάμε το created_at των tips που ξαναβγαίνουν, σβήνουμε μόνο όσα δεν ισχύουν πια
+  // Αμετάβλητο record: ένα tip που δημοσιεύτηκε ΔΕΝ αλλάζει και ΔΕΝ σβήνεται ποτέ.
+  // Αν δεν ισχύει πια πριν τη σέντρα → status 'withdrawn' (φαίνεται δημόσια ως αποσυρμένο).
   const keep = new Set([...VIP, ...FREE].map((c) => c.f.id + "|" + MARKET[c.k] + "|" + c.k));
-  const old = (await env.DB.prepare("SELECT fixture_id, market, sel FROM tips WHERE result IS NULL AND fixture_id IN (SELECT id FROM fixtures WHERE ts > ? AND status IN ('NS','TBD'))").bind(now + 15 * 60).all()).results;
+  const old = (await env.DB.prepare("SELECT fixture_id, market, sel FROM tips WHERE status='active' AND result IS NULL AND fixture_id IN (SELECT id FROM fixtures WHERE ts > ? AND status IN ('NS','TBD'))").bind(now + 15 * 60).all()).results;
   const st = old.filter((t) => !keep.has(t.fixture_id + "|" + t.market + "|" + t.sel))
-    .map((t) => env.DB.prepare("DELETE FROM tips WHERE fixture_id=? AND market=? AND sel=?").bind(t.fixture_id, t.market, t.sel));
+    .map((t) => env.DB.prepare("UPDATE tips SET status='withdrawn', withdrawn_at=? WHERE fixture_id=? AND market=? AND sel=?").bind(now, t.fixture_id, t.market, t.sel));
   for (const [tier, list] of [["vip", VIP], ["free", FREE]])
-    for (const c of list)
-      st.push(env.DB.prepare(`INSERT INTO tips(fixture_id,market,sel,tier,strength,level,price,prob,reason,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)
-        ON CONFLICT(fixture_id,market,sel) DO UPDATE SET tier=excluded.tier,strength=excluded.strength,level=excluded.level,price=excluded.price,prob=excluded.prob,reason=excluded.reason`)
-        .bind(c.f.id, MARKET[c.k], c.k, tier, c.s, c.level, c.p, c.prob, c.why, now));
+    for (const c of list) {
+      const hash = await sha256([c.f.id, MARKET[c.k], c.k, tier, c.p, c.prob, now, MODEL_VERSION].join("|"));
+      st.push(env.DB.prepare(`INSERT OR IGNORE INTO tips(fixture_id,market,sel,tier,strength,level,price,prob,reason,created_at,status,model_version,hash)
+        VALUES(?,?,?,?,?,?,?,?,?,?,'active',?,?)`)
+        .bind(c.f.id, MARKET[c.k], c.k, tier, c.s, c.level, c.p, c.prob, c.why, now, MODEL_VERSION, hash));
+    }
   for (let i = 0; i < st.length; i += 90) await env.DB.batch(st.slice(i, i + 90));
   return { fixtures: fx.length, with_odds: withOdds, candidates: cands.length, vip: VIP.length, free: FREE.length };
 }

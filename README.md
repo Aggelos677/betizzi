@@ -36,3 +36,5 @@
 
 - 01/11/2026: betizzi-engine v1 (adapters API-Football για stats και προσωρινά για αποδόσεις, tips με τους νέους κανόνες). Τοπικό τεστ: 754 αγώνες, 5.561 τιμές, 91 tips με φόρμα για 400 ομάδες.
 - 01/11/2026: πρώτο ανέβασμα, πρωτότυπο ως στατική σελίδα. Σύνδεση Cloudflare Workers Builds (betizzi-web, root /web).
+
+- 01/11/2026: Tips αμετάβλητα (status/withdrawn_at/model_version/hash στη D1), VIP κρυμμένα στο δημόσιο /api/day μέχρι τη σέντρα, αποφάσεις SEO/GEO στο CLAUDE.md.
