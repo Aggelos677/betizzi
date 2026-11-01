@@ -376,7 +376,7 @@ details summary{cursor:pointer;color:var(--mu);margin:8px 0}
 .chips{display:flex;gap:6px;overflow-x:auto;margin:0 0 8px;padding-bottom:2px}.ch{flex:none;text-decoration:none;font:700 13px Manrope,sans-serif;padding:8px 12px;border-radius:999px;border:1px solid var(--ln);color:var(--mu);min-height:36px;text-transform:capitalize}
 .ch.on{background:var(--lime);color:#0c0f0d;border-color:var(--lime)}
 h2.rep{font-size:26px;text-transform:capitalize;margin-top:14px}
-.kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 0 8px}.kpi div{background:var(--c1);border:1px solid var(--ln);border-radius:12px;padding:10px 6px;text-align:center}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 8px}.kpi div{background:var(--c1);border:1px solid var(--ln);border-radius:12px;padding:10px 6px;text-align:center}
 .kpi b{display:block;font:700 22px "JetBrains Mono",monospace}.kpi small{color:var(--mu);font-size:11px;display:block}.kpi em{font:700 11px "JetBrains Mono",monospace;font-style:normal}
 .pos{color:var(--lime)}.neg{color:#ff6b6b}
 .big{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
@@ -389,7 +389,8 @@ h2.rep{font-size:26px;text-transform:capitalize;margin-top:14px}
 .rr .lab{font:700 12px "JetBrains Mono",monospace}.rr .bar{height:8px;background:var(--c2);border-radius:4px;overflow:hidden}.rr .bar i{display:block;height:100%}.rr .bar .p{background:var(--lime)}.rr .bar .n{background:#ff6b6b}
 .rr .v{grid-column:2;font:500 11px "JetBrains Mono",monospace;color:var(--mu)}.rr.few{opacity:.5}
 .bdg{grid-column:2;justify-self:start;font:700 10px Manrope,sans-serif;padding:2px 6px;border-radius:5px;border:1px solid currentColor}
-@media(max-width:640px){.kpi{grid-template-columns:repeat(3,1fr)}.two,.three{grid-template-columns:1fr}}
+.hitk b{color:var(--lime)}
+@media(max-width:640px){.kpi{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr}}
 `;
 function recStats(a) {
   const n = a.length, w = a.filter((t) => t.result === 1).length;
@@ -430,11 +431,10 @@ function recordPage(lang, d, mq = "", tq = "") {
     <div class="chips">${chip(q(mo, ""), r.all, !tq)}${chip(q(mo, "free"), "TIP · Free", tq === "free")}${chip(q(mo, "vip"), "VIP", tq === "vip")}</div>` : "";
   const delta = (a, b, unit) => { if (b == null) return ""; const v = a - b; return `<em class="${v >= 0 ? "pos" : "neg"}">${v >= 0 ? "▲" : "▼"} ${Math.abs(v).toFixed(unit === "%" ? 0 : 2)}${unit}</em>`; };
   const kpi = S.length ? `<div class="kpi">
-    <div><small>${esc(r.tips)}</small><b>${ms.n}</b><small>${ms.w} ✓ · ${ms.l} ✗</small></div>
-    <div><small>${esc(r.hit)}</small><b>${ms.hit}%</b>${ps && ps.n ? delta(ms.hit, ps.hit, "%") : ""}</div>
-    <div><small>${esc(r.units)}</small><b class="${ms.u >= 0 ? "pos" : "neg"}">${sgn(ms.u)}</b>${ps && ps.n ? delta(ms.u, ps.u, "u") : ""}</div>
-    <div><small>${esc(r.roi)}</small><b class="${ms.roi >= 0 ? "pos" : "neg"}">${sgn(ms.roi, 1)}%</b></div>
-    <div><small>${esc(r.avg)}</small><b>${ms.avg.toFixed(2)}</b></div></div>${ps && ps.n ? `<p class="note">▲▼ ${esc(r.vsPrev)} (${esc(mName(prevK))})</p>` : ""}` : "";
+    <div><small>${esc(r.tips)}</small><b>${ms.n}</b></div>
+    <div><small>${esc(r.won)}</small><b class="pos">${ms.w} ✓</b></div>
+    <div><small>${esc(r.lost)}</small><b>${ms.l} ✗</b></div>
+    <div class="hitk"><small>${esc(r.hit)}</small><b>${ms.hit}%</b>${ps && ps.n ? delta(ms.hit, ps.hit, "%") : ""}</div></div>${ps && ps.n ? `<p class="note">▲▼ ${esc(r.vsPrev)} (${esc(mName(prevK))})</p>` : ""}` : "";
   const mp = (x) => matchPath(lang, { id: x.id, ts: x.ts, home: { name: x.home }, away: { name: x.away } });
   const wins = S.filter((x) => x.result === 1).sort((a, b) => b.price - a.price).slice(0, 3);
   const bigHtml = wins.length ? `<h2>${esc(mo === "all" ? r.big : r.top3)}</h2><div class="big">${wins.map((x, i) => `<a class="bw" href="${mp(x)}" style="text-decoration:none">
@@ -442,31 +442,33 @@ function recordPage(lang, d, mq = "", tq = "") {
     <small><span class="tg ${x.tier}">${x.tier === "vip" ? "VIP" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} · ${esc(x.league)} · ${fD(x.ts, { day: "numeric", month: "short" })}</small></a>`).join("")}</div>` : "";
   const by = (a, f) => { const m = new Map(); for (const x of a) { const k = f(x); (m.get(k) || m.set(k, []).get(k)).push(x); } return m; };
   // Λίγκες: μόνο όσες έχουν τουλάχιστον MIN_L tips· κατάταξη σε μονάδες.
-  const lg = [...by(S, (x) => `${x.league} · ${x.country}`).entries()].map(([k, a]) => [k, recStats(a)]).filter(([, s]) => s.n >= MIN_L).sort((a, b) => b[1].u - a[1].u);
-  const lgRow = (k, s, good) => `<li><span>${esc(k)}</span><span class="r"><b class="${good ? "pos" : "neg"}">${sgn(s.u)}u</b><small>${s.w}/${s.n} · ${s.hit}%</small></span></li>`;
-  const good = lg.filter(([, s]) => s.u > 0).slice(0, 3), bad = lg.filter(([, s]) => s.u < 0).slice(-3).reverse();
+  const lg = [...by(S, (x) => `${x.league} · ${x.country}`).entries()].map(([k, a]) => [k, recStats(a)]).filter(([, s]) => s.n >= MIN_L).sort((a, b) => b[1].hit - a[1].hit || b[1].n - a[1].n);
+  const lgRow = (k, s, good) => `<li><span>${esc(k)}</span><span class="r"><b class="${good ? "pos" : "neg"}">${s.hit}%</b><small>${s.w}/${s.n} ✓</small></span></li>`;
+  const good = lg.slice(0, 3), bad = lg.slice(3).slice(-3).reverse();
   const lgHtml = S.length ? `<div class="two">
     <div class="card gl"><h3>🔥 ${esc(r.goodL)}</h3>${good.length ? `<ul>${good.map(([k, s]) => lgRow(k, s, true)).join("")}</ul>` : `<p class="note">${esc(r.needL)}</p>`}</div>
     <div class="card bl"><h3>🧊 ${esc(r.badL)}</h3>${bad.length ? `<ul>${bad.map(([k, s]) => lgRow(k, s, false)).join("")}</ul>` : `<p class="note">${esc(r.needL)}</p>`}</div></div>` : "";
   // Εύρη αποδόσεων ανά αγορά: όλα φαίνονται· «καλύτερο/χειρότερο» μόνο με τουλάχιστον MIN_R tips.
   const rangeCard = (title, a) => {
     if (!a.length) return "";
-    const rows = BANDS.map(([lo, hi, lab]) => [lab, recStats(a.filter((x) => x.price >= lo && x.price < hi))]).filter(([, s]) => s.n);
+    const rows = BANDS.map(([lo, hi, lab]) => { const b = a.filter((x) => x.price >= lo && x.price < hi), st = recStats(b);
+      st.ex = b.length ? st.w / st.n - b.reduce((z, x) => z + 1 / x.price, 0) / b.length : 0; return [lab, st]; }).filter(([, s]) => s.n);
     const q = rows.filter(([, s]) => s.n >= MIN_R);
     // «Καλύτερο» μόνο αν είναι κερδοφόρο, «Χειρότερο» μόνο αν είναι χαμένο — όχι ταμπέλα σε κάτι που δεν την αξίζει.
-    let best = q.length >= 2 ? q.reduce((m, x) => (x[1].u > m[1].u ? x : m)) : null, worst = q.length >= 2 ? q.reduce((m, x) => (x[1].u < m[1].u ? x : m)) : null;
-    if (best && best[1].u <= 0) best = null; if (worst && worst[1].u >= 0) worst = null;
+    // Κρίνουμε με το «πόσο πάνω/κάτω από ό,τι έδινε η απόδοση» (αλλιώς οι χαμηλές αποδόσεις θα κέρδιζαν πάντα).
+    let best = q.length >= 2 ? q.reduce((m, x) => (x[1].ex > m[1].ex ? x : m)) : null, worst = q.length >= 2 ? q.reduce((m, x) => (x[1].ex < m[1].ex ? x : m)) : null;
+    if (best && best[1].ex <= 0) best = null; if (worst && worst[1].ex >= 0) worst = null;
     return `<div class="card rg"><h3>${esc(title)}</h3>${rows.map(([lab, s]) => {
       const tag = best && lab === best[0] ? `<span class="bdg pos">${esc(r.bestR)}</span>` : worst && lab === worst[0] ? `<span class="bdg neg">${esc(r.worstR)}</span>` : "";
-      return `<div class="rr${s.n < MIN_R ? " few" : ""}"><span class="lab">${lab}</span><span class="bar"><i style="width:${s.hit}%" class="${s.u >= 0 ? "p" : "n"}"></i></span><span class="v">${s.hit}% · ${s.w}/${s.n} · <b class="${s.u >= 0 ? "pos" : "neg"}">${sgn(s.u)}u</b></span>${tag}</div>`;
+      return `<div class="rr${s.n < MIN_R ? " few" : ""}"><span class="lab">${lab}</span><span class="bar"><i style="width:${s.hit}%" class="${s.ex >= 0 ? "p" : "n"}"></i></span><span class="v"><b>${s.hit}%</b> · ${s.w}/${s.n} ✓</span>${tag}</div>`;
     }).join("")}${q.length < 2 ? `<p class="note">${esc(r.needR)}</p>` : ""}</div>`;
   };
   const isOU = (x) => /^[OU]\d/.test(x.sel), isGG = (x) => x.sel === "GG" || x.sel === "NG", is12 = (x) => ["1", "X", "2", "1X", "X2", "12"].includes(x.sel);
   const rangesHtml = S.length ? `<h2>${esc(r.ranges)}</h2><div class="three">${rangeCard("Over/Under", S.filter(isOU))}${rangeCard("GG/NG", S.filter(isGG))}${rangeCard("1X2", S.filter(is12))}</div>` : "";
   const table = (title, head, groups) => {
     const rows = [...groups.entries()].map(([k, a]) => [k, recStats(a)]);
-    return rows.length ? `<h2>${esc(title)}</h2><div class="card tw"><table><tr><th>${esc(head)}</th><th>${esc(r.tips)}</th><th>${esc(r.won)}</th><th>${esc(r.hit)}</th><th>${esc(r.units)}</th><th>${esc(r.roi)}</th><th>${esc(r.avg)}</th></tr>${
-      rows.map(([k, s]) => `<tr><td>${esc(k)}</td><td>${s.n}</td><td>${s.w}</td><td>${s.hit}%</td><td>${sgn(s.u)}</td><td>${sgn(s.roi, 1)}%</td><td>${s.avg.toFixed(2)}</td></tr>`).join("")}</table></div>` : "";
+    return rows.length ? `<h2>${esc(title)}</h2><div class="card tw"><table><tr><th>${esc(head)}</th><th>${esc(r.tips)}</th><th>${esc(r.won)}</th><th>${esc(r.lost)}</th><th>${esc(r.hit)}</th></tr>${
+      rows.map(([k, s]) => `<tr><td>${esc(k)}</td><td>${s.n}</td><td>${s.w}</td><td>${s.l}</td><td>${s.hit}%</td></tr>`).join("")}</table></div>` : "";
   };
   const monthsTable = mo === "all" ? table(r.byMonth, r.month, new Map(months.map((k) => [mName(k), ALL.filter((x) => inM(x, k) && tierOk(x))]))) : "";
   const li = (x, wd) => `<li class="${wd ? "l" : x.result === 1 ? "w" : "l"}"><span class="d">${fD(x.ts, { day: "2-digit", month: "2-digit" })}<br>${fD(x.ts, { hour: "2-digit", minute: "2-digit", hourCycle: "h23" })}</span>
@@ -484,7 +486,7 @@ function recordPage(lang, d, mq = "", tq = "") {
   const ld = [
     { "@context": "https://schema.org", "@type": "Dataset", name: r.title, description: r.desc, url: `${SITE}${base}`, inLanguage: HREFLANG[lang],
       creator: { "@type": "Organization", name: "betizzi", url: SITE }, dateModified: nowIso, temporalCoverage: d.since ? `${new Date(d.since * 1000).toISOString().slice(0, 10)}/..` : undefined,
-      isAccessibleForFree: true, variableMeasured: [r.tips, r.won, r.hit, r.units, r.roi] },
+      isAccessibleForFree: true, variableMeasured: [r.tips, r.won, r.lost, r.hit] },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
       { "@type": "ListItem", position: 1, name: "betizzi", item: `${SITE}/${lang}/` },
       { "@type": "ListItem", position: 2, name: r.nav, item: `${SITE}${base}` }] },
