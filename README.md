@@ -38,3 +38,4 @@
 - 01/11/2026: πρώτο ανέβασμα, πρωτότυπο ως στατική σελίδα. Σύνδεση Cloudflare Workers Builds (betizzi-web, root /web).
 
 - 01/11/2026: Tips αμετάβλητα (status/withdrawn_at/model_version/hash στη D1), VIP κρυμμένα στο δημόσιο /api/day μέχρι τη σέντρα, αποφάσεις SEO/GEO στο CLAUDE.md.
+- 01/11/2026: Νέος κανόνας: δεδομένα μόνο από modix-bt-v2. Cron του betizzi-engine σε παύση. Επόμενο: σελίδα με mock δεδομένα στη μορφή του modix-bt-v2.

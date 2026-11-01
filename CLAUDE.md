@@ -31,7 +31,7 @@
 - Γραμματοσειρά τίτλων με ελληνικά και κυριλλικά (όχι Barlow Condensed): Fira Sans Extra Condensed ή Roboto Condensed.
 
 ## Λίγκες (κανόνας, 01/11/2026)
-- Πηγή: API-Football. Κάθε χώρα με ποδόσφαιρο: 1η και 2η κατηγορία + εθνικό κύπελλο + League Cup + Super Cup.
+- Πηγή: modix-bt-v2 (πριν: API-Football). Κάθε χώρα με ποδόσφαιρο: 1η και 2η κατηγορία + εθνικό κύπελλο + League Cup + Super Cup.
 - Αγγλία ολόκληρη: Premier League έως National League + FA Cup, League Cup, EFL Trophy, FA Trophy, Community Shield.
 - Πάντα: Coppa Italia (id 137) και Κύπελλο Τουρκίας (id 206), ακόμα κι αν λείπουν από το «current».
 - Διεθνή: Champions/Europa/Conference League, Super Cup, Libertadores, Sudamericana, CAF, AFC, CONCACAF, Παγκόσμιο/Euro/Copa/AFCON + προκριματικά, Nations League, φιλικά εθνικών, φιλικά μεγάλων συλλόγων.
@@ -50,6 +50,13 @@
 - E-E-A-T: σελίδες About, Μεθοδολογία, Record, Υπεύθυνο παιχνίδι, Επικοινωνία, Affiliate disclosure, με όνομα/ημερομηνία ενημέρωσης.
 - Affiliate: `rel="sponsored nofollow"`, μόνο σε χώρες όπου ο bookmaker έχει άδεια. Ιταλία: κανένα affiliate/διαφήμιση στοιχήματος (Decreto Dignità). Ηλικία ανά χώρα (Ελλάδα: να επιβεβαιωθεί 21+).
 - Ποτέ λέξεις «σίγουρο», «κλειδωμένο», «εγγυημένο», «fixed».
+
+## Κοινός λογαριασμός Cloudflare με MODIX90 (01/11/2026)
+- ΜΗΝ αγγίζεις τίποτα που αρχίζει με modix-, modix90-, ptrn90-, p90-, pattern90 (workers, D1, R2, secrets, cron). Ούτε αλλαγή, ούτε διαγραφή, ούτε binding.
+- Όλοι οι δικοί μας πόροι: πρόθεμα betizzi-.
+- Δεδομένα (αγώνες, αποδόσεις, backtests) ΜΟΝΟ από το API modix-bt-v2, μόνο ανάγνωση. Μέχρι να είναι έτοιμο: mock στην ίδια μορφή, ώστε να αλλάξει μόνο η διεύθυνση.
+- Αν λείπει κάτι από τα δεδομένα, δεν το φτιάχνουμε μόνοι μας: το ζητάει ο Owner στο project του MODIX90.
+- Το engine με API-Football (betizzi-engine) είναι σε παύση· ο κώδικας μένει ως αναφορά για τους κανόνες tips.
 
 ## Αρχιτεκτονική
 - Κάθε πηγή δεδομένων πίσω από δικό της «adapter»: `stats` (API-Football), `odds` (btfodds / OddAlerts / μελλοντικό API bookmaker), `live` (API-Football). Η αλλαγή πηγής αλλάζει μόνο τον adapter, ποτέ τη σελίδα.
