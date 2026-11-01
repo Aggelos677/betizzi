@@ -403,5 +403,6 @@ export const UI = {
   "Cash it in!": ["Πάμε ταμείο!", "¡A cobrar!", "Hora de receber!", "À la caisse !", "Ab zur Kasse!", "La casierie!", "Na kasu!", "Към касата!"],
   "We called the score!": ["Το βρήκαμε το σκορ!", "¡Acertamos el marcador!", "Acertamos o placar!", "On a trouvé le score !", "Ergebnis getroffen!", "Am ghicit scorul!", "Pogodili smo rezultat!", "Познахме резултата!"],
   "🏁 Win at full time": ["🏁 Νίκη στη λήξη", "🏁 Gana al final", "🏁 Vitória no fim", "🏁 Gagné au coup de sifflet", "🏁 Sieg bei Abpfiff", "🏁 Câștig la final", "🏁 Pobeda na kraju", "🏁 Победа накрая"],
+  "Correct score": ["Σωστό σκορ", "Marcador exacto", "Placar exato", "Score exact", "Genaues Ergebnis", "Scor corect", "Tačan rezultat", "Точен резултат"],
   "Upcoming": ["Επόμενοι", "Próximos", "Próximos", "À venir", "Demnächst", "Urmează", "Predstoje", "Предстоящи"],
 };
