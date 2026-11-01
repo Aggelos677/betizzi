@@ -431,10 +431,22 @@ body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
   .wrap.app{max-width:1240px;display:grid;grid-template-columns:minmax(0,1fr) 380px;column-gap:28px;align-items:start}
   .wrap.app > header,.wrap.app > nav.tabs{grid-column:1 / -1}
   .wrap.app > .wrap{grid-column:1;max-width:none}
-  .side{display:block;grid-column:2;grid-row:3 / span 6;position:sticky;top:76px;max-height:calc(100vh - 160px);overflow:auto}
+  .side{display:flex;flex-direction:column;gap:16px;grid-column:2;grid-row:3 / span 6}
   .side .card{margin:0}
-  #view-tips > section.card:has(#bzcList){display:none}
 }
+/* πλαϊνό ανά καρτέλα: Wall of wins */
+.rec{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rec div{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px 6px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.rec b{font-size:1.15rem;color:var(--fg)}
+.rec span{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.wincp{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--win);background:rgba(60,207,110,.08);border-radius:10px;padding:9px 12px;font:800 1rem var(--f-display);letter-spacing:.04em}
+.wincp small{font:600 .74rem var(--f-body);color:var(--muted);letter-spacing:0;margin-left:4px}
+.wincp .mono{color:var(--win);font-size:1.05rem}
+.winrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.winrow .wm{min-width:0;display:flex;flex-direction:column}
+.winrow .wm b{font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.winrow .wm small{font-size:.76rem;color:var(--muted)}
+.winrow .wo{font:700 .9rem var(--f-mono);color:var(--win);flex:none}
 </style>
 </head>
 <body>
@@ -464,7 +476,7 @@ body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
   </div>
 
   <!-- TIPS -->
-  <aside id="sidePanel" class="side" aria-label="Today's coupons"><section class="card"><div class="secthead"><h2>Today's coupons</h2></div><div id="bzcSide" class="bzc-list"></div></section></aside>
+  <aside id="sidePanel" class="side" aria-label="Side panel"><section class="card" data-side="coupons"><div class="secthead"><h2>Today's coupons</h2></div><div id="bzcSide" class="bzc-list"></div></section><section class="card" data-side="tips" hidden><div class="secthead"><h2>Wall of wins</h2></div><div id="winsSide" style="display:flex;flex-direction:column;gap:10px"></div></section><section class="card" data-side="build" hidden><div class="secthead"><h2>My slip</h2></div><div id="slipSide" style="display:flex;flex-direction:column;gap:12px"></div></section></aside>
   <div id="view-tips" role="tabpanel" aria-labelledby="tab-tips" class="wrap" hidden>
     <label class="sw" hidden><input type="checkbox" id="vipMember"> Show as registered user (untick to see what a visitor sees)</label>
     <section class="card" aria-labelledby="bzc-title"><div class="secthead"><h2 id="bzc-title">Today's coupons</h2><span class="tag lime" id="bzcCount"></span></div><div id="bzcList" class="bzc-list"></div></section>
@@ -668,7 +680,7 @@ function toggleSel(k){
   afterSlip();
 }
 function addLegs(keys){var mids=keys.map(midOf);slip=slip.filter(function(k){return mids.indexOf(midOf(k))<0;});keys.forEach(function(k){slip.push(k);});afterSlip();toast("Moved to your slip");openSheet();}
-function afterSlip(){save();syncPressed();renderBar();if(!$("sheet").hidden)renderMySlip();}
+function afterSlip(){save();syncPressed();renderBar();if(!$("sheet").hidden)renderMySlip();else renderSide();}
 function totals(){var o=1,p=1,known=true;slip.forEach(function(k){o*=SEL[k].odd;if(SEL[k].p==null)known=false;else p*=SEL[k].p;});return {odds:o,prob:known?p:null};}
 function renderBar(){var b=$("slipBarBtn"),t=totals();$("sbCount").textContent=slip.length;b.dataset.empty=slip.length?"false":"true";
   $("sbTotal").textContent=slip.length?"x"+t.odds.toFixed(2):"—";
@@ -707,8 +719,8 @@ function bindStake(root,id,oddsFn,after){var r=$(id);
   Array.prototype.forEach.call(root.querySelectorAll("[data-m]"),function(b){b.addEventListener("click",function(){if(smode===b.dataset.m)return;smode=b.dataset.m;store("ko-smode",smode);var box=$(id+"Box"),tmp=document.createElement("div");tmp.innerHTML=stakeHTML(id,oddsFn());box.parentNode.replaceChild(tmp.firstChild,box);bindStake($(id+"Box"),id,oddsFn,after);if(smode==="win")set(curVal(oddsFn()));});});
   updStake(id,oddsFn());}
 function oneIn(p){return Math.max(1,Math.round(1/p));}
-function renderMySlip(){
-  var box=$("mySlip");
+function renderMySlip(target){
+  var box=target||$("mySlip"),other=box.id==="mySlip"?$("slipSide"):$("mySlip");if(other)other.innerHTML="";
   if(!slip.length){box.innerHTML='<div class="empty">Your slip is empty. Add a tip from Matches or Our tips, or tap Build.</div><button type="button" class="btn sec" id="goMatches">See matches</button>';
     $("goMatches").addEventListener("click",function(){closeSheet();showTab("matches");});return;}
   var t=totals(),ret=stake*t.odds;
@@ -736,7 +748,7 @@ function renderMySlip(){
   });
 }
 function openSheet(){renderMySlip();$("sheet").hidden=false;$("sheetBg").hidden=false;$("sheetClose").focus();}
-function closeSheet(){$("sheet").hidden=true;$("sheetBg").hidden=true;$("slipBarBtn").focus();}
+function closeSheet(){$("sheet").hidden=true;$("sheetBg").hidden=true;renderSide();$("slipBarBtn").focus();}
 $("slipBarBtn").addEventListener("click",openSheet);$("sheetClose").addEventListener("click",closeSheet);$("sheetBg").addEventListener("click",closeSheet);
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("sheet").hidden)closeSheet();});
 
@@ -830,8 +842,27 @@ function couponWin(c){
   setTimeout(function(){w.classList.add("out");},3200);setTimeout(function(){w.remove();},3700);
 }
 var TABS=["matches","tips","build","coupons"];
-function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-selected",t===name?"true":"false");$("view-"+t).hidden=t!==name;});store("ko-tab",name);window.scrollTo(0,0);}
+function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-selected",t===name?"true":"false");$("view-"+t).hidden=t!==name;});store("ko-tab",name);renderSide();window.scrollTo(0,0);}
 TABS.forEach(function(t){$("tab-"+t).addEventListener("click",function(){showTab(t);});});
+/* ---------- πλαϊνό (PC): αλλάζει ανάλογα με την καρτέλα ---------- */
+function sideOn(){return !!(window.matchMedia&&window.matchMedia("(min-width:1100px)").matches);}
+function curTab(){var c="matches";(TABS||[]).forEach(function(t){var e=$("tab-"+t);if(e&&e.getAttribute("aria-selected")==="true")c=t;});return c;}
+function renderSide(){var p=$("sidePanel");if(!p)return;var tab=curTab(),mode=tab==="tips"?"tips":tab==="build"?"build":"coupons";
+  Array.prototype.forEach.call(p.querySelectorAll("[data-side]"),function(s){s.hidden=s.getAttribute("data-side")!==mode;});
+  if(mode==="tips")renderWins();
+  if(mode==="build"){if(sideOn()&&$("sheet").hidden)renderMySlip($("slipSide"));else $("slipSide").innerHTML="";}
+}
+function renderWins(){var box=$("winsSide");if(!box)return;
+  var fw=0,fl=0,vw=0,vl=0,wins=[];
+  MATCHES.forEach(function(m){if(!m.done||m.type==="cancelled")return;m.tips.forEach(function(t){var v=t.tier==="vip";if(t.r===1){if(v)vw++;else fw++;wins.push({m:m,t:t});}else if(t.r===0){if(v)vl++;else fl++;}});});
+  var L=(typeof BZC!=="undefined"&&BZC)||[],cw=L.filter(function(c){return c.result===1;}),cl=L.filter(function(c){return c.result===0;}).length;
+  function rec(lbl,w,l){return '<div><b class="mono">'+w+'/'+(w+l)+'</b><span>'+lbl+'</span></div>';}
+  var h='<span class="label">Today\'s record</span><div class="rec">'+rec("Free",fw,fl)+rec("VIP",vw,vl)+rec("Coupons",cw.length,cl)+'</div>';
+  h+=cw.map(function(c){return '<div class="wincp"><span>WINNER ✅<small>'+esc(c.kind)+' · '+esc(BZC_VAR[c.variant]||c.variant)+'</small></span><span class="mono">x'+c.odds.toFixed(2)+'</span></div>';}).join("");
+  h+=wins.length?'<div>'+wins.map(function(x){return '<div class="winrow"><span class="wm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+' · FT '+esc(x.m.score)+'</small></span><span class="wo">✓ '+(x.t.odds?x.t.odds.toFixed(2):'')+'</span></div>';}).join("")+'</div>':'<div class="empty">No wins yet today. Matches are still running.</div>';
+  h+='<p class="hint" style="margin:0">We show every result, wins and losses.</p>';
+  box.innerHTML=h;}
+if(window.matchMedia){var _sm=window.matchMedia("(min-width:1100px)");var _sf=function(){renderSide();};if(_sm.addEventListener)_sm.addEventListener("change",_sf);else if(_sm.addListener)_sm.addListener(_sf);}
 
 /* ---------- helpers ---------- */
 function fbars(s,who){return '<span class="fb" role="img" aria-label="'+esc(who)+' last 5, older to newer: '+(s||"no data")+'">'+(s||"").split("").map(function(c){return '<i class="f'+c+'"></i>';}).join("")+'</span>';}
@@ -1116,6 +1147,7 @@ function renderTips(){
   $("freeList").innerHTML=free.map(function(x){return tipCard(x.m,x.t);}).join("")||'<div class="empty">No free tips today.</div>';
   $("vipList").innerHTML=vip.map(function(x){return tipCard(x.m,x.t);}).join("")||'<div class="empty">No VIP tips today.</div>';
   bindButtons($("view-tips")); syncPressed();
+  renderSide();
 }
 function setVip(v){vipMember=v;store("ko-vip",v);$("vipMember").checked=v;renderTips();renderMatches();renderBuilder();}
 $("vipMember").checked=vipMember;
