@@ -3,6 +3,7 @@
 import { LANGS, HREFLANG, TZ, LOCALE, T, SEL, UI, UI_ORDER, REC } from "./i18n.js";
 import { TRANSLATOR } from "./translator.js";
 import { getDay, getMatch, getRecord } from "./data.js";
+import { PG, PG_ORDER, OP } from "./i18n-pages.js";
 
 const SITE = "https://betizzi.com";
 // Σειρά λιγκών: πρώτα οι μεγάλες (Top 30), μετά οι υπόλοιπες ανά χώρα.
@@ -48,6 +49,8 @@ ul{list-style:none;margin:0;padding:0}
 table{width:100%;border-collapse:collapse;font:500 14px "JetBrains Mono",monospace}td,th{padding:7px 4px;text-align:center;border-top:1px solid var(--ln)}th{color:var(--mu);font:600 12px Manrope,sans-serif}
 .fm{display:flex;gap:3px}.fm span{width:16px;height:20px;border-radius:5px;display:grid;place-items:center;font:700 11px "JetBrains Mono",monospace;color:#0c0f0d}
 .fm .W{background:#3ccf6e}.fm .D{background:#ffb547}.fm .L{background:#ff6b6b}
+.fl a{margin:0 6px;white-space:nowrap}
+.doc h2{margin-top:22px}.doc p,.doc li{color:#cfd8d1;line-height:1.6}.doc ul{list-style:disc;padding-left:20px}.doc li{margin:4px 0}.doc a{color:var(--lime)}
 .recl{text-align:center;margin:10px 0}.recl a{color:var(--lime);font-weight:700;text-decoration:none}
 .frow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0}.frow .tm{min-width:0}
 `;
@@ -96,6 +99,14 @@ export default {
       if (hit && Date.now() - hit.t < 5 * 60000) return html(hit.b, 200, age21(req, rm[1]));
       try { const b = recordPage(rm[1], await getRecord(env), mq, tq); PAGES.set(key, { t: Date.now(), b }); return html(b, 200, age21(req, rm[1])); }
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
+    }
+    const sp = p.match(/^\/([a-z]{2})\/([a-z0-9-]+)$/);
+    if (sp && LANGS.includes(sp[1])) {
+      const [, lang, slug] = sp;
+      const key = PG_ORDER.find((k) => PG[k].slug[lang] === slug);
+      if (key) return html(staticPage(lang, key), 200, age21(req, lang));
+      const other = PG_ORDER.find((k) => Object.values(PG[k].slug).includes(slug));
+      if (other) return Response.redirect(url.origin + pgPath(other, lang), 301);
     }
     if (m === null && /^\/[a-z]{2}$/.test(p) && LANGS.includes(p.slice(1))) return Response.redirect(url.origin + p + "/", 301);
     return env.ASSETS.fetch(req);
@@ -228,7 +239,7 @@ ${alt}
     .replace('<div class="hscroll" id="mFilter"', () => ssr + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml)
     .replace("<!--datanote-->", () => `<nav class="langs" aria-label="Language">${langNav}</nav>`)
-    .replace("<!--footlinks-->", () => `<p class="footl" style="margin:0;opacity:.7;font-size:.8rem"><a href="/${lang}/${REC[lang].slug}" style="color:inherit">${esc(REC[lang].nav)}</a></p>`);
+    .replace("<!--footlinks-->", () => `<p class="footl" style="margin:0;opacity:.7;font-size:.8rem;line-height:1.9">${footLinks(lang, ' style="color:inherit"')}</p>`);
   // μετάφραση της εφαρμογής + σωστή ημερομηνία στη γλώσσα της σελίδας
   const dShort = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "long", day: "numeric", month: "long" }).format(noon);
   tpl = tpl.replace('"today").textContent="Sunday 1 November"', () => '"today").textContent=' + JSON.stringify(dShort));
@@ -358,7 +369,7 @@ ${md ? `<h2>${esc(t.model)}</h2><div class="card">${modelHtml}</div>` : ""}
 ${oddsHtml ? `<h2>${esc(t.odds)}</h2><div class="card">${oddsHtml}</div>` : ""}
 <p><a href="/${lang}/">← ${esc(t.back)}</a></p>
 </main>
-<footer><p>${esc(t.rg)}</p><p>© betizzi · <time datetime="${nowIso}">${esc(dLong)}</time> · <a href="/${lang}/${REC[lang].slug}">${esc(REC[lang].nav)}</a></p></footer>
+<footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi · <time datetime="${nowIso}">${esc(dLong)}</time></p></footer>
 </body>
 </html>`;
 }
@@ -535,7 +546,75 @@ ${wdHtml}
 <h2>${esc(r.how)}</h2><p class="how">${esc(r.howText)}</p>
 <p><a href="/${lang}/">← ${esc(t.back)}</a></p>
 </main>
-<footer><p>${esc(t.rg)}</p><p>© betizzi · <time datetime="${nowIso}">${esc(dLong(d.updated || Date.now() / 1000))}</time></p></footer>
+<footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi · <time datetime="${nowIso}">${esc(dLong(d.updated || Date.now() / 1000))}</time></p></footer>
+</body>
+</html>`;
+}
+
+// ---------- Στατικές σελίδες (Ποιοι είμαστε, Επικοινωνία, Υπεύθυνο παιχνίδι, Affiliate, Όροι, Απόρρητο, Cookies) ----------
+function pgPath(key, lang) {
+  const sl = PG[key].slug[lang];
+  return sl ? `/${lang}/${sl}` : `/en/${PG[key].slug.en}`; // Όροι/Απόρρητο/Cookies: όπου δεν υπάρχει μετάφραση, τα αγγλικά
+}
+const pgLabel = (key, lang) => (PG[key].title[lang] || PG[key].title.en).replace(/\s*·\s*18\+$/, "");
+function footLinks(lang, attr = "") {
+  const a = [`<a href="/${lang}/${REC[lang].slug}"${attr}>${esc(REC[lang].nav)}</a>`];
+  for (const k of PG_ORDER) a.push(`<a href="${pgPath(k, lang)}"${attr}${PG[k].slug[lang] ? "" : ' hreflang="en"'}>${esc(pgLabel(k, lang))}</a>`);
+  return a.join(" · ");
+}
+// Μικρό markdown: ## τίτλοι, - λίστες, παράγραφοι, **έντονα**, [κείμενο](link)
+function md(src) {
+  const inl = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, x, u) =>
+    `<a href="${u}"${/^https?:/.test(u) ? ' rel="noopener" target="_blank"' : ""}>${x}</a>`);
+  return src.trim().split(/\n\s*\n/).map((blk) => {
+    const lines = blk.split("\n");
+    if (lines[0].startsWith("## ")) { const rest = lines.slice(1).join("\n"); return `<h2>${inl(lines[0].slice(3))}</h2>` + (rest.trim() ? md(rest) : ""); }
+    if (lines.every((l) => l.startsWith("- "))) return `<ul>${lines.map((l) => `<li>${inl(l.slice(2))}</li>`).join("")}</ul>`;
+    return `<p>${inl(lines.join(" "))}</p>`;
+  }).join("\n");
+}
+function staticPage(lang, key) {
+  const pg = PG[key], t = T[lang];
+  const own = !!pg.body[lang], L = own ? lang : "en"; // χωρίς μετάφραση → αγγλικό κείμενο
+  const langs = LANGS.filter((l) => pg.slug[l]);
+  const canonical = SITE + pgPath(key, lang);
+  const alt = langs.map((l) => `<link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE}/${l}/${pg.slug[l]}">`).join("") + `<link rel="alternate" hreflang="x-default" href="${SITE}/en/${pg.slug.en}">`;
+  const langNav = LANGS.map((l) => `<a href="${pgPath(key, l)}" hreflang="${HREFLANG[l]}"${l === lang ? ' aria-current="page"' : ""}>${l.toUpperCase()}</a>`).join("");
+  const upd = new Date(OP.updated + "T00:00:00Z").toISOString();
+  const dUpd = new Intl.DateTimeFormat(LOCALE[lang], { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(upd));
+  const ld = [{ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
+    { "@type": "ListItem", position: 1, name: "betizzi", item: `${SITE}/${lang}/` },
+    { "@type": "ListItem", position: 2, name: pg.title[L], item: canonical }] }];
+  if (key === "about") ld.push({ "@context": "https://schema.org", "@type": "Organization", name: "betizzi", url: SITE, logo: `${SITE}/og/en.png`,
+    description: pg.desc.en, email: OP.hello, founder: { "@type": "Person", name: OP.name },
+    address: { "@type": "PostalAddress", addressLocality: "Paphos", addressCountry: "CY" },
+    contactPoint: [{ "@type": "ContactPoint", contactType: "customer support", email: OP.hello }, { "@type": "ContactPoint", contactType: "partnerships", email: OP.partners }] });
+  return `<!doctype html>
+<html lang="${HREFLANG[L]}">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(pg.title[L])} | betizzi</title>
+<meta name="description" content="${esc(pg.desc[L])}">
+<link rel="canonical" href="${canonical}">
+${own ? alt : '<meta name="robots" content="noindex,follow">'}
+<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:title" content="${esc(pg.title[L])}">
+<meta property="og:description" content="${esc(pg.desc[L])}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
+<meta property="article:modified_time" content="${upd}"><meta name="theme-color" content="#0c0f0d">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>
+<style>${CSS}</style>
+</head>
+<body>
+<header><a class="logo" href="/${lang}/"><b>bet</b><i>izzi</i></a><nav class="l" aria-label="Language">${langNav}</nav></header>
+<main class="doc">
+<nav class="bc"><a href="/${lang}/">betizzi</a> › ${esc(pg.title[L])}</nav>
+<h1>${esc(pg.title[L])}</h1>
+${md(pg.body[L])}
+<p class="how" style="font-size:13px;margin-top:24px"><time datetime="${upd}">${esc(dUpd)}</time></p>
+<p><a href="/${lang}/">← ${esc(t.back)}</a></p>
+</main>
+<footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi · ${esc(OP.name)}, ${esc(OP.city)}</p></footer>
 </body>
 </html>`;
 }
