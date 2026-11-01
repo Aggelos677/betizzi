@@ -166,6 +166,9 @@ async function apiDay(env, date) {
       FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id
       WHERE f.ts BETWEEN ? AND ? ORDER BY l.tier, l.country, f.ts`).bind(from, to).all();
   const tips = await env.DB.prepare(`SELECT t.* FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE f.ts BETWEEN ? AND ?`).bind(from, to).all();
+  // μόνο οι λίγκες που διάλεξε ο Owner (data/leagues.json, 01/11: 135)
+  fx.results = fx.results.filter((f) => LEAGUE_IDS.has(f.league_id));
+  { const ok = new Set(fx.results.map((f) => f.id)); tips.results = tips.results.filter((t) => ok.has(t.fixture_id)); }
   // VIP: η επιλογή/απόδοση/αιτιολόγηση ΔΕΝ φεύγουν δημόσια μέχρι 10΄ μετά τη σέντρα (μετά φαίνονται για το record).
   // Όταν μπει login, ο συνδεδεμένος χρήστης θα παίρνει πλήρη VIP από ξεχωριστό endpoint.
   const t0 = now();
