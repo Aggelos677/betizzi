@@ -1,8 +1,11 @@
 {
-  // betizzi – η σελίδα (πρωτότυπο). Μόνο στατικά αρχεία από το web/public.
+  // betizzi – η σελίδα. Σελίδες SSR από src/index.js, στατικά αρχεία από public/.
   "name": "betizzi-web",
+  "main": "src/index.js",
   "compatibility_date": "2026-10-01",
-  "assets": { "directory": "./public" },
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  // Δεδομένα από το betizzi-engine (αργότερα modix-bt-v2, αλλάζει μόνο το src/data.js)
+  "services": [{ "binding": "ENGINE", "service": "betizzi-engine" }],
   "workers_dev": true,
   "preview_urls": false,
   "observability": { "enabled": true }
