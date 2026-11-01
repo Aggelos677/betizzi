@@ -143,7 +143,7 @@ async function apiDay(env, date) {
       (SELECT home_id FROM fixtures WHERE ts BETWEEN ?1 AND ?2 UNION SELECT away_id FROM fixtures WHERE ts BETWEEN ?1 AND ?2) ORDER BY r.ts DESC`).bind(from, to).all()).results)
     (res[r.team_id] ||= []).push(r);
   const tipsBy = {};
-  for (const t of tips.results) (tipsBy[t.fixture_id] ||= []).push(t);
+  for (const t of out) (tipsBy[t.fixture_id] ||= []).push(t); // μόνο τα ορατά tips (το σκορ δεν προδίδει VIP)
   for (const f of fx.results) {
     f.odds = odds[f.id] || {};
     f.model = scoreModel(f.odds, tipsBy[f.id] || []);
@@ -166,7 +166,7 @@ async function apiMatch(env, id) {
   const odds = {};
   for (const o of (await env.DB.prepare("SELECT market, sel, price FROM odds WHERE fixture_id=?").bind(id).all()).results) odds[o.sel] = o.price;
   const form = async (team) => (await env.DB.prepare("SELECT fixture_id, ts, is_home, gf, ga FROM results WHERE team_id=? AND ts < ? ORDER BY ts DESC LIMIT 10").bind(team, f.ts).all()).results;
-  const model = scoreModel(odds, tips);
+  const model = scoreModel(odds, tips.filter((t) => t.sel));
   return { fixture: f, tips, odds, form: { home: await form(f.home_id), away: await form(f.away_id) }, model };
 }
 
