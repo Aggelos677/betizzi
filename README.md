@@ -51,3 +51,4 @@
 - 01/11/2026: Email: Cloudflare Email Routing για betizzi.com → bettipsters79@gmail.com (admin, hello, social, marketing, privacy). Αποστολή από Gmail «Send mail as» (smtp.gmail.com) ως admin/hello/marketing. SPF: include:_spf.mx.cloudflare.net include:_spf.google.com. Αυτόματα email site (εγγραφή VIP): αργότερα, ξεχωριστός λογαριασμός Brevo ή Cloudflare Email Sending.
 - 01/11/2026: Μετάφραση εφαρμογής: 151 κείμενα × 8 γλώσσες στο web/src/i18n.js (UI). Μεταφραστής στον browser (web/src/translator.js) με MutationObserver. Ημερομηνία στη γλώσσα της σελίδας. Ελληνικά κεφαλαία χωρίς τόνους. Εκκρεμεί: ονόματα χωρών/λιγκών.
 - 01/11/2026: Κουπόνια ημέρας (engine/src/coupons.js, /api/coupons, cron 06:50 UTC) στην καρτέλα «Τα tips μας». Ομάδες Β/reserves/νέων/γυναικών εκτός tips και κουπονιών (NOT_FIRST_TEAM).
+- 01/11/2026: Κουπόνια με στυλ αποδόσεων (low 1.20–1.50 / mid 1.55–1.95 / high 1.70–2.40), όχι όλα φαβορί. Live σκορ πράσινο (όχι κόκκινο).
