@@ -451,6 +451,7 @@ body.cshake .wrap.app{animation:cshk .5s ease .15s}
 @keyframes cshk{0%,100%{transform:none}20%{transform:translate(-6px,2px)}40%{transform:translate(6px,-2px)}60%{transform:translate(-4px,1px)}80%{transform:translate(3px,0)}}
 .pnote{font-size:.78rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px;margin-top:2px;line-height:1.5}
 .pnote b{color:var(--fg)}.pnote .below{color:var(--warn)}
+.clrall{appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:5px 11px;font:700 .78rem var(--f-body);cursor:pointer;min-height:32px}.clrall:hover{color:var(--bad);border-color:var(--bad)}
 /* Φτιάξε: δύο τρόποι */
 #resultSideWrap:not(:empty){margin-bottom:6px}
 #resultSideWrap .empty{font-size:.85rem}
@@ -856,7 +857,7 @@ function renderMySlip(target){
   if(!slip.length){box.innerHTML='<div class="empty">Your slip is empty. Add a tip from Matches or Our tips, or tap Build.</div><button type="button" class="btn sec" id="goMatches">See matches</button>';
     $("goMatches").addEventListener("click",function(){closeSheet();showTab("matches");});return;}
   var t=totals(),ret=stake*t.odds;
-  var h=bookRowHTML()+'<div class="slip"><div class="slip-head"><span class="label">'+slip.length+(slip.length===1?' pick · single':' picks · accumulator')+'</span></div>';
+  var h=bookRowHTML()+'<div class="slip"><div class="slip-head"><span class="label">'+slip.length+(slip.length===1?' pick · single':' picks · accumulator')+'</span><button type="button" class="clrall" id="clearTop">🗑 <span>Clear all</span></button></div>';
   slip.forEach(function(k){h+=legHTML(SEL[k],true);});
   h+=bookTotalsHTML(slip);
   h+=stakeHTML("sStake",t.odds);
@@ -874,6 +875,7 @@ function renderMySlip(target){
   $("stakeIn").addEventListener("input",function(){var v=parseFloat(this.value);if(v>0){stake=v;save();$("retOut").textContent=(stake*totals().odds).toFixed(2);updStake("sStake",totals().odds);renderBar();}});
   bindStake(box,"sStake",function(){return totals().odds;},function(v){$("stakeIn").value=v;$("retOut").textContent=(v*totals().odds).toFixed(2);});
   $("clearSlip").addEventListener("click",function(){slip=[];afterSlip();toast("Slip cleared");});
+  $("clearTop").addEventListener("click",function(){slip=[];afterSlip();toast("Slip cleared");});
   $("trackSlip").addEventListener("click",function(){saveCoupon(slip.slice(),stake);slip=[];afterSlip();closeSheet();showTab("coupons");toast("Coupon saved. We'll follow it for you");});
   $("copySlip").addEventListener("click",function(){
     var txt="betizzi slip\n"+slip.map(function(k){var s=SEL[k];return s.m.home+" v "+s.m.away+" | "+s.label+" @ "+s.odd.toFixed(2);}).join("\n")+"\nTotal: "+totals().odds.toFixed(2);
