@@ -25,12 +25,13 @@ const MAP = {
 export function apifOdds(env) {
   return {
     name: "apif",
-    async oddsByDate(date, leagueIds) {
-      const rows = []; let page = 1, total = 1, calls = 0;
-      do {
+    // Μία σελίδα τη φορά, για να μοιράζεται η δουλειά σε πολλά σύντομα τρεξίματα.
+    async oddsPage(date, page, leagueIds) {
+      const rows = [];
+      {
         const r = await apifFetch(`${BASE}odds?date=${date}&page=${page}`, env.APIF_KEY);
-        const j = await r.json(); calls++;
-        total = j.paging ? j.paging.total : 1;
+        const j = await r.json();
+        var total = j.paging ? j.paging.total : 1;
         for (const o of j.response || []) {
           if (!leagueIds.has(o.league.id)) continue;
           const best = {};
@@ -47,9 +48,8 @@ export function apifOdds(env) {
           }
           rows.push(...Object.values(best));
         }
-        page++;
-      } while (page <= total && calls < 80);
-      return { rows, calls };
+      }
+      return { rows, total };
     },
   };
 }

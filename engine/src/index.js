@@ -76,19 +76,27 @@ async function syncForm(env, batch = 40) {
   return results.length;
 }
 
-async function syncOdds(env) {
+// Αποδόσεις σε κομμάτια: έως 8 σελίδες ανά τρέξιμο, με δείκτη στη D1. Κάθε μέρα ξαναρχίζει κάθε 12 ώρες.
+async function syncOdds(env, maxPages = 8) {
   const src = sources(env).odds;
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS odds_cursor(date TEXT PRIMARY KEY, next_page INTEGER, total INTEGER, started INTEGER, done INTEGER)").run();
   let calls = 0, n = 0;
-  for (let d = 0; d < 2; d++) {
-    const { rows, calls: c } = await src.oddsByDate(ymd(now() + d * DAY), LEAGUE_IDS);
-    calls += c;
-    const st = rows.map((o) => env.DB.prepare("INSERT OR REPLACE INTO odds(fixture_id,source,market,sel,price,bookmaker,updated) VALUES(?,?,?,?,?,?,?)")
-      .bind(o.fixture_id, src.name, o.market, o.sel, o.price, o.bookmaker, o.updated));
-    for (let i = 0; i < st.length; i += 90) await env.DB.batch(st.slice(i, i + 90));
-    n += rows.length;
+  for (let d = 0; d < 2 && calls < maxPages; d++) {
+    const date = ymd(now() + d * DAY);
+    let c = await env.DB.prepare("SELECT * FROM odds_cursor WHERE date=?").bind(date).first();
+    if (!c || (c.done && now() - c.started > 12 * 3600)) c = { date, next_page: 1, total: 1, started: now(), done: 0 };
+    while (!c.done && calls < maxPages) {
+      const { rows, total } = await src.oddsPage(date, c.next_page, LEAGUE_IDS); calls++;
+      const st = rows.map((o) => env.DB.prepare("INSERT OR REPLACE INTO odds(fixture_id,source,market,sel,price,bookmaker,updated) VALUES(?,?,?,?,?,?,?)")
+        .bind(o.fixture_id, src.name, o.market, o.sel, o.price, o.bookmaker, o.updated));
+      for (let i = 0; i < st.length; i += 90) await env.DB.batch(st.slice(i, i + 90));
+      n += rows.length; c.total = total; c.next_page++;
+      if (c.next_page > total) c.done = 1;
+    }
+    await env.DB.prepare("INSERT OR REPLACE INTO odds_cursor VALUES(?,?,?,?,?)").bind(c.date, c.next_page, c.total, c.started, c.done).run();
   }
-  await log(env, "odds", true, calls, n + " prices");
-  return n;
+  if (calls) await log(env, "odds", true, calls, n + " prices");
+  return { calls, prices: n };
 }
 
 async function syncLive(env) {
@@ -172,7 +180,7 @@ export default {
     if (m % 5 === 0) tasks.push(syncLive(env));
     if (h === 3 && m === 5) tasks.push(seedLeagues(env).then(() => syncFixtures(env)));
     if (m % 6 === 1) tasks.push(syncForm(env));
-    if (h % 12 === 4 && m === 20) tasks.push(syncOdds(env));
+    if (m % 2 === 0) tasks.push(syncOdds(env)); // κάνει δουλειά μόνο όταν υπάρχουν σελίδες που λείπουν
     if (m === 40 && h % 3 === 0) tasks.push(runTips(env));
     if (h === 3 && m === 50) tasks.push(runTips(env));
     ctx.waitUntil(Promise.allSettled(tasks).then(async (r) => {
