@@ -925,7 +925,7 @@ function clState(t,m){var sc=(m.score||"0-0").split("-").map(Number),h=sc[0]||0,
 function renderClose(){var box=$("closeBox");if(!box)return;var it=[],ms={};
   MATCHES.forEach(function(m){if(!m.live)return;m.tips.forEach(function(t){if(!t.sel)return; /* VIP: φαίνονται σε όλους όταν ο server τα ανοίξει (10΄ μετά τη σέντρα) */ms[m.id]=1;it.push({m:m,t:t,s:clState(t,m)});});});
   it=it.filter(function(x){return x.s!=="wait";});
-  if(Object.keys(ms).length<3||!it.length){box.hidden=true;return;}
+  if(!it.length){box.hidden=true;return;} /* απόφαση Owner: φαίνεται και με 1 μόνο, για να δούμε το εφέ */
   var rk={won:0,close:1,wait:2};it.sort(function(a,b){return rk[a.s]-rk[b.s]||(b.m.min||0)-(a.m.min||0);});it=it.slice(0,6);
   var fresh=[];
   var h=it.map(function(x){var k=x.m.id+"|"+x.t.sel,jw=x.s==="won"&&CLPREV[k]&&CLPREV[k]!=="won";if(jw)fresh.push(k);CLPREV[k]=x.s;
