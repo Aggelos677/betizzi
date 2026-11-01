@@ -277,7 +277,7 @@ export const UI = {
   "I want to stake": ["Θέλω να ποντάρω", "Quiero apostar", "Quero apostar", "Je veux miser", "Ich setze", "Vreau să mizez", "Želim da uložim", "Искам да заложа"],
   "I want to win": ["Θέλω να κερδίσω", "Quiero ganar", "Quero ganhar", "Je veux gagner", "Ich will gewinnen", "Vreau să câștig", "Želim da dobijem", "Искам да спечеля"],
   "Amount to win": ["Ποσό που θέλω να κερδίσω", "Cantidad a ganar", "Valor a ganhar", "Montant à gagner", "Gewinnbetrag", "Suma de câștigat", "Iznos za dobitak", "Сума за печалба"],
-  "Potential return": ["Πιθανή επιστροφή", "Retorno posible", "Retorno possível", "Gain potentiel", "Möglicher Gewinn", "Câștig posibil", "Mogući dobitak", "Възможна печалба"],
+  "Potential return": ["Πιθανά κέρδη", "Ganancia potencial", "Retorno potencial", "Gains potentiels", "Möglicher Gewinn", "Câștig potențial", "Mogući dobitak", "Възможна печалба"],
   "Place this slip at": ["Παίξ' το στον", "Juega esta apuesta en", "Faça este bilhete na", "Joue ce ticket chez", "Diesen Schein spielen bei", "Joacă biletul la", "Odigraj tiket kod", "Заложи фиша при"],
   "Clear": ["Καθαρισμός", "Vaciar", "Limpar", "Vider", "Leeren", "Golește", "Obriši", "Изчисти"],
   "Copy": ["Αντιγραφή", "Copiar", "Copiar", "Copier", "Kopieren", "Copiază", "Kopiraj", "Копирай"],

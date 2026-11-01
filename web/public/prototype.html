@@ -653,8 +653,8 @@ function updStake(id,odds,target){
   var a=steps(),r=$(id);if(!r)return;var v=target!=null?target:(smode==="win"?stake*odds:stake),i=nIx(a,v);
   r.value=i;r.style.setProperty("--fill",(i/(a.length-1)*100)+"%");
   /* πάντα: αριστερά τι ποντάρεις, δεξιά (πράσινο) τι κερδίζεις */
-  if(smode==="win"){$(id+"L").innerHTML='<span>Stake</span> <b>'+fmt(stake)+'</b> €';$(id+"S").textContent="To win";$(id+"R").textContent=fmt(v);r.setAttribute("aria-valuetext","win "+v+" euro, stake "+fmt(stake)+" euro");}
-  else{$(id+"L").innerHTML='<span>Stake</span> <b>'+fmt(stake)+'</b> €';$(id+"S").textContent="To win";$(id+"R").textContent=(stake*odds).toFixed(2);r.setAttribute("aria-valuetext",stake+" euro");}
+  if(smode==="win"){$(id+"L").innerHTML='<span>Stake</span> <b>'+fmt(stake)+'</b> €';$(id+"S").textContent="Potential return";$(id+"R").textContent=fmt(v);r.setAttribute("aria-valuetext","win "+v+" euro, stake "+fmt(stake)+" euro");}
+  else{$(id+"L").innerHTML='<span>Stake</span> <b>'+fmt(stake)+'</b> €';$(id+"S").textContent="Potential return";$(id+"R").textContent=(stake*odds).toFixed(2);r.setAttribute("aria-valuetext",stake+" euro");}
 }
 function bindStake(root,id,oddsFn,after){var r=$(id);
   function set(v){var o=oddsFn();if(smode==="win"){stake=Math.max(0.1,Math.round(v/o*100)/100);}else stake=v;save();updStake(id,o,v);renderBar();if(after)after(stake);}
