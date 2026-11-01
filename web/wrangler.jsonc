@@ -6,6 +6,11 @@
   "assets": { "directory": "./public", "binding": "ASSETS" },
   // Δεδομένα από το betizzi-engine (αργότερα modix-bt-v2, αλλάζει μόνο το src/data.js)
   "services": [{ "binding": "ENGINE", "service": "betizzi-engine" }],
+  // Δικό μας domain (ζώνη betizzi.com στο Cloudflare). www → 301 στο betizzi.com (src/index.js).
+  "routes": [
+    { "pattern": "betizzi.com", "custom_domain": true },
+    { "pattern": "www.betizzi.com", "custom_domain": true }
+  ],
   "workers_dev": true,
   "preview_urls": false,
   "observability": { "enabled": true }
