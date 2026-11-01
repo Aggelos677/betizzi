@@ -178,6 +178,15 @@ async function apiDay(env, date) {
   const odds = {};
   for (const o of (await env.DB.prepare("SELECT o.fixture_id, o.sel, o.price FROM odds o JOIN fixtures f ON f.id=o.fixture_id WHERE f.ts BETWEEN ? AND ?").bind(from, to).all()).results)
     (odds[o.fixture_id] ||= {})[o.sel] = o.price;
+  // Τιμή ανά bookmaker (για «ο bookmaker μου» και «καλύτερο σύνολο παρολί»): {bk: [1,X,2,O25,U25,GG,NG]}
+  const BK_SEL = ["1", "X", "2", "O25", "U25", "GG", "NG"], bkOdds = {};
+  try {
+    for (const o of (await env.DB.prepare(`SELECT b.fixture_id, b.bk, b.sel, b.price FROM odds_bk b JOIN fixtures f ON f.id=b.fixture_id
+        WHERE f.ts BETWEEN ? AND ? AND b.sel IN ('1','X','2','O25','U25','GG','NG')`).bind(from, to).all()).results) {
+      const fb = (bkOdds[o.fixture_id] ||= {}), arr = (fb[o.bk] ||= [0, 0, 0, 0, 0, 0, 0]);
+      arr[BK_SEL.indexOf(o.sel)] = o.price;
+    }
+  } catch (e) { /* ο πίνακας μπορεί να λείπει σε παλιά βάση */ }
   const res = {};
   for (const r of (await env.DB.prepare(`SELECT r.team_id, r.ts, r.is_home, r.gf, r.ga FROM results r WHERE r.team_id IN
       (SELECT home_id FROM fixtures WHERE ts BETWEEN ?1 AND ?2 UNION SELECT away_id FROM fixtures WHERE ts BETWEEN ?1 AND ?2) ORDER BY r.ts DESC`).bind(from, to).all()).results)
@@ -186,6 +195,7 @@ async function apiDay(env, date) {
   for (const t of out) (tipsBy[t.fixture_id] ||= []).push(t); // μόνο τα ορατά tips (το σκορ δεν προδίδει VIP)
   for (const f of fx.results) {
     f.odds = odds[f.id] || {};
+    f.bk = bkOdds[f.id] || {};
     f.model = scoreModel(f.odds, tipsBy[f.id] || []);
     for (const side of ["home", "away"]) {
       const list = (res[f[side + "_id"]] || []).filter((r) => r.ts < f.ts).slice(0, 10);
