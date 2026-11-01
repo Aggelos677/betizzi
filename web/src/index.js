@@ -54,6 +54,10 @@ export default {
     const url = new URL(req.url);
     const p = url.pathname;
     if (p === "/") return Response.redirect(url.origin + "/en/", 301);
+    if (p === "/live.json") {
+      const r = env.ENGINE ? await env.ENGINE.fetch("https://engine/api/live") : await fetch("https://betizzi-engine.bettipsters79.workers.dev/api/live");
+      return new Response(await r.text(), { headers: { "content-type": "application/json", "cache-control": "public, max-age=20" } });
+    }
     const m = p.match(/^\/([a-z]{2})\/$/);
     if (m && LANGS.includes(m[1])) {
       try { return html(await todayPage(env, m[1], url)); }

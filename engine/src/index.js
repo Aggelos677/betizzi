@@ -108,7 +108,27 @@ async function syncLive(env) {
   const src = sources(env).stats;
   const list = (await src.live()).filter((f) => LEAGUE_IDS.has(f.league_id));
   if (list.length) await saveFixtures(env, list);
+  // όσοι ήταν live και δεν είναι πια στη λίστα → τελείωσαν: παίρνουμε το τελικό (έως 20 ανά λεπτό)
+  const liveIds = new Set(list.map((f) => f.id));
+  const gone = (await env.DB.prepare("SELECT id FROM fixtures WHERE status IN ('1H','2H','HT','ET','BT','P','LIVE','INT','SUSP') AND ts > ?").bind(now() - 6 * 3600).all()).results
+    .map((r) => r.id).filter((id) => !liveIds.has(id));
+  // και όσοι έπρεπε να έχουν αρχίσει πριν 2,5 ώρες αλλά δεν τους είδαμε ποτέ live
+  const stale = (await env.DB.prepare("SELECT id FROM fixtures WHERE status IN ('NS','TBD') AND ts BETWEEN ? AND ? LIMIT 20").bind(now() - 8 * 3600, now() - 150 * 60).all()).results.map((r) => r.id);
+  const ids = [...gone, ...stale].slice(0, 20);
+  if (ids.length) await saveFixtures(env, await src.byIds(ids));
+  await settleTips(env);
   return list.length;
+}
+
+// Κλείσιμο tips: μόνο σε κανονική λήξη (FT). Το αποτέλεσμα γράφεται μία φορά.
+async function settleTips(env) {
+  const rows = (await env.DB.prepare(`SELECT t.fixture_id, t.market, t.sel, f.gh, f.ga FROM tips t JOIN fixtures f ON f.id=t.fixture_id
+    WHERE t.result IS NULL AND t.status='active' AND f.status='FT'`).all()).results;
+  const won = (s, i, j) => ({ "1": i > j, X: i === j, "2": i < j, "1X": i >= j, X2: i <= j, "12": i !== j, O15: i + j > 1, O25: i + j > 2, O35: i + j > 3,
+    U25: i + j < 3, U35: i + j < 4, GG: i > 0 && j > 0, NG: i === 0 || j === 0 })[s];
+  const st = rows.filter((r) => won(r.sel, r.gh, r.ga) !== undefined)
+    .map((r) => env.DB.prepare("UPDATE tips SET result=? WHERE fixture_id=? AND market=? AND sel=? AND result IS NULL").bind(won(r.sel, r.gh, r.ga) ? 1 : 0, r.fixture_id, r.market, r.sel));
+  for (let i = 0; i < st.length; i += 90) await env.DB.batch(st.slice(i, i + 90));
 }
 
 async function runTips(env) {
@@ -216,6 +236,10 @@ export default {
     const u = new URL(req.url);
     try {
       if (u.pathname === "/" || u.pathname === "/status") return json(await status(env));
+      if (u.pathname === "/api/live") {
+        const r = await env.DB.prepare("SELECT id, status, elapsed, gh, ga FROM fixtures WHERE ts BETWEEN ? AND ? AND status NOT IN ('NS','TBD')").bind(now() - 4 * 3600, now() + 600).all();
+        return json(r.results.map((f) => [f.id, f.status, f.elapsed, f.gh, f.ga]));
+      }
       if (u.pathname === "/api/match") return json(await apiMatch(env, +u.searchParams.get("id")));
       if (u.pathname === "/api/day") return json(await apiDay(env, u.searchParams.get("date") || ymd(now())));
       if (u.pathname === "/run") {
@@ -243,7 +267,7 @@ export default {
     const tasks = [];
     // Αργός ρυθμός (01/11/2026, απόφαση Owner): μοιραζόμαστε το κλειδί API-Football με το MODIX90.
     // Ανεβαίνει όταν πάμε live.
-    if (m % 5 === 0) tasks.push(syncLive(env));
+    tasks.push(syncLive(env)); // 1 κλήση/λεπτό: τα live σκορ πρέπει να είναι φρέσκα για τα εφέ
     if (h === 3 && m === 5) tasks.push(seedLeagues(env).then(() => syncFixtures(env)));
     tasks.push(syncForm(env, 60)); // κάθε λεπτό, 60 ομάδες (~1 κλήση/0,7΄΄)
     tasks.push(syncOdds(env)); // κάνει δουλειά μόνο όταν υπάρχουν σελίδες που λείπουν

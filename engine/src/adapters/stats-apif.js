@@ -35,6 +35,7 @@ export function apifStats(env) {
     name: "apif",
     async fixturesByDate(date) { return (await get(`fixtures?date=${date}`)).map(fx); },
     async live() { return (await get("fixtures?live=all")).map(fx); },
+    async byIds(ids) { return ids.length ? (await get("fixtures?ids=" + ids.slice(0, 20).join("-"))).map(fx) : []; },
     async lastResults(teamId, n) {
       const list = await get(`fixtures?team=${teamId}&last=${n}&status=FT-AET-PEN`);
       return list.map((f) => {

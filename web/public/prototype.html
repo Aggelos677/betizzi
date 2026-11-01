@@ -606,7 +606,7 @@ MATCHES.forEach(function(m){
 });
 function badgeIcons(m,n){return m.badges.slice(0,n).map(function(k){return '<i class="bdg" title="'+BADGE[k][1]+'" aria-label="'+BADGE[k][1]+'">'+BADGE[k][0]+'</i>';}).join("");}
 
-var vipMember = load("ko-vip", true);
+var vipMember = load("ko-vip", false);
 
 /* ---------- my slip ---------- */
 var slip = load("ko-slip",[]).filter(function(k){return SEL[k]&&SEL[k].m.open;});
@@ -988,6 +988,35 @@ $("demoCalled").addEventListener("click",function(){
   setTimeout(function(){renderMatches();renderFilters();toast("🎯 "+countFilter("called")+" scores called today");},4300);
 });
 
+/* ---------- live: πραγματικά σκορ κάθε 30΄΄ → εφέ γκολ, tip που κλείνει, «Called it», κουπόνια ---------- */
+(function(){
+  if(location.protocol==="file:")return;
+  var LV={"1H":1,"2H":1,"HT":1,"ET":1,"BT":1,"P":1,"LIVE":1,"INT":1},FIN={"FT":1,"AET":1,"PEN":1};
+  function landed(t,i,j){var s=(t.sel||"").toLowerCase(),n;
+    if(s==="gg")return i>0&&j>0; if((n=s.match(/^over\s*([\d.]+)/)))return i+j>parseFloat(n[1]); return false;}
+  function tick(){
+    fetch("/live.json",{cache:"no-store"}).then(function(r){return r.json();}).then(function(list){
+      var changed=false,fx=[];
+      list.forEach(function(x){
+        var m=MATCHES.find(function(y){return y.id===x[0];});if(!m||m._demo)return;
+        var st=x[1],sc=(x[3]==null?"":x[3]+"-"+x[4]),old=m.score;
+        var live=!!LV[st],done=!!FIN[st];
+        if(m.score===sc&&m.live===live&&m.done===done&&m.min===(x[2]||0))return;
+        changed=true;
+        var o=(old||"0-0").split("-").map(Number),n=sc?sc.split("-").map(Number):o;
+        if(n[0]+n[1]>o[0]+o[1]&&old!==""){
+          var side=n[0]>o[0]?"h":"a";
+          var big=m.tips.some(function(t){return (t.tier==="free"||vipMember)&&!landed(t,o[0],o[1])&&landed(t,n[0],n[1]);});
+          fx.push(function(){big?goalFx(m.id,side):goalFxSmall(m.id,side);if(big)toast("⚽ "+m.home+" v "+m.away+" "+sc+" · tip landed");});
+        }
+        if(done&&!m.done&&sc===m.bz)fx.push(function(){calledIt(m);m.hit=true;});
+        m.score=sc;m.min=x[2]||0;m.live=live;m.done=done;m.open=!live&&!done;m.type=live?"inprogress":done?"finished":m.type;
+      });
+      if(changed){renderFilters();renderMatches();try{renderTips();renderCoupons();renderBar();}catch(e){}fx.forEach(function(f,i){setTimeout(f,250+i*700);});}
+    }).catch(function(){});
+  }
+  tick();setInterval(function(){if(!document.hidden)tick();},30000);
+})();
 $("demoCoupon").addEventListener("click",function(){
   var picks=[];MATCHES.forEach(function(m){if(picks.length<3&&m.open&&!m._demo)m.tips.forEach(function(t){var c=tipCode(t);if(picks.length<3&&(c==="O25"||c==="GG"||c==="1"||c==="2")&&(t.tier==="free"||vipMember)&&picks.every(function(p){return p.m!==m;}))picks.push({m:m,t:t,c:c});});});
   if(picks.length<3){toast("Nothing left to demo, refresh the page");return;}
