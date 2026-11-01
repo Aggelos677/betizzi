@@ -1,0 +1,54 @@
+// Adapter «odds» για το API-Football (προσωρινό, μέχρι να μπει btfodds/OddAlerts).
+// Κρατάει την καλύτερη τιμή από Pinnacle, Bet365, 1xBet για τις αγορές των tips.
+const BASE = "https://v3.football.api-sports.io/";
+// Ήπιος ρυθμός: ~5 κλήσεις/δευτ., και μία επανάληψη αν απαντήσει 429 (όριο ανά λεπτό).
+let last = 0;
+async function apifFetch(url, key) {
+  for (let i = 0; i < 3; i++) {
+    const wait = Math.max(0, last + 220 - Date.now()); if (wait) await new Promise((r) => setTimeout(r, wait));
+    last = Date.now();
+    const r = await fetch(url, { headers: { "x-apisports-key": key } });
+    if (r.status !== 429) return r;
+    await new Promise((res) => setTimeout(res, 3000 * (i + 1)));
+  }
+  throw new Error("apif 429 " + url);
+}
+const BOOKS = new Set(["Pinnacle", "Bet365", "1xBet"]);
+const MAP = {
+  "Match Winner": { market: "1X2", sel: { Home: "1", Draw: "X", Away: "2" } },
+  "Goals Over/Under": { market: "OU", sel: { "Over 2.5": "O25", "Under 2.5": "U25", "Over 1.5": "O15", "Under 3.5": "U35", "Over 3.5": "O35" } },
+  "Both Teams Score": { market: "BTTS", sel: { Yes: "GG", No: "NG" } },
+  "Double Chance": { market: "DC", sel: { "Home/Draw": "1X", "Draw/Away": "X2", "Home/Away": "12" } },
+};
+
+export function apifOdds(env) {
+  return {
+    name: "apif",
+    async oddsByDate(date, leagueIds) {
+      const rows = []; let page = 1, total = 1, calls = 0;
+      do {
+        const r = await apifFetch(`${BASE}odds?date=${date}&page=${page}`, env.APIF_KEY);
+        const j = await r.json(); calls++;
+        total = j.paging ? j.paging.total : 1;
+        for (const o of j.response || []) {
+          if (!leagueIds.has(o.league.id)) continue;
+          const best = {};
+          for (const b of o.bookmakers) {
+            if (!BOOKS.has(b.name)) continue;
+            for (const bet of b.bets) {
+              const m = MAP[bet.name]; if (!m) continue;
+              for (const v of bet.values) {
+                const sel = m.sel[v.value]; if (!sel) continue;
+                const p = parseFloat(v.odd); const k = m.market + "|" + sel;
+                if (!best[k] || p > best[k].price) best[k] = { fixture_id: o.fixture.id, market: m.market, sel, price: p, bookmaker: b.name, updated: Math.floor(Date.parse(o.update) / 1000) };
+              }
+            }
+          }
+          rows.push(...Object.values(best));
+        }
+        page++;
+      } while (page <= total && calls < 80);
+      return { rows, calls };
+    },
+  };
+}

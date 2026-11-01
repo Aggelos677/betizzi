@@ -1,0 +1,14 @@
+{
+  // betizzi-engine — μηχανή δεδομένων (01/11/2026)
+  "name": "betizzi-engine",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  "triggers": { "crons": ["* * * * *"] },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "betizzi-db", "database_id": "2d23c360-c1ef-4757-95b1-8b1dc4316c89" }
+  ],
+  // Secrets (Cloudflare → betizzi-engine → Settings → Variables and Secrets): APIF_KEY, ADMIN_TOKEN
+  "observability": { "enabled": true }
+}

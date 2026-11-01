@@ -1,0 +1,168 @@
+// betizzi-engine — μηχανή δεδομένων.
+// Τραβάει αγώνες/αποτελέσματα/live από τα «adapters», βγάζει tips με τους κανόνες του betizzi
+// και τα γράφει στη βάση betizzi-db. Η σελίδα διαβάζει ΜΟΝΟ από τη βάση (/api/...).
+import LEAGUES from "../data/leagues.json";
+import { apifStats } from "./adapters/stats-apif.js";
+import { apifOdds } from "./adapters/odds-apif.js";
+import { makeTips } from "./tips.js";
+
+const LEAGUE_IDS = new Set(LEAGUES.map((l) => l.id));
+const DAY = 86400;
+
+// Ποιος adapter χρησιμοποιείται. Αλλαγή πηγής = αλλαγή μόνο εδώ.
+function sources(env) {
+  return { stats: apifStats(env), odds: apifOdds(env) };
+}
+
+const now = () => Math.floor(Date.now() / 1000);
+const ymd = (ts) => new Date(ts * 1000).toISOString().slice(0, 10);
+
+async function log(env, job, ok, calls, note) {
+  await env.DB.prepare("INSERT INTO runs(ts,job,ok,calls,note) VALUES(?,?,?,?,?)")
+    .bind(now(), job, ok ? 1 : 0, calls, String(note || "").slice(0, 500)).run();
+}
+
+// ---------- jobs ----------
+async function seedLeagues(env) {
+  const stmts = LEAGUES.map((l) =>
+    env.DB.prepare("INSERT OR REPLACE INTO leagues(id,country,name,type,tier,enabled) VALUES(?,?,?,?,?,1)")
+      .bind(l.id, l.country, l.name, l.type, l.tier));
+  for (let i = 0; i < stmts.length; i += 90) await env.DB.batch(stmts.slice(i, i + 90));
+  return LEAGUES.length;
+}
+
+async function syncFixtures(env, days = 3) {
+  const src = sources(env).stats;
+  let n = 0, calls = 0;
+  for (let d = 0; d < days; d++) {
+    const list = await src.fixturesByDate(ymd(now() + d * DAY)); calls++;
+    const keep = list.filter((f) => LEAGUE_IDS.has(f.league_id));
+    await saveFixtures(env, keep);
+    n += keep.length;
+  }
+  await log(env, "fixtures", true, calls, n + " fixtures");
+  return n;
+}
+
+async function saveFixtures(env, list) {
+  const st = [];
+  for (const f of list) {
+    st.push(env.DB.prepare(`INSERT INTO fixtures(id,ts,league_id,season,round,home_id,away_id,status,elapsed,gh,ga,hth,hta,updated)
+      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      ON CONFLICT(id) DO UPDATE SET ts=excluded.ts,status=excluded.status,elapsed=excluded.elapsed,gh=excluded.gh,ga=excluded.ga,hth=excluded.hth,hta=excluded.hta,updated=excluded.updated`)
+      .bind(f.id, f.ts, f.league_id, f.season, f.round, f.home.id, f.away.id, f.status, f.elapsed, f.gh, f.ga, f.hth, f.hta, now()));
+    for (const t of [f.home, f.away])
+      st.push(env.DB.prepare("INSERT OR REPLACE INTO teams(id,name,country,logo) VALUES(?,?,?,?)").bind(t.id, t.name, f.country, t.logo));
+  }
+  for (let i = 0; i < st.length; i += 90) await env.DB.batch(st.slice(i, i + 90));
+}
+
+// Φόρμα: τελευταίοι 10 αγώνες κάθε ομάδας που παίζει τις επόμενες 3 μέρες. Λίγες ομάδες ανά εκτέλεση.
+async function syncForm(env, batch = 40) {
+  const src = sources(env).stats;
+  const { results } = await env.DB.prepare(`
+    SELECT t.team FROM (SELECT home_id team FROM fixtures WHERE ts BETWEEN ?1 AND ?2 UNION SELECT away_id FROM fixtures WHERE ts BETWEEN ?1 AND ?2) t
+    LEFT JOIN (SELECT team_id, MAX(fetched) f FROM form_fetch GROUP BY team_id) ff ON ff.team_id=t.team
+    WHERE ff.f IS NULL OR ff.f < ?3 LIMIT ?4`).bind(now(), now() + 3 * DAY, now() - 20 * 3600, batch).all();
+  let calls = 0;
+  for (const r of results) {
+    const games = await src.lastResults(r.team, 10); calls++;
+    const st = games.map((g) => env.DB.prepare("INSERT OR REPLACE INTO results(team_id,fixture_id,ts,is_home,gf,ga,ht_gf,ht_ga) VALUES(?,?,?,?,?,?,?,?)")
+      .bind(r.team, g.id, g.ts, g.is_home, g.gf, g.ga, g.ht_gf, g.ht_ga));
+    st.push(env.DB.prepare("INSERT OR REPLACE INTO form_fetch(team_id,fetched) VALUES(?,?)").bind(r.team, now()));
+    await env.DB.batch(st);
+  }
+  if (calls) await log(env, "form", true, calls, results.length + " teams");
+  return results.length;
+}
+
+async function syncOdds(env) {
+  const src = sources(env).odds;
+  let calls = 0, n = 0;
+  for (let d = 0; d < 2; d++) {
+    const { rows, calls: c } = await src.oddsByDate(ymd(now() + d * DAY), LEAGUE_IDS);
+    calls += c;
+    const st = rows.map((o) => env.DB.prepare("INSERT OR REPLACE INTO odds(fixture_id,source,market,sel,price,bookmaker,updated) VALUES(?,?,?,?,?,?,?)")
+      .bind(o.fixture_id, src.name, o.market, o.sel, o.price, o.bookmaker, o.updated));
+    for (let i = 0; i < st.length; i += 90) await env.DB.batch(st.slice(i, i + 90));
+    n += rows.length;
+  }
+  await log(env, "odds", true, calls, n + " prices");
+  return n;
+}
+
+async function syncLive(env) {
+  const src = sources(env).stats;
+  const list = (await src.live()).filter((f) => LEAGUE_IDS.has(f.league_id));
+  if (list.length) await saveFixtures(env, list);
+  return list.length;
+}
+
+async function runTips(env) {
+  const out = await makeTips(env, now());
+  await log(env, "tips", true, 0, JSON.stringify(out));
+  return out;
+}
+
+// ---------- API για τη σελίδα ----------
+async function apiDay(env, date) {
+  const from = Math.floor(Date.parse(date + "T00:00:00Z") / 1000) - 3 * 3600;
+  const to = from + DAY;
+  const fx = await env.DB.prepare(`SELECT f.*, l.name league, l.country, l.type ltype, l.tier,
+      h.name home, h.logo home_logo, a.name away, a.logo away_logo
+      FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id
+      WHERE f.ts BETWEEN ? AND ? ORDER BY l.tier, l.country, f.ts`).bind(from, to).all();
+  const tips = await env.DB.prepare(`SELECT t.* FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE f.ts BETWEEN ? AND ?`).bind(from, to).all();
+  return { date, fixtures: fx.results, tips: tips.results };
+}
+
+async function status(env) {
+  const q = (s) => env.DB.prepare(s).first();
+  return {
+    leagues: (await q("SELECT COUNT(*) n FROM leagues")).n,
+    fixtures_next_3d: (await env.DB.prepare("SELECT COUNT(*) n FROM fixtures WHERE ts BETWEEN ? AND ?").bind(now(), now() + 3 * DAY).first()).n,
+    teams_with_form: (await q("SELECT COUNT(DISTINCT team_id) n FROM results")).n,
+    odds_rows: (await q("SELECT COUNT(*) n FROM odds")).n,
+    tips: (await env.DB.prepare("SELECT tier, COUNT(*) n FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE f.ts > ? GROUP BY tier").bind(now() - 6 * 3600).all()).results,
+    last_runs: (await env.DB.prepare("SELECT datetime(ts,'unixepoch') at, job, ok, calls, note FROM runs ORDER BY id DESC LIMIT 12").all()).results,
+  };
+}
+
+const json = (o, s = 200) => new Response(JSON.stringify(o, null, 1), { status: s, headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" } });
+
+export default {
+  async fetch(req, env) {
+    const u = new URL(req.url);
+    try {
+      if (u.pathname === "/" || u.pathname === "/status") return json(await status(env));
+      if (u.pathname === "/api/day") return json(await apiDay(env, u.searchParams.get("date") || ymd(now())));
+      if (u.pathname === "/run") {
+        if (!env.ADMIN_TOKEN || u.searchParams.get("t") !== env.ADMIN_TOKEN) return json({ error: "unauthorized" }, 401);
+        const job = u.searchParams.get("job");
+        const jobs = { seed: seedLeagues, fixtures: syncFixtures, form: syncForm, odds: syncOdds, live: syncLive, tips: runTips };
+        if (!jobs[job]) return json({ error: "unknown job", jobs: Object.keys(jobs) }, 400);
+        return json({ job, result: await jobs[job](env) });
+      }
+      return json({ error: "not found" }, 404);
+    } catch (e) {
+      return json({ error: String(e && e.message || e) }, 500);
+    }
+  },
+
+  // Ένα cron κάθε λεπτό. Τι τρέχει εξαρτάται από την ώρα (UTC).
+  async scheduled(ev, env, ctx) {
+    const d = new Date(ev.scheduledTime), m = d.getUTCMinutes(), h = d.getUTCHours();
+    const tasks = [];
+    // live: κάθε λεπτό 11:00–21:59 UTC (13:00–23:59 Κύπρου), αλλιώς κάθε 2 λεπτά
+    if (h >= 11 && h <= 21 ? true : m % 2 === 0) tasks.push(syncLive(env));
+    if (h === 3 && m === 5) tasks.push(seedLeagues(env).then(() => syncFixtures(env)));
+    if (m % 3 === 1) tasks.push(syncForm(env));
+    if (h % 6 === 0 && m === 20) tasks.push(syncOdds(env));
+    if (m === 40 && h % 3 === 0) tasks.push(runTips(env));
+    if (h === 3 && m === 50) tasks.push(runTips(env));
+    ctx.waitUntil(Promise.allSettled(tasks).then(async (r) => {
+      const bad = r.filter((x) => x.status === "rejected");
+      if (bad.length) await log(env, "cron", false, 0, bad.map((b) => String(b.reason)).join(" | "));
+    }));
+  },
+};
