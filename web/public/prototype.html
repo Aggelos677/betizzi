@@ -64,7 +64,7 @@ section.card{background:var(--panel);border:1px solid var(--line);border-radius:
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .ret-top{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
 .ret-val{font:800 2.6rem/1 var(--f-display);color:var(--lime);letter-spacing:.02em}
-.ret-val small{font-size:1.2rem;color:var(--muted);margin-right:2px}
+.ret-val small{font:700 .78rem var(--f-body,Manrope),sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:6px;vertical-align:middle}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:36px;background:transparent;cursor:pointer}
 input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:999px;background:linear-gradient(to right,var(--lime) var(--fill,30%),var(--line) var(--fill,30%))}
 input[type=range]::-moz-range-track{height:8px;border-radius:999px;background:var(--line)}
@@ -652,8 +652,9 @@ function stakeHTML(id,odds){var a=steps(),i=nIx(a,curVal(odds));
 function updStake(id,odds,target){
   var a=steps(),r=$(id);if(!r)return;var v=target!=null?target:(smode==="win"?stake*odds:stake),i=nIx(a,v);
   r.value=i;r.style.setProperty("--fill",(i/(a.length-1)*100)+"%");
-  if(smode==="win"){$(id+"L").innerHTML='To win <b>'+fmt(v)+'</b> €';$(id+"S").textContent="stake";$(id+"R").textContent=fmt(stake);r.setAttribute("aria-valuetext","win "+v+" euro, stake "+fmt(stake)+" euro");}
-  else{$(id+"L").innerHTML='Stake <b>'+fmt(stake)+'</b> €';$(id+"S").textContent="return";$(id+"R").textContent=(stake*odds).toFixed(2);r.setAttribute("aria-valuetext",stake+" euro");}
+  /* πάντα: αριστερά τι ποντάρεις, δεξιά (πράσινο) τι κερδίζεις */
+  if(smode==="win"){$(id+"L").innerHTML='<span>Stake</span> <b>'+fmt(stake)+'</b> €';$(id+"S").textContent="To win";$(id+"R").textContent=fmt(v);r.setAttribute("aria-valuetext","win "+v+" euro, stake "+fmt(stake)+" euro");}
+  else{$(id+"L").innerHTML='<span>Stake</span> <b>'+fmt(stake)+'</b> €';$(id+"S").textContent="To win";$(id+"R").textContent=(stake*odds).toFixed(2);r.setAttribute("aria-valuetext",stake+" euro");}
 }
 function bindStake(root,id,oddsFn,after){var r=$(id);
   function set(v){var o=oddsFn();if(smode==="win"){stake=Math.max(0.1,Math.round(v/o*100)/100);}else stake=v;save();updStake(id,o,v);renderBar();if(after)after(stake);}
