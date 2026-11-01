@@ -58,13 +58,12 @@ export async function makeTips(env, now) {
       "1": fair(o["1"], o["1"], o["X"], o["2"]), "X": fair(o["X"], o["1"], o["X"], o["2"]), "2": fair(o["2"], o["1"], o["X"], o["2"]),
       O25: fair(o.O25, o.O25, o.U25), U25: fair(o.U25, o.O25, o.U25), GG: fair(o.GG, o.GG, o.NG), NG: fair(o.NG, o.GG, o.NG),
     };
-    // «Πάτος» τιμής: κάτω από αυτόν δεν το προτείνουμε (VIP = ο πάτος, Free = 3% κάτω από τον πάτο του VIP, τουλάχιστον 1.40)
+    // «Πάτος» τιμής για το «όχι κάτω από»: VIP = ο πάτος, Free = 3% κάτω από τον πάτο του VIP (τουλάχιστον 1.40) ή η τιμή έκδοσης αν είναι πιο χαμηλή
     const freeMin = (fl) => Math.max(RULES.free.min, Math.round(fl * RULES.freeBelowVip * 100) / 100);
     for (const k of ["O25", "U25", "GG", "NG"]) {
       const s = sig[k], p = o[k]; if (s < 7 || !p) continue;
       const fl = Math.max(RULES.vip.floor, RULES.vipTarget[k][s]);
       const vip = p >= fl && p <= RULES.vip.max;
-      if (!vip && p < freeMin(fl)) continue;
       cands.push({ f, k, s, p, vip, fl, fmin: freeMin(fl), level: s >= 9 ? "A" : s === 8 ? "B" : "C", prob: prob[k], why: `${s}/10 games` });
     }
     const hp = pts(H), ap = pts(A);
@@ -75,8 +74,7 @@ export async function makeTips(env, now) {
       if (me >= th && diff >= 6 && p) {
         const fl = Math.max(RULES.vip.floor, RULES.vipTarget12(side, diff));
         const vip = p >= fl && p <= RULES.vip.max;
-        if (!vip && p < freeMin(fl)) continue;
-        cands.push({ f, k: side, s: 100 + diff, p, vip, fl, fmin: freeMin(fl), level: me >= 13 && diff >= 9 ? "A" : "B", prob: prob[side], why: `form ${hp}-${ap} pts` });
+          cands.push({ f, k: side, s: 100 + diff, p, vip, fl, fmin: freeMin(fl), level: me >= 13 && diff >= 9 ? "A" : "B", prob: prob[side], why: `form ${hp}-${ap} pts` });
       }
     }
     const px = o["X"];
@@ -120,7 +118,9 @@ export async function makeTips(env, now) {
   try { await env.DB.prepare("ALTER TABLE tips ADD COLUMN min_price REAL").run(); } catch (e) { /* υπάρχει ήδη */ }
   for (const [tier, list] of [["vip", VIP], ["free", FREE]])
     for (const c of list) {
-      const minp = tier === "vip" ? c.fl : c.fmin;
+      // απόφαση Owner 01/11: τα Free ΔΕΝ κόβονται. «Όχι κάτω από» = ο πάτος του Free (3% κάτω από το VIP),
+      // εκτός αν το tip βγήκε πιο χαμηλά: τότε «όχι κάτω από» την τιμή έκδοσης.
+      const minp = tier === "vip" ? c.fl : Math.min(c.p, c.fmin);
       const hash = await sha256([c.f.id, MARKET[c.k], c.k, tier, c.p, c.prob, now, MODEL_VERSION, minp].join("|"));
       st.push(env.DB.prepare(`INSERT OR IGNORE INTO tips(fixture_id,market,sel,tier,strength,level,price,prob,reason,created_at,status,model_version,hash,min_price)
         VALUES(?,?,?,?,?,?,?,?,?,?,'active',?,?,?)`)
