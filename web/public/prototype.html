@@ -922,20 +922,27 @@ function clState(t,m){var sc=(m.score||"0-0").split("-").map(Number),h=sc[0]||0,
   if(s==="NG")return (g===0&&min>60)||((h===0||a===0)&&g>0&&min>=85)?"close":"wait";
   var hold=s==="Home"?h>a:s==="Away"?a>h:s==="Draw"?h===a:s==="1X"?h>=a:s==="X2"?a>=h:s==="12"?h!==a:false;
   return hold&&min>=85?"close":"wait";}
-function renderClose(){var box=$("closeBox");if(!box)return;var it=[],ms={};
-  MATCHES.forEach(function(m){if(!m.live)return;m.tips.forEach(function(t){if(!t.sel)return; /* VIP: φαίνονται σε όλους όταν ο server τα ανοίξει (10΄ μετά τη σέντρα) */ms[m.id]=1;it.push({m:m,t:t,s:clState(t,m)});});});
-  it=it.filter(function(x){return x.s!=="wait";});
-  if(!it.length){box.hidden=true;return;} /* απόφαση Owner: φαίνεται και με 1 μόνο, για να δούμε το εφέ */
-  var rk={won:0,close:1,wait:2};it.sort(function(a,b){return rk[a.s]-rk[b.s]||(b.m.min||0)-(a.m.min||0);});it=it.slice(0,6);
-  var fresh=[];
-  var h=it.map(function(x){var k=x.m.id+"|"+x.t.sel,jw=x.s==="won"&&CLPREV[k]&&CLPREV[k]!=="won";if(jw)fresh.push(k);CLPREV[k]=x.s;
-    return '<div class="clrow '+x.s+(jw?' justwon':'')+'" data-k="'+esc(k)+'"><span class="clmin"><b>'+esc(x.m.score||"0-0")+'</b>'+(x.m.min||0)+'\'</span><span class="clm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+'</small></span><span class="clst"><span class="mono">'+(x.t.odds?x.t.odds.toFixed(2):'')+'</span>'+(x.s==="won"?'<span class="clbdg">✓ <span>Landed</span></span>':x.s==="close"?'<span class="clbdg"><span>Close</span></span>':'')+'</span></div>';}).join("");
-  it.forEach(function(x){var k=x.m.id+"|"+x.t.sel;if(!CLPREV[k])CLPREV[k]=x.s;});
-  var L=$("closeList");if(L._h!==h){L._h=h;L.innerHTML=h;}box.hidden=false;
+var WONAT={};
+function renderClose(){var box=$("closeBox");if(!box)return;var it=[],now=Date.now(),fresh=[];
+  /* όλα τα live tips: κρατάμε την προηγούμενη κατάσταση για να πιάσουμε τη στιγμή που ένα tip «μπαίνει» */
+  MATCHES.forEach(function(m){if(!m.live)return;m.tips.forEach(function(t){if(!t.sel)return; /* VIP: φαίνονται όταν τα ανοίξει ο server (10΄ μετά τη σέντρα) */
+    var k=m.id+"|"+t.sel,s=clState(t,m);
+    if(s==="won"&&CLPREV[k]&&CLPREV[k]!=="won"&&!WONAT[k]){WONAT[k]=now;fresh.push(k);}
+    CLPREV[k]=s;
+    /* «Μπήκε»: ανεβαίνει δεξιά με εφέ τη στιγμή του γκολ και φεύγει μετά από 2΄ (απόφαση Owner) */
+    if(s==="won"&&!(WONAT[k]&&now-WONAT[k]<120000))return;
+    if(s==="wait")return;
+    it.push({m:m,t:t,s:s,k:k});});});
+  if(!it.length){box.hidden=true;return;}
+  var rk={won:0,close:1};it.sort(function(a,b){return rk[a.s]-rk[b.s]||(b.m.min||0)-(a.m.min||0);});it=it.slice(0,6);
+  var h=it.map(function(x){var jw=fresh.indexOf(x.k)>=0;
+    return '<div class="clrow '+x.s+(jw?' justwon':'')+'" data-k="'+esc(x.k)+'"><span class="clmin"><b>'+esc(x.m.score||"0-0")+'</b>'+(x.m.min||0)+'\'</span><span class="clm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+'</small></span><span class="clst"><span class="mono">'+(x.t.odds?x.t.odds.toFixed(2):'')+'</span>'+(x.s==="won"?'<span class="clbdg">✓ <span>Landed</span></span>':'<span class="clbdg"><span>Close</span></span>')+'</span></div>';}).join("");
+  var L=$("closeList");if(L._h!==h||fresh.length){L._h=h;L.innerHTML=h;}box.hidden=false;
   fresh.forEach(function(k){var row=L.querySelector('[data-k="'+k.replace(/"/g,'\\"')+'"]');if(!row)return;
-    for(var i=0;i<14;i++){var c=document.createElement("i");c.className="conf";c.style.background=["#b6f23a","#3ccf6e","#fff","#e8b931"][i%4];c.style.setProperty("--x",(Math.random()*-220)+"px");c.style.setProperty("--y",(Math.random()*90-45)+"px");c.style.animationDelay=(Math.random()*.2)+"s";row.appendChild(c);}
+    for(var i=0;i<18;i++){var c=document.createElement("i");c.className="conf";c.style.background=["#b6f23a","#3ccf6e","#fff","#e8b931"][i%4];c.style.setProperty("--x",(Math.random()*-220)+"px");c.style.setProperty("--y",(Math.random()*90-45)+"px");c.style.animationDelay=(Math.random()*.2)+"s";row.appendChild(c);}
     setTimeout(function(){row.classList.remove("justwon");Array.prototype.forEach.call(row.querySelectorAll(".conf"),function(c){c.remove();});},1600);});
 }
+setInterval(function(){if(!document.hidden)renderClose();},15000);
 function renderWins(){var box=$("winsSide");if(!box)return;
   var wins=[];MATCHES.forEach(function(m){if(!m.done||m.type==="cancelled")return;m.tips.forEach(function(t){if(t.r===1)wins.push({m:m,t:t});});});
   wins.sort(function(a,b){return (b.t.odds||0)-(a.t.odds||0);});
