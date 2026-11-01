@@ -16,7 +16,7 @@ async function apifFetch(url, key) {
 }
 // 3–5 καλοί bookmakers (απόφαση Owner 01/11/2026). Κρατάμε την τιμή ΚΑΘΕ bookmaker,
 // ώστε να δείχνουμε πού είναι το καλύτερο παρολί, ή μόνο τον bookmaker του χρήστη.
-export const BOOKS = ["Bet365", "Pinnacle", "1xBet", "Unibet", "Bwin"];
+export const BOOKS = ["Bet365", "Betano", "Pinnacle", "1xBet", "William Hill"];
 const BOOKSET = new Set(BOOKS);
 const MAP = {
   "Match Winner": { market: "1X2", sel: { Home: "1", Draw: "X", Away: "2" } },
