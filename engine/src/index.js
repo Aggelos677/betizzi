@@ -179,8 +179,8 @@ export default {
     // Ανεβαίνει όταν πάμε live.
     if (m % 5 === 0) tasks.push(syncLive(env));
     if (h === 3 && m === 5) tasks.push(seedLeagues(env).then(() => syncFixtures(env)));
-    if (m % 6 === 1) tasks.push(syncForm(env));
-    if (m % 2 === 0) tasks.push(syncOdds(env)); // κάνει δουλειά μόνο όταν υπάρχουν σελίδες που λείπουν
+    tasks.push(syncForm(env, 60)); // κάθε λεπτό, 60 ομάδες (~1 κλήση/0,7΄΄)
+    tasks.push(syncOdds(env)); // κάνει δουλειά μόνο όταν υπάρχουν σελίδες που λείπουν
     if (m === 40 && h % 3 === 0) tasks.push(runTips(env));
     if (h === 3 && m === 50) tasks.push(runTips(env));
     ctx.waitUntil(Promise.allSettled(tasks).then(async (r) => {
