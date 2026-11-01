@@ -435,6 +435,19 @@ body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
   .side .card{margin:0}
 }
 
+.lgb{content-visibility:auto;contain-intrinsic-size:auto 420px}
+#mFilter,#lFilter{min-height:44px}
+/* σωστό σκορ: πανηγύρι σε όλη την οθόνη */
+.cbig{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(circle,rgba(182,242,58,.28),rgba(12,15,13,0) 62%);animation:cbg 3s ease forwards}
+.cbig-in{display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 34px;border:3px solid var(--lime);border-radius:20px;background:rgba(12,15,13,.94);box-shadow:0 0 70px rgba(182,242,58,.65),inset 0 0 30px rgba(182,242,58,.15);animation:cbpop .65s cubic-bezier(.2,1.6,.4,1) both,cbglow 1s ease-in-out .7s 2}
+.cbig-t{font:800 clamp(1.6rem,6vw,2.6rem)/1 var(--f-display);color:var(--lime);letter-spacing:.05em;text-transform:uppercase;text-align:center}
+.cbig b{font-size:clamp(2.4rem,10vw,3.6rem);color:#fff;text-shadow:0 0 18px rgba(182,242,58,.7)}
+.cbig small{color:var(--muted);font-weight:700;font-size:.95rem;text-align:center}
+@keyframes cbpop{0%{transform:scale(3) rotate(-15deg);opacity:0}100%{transform:scale(1) rotate(-4deg);opacity:1}}
+@keyframes cbglow{0%,100%{box-shadow:0 0 70px rgba(182,242,58,.65)}50%{box-shadow:0 0 120px rgba(182,242,58,.95)}}
+@keyframes cbg{0%,82%{opacity:1}100%{opacity:0}}
+body.cshake .wrap.app{animation:cshk .5s ease .15s}
+@keyframes cshk{0%,100%{transform:none}20%{transform:translate(-6px,2px)}40%{transform:translate(6px,-2px)}60%{transform:translate(-4px,1px)}80%{transform:translate(3px,0)}}
 /* φίλτρα σε δύο γραμμές */
 .frows{display:flex;flex-direction:column;gap:8px}
 #mFilter a.chip,#lFilter a.chip{text-decoration:none;display:inline-flex;align-items:center}
@@ -984,8 +997,9 @@ function renderFilters(){
   var _sl1=$("mFilter").scrollLeft,_sl2=$("lFilter").scrollLeft;
   var box=$("mFilter");box.innerHTML="";
   if(IS_TODAY&&nl)box.appendChild(chipEl('<span class="ldot"></span>Live <span class="c">'+cnt({t:"live"})+'</span>',mFilter==="live",function(){mFilter=mFilter==="live"?"all":"live";renderFilters();renderMatches();},"livechip"));
-  DN.nav.forEach(function(d){if(d.n!==0&&d.n!==1)return;var on=d.d===DN.date&&mFilter!=="live";
-    box.appendChild(chipEl('<span>'+esc(d.lbl)+'</span>'+(on?' <span class="c">'+cnt({t:"all"})+'</span>':''),on,on?function(e){e.preventDefault();if(mFilter==="all")return;var y=window.scrollY;mFilter="all";renderFilters();renderMatches();window.scrollTo(0,y);}:null,"",on?"#":d.href));});
+  DN.nav.forEach(function(d){if(d.n!==0&&d.n!==1)return;var cur=d.d===DN.date,on=cur&&mFilter!=="live";
+    /* η μέρα της σελίδας είναι κουμπί (χωρίς ξαναφόρτωμα) και από το Live· οι άλλες μέρες είναι σύνδεσμοι */
+    box.appendChild(chipEl('<span>'+esc(d.lbl)+'</span>'+(cur?' <span class="c">'+cnt({t:"all"})+'</span>':''),on,cur?function(e){e.preventDefault();if(mFilter==="all")return;mFilter="all";renderFilters();renderMatches();}:null,"",cur?null:d.href));});
   var other=DN.nav.filter(function(d){return d.d===DN.date&&d.n!==0&&d.n!==1;})[0];
   if(other)box.appendChild(chipEl('<span>'+esc(other.lbl)+'</span> <span class="c">'+cnt({t:"all"})+'</span>',true,null,""));
   box.appendChild(chipEl("📅",stripOpen,function(){stripOpen=!stripOpen;renderFilters();},"calchip"));
@@ -1057,22 +1071,26 @@ function detailHTML(m){
   /* απουσίες & νέα: κρυφά μέχρι να υπάρχουν δεδομένα */
   return h;
 }
+document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest('#mFilter a[href],#dayStrip a[href]');if(a&&a.getAttribute("href")!=="#"){try{sessionStorage.setItem("ko-y",String(window.scrollY));}catch(x){}}},true);
 function renderMatches(){var _y=window.scrollY;renderMatches2();if(Math.abs(window.scrollY-_y)>2)window.scrollTo(0,_y);}
+/* γρήγορη λίστα: οι πρώτοι ~60 αγώνες αμέσως, οι υπόλοιποι σε κομμάτια στο παρασκήνιο (δεν «κολλάει» η σελίδα στο κινητό) */
+var RJOB=0;
 function renderMatches2(){
+  var job=++RJOB,box=$("matchList");
   var list=MATCHES.filter(function(m){return passAll(m);});
   if(q){var s=q.toLowerCase();list=list.filter(function(m){return (m.home+" "+m.away+" "+m.league+" "+m.country).toLowerCase().indexOf(s)>=0;});}
-  if(!list.length){$("matchList").innerHTML='<div class="empty" style="border:0">No matches for this filter.</div>';return;}
-  var h="",cur="";
-  list.forEach(function(m){
-    if(m.key!==cur){ var n=list.filter(function(x){return x.key===m.key;}).length; h+='<div class="lghead"><b>'+esc(m.country)+' · '+esc(m.league)+'</b><span>'+n+'</span></div>'; cur=m.key; }
-    h+=rowHTML(m);
-  });
-  $("matchList").innerHTML=h;
-  bindMatchList();
+  if(!list.length){box.innerHTML='<div class="empty" style="border:0">No matches for this filter.</div>';return;}
+  var cnt={};list.forEach(function(m){cnt[m.key]=(cnt[m.key]||0)+1;});
+  var blocks=[],cur=null;
+  list.forEach(function(m){if(!cur||cur.key!==m.key){cur={key:m.key,h:'<div class="lghead"><b>'+esc(m.country)+' · '+esc(m.league)+'</b><span>'+cnt[m.key]+'</span></div>',n:0};blocks.push(cur);}cur.h+=rowHTML(m);cur.n++;});
+  var i=0;
+  function chunk(limit){var h="",n=0;while(i<blocks.length&&(n<limit||!n)){h+='<div class="lgb">'+blocks[i].h+'</div>';n+=blocks[i].n;i++;}return h;}
+  box.innerHTML=chunk(60);bindMatchList();
+  (function more(){if(job!==RJOB||i>=blocks.length)return;setTimeout(function(){if(job!==RJOB)return;box.insertAdjacentHTML("beforeend",chunk(120));bindMatchList();more();},16);})();
 }
 function bindMatchList(){
   var box=$("matchList");
-  Array.prototype.forEach.call(box.querySelectorAll("details.mrow"),function(d){
+  Array.prototype.forEach.call(box.querySelectorAll("details.mrow"),function(d){if(d._t)return;d._t=1;
     d.addEventListener("toggle",function(){ if(d.open){ var m=MATCHES.filter(function(x){return String(x.id)===d.dataset.mid;})[0]; var det=d.querySelector(".mdet"); det.innerHTML=detailHTML(m); bindButtons(det); syncPressed(); } });
   });
   bindButtons(box);
@@ -1121,7 +1139,19 @@ function fanfare(){
 }
 function thud(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type="sine";o.frequency.setValueAtTime(160,t);o.frequency.exponentialRampToValueAtTime(40,t+.35);
   g.gain.setValueAtTime(.9,t);g.gain.exponentialRampToValueAtTime(.001,t+.4);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+.45);}catch(e){}}
+/* σωστό σκορ: μεγάλο πανηγύρι σε όλη την οθόνη (απόφαση Owner: «ακόμα πιο έντονο») */
+function calledBig(m){
+  var o=document.createElement("div");o.className="cbig";o.setAttribute("role","status");
+  o.innerHTML='<div class="cbig-in"><span class="cbig-t">🎯 <span>We called the score!</span></span><b class="mono">'+esc(m.score||"")+'</b><small>'+esc(m.home)+' v '+esc(m.away)+'</small></div>';
+  document.body.appendChild(o);
+  var W=window.innerWidth,H=window.innerHeight;
+  [[W*.5,H*.4],[W*.15,H*.7],[W*.85,H*.7]].forEach(function(p,i){setTimeout(function(){confetti(p[0],p[1],true);},i*250);});
+  setTimeout(function(){confetti(W*.3,H*.25,true);confetti(W*.7,H*.25,true);},900);
+  document.body.classList.remove("cshake");void document.body.offsetWidth;document.body.classList.add("cshake");
+  setTimeout(function(){o.remove();document.body.classList.remove("cshake");},3000);
+}
 function calledIt(m){
+  calledBig(m);
   var row=document.querySelector('details.mrow[data-mid="'+m.id+'"]');if(!row)return;
   var sc=row.querySelector(".r-score");if(!sc)return;
   fanfare();
@@ -1389,6 +1419,7 @@ $("buildBtn").addEventListener("click",function(){build();$("result").scrollInto
 /* ---------- init ---------- */
 $("today").textContent="Sunday 1 November";
 renderFilters(); renderMatches(); renderTips(); renderBuilder(); renderBar(); renderCoupons();
+try{var _ky=sessionStorage.getItem("ko-y");if(_ky!=null){sessionStorage.removeItem("ko-y");if("scrollRestoration" in history)history.scrollRestoration="manual";requestAnimationFrame(function(){window.scrollTo(0,+_ky);});}}catch(x){}
 var startTab=load("ko-tab","matches"); showTab(TABS.indexOf(startTab)>=0?startTab:"matches");
 })();
 </script>

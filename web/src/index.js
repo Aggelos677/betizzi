@@ -214,9 +214,17 @@ ${alt}
   // μετάφραση της εφαρμογής + σωστή ημερομηνία στη γλώσσα της σελίδας
   const dShort = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "long", day: "numeric", month: "long" }).format(noon);
   tpl = tpl.replace('"today").textContent="Sunday 1 November"', () => '"today").textContent=' + JSON.stringify(dShort));
+  tpl = tpl.replace('<span id="today"></span>', () => '<span id="today">' + esc(dShort) + "</span>");
   if (lang !== "en") {
     const i = UI_ORDER.indexOf(lang), dict = {};
     for (const k in UI) dict[k] = UI[k][i];
+    // μετάφραση και από τον server για τα σταθερά κείμενα (όχι «πήδημα» όταν η σελίδα αλλάζει γλώσσα στον browser)
+    const bi = tpl.indexOf("<body");
+    let body = tpl.slice(bi);
+    // μόνο στο HTML, ποτέ μέσα σε <script>
+    body = body.split(/(<script[\s\S]*?<\/script>)/).map((part) => part.startsWith("<script") ? part
+      : part.replace(/>([^<>]+)</g, (mm, txt) => { const k = txt.trim(); return k && dict[k] ? ">" + txt.replace(k, () => esc(dict[k])) + "<" : mm; })).join("");
+    tpl = tpl.slice(0, bi) + body;
     tpl = tpl.replace(/<body([^>]*)>/, (m) => m + `<script>window.__I18N=${JSON.stringify(dict).replace(/</g, "\\u003c")};${TRANSLATOR}</script>`);
   }
   if (!url.searchParams.has("demo")) tpl = tpl.replace('<div class="demorow">', '<div class="demorow" hidden>').replace('id="demoCoupon"', 'id="demoCoupon" hidden');

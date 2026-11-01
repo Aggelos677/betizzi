@@ -401,5 +401,6 @@ export const UI = {
   "Tomorrow": ["Αύριο", "Mañana", "Amanhã", "Demain", "Morgen", "Mâine", "Sutra", "Утре"],
   "Pick your leagues in Build → My leagues": ["Διάλεξε τα πρωταθλήματά σου στο Φτιάξε → Τα πρωταθλήματά μου", "Elige tus ligas en Crear → Mis ligas", "Escolha suas ligas em Montar → Minhas ligas", "Choisis tes ligues dans Créer → Mes ligues", "Wähle deine Ligen unter Bauen → Meine Ligen", "Alege-ți ligile în Creează → Ligile mele", "Izaberi lige u Napravi → Moje lige", "Избери лигите си в Създай → Моите лиги"],
   "Cash it in!": ["Πάμε ταμείο!", "¡A cobrar!", "Hora de receber!", "À la caisse !", "Ab zur Kasse!", "La casierie!", "Na kasu!", "Към касата!"],
+  "We called the score!": ["Το βρήκαμε το σκορ!", "¡Acertamos el marcador!", "Acertamos o placar!", "On a trouvé le score !", "Ergebnis getroffen!", "Am ghicit scorul!", "Pogodili smo rezultat!", "Познахме резултата!"],
   "Upcoming": ["Επόμενοι", "Próximos", "Próximos", "À venir", "Demnächst", "Urmează", "Predstoje", "Предстоящи"],
 };
