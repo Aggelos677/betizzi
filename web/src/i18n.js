@@ -423,5 +423,6 @@ export const UI = {
   "No open tips right now. Check tomorrow.": ["Δεν υπάρχουν ανοιχτά tips τώρα. Δες αύριο.", "No hay tips abiertos ahora. Mira mañana.", "Sem tips abertos agora. Veja amanhã.", "Pas de tips ouverts pour l'instant. Reviens demain.", "Gerade keine offenen Tipps. Schau morgen.", "Nu sunt ponturi deschise acum. Revino mâine.", "Trenutno nema otvorenih tipova. Pogledaj sutra.", "Няма отворени прогнози сега. Виж утре."],
   "Add": ["Πρόσθεσε", "Añadir", "Adicionar", "Ajouter", "Hinzufügen", "Adaugă", "Dodaj", "Добави"],
   "Clear all": ["Άδειασέ το", "Borrar todo", "Limpar tudo", "Tout effacer", "Alles löschen", "Șterge tot", "Obriši sve", "Изчисти всичко"],
+  "🏆 Coupon wins": ["🏆 Κουπόνι κερδίζει", "🏆 Cupón ganador", "🏆 Bilhete vence", "🏆 Ticket gagnant", "🏆 Schein gewinnt", "🏆 Bilet câștigător", "🏆 Tiket prolazi", "🏆 Фиш печели"],
   "Upcoming": ["Επόμενοι", "Próximos", "Próximos", "À venir", "Demnächst", "Urmează", "Predstoje", "Предстоящи"],
 };
