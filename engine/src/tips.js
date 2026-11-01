@@ -84,7 +84,9 @@ export async function makeTips(env, now) {
   for (const c of cands.filter((c) => c.vip).sort((a, b) => b.s - a.s)) { if (VIP.length >= vipQuota) break; if (take(c)) VIP.push(c); }
   // Free: επίπεδα Α→Β→Γ, αναλογία ανά ομάδα αγορών, 1 X τη μέρα
   const freeQuota = Math.round(withOdds * RULES.freeShare);
-  const pool = cands.filter((c) => !VIP.includes(c) && c.p >= RULES.free.min && c.p <= RULES.free.max)
+  // Αγώνας με VIP δεν παίρνει και Free (το VIP είναι το επόμενο σκαλί).
+  const vipFx = new Set(VIP.map((c) => c.f.id));
+  const pool = cands.filter((c) => !vipFx.has(c.f.id) && c.p >= RULES.free.min && c.p <= RULES.free.max)
     .sort((a, b) => LEVEL[a.level] - LEVEL[b.level] || b.s - a.s);
   const FREE = [], byG = { RES: 0, GOALS: 0, BTTS: 0 }; let xs = 0;
   const tryFree = (c, capG) => {
