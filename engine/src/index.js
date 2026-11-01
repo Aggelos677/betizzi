@@ -147,6 +147,12 @@ export default {
       if (u.pathname === "/run") {
         if (!env.ADMIN_TOKEN || u.searchParams.get("t") !== env.ADMIN_TOKEN) return json({ error: "unauthorized" }, 401);
         const job = u.searchParams.get("job");
+        if (job === "apistatus") {
+          const r = await fetch("https://v3.football.api-sports.io/status", { headers: { "x-apisports-key": env.APIF_KEY } });
+          const j = await r.json();
+          return json({ key_tail: String(env.APIF_KEY || "").slice(-4), plan: j.response?.subscription?.plan, account: j.response?.account?.firstname,
+            today: j.response?.requests, per_min_limit: r.headers.get("x-ratelimit-limit"), per_min_left: r.headers.get("x-ratelimit-remaining"), errors: j.errors });
+        }
         const jobs = { seed: seedLeagues, fixtures: syncFixtures, form: syncForm, odds: syncOdds, live: syncLive, tips: runTips };
         if (!jobs[job]) return json({ error: "unknown job", jobs: Object.keys(jobs) }, 400);
         return json({ job, result: await jobs[job](env) });
