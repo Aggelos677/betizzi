@@ -217,6 +217,15 @@ function scoreModel(o, tips) {
   return { p1, px, p2, over25: pO ?? over(g), score: [best[0], best[1]] };
 }
 
+// Έτοιμες απαντήσεις /api/day για σήμερα και αύριο (UTC), για γρήγορη σελίδα.
+async function cacheDays(env) {
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS api_cache(k TEXT PRIMARY KEY, body TEXT, t INTEGER)").run();
+  for (const d of [ymd(now()), ymd(now() + DAY)]) {
+    const body = JSON.stringify(await apiDay(env, d));
+    await env.DB.prepare("INSERT OR REPLACE INTO api_cache(k, body, t) VALUES(?,?,?)").bind("day:" + d, body, now()).run();
+  }
+}
+
 async function status(env) {
   const q = (s) => env.DB.prepare(s).first();
   return {
@@ -241,7 +250,13 @@ export default {
         return json(r.results.map((f) => [f.id, f.status, f.elapsed, f.gh, f.ga]));
       }
       if (u.pathname === "/api/match") return json(await apiMatch(env, +u.searchParams.get("id")));
-      if (u.pathname === "/api/day") return json(await apiDay(env, u.searchParams.get("date") || ymd(now())));
+      if (u.pathname === "/api/day") {
+        // έτοιμο από το cron (κάθε 2΄) → γρήγορη απάντηση· αλλιώς υπολογισμός επί τόπου
+        const date = u.searchParams.get("date") || ymd(now());
+        const c = await env.DB.prepare("SELECT body, t FROM api_cache WHERE k=?").bind("day:" + date).first().catch(() => null);
+        if (c && now() - c.t < 600) return new Response(c.body, { headers: { "content-type": "application/json; charset=utf-8", "x-cache": "hit" } });
+        return json(await apiDay(env, date));
+      }
       if (u.pathname === "/run") {
         if (!env.ADMIN_TOKEN || u.searchParams.get("t") !== env.ADMIN_TOKEN) return json({ error: "unauthorized" }, 401);
         const job = u.searchParams.get("job");
@@ -251,7 +266,7 @@ export default {
           return json({ key_tail: String(env.APIF_KEY || "").slice(-4), plan: j.response?.subscription?.plan, account: j.response?.account?.firstname,
             today: j.response?.requests, per_min_limit: r.headers.get("x-ratelimit-limit"), per_min_left: r.headers.get("x-ratelimit-remaining"), errors: j.errors });
         }
-        const jobs = { seed: seedLeagues, fixtures: syncFixtures, form: syncForm, odds: syncOdds, live: syncLive, tips: runTips };
+        const jobs = { cache: cacheDays, seed: seedLeagues, fixtures: syncFixtures, form: syncForm, odds: syncOdds, live: syncLive, tips: runTips };
         if (!jobs[job]) return json({ error: "unknown job", jobs: Object.keys(jobs) }, 400);
         return json({ job, result: await jobs[job](env) });
       }
@@ -273,6 +288,7 @@ export default {
     tasks.push(syncOdds(env)); // κάνει δουλειά μόνο όταν υπάρχουν σελίδες που λείπουν
     if (m === 40 && h % 3 === 0) tasks.push(runTips(env));
     if (h === 3 && m === 50) tasks.push(runTips(env));
+    if (m % 2 === 0) tasks.push(cacheDays(env));
     ctx.waitUntil(Promise.allSettled(tasks).then(async (r) => {
       const bad = r.filter((x) => x.status === "rejected");
       if (bad.length) await log(env, "cron", false, 0, bad.map((b) => String(b.reason)).join(" | "));
