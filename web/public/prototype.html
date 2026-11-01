@@ -435,6 +435,13 @@ body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
   .side .card{margin:0}
 }
 
+/* γλώσσες */
+header{position:relative}
+.langs{display:flex;gap:4px;flex-wrap:wrap;font:700 .72rem var(--f-mono)}
+.langs a{color:var(--muted);text-decoration:none;padding:5px 7px;border:1px solid var(--line);border-radius:7px;min-height:30px;display:inline-flex;align-items:center}
+.langs a:hover{color:var(--fg)}
+.langs a[aria-current]{color:var(--lime);border-color:var(--lime)}
+@media (min-width:768px){.langs{position:absolute;top:20px;right:0}}
 /* Κοντά στη νίκη (πάνω δεξιά) */
 .closebox{border-color:rgba(60,207,110,.45)}
 .livedot{width:10px;height:10px;border-radius:50%;background:var(--win);box-shadow:0 0 0 0 rgba(60,207,110,.6);animation:ldot 1.6s infinite}

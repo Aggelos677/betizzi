@@ -389,7 +389,7 @@ export const UI = {
   "· Draw": ["· X", "· X", "· X", "· X", "· X", "· X", "· X", "· X"],
   "Our biggest wins today": ["Οι πιο μεγάλες νίκες μας σήμερα", "Nuestras mayores victorias de hoy", "Nossas maiores vitórias hoje", "Nos plus belles victoires du jour", "Unsere größten Treffer heute", "Cele mai mari victorii ale noastre azi", "Naše najveće pobede danas", "Най-големите ни победи днес"],
   "No wins yet today. Matches are still running.": ["Καμία νίκη ακόμα σήμερα. Οι αγώνες συνεχίζονται.", "Aún no hay aciertos hoy. Los partidos siguen.", "Ainda sem acertos hoje. Os jogos continuam.", "Pas encore de gain aujourd'hui. Les matchs continuent.", "Heute noch kein Treffer. Die Spiele laufen noch.", "Încă nicio victorie azi. Meciurile continuă.", "Još nema pogodaka danas. Utakmice traju.", "Още няма познати днес. Мачовете продължават."],
-  "Close to winning": ["Κοντά στη νίκη", "Cerca de ganar", "Perto de ganhar", "Proche de la victoire", "Kurz vor dem Treffer", "Aproape de câștig", "Blizu pobede", "Близо до победата"],
+  "Close to winning": ["Κοντά στο ταμείο", "Cerca de ganar", "Perto de ganhar", "Proche de la victoire", "Kurz vor dem Treffer", "Aproape de câștig", "Blizu pobede", "Близо до победата"],
   "Landed": ["Μπήκε", "Acertado", "Acertou", "Gagné", "Getroffen", "Intrat", "Prošao", "Влезе"],
   "Close": ["Κοντά", "Cerca", "Perto", "Proche", "Knapp", "Aproape", "Blizu", "Близо"],
   "Parlay picks today": ["Προτάσεις παρολί σήμερα", "Combinadas sugeridas hoy", "Múltiplas sugeridas hoje", "Combinés du jour", "Kombi-Tipps heute", "Bilete propuse azi", "Predlozi tiketa danas", "Предложени комбинации днес"],
