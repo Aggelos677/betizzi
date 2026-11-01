@@ -1,6 +1,7 @@
 // betizzi-engine — μηχανή δεδομένων.
 // Τραβάει αγώνες/αποτελέσματα/live από τα «adapters», βγάζει tips με τους κανόνες του betizzi
 // και τα γράφει στη βάση betizzi-db. Η σελίδα διαβάζει ΜΟΝΟ από τη βάση (/api/...).
+import { makeCoupons, apiCoupons } from "./coupons.js";
 import LEAGUES from "../data/leagues.json";
 import { apifStats } from "./adapters/stats-apif.js";
 import { apifOdds } from "./adapters/odds-apif.js";
@@ -173,7 +174,7 @@ async function apiDay(env, date) {
       f[side + "_gg"] = list.length ? list.filter((r) => r.gf > 0 && r.ga > 0).length / list.length : null;
     }
   }
-  return { date, fixtures: fx.results, tips: out };
+  return { date, fixtures: fx.results, tips: out, coupons: await apiCoupons(env, date) };
 }
 
 // Ένας αγώνας: στοιχεία, tips (VIP κρυφό ως τη σέντρα), αποδόσεις, φόρμα 10 αγώνων, πιθανότητες και πιθανό σκορ.
@@ -249,6 +250,7 @@ export default {
         const r = await env.DB.prepare("SELECT id, status, elapsed, gh, ga FROM fixtures WHERE ts BETWEEN ? AND ? AND status NOT IN ('NS','TBD')").bind(now() - 4 * 3600, now() + 600).all();
         return json(r.results.map((f) => [f.id, f.status, f.elapsed, f.gh, f.ga]));
       }
+      if (u.pathname === "/api/coupons") return json(await apiCoupons(env, u.searchParams.get("date") || ymd(now())));
       if (u.pathname === "/api/match") return json(await apiMatch(env, +u.searchParams.get("id")));
       if (u.pathname === "/api/day") {
         // έτοιμο από το cron (κάθε 2΄) → γρήγορη απάντηση· αλλιώς υπολογισμός επί τόπου
@@ -266,7 +268,7 @@ export default {
           return json({ key_tail: String(env.APIF_KEY || "").slice(-4), plan: j.response?.subscription?.plan, account: j.response?.account?.firstname,
             today: j.response?.requests, per_min_limit: r.headers.get("x-ratelimit-limit"), per_min_left: r.headers.get("x-ratelimit-remaining"), errors: j.errors });
         }
-        const jobs = { cache: cacheDays, seed: seedLeagues, fixtures: syncFixtures, form: syncForm, odds: syncOdds, live: syncLive, tips: runTips };
+        const jobs = { coupons: makeCoupons, coupons_dry: (e) => makeCoupons(e, undefined, true), cache: cacheDays, seed: seedLeagues, fixtures: syncFixtures, form: syncForm, odds: syncOdds, live: syncLive, tips: runTips };
         if (!jobs[job]) return json({ error: "unknown job", jobs: Object.keys(jobs) }, 400);
         return json({ job, result: await jobs[job](env) });
       }
@@ -289,6 +291,7 @@ export default {
     if (m === 40 && h % 3 === 0) tasks.push(runTips(env));
     if (h === 3 && m === 50) tasks.push(runTips(env));
     if (m % 2 === 0) tasks.push(cacheDays(env));
+    if (h === 6 && m === 50) tasks.push(makeCoupons(env)); // μετά τα tips των 06:40 UTC
     ctx.waitUntil(Promise.allSettled(tasks).then(async (r) => {
       const bad = r.filter((x) => x.status === "rejected");
       if (bad.length) await log(env, "cron", false, 0, bad.map((b) => String(b.reason)).join(" | "));
