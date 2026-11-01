@@ -220,7 +220,8 @@ ${alt}
     .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";")
     .replace('<div class="hscroll" id="mFilter"', () => ssr + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml)
-    .replace("<!--datanote-->", () => `<p class="recl"><a href="/${lang}/${REC[lang].slug}">📊 ${esc(REC[lang].nav)}</a></p><nav class="langs" aria-label="Language">${langNav}</nav>`);
+    .replace("<!--datanote-->", () => `<nav class="langs" aria-label="Language">${langNav}</nav>`)
+    .replace("<!--footlinks-->", () => `<p class="footl" style="margin:0;opacity:.7;font-size:.8rem"><a href="/${lang}/${REC[lang].slug}" style="color:inherit">${esc(REC[lang].nav)}</a></p>`);
   // μετάφραση της εφαρμογής + σωστή ημερομηνία στη γλώσσα της σελίδας
   const dShort = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "long", day: "numeric", month: "long" }).format(noon);
   tpl = tpl.replace('"today").textContent="Sunday 1 November"', () => '"today").textContent=' + JSON.stringify(dShort));
@@ -348,9 +349,9 @@ ${alt}
 ${md ? `<h2>${esc(t.model)}</h2><div class="card">${modelHtml}</div>` : ""}
 <h2>${esc(t.form)}</h2><div class="card">${formRow(x.home)}${formRow(x.away)}</div>
 ${oddsHtml ? `<h2>${esc(t.odds)}</h2><div class="card">${oddsHtml}</div>` : ""}
-<p><a href="/${lang}/">← ${esc(t.back)}</a> · <a href="/${lang}/${REC[lang].slug}">📊 ${esc(REC[lang].nav)}</a></p>
+<p><a href="/${lang}/">← ${esc(t.back)}</a></p>
 </main>
-<footer><p>${esc(t.rg)}</p><p>© betizzi · <time datetime="${nowIso}">${esc(dLong)}</time></p></footer>
+<footer><p>${esc(t.rg)}</p><p>© betizzi · <time datetime="${nowIso}">${esc(dLong)}</time> · <a href="/${lang}/${REC[lang].slug}">${esc(REC[lang].nav)}</a></p></footer>
 </body>
 </html>`;
 }
