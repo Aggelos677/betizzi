@@ -183,12 +183,13 @@ ${alt}
 <style>.ssrh{font:800 1.15rem/1.15 "Fira Sans Extra Condensed",sans-serif;margin:4px 0 2px;text-transform:none;letter-spacing:0}.ssra{font-size:.8rem;color:var(--muted);margin:0 0 8px}
 .mlist .lg h3{margin:0;padding:8px 12px;font-size:.9rem}.mlist .lg ul{list-style:none;margin:0;padding:0}.mlist .m{display:flex;gap:8px;padding:6px 12px}</style>`;
   const raw = matches.map((x) => rawRow(x, hm));
+  const coupons = (day.coupons || []).map((c) => ({ ...c, legs: c.legs.map((l) => ({ ...l, time: l.ts ? hm(l.ts) : "" })) }));
   const top = TOP.map((id) => groups.get(id)).filter(Boolean).map((g) => g.league.country + "|" + g.league.name);
   let tpl = await template(env, url);
   tpl = tpl.replace('<html lang="en">', `<html lang="${HREFLANG[lang]}">`)
     .replace(/<title>[\s\S]*?<\/title>/, () => head)
     .replace(/var RAW = \[[\s\S]*?\];\n/, () => "var RAW = " + JSON.stringify(raw).replace(/</g, "\\u003c") + ";\n")
-    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";")
+    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";")
     .replace('<div class="hscroll" id="mFilter"', () => ssr + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml);
   // μετάφραση της εφαρμογής + σωστή ημερομηνία στη γλώσσα της σελίδας

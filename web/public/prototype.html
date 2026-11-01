@@ -396,6 +396,17 @@ details.mrow.calledrow>summary{background:radial-gradient(circle at 78% 50%,rgba
 .sponsor{display:flex;justify-content:space-between;align-items:center;gap:10px;text-decoration:none;background:#fff;color:#0c0f0d;border-radius:12px;padding:14px 16px;min-height:52px;font:800 1.05rem var(--f-display);letter-spacing:.05em;text-transform:uppercase}
 .sponsor b{color:#0c0f0d;border-bottom:2px dashed #0c0f0d}
 .aff{margin:-4px 0 0;font-size:.74rem;color:var(--muted)}
+
+.bzc-list{display:flex;flex-direction:column;gap:12px}
+.bzc{border:1px solid var(--line);border-radius:14px;background:var(--card2,#1b231e);overflow:hidden}
+.bzc-won{border-color:var(--lime);box-shadow:0 0 0 1px var(--lime) inset}.bzc-lost{opacity:.7}
+.bzhead{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.bzk{font:800 1.4rem/1 var(--f-display);color:var(--lime)}.bzv{color:var(--muted);font-size:.82rem;flex:1}.bztot{font-weight:700;font-size:1.05rem}
+.bzleg{display:grid;grid-template-columns:42px 1fr auto auto;gap:8px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--line);font-size:.86rem}
+.bzm{display:flex;flex-direction:column;min-width:0}.bzm b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}.bzm small{color:var(--muted);font-size:.72rem}
+.bzt,.bzs{font:500 .78rem var(--f-mono,monospace);color:var(--muted)}.bzs{color:var(--lime)}.bzw{color:#3ccf6e}.bzl{color:#ff6b6b}
+.bzp{font-weight:700;white-space:nowrap}.bzp.vip{color:var(--gold,#e8b931)}.bzo{color:var(--muted);font-size:.8rem}
+.bzfoot{display:flex;align-items:center;gap:10px;padding:10px 12px;flex-wrap:wrap}.bzfoot .hint{flex:1;min-width:180px;margin:0}.bzadd{min-height:44px}
 </style>
 </head>
 <body>
@@ -425,7 +436,8 @@ details.mrow.calledrow>summary{background:radial-gradient(circle at 78% 50%,rgba
 
   <!-- TIPS -->
   <div id="view-tips" role="tabpanel" aria-labelledby="tab-tips" class="wrap" hidden>
-    <label class="sw"><input type="checkbox" id="vipMember"> Show as registered user (untick to see what a visitor sees)</label>
+    <label class="sw" hidden><input type="checkbox" id="vipMember"> Show as registered user (untick to see what a visitor sees)</label>
+    <section class="card" aria-labelledby="bzc-title"><div class="secthead"><h2 id="bzc-title">Today's coupons</h2><span class="tag lime" id="bzcCount"></span></div><div id="bzcList" class="bzc-list"></div></section>
     <section class="card" aria-labelledby="free-title">
       <div class="secthead"><h2 id="free-title">Free tips</h2><span class="tag free" id="freeCount"></span></div>
       <div id="freeList" style="display:flex;flex-direction:column;gap:8px"></div>
@@ -1039,7 +1051,28 @@ function tipCard(m,t){
     +(locked?'<button type="button" class="btn vipb" data-unlock="1" style="margin-left:auto">Sign up free</button>':(m.open?'<button type="button" class="btn sec" data-key="'+esc(t.key)+'" aria-pressed="false" style="margin-left:auto;min-height:40px;padding:6px 12px">Add</button>':''))+'</div>'
     +'<div class="why" style="font-size:.82rem;color:var(--muted)">'+(locked?'Free sign-up to see the pick and the reason.':esc(t.why))+'</div></div>';
 }
+/* έτοιμα κουπόνια του betizzi (βγαίνουν από τον server μία φορά τη μέρα) */
+var BZC_SEL={"1":"1","2":"2","X":"X","O25":"Over 2.5","U25":"Under 2.5","O15":"Over 1.5","GG":"GG","NG":"NG"};
+var BZC_VAR={wins:"Wins",goals:"Goals",mix:"Mix",ucl:"Champions League",uel:"Europa League"};
+function renderBzCoupons(){var box=$("bzcList");if(!box)return;var L=(typeof BZC!=="undefined"&&BZC)||[];
+  $("bzcCount").textContent=L.length?L.length+"":"";
+  if(!L.length){box.innerHTML='<div class="empty">Today\'s coupons are not out yet.</div>';return;}
+  box.innerHTML=L.map(function(c){
+    var st=c.result===1?"won":c.result===0?"lost":c.legs.some(function(l){return l.status&&l.status!=="NS"&&l.status!=="TBD";})?"live":"wait";
+    var legs=c.legs.map(function(l){var r=l.result===1?'<b class="bzw">✓</b>':l.result===0?'<b class="bzl">✗</b>':(l.gh!=null&&l.status!=="NS"?'<span class="bzs">'+l.gh+'-'+l.ga+'</span>':'<span class="bzt">'+esc(l.time||"")+'</span>');
+      var pick=l.locked?'<span class="bzp vip">VIP 🔒</span>':'<span class="bzp">'+esc(BZC_SEL[l.sel]||l.sel)+'</span><span class="mono bzo">'+(l.price?l.price.toFixed(2):"")+'</span>';
+      return '<div class="bzleg">'+r+'<span class="bzm"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+esc(l.league||"")+'</small></span>'+pick+'</div>';}).join("");
+    var keys=c.legs.filter(function(l){return !l.locked;}).map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});
+    var head='<div class="bzhead"><span class="bzk">'+esc(c.kind)+'</span><span class="bzv">'+esc(BZC_VAR[c.variant]||c.variant)+' · '+c.legs.length+' picks</span><span class="mono bztot">x'+c.odds.toFixed(2)+'</span></div>';
+    var foot='<div class="bzfoot"><span class="hint">Our model: this slip wins about <b>1 time in '+oneIn(c.prob)+'</b>. No win is guaranteed.</span>'
+      +(st==="wait"&&keys.length?'<button type="button" class="btn sec bzadd" data-bzc="'+c.n+'">Add to my slip</button>':'')
+      +(st==="won"?'<span class="res w">Won</span>':st==="lost"?'<span class="res l">Lost</span>':st==="live"?'<span class="res p">Live</span>':'')+'</div>';
+    return '<div class="bzc bzc-'+st+'">'+head+legs+foot+'</div>';}).join("");
+  Array.prototype.forEach.call(box.querySelectorAll("[data-bzc]"),function(b){b.addEventListener("click",function(){var c=L.filter(function(x){return String(x.n)===b.dataset.bzc;})[0];if(!c)return;
+    var keys=c.legs.filter(function(l){return !l.locked;}).map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});if(keys.length)addLegs(keys);});});
+}
 function renderTips(){
+  renderBzCoupons();
   var all=[];MATCHES.forEach(function(m){m.tips.forEach(function(t){all.push({m:m,t:t});});});
   var ord=function(x){return x.m.live?0:x.m.open?1:2;};
   all.sort(function(a,b){return ord(a)-ord(b)||a.m.time.localeCompare(b.m.time);});

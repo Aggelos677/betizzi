@@ -3,7 +3,7 @@
 //  Δευ–Παρ: x3, x5, x10
 //  Σαβ–Κυρ: x3 νίκες, x3 γκολ, x5 νίκες, x5 γκολ, x10 ×2, x50
 //  + ένα x50 τη μέρα του Champions League και τη μέρα του Europa/Conference.
-import { MODEL_VERSION } from "./tips.js";
+import { MODEL_VERSION, NOT_FIRST_TEAM } from "./tips.js";
 
 const DAY = 86400;
 const now = () => Math.floor(Date.now() / 1000);
@@ -29,8 +29,8 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
 
   const from = Math.floor(Date.parse(date + "T00:00:00Z") / 1000), to = from + DAY;
   const start = Math.max(now() + 45 * 60, from); // μόνο αγώνες που δεν έχουν αρχίσει (περιθώριο 45΄)
-  const fx = (await env.DB.prepare("SELECT id, league_id FROM fixtures WHERE ts BETWEEN ? AND ? AND status IN ('NS','TBD')").bind(start, to).all()).results;
-  const leagueOf = new Map(fx.map((f) => [f.id, f.league_id]));
+  const fx = (await env.DB.prepare("SELECT f.id, f.league_id, h.name hn, a.name an FROM fixtures f JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id WHERE f.ts BETWEEN ? AND ? AND f.status IN ('NS','TBD')").bind(start, to).all()).results;
+  const leagueOf = new Map(fx.filter((f) => !NOT_FIRST_TEAM.test(f.hn) && !NOT_FIRST_TEAM.test(f.an)).map((f) => [f.id, f.league_id]));
   // υποψήφιες επιλογές: τα tips μας + οι πιο πιθανές επιλογές του μοντέλου (από τις αποδόσεις)
   const cands = [];
   for (const t of (await env.DB.prepare("SELECT fixture_id, sel, price, prob, tier FROM tips WHERE status='active' AND fixture_id IN (SELECT id FROM fixtures WHERE ts BETWEEN ? AND ? AND status IN ('NS','TBD'))").bind(start, to).all()).results)

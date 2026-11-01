@@ -1,4 +1,6 @@
 // Κανόνες tips betizzi (01/11/2026). Όλα τα όρια εδώ, σε ένα σημείο.
+// Ομάδες που δεν παίρνουν ποτέ tip/κουπόνι (κανόνας λιγκών): Β ομάδες, reserves, νέοι, γυναικείες.
+export const NOT_FIRST_TEAM = /(^Jong | II$| III$| B$| C$|\bU-?(1[6-9]|2[0-3])\b|\bReserves?\b|\(W\)| W$|\bWomen\b|\bYouth\b)/i;
 export const MODEL_VERSION = "rules-2026-11-01";
 async function sha256(s) {
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
@@ -25,8 +27,8 @@ const LEVEL = { A: 0, B: 1, C: 2 };
 
 export async function makeTips(env, now) {
   const DAY = 86400;
-  const fx = (await env.DB.prepare("SELECT id, ts, home_id, away_id FROM fixtures WHERE ts BETWEEN ? AND ? AND status IN ('NS','TBD')")
-    .bind(now + 15 * 60, now + 2 * DAY).all()).results;
+  const fx = (await env.DB.prepare("SELECT f.id, f.ts, f.home_id, f.away_id, h.name hn, a.name an FROM fixtures f JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id WHERE f.ts BETWEEN ? AND ? AND f.status IN ('NS','TBD')")
+    .bind(now + 15 * 60, now + 2 * DAY).all()).results.filter((f) => !NOT_FIRST_TEAM.test(f.hn) && !NOT_FIRST_TEAM.test(f.an));
   if (!fx.length) return { fixtures: 0 };
   const ids = fx.map((f) => f.id);
   // αποδόσεις: καλύτερη τιμή ανά αγώνα/επιλογή

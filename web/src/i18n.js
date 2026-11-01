@@ -366,4 +366,10 @@ export const UI = {
 "🎯 Called": ["🎯 Τα βρήκαμε", "🎯 Acertados", "🎯 Acertamos", "🎯 Trouvés", "🎯 Getroffen", "🎯 Ghicite", "🎯 Pogođeno", "🎯 Познати"],
   "matches fit your filters right now.": ["αγώνες ταιριάζουν στα φίλτρα σου τώρα.", "partidos encajan con tus filtros ahora.", "jogos batem com seus filtros agora.", "matchs correspondent à tes filtres maintenant.", "Spiele passen gerade zu deinen Filtern.", "meciuri se potrivesc acum filtrelor tale.", "utakmica odgovara tvojim filterima sada.", "мача отговарят на филтрите ти сега."],
   "sign up": ["εγγραφή", "regístrate", "cadastre-se", "inscris-toi", "registrieren", "înregistrează-te", "registruj se", "регистрирай се"],
+  "Today's coupons": ["Τα κουπόνια της ημέρας", "Cupones del día", "Bilhetes do dia", "Tickets du jour", "Scheine des Tages", "Biletele zilei", "Tiketi dana", "Фишове за деня"],
+  "Today's coupons are not out yet.": ["Τα σημερινά κουπόνια δεν έχουν βγει ακόμα.", "Los cupones de hoy aún no están listos.", "Os bilhetes de hoje ainda não saíram.", "Les tickets du jour ne sont pas encore prêts.", "Die heutigen Scheine sind noch nicht da.", "Biletele de azi nu sunt gata încă.", "Današnji tiketi još nisu spremni.", "Днешните фишове още не са готови."],
+  "Wins ·": ["Νίκες ·", "Victorias ·", "Vitórias ·", "Victoires ·", "Siege ·", "Victorii ·", "Pobede ·", "Победи ·"],
+  "Goals ·": ["Γκολ ·", "Goles ·", "Gols ·", "Buts ·", "Tore ·", "Goluri ·", "Golovi ·", "Голове ·"],
+  "Mix ·": ["Μικτό ·", "Mixto ·", "Misto ·", "Mixte ·", "Gemischt ·", "Mixt ·", "Mešovito ·", "Микс ·"],
+  " picks": [" επιλογές", " selecciones", " seleções", " sélections", " Tipps", " selecții", " parova", " избора"],
 };

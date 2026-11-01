@@ -10,6 +10,7 @@ export async function getDay(env, date) {
   for (const t of d.tips) if (t.status !== "withdrawn") (tipsBy[t.fixture_id] ||= []).push(t);
   return {
     date,
+    coupons: d.coupons || [],
     matches: d.fixtures.map((f) => ({
       id: f.id, ts: f.ts, status: f.status, minute: f.elapsed, score: f.gh == null ? null : [f.gh, f.ga],
       league: { id: f.league_id, name: f.league, country: f.country },
