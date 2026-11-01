@@ -451,6 +451,12 @@ body.cshake .wrap.app{animation:cshk .5s ease .15s}
 @keyframes cshk{0%,100%{transform:none}20%{transform:translate(-6px,2px)}40%{transform:translate(6px,-2px)}60%{transform:translate(-4px,1px)}80%{transform:translate(3px,0)}}
 .pnote{font-size:.78rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px;margin-top:2px;line-height:1.5}
 .pnote b{color:var(--fg)}.pnote .below{color:var(--warn)}
+/* Φτιάξε: δύο τρόποι */
+.bmode{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bmb{appearance:none;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-height:64px}
+.bmb b{font:800 1.05rem var(--f-display);letter-spacing:.04em;text-transform:uppercase}
+.bmb small{font-size:.78rem;color:var(--muted)}
+.bmb.on{background:var(--lime);border-color:var(--lime);color:var(--lime-ink)}.bmb.on small{color:var(--lime-ink);opacity:.8}
 /* ο bookmaker μου */
 .bkrow{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
 .bkchips .chip{min-height:36px;padding:6px 11px;font-size:.8rem}
@@ -576,7 +582,14 @@ header{position:relative}
 
   <!-- BUILD -->
   <div id="view-build" role="tabpanel" aria-labelledby="tab-build" class="wrap" hidden>
-    <section class="card" aria-labelledby="b-title">
+    <div class="bmode" role="radiogroup" aria-label="How to build"><button type="button" class="bmb" data-bm="list" role="radio"><b>Pick from our tips</b><small>Add the ones you want, like at a bookmaker</small></button><button type="button" class="bmb" data-bm="auto" role="radio"><b>Build it for me</b><small>Tell us what you want, we make the parlay</small></button></div>
+    <section class="card" id="bList" aria-labelledby="bl-title" hidden>
+      <div class="secthead" style="flex-wrap:wrap"><h2 id="bl-title">Our tips</h2><div class="srcseg" id="blSeg" role="radiogroup" aria-label="Show"></div></div>
+      <div id="bkList"></div>
+      <p class="hint" style="margin:-6px 0 0">Tap Add on the tips you like. Your slip builds up on the right (on the phone: the My slip bar), where you set your stake or what you want to win.</p>
+      <div id="blItems" style="display:flex;flex-direction:column;gap:8px"></div>
+    </section>
+    <section class="card" id="bAuto" aria-labelledby="b-title">
       <div class="secthead" style="flex-wrap:wrap"><h2 id="b-title">Build your slip</h2><div class="srcseg" id="srcSeg" role="radiogroup" aria-label="Build from"></div></div>
       <div id="bkBuild"></div><div class="basket"><span class="bk-ico" aria-hidden="true">🧺</span><div><b>From our tips basket</b><div class="bk-n"><span id="bkFree" class="mono"></span> <span>Free tips</span> · <span id="bkVip" class="mono"></span> <span>VIP tips</span></div><div class="bk-s">Your slip is built only from these, never at random.</div></div></div><div class="hint" id="srcNote" style="margin-top:-8px"></div>
       
@@ -1412,7 +1425,20 @@ function candidates(){
   return out;
 }
 var SRC_NOTE={all:"Any match, picked by our model.",free:"Only from today's free tips.",vip:"Only from today's VIP tips.",both:"Only from today's free and VIP tips."};
+/* Φτιάξε: δύο τρόποι (απόφαση Owner 01/11) — από τη λίστα των tips μας ή «φτιάξ' το για μένα» */
+var bMode=load("ko-bmode","list")==="auto"?"auto":"list",blSrc="both";
+function renderBMode(){Array.prototype.forEach.call(document.querySelectorAll("[data-bm]"),function(b){var on=b.getAttribute("data-bm")===bMode;b.setAttribute("aria-checked",on?"true":"false");b.className="bmb"+(on?" on":"");});
+  $("bList").hidden=bMode!=="list";$("bAuto").hidden=bMode!=="auto";if(bMode==="list")renderBList();}
+function renderBList(){var box=$("blItems");if(!box)return;
+  seg($("blSeg"),[["both","All"],["free","Free"],["vip","VIP"]].map(function(x){return {k:x[0],html:x[1]};}),function(it){return it.k===blSrc;},function(it){blSrc=it.k;renderBList();},"radio");
+  if($("bkList")){$("bkList").innerHTML=bookRowHTML();bindBookRow($("bkList"));}
+  var all=[];MATCHES.forEach(function(m){if(!m.open)return;m.tips.forEach(function(t){if(blSrc!=="both"&&t.tier!==blSrc)return;all.push({m:m,t:t});});});
+  all.sort(function(a,b){return a.m.time.localeCompare(b.m.time)||topIx(a.m.key)-topIx(b.m.key);});
+  box.innerHTML=all.map(function(x){return tipCard(x.m,x.t);}).join("")||'<div class="empty">No open tips right now. Check tomorrow.</div>';
+  bindButtons(box);syncPressed();}
+Array.prototype.forEach.call(document.querySelectorAll("[data-bm]"),function(b){b.addEventListener("click",function(){bMode=b.getAttribute("data-bm");store("ko-bmode",bMode);renderBMode();});});
 function renderBuilder(){
+  renderBMode();
   if($("bkBuild")){$("bkBuild").innerHTML=bookRowHTML();bindBookRow($("bkBuild"));}
   (function(){var f=0,v=0;MATCHES.forEach(function(m){m.tips.forEach(function(t){if(t.tier==="vip")v++;else f++;});});if($("bkFree"))$("bkFree").textContent=f;if($("bkVip"))$("bkVip").textContent=v;})();
   seg($("srcSeg"),[["free","Free"],["vip","VIP"],["both","Both"]].map(function(x){return {k:x[0],html:x[1]};}),function(it){return it.k===bSrc;},function(it){bSrc=it.k;saveB();renderBuilder();},"radio");
