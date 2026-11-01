@@ -11,13 +11,21 @@ const ymd = (t) => new Date(t * 1000).toISOString().slice(0, 10);
 const WINS = new Set(["1", "2"]), GOALS = new Set(["O25", "GG", "O15"]);
 const UCL = 2, UEL = [3, 848];
 
-function schedule(date, leagueIds) {
+// Στυλ επιλογών: όχι όλα «σούπερ φαβορί». Ποικιλία ανά μέρα (απόφαση Owner 01/11/2026).
+//  low  = χαμηλές αποδόσεις (1.20–1.50), περισσότερες επιλογές
+//  mid  = 1.55–1.95, λίγες επιλογές (π.χ. x3 = 1.80 × 1.75)
+//  high = 1.70–2.40, για μεγάλα κουπόνια με λίγες «γεμάτες» επιλογές
+const BAND = { low: [1.2, 1.5], mid: [1.55, 1.95], high: [1.7, 2.4] };
+function schedule(date, leagueIds, rnd) {
   const wd = new Date(date + "T12:00:00Z").getUTCDay(); // 0=Κυρ, 6=Σαβ
+  const pick = (a) => a[Math.floor(rnd() * a.length)];
+  const s3 = pick([["mid", "low"], ["low", "mid"]]), s5 = pick([["mid", "low"], ["low", "mid"]]);
   const list = wd === 0 || wd === 6
-    ? [["x3", 3, "wins"], ["x3", 3, "goals"], ["x5", 5, "wins"], ["x5", 5, "goals"], ["x10", 10, "mix"], ["x10", 10, "mix"], ["x50", 50, "mix"]]
-    : [["x3", 3, "mix"], ["x5", 5, "mix"], ["x10", 10, "mix"]];
-  if (leagueIds.has(UCL)) list.push(["x50", 50, "ucl"]);
-  if (UEL.some((id) => leagueIds.has(id))) list.push(["x50", 50, "uel"]);
+    ? [["x3", 3, "wins", s3[0]], ["x3", 3, "goals", s3[1]], ["x5", 5, "wins", s5[0]], ["x5", 5, "goals", s5[1]],
+       ["x10", 10, "mix", "mid"], ["x10", 10, "mix", pick(["low", "high"])], ["x50", 50, "mix", "high"]]
+    : [["x3", 3, "mix", pick(["mid", "low"])], ["x5", 5, "mix", pick(["mid", "low"])], ["x10", 10, "mix", pick(["mid", "high"])]];
+  if (leagueIds.has(UCL)) list.push(["x50", 50, "ucl", "high"]);
+  if (UEL.some((id) => leagueIds.has(id))) list.push(["x50", 50, "uel", "high"]);
   return list;
 }
 
@@ -39,7 +47,7 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
   for (const o of (await env.DB.prepare("SELECT fixture_id, sel, price FROM odds WHERE fixture_id IN (SELECT id FROM fixtures WHERE ts BETWEEN ? AND ? AND status IN ('NS','TBD'))").bind(start, to).all()).results)
     (odds[o.fixture_id] ||= {})[o.sel] = o.price;
   for (const [id, o] of Object.entries(odds)) {
-    const add = (sel, p) => { if (o[sel] && p >= 0.55 && o[sel] >= 1.2) cands.push({ f: +id, sel, price: o[sel], prob: p, src: "model" }); };
+    const add = (sel, p) => { if (o[sel] && p >= 0.47 && o[sel] >= 1.2) cands.push({ f: +id, sel, price: o[sel], prob: p, src: "model" }); };
     if (o["1"] && o.X && o["2"]) { const s = 1 / o["1"] + 1 / o.X + 1 / o["2"]; add("1", 1 / o["1"] / s); add("2", 1 / o["2"] / s); }
     if (o.O25 && o.U25) { const s = 1 / o.O25 + 1 / o.U25; add("O25", 1 / o.O25 / s); add("U25", 1 / o.U25 / s); }
     if (o.GG && o.NG) { const s = 1 / o.GG + 1 / o.NG; add("GG", 1 / o.GG / s); add("NG", 1 / o.NG / s); }
@@ -53,9 +61,11 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
   const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
 
   const out = [], usedBy = {};
-  const plan = schedule(date, new Set(fx.map((f) => f.league_id)));
-  for (const [kind, target, variant] of plan) {
-    let p = pool.filter((c) => c.price <= (target >= 50 ? 2.6 : target >= 10 ? 2.2 : 1.9) && c.price >= (target >= 50 ? 1.45 : target >= 10 ? 1.3 : 1.2)); // μεγάλα κουπόνια: λιγότερες, πιο «γεμάτες» επιλογές
+  const plan = schedule(date, new Set(fx.map((f) => f.league_id)), rnd);
+  for (const [kind, target, variant, style] of plan) {
+    const [lo, hi] = BAND[style];
+    // επιλογές του μοντέλου στα ψηλά στυλ μόνο αν είναι αρκετά πιθανές για την απόδοσή τους
+    let p = pool.filter((c) => c.price >= lo && c.price <= hi && (c.src !== "model" || style === "low" || c.prob * c.price >= 0.93));
     if (variant === "wins") p = p.filter((c) => WINS.has(c.sel));
     if (variant === "goals") p = p.filter((c) => GOALS.has(c.sel));
     if (variant === "ucl") p = p.filter((c) => leagueOf.get(c.f) === UCL);
@@ -73,9 +83,9 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
     if (tot < target * 0.85 || legs.length < 2) continue; // δεν βγαίνει σήμερα
     legs.forEach((l) => used.add(l.f));
     const prob = legs.reduce((a, l) => a * l.prob, 1);
-    out.push({ kind, variant, legs, odds: Math.round(tot * 100) / 100, prob });
+    out.push({ kind, variant, style, legs, odds: Math.round(tot * 100) / 100, prob });
   }
-  if (dry) return { date, dry: true, made: out.map((c) => ({ kind: c.kind, variant: c.variant, odds: c.odds, prob: Math.round(c.prob * 1000) / 10, legs: c.legs.map((l) => l.sel + "@" + l.price + "(" + l.src + ")") })) };
+  if (dry) return { date, dry: true, made: out.map((c) => ({ kind: c.kind, variant: c.variant, odds: c.odds, prob: Math.round(c.prob * 1000) / 10, style: c.style, legs: c.legs.map((l) => l.sel + "@" + l.price + "(" + l.src + ")") })) };
   const t = now(), st = [];
   for (let i = 0; i < out.length; i++) {
     const c = out[i];
@@ -84,7 +94,7 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
     st.push(env.DB.prepare("INSERT OR IGNORE INTO coupons VALUES(?,?,?,?,?,?,?,?,?,?)").bind(date, i + 1, c.kind, c.variant, legs, c.odds, c.prob, t, MODEL_VERSION, hash));
   }
   if (st.length) await env.DB.batch(st);
-  return { date, made: out.map((c) => `${c.kind} ${c.variant} ${c.legs.length} legs x${c.odds}`) };
+  return { date, made: out.map((c) => `${c.kind} ${c.variant} ${c.style} ${c.legs.length} legs x${c.odds}`) };
 }
 
 async function sha256(s) {
