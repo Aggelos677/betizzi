@@ -8,8 +8,9 @@ async function apifFetch(url, key) {
     const wait = Math.max(0, last + 220 - Date.now()); if (wait) await new Promise((r) => setTimeout(r, wait));
     last = Date.now();
     const r = await fetch(url, { headers: { "x-apisports-key": key } });
-    if (r.status !== 429) return r;
-    await new Promise((res) => setTimeout(res, 3000 * (i + 1)));
+    const body = r.status === 429 ? null : await r.text();
+    if (body !== null && !body.slice(0, 300).includes('"rateLimit"')) return new Response(body, { status: r.status });
+    await new Promise((res) => setTimeout(res, 8000 * (i + 1)));
   }
   throw new Error("apif 429 " + url);
 }
