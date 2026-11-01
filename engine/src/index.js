@@ -120,7 +120,7 @@ async function runTips(env) {
 // ---------- API για τη σελίδα ----------
 async function apiDay(env, date) {
   const from = Math.floor(Date.parse(date + "T00:00:00Z") / 1000) - 3 * 3600;
-  const to = from + DAY;
+  const to = from + DAY + 6 * 3600; // καλύπτει ζώνες ώρας από UTC−3 έως UTC+3
   const fx = await env.DB.prepare(`SELECT f.*, l.name league, l.country, l.type ltype, l.tier,
       h.name home, h.logo home_logo, a.name away, a.logo away_logo
       FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id
@@ -134,6 +134,25 @@ async function apiDay(env, date) {
     if (t.tier === "vip" && f && f.ts > t0) return { fixture_id: t.fixture_id, tier: "vip", status: t.status, locked: true };
     return t;
   });
+  // Για τη σελίδα: αποδόσεις, μοντέλο, φόρμα 5 αγώνων και GG στους 10, για κάθε αγώνα.
+  const odds = {};
+  for (const o of (await env.DB.prepare("SELECT o.fixture_id, o.sel, o.price FROM odds o JOIN fixtures f ON f.id=o.fixture_id WHERE f.ts BETWEEN ? AND ?").bind(from, to).all()).results)
+    (odds[o.fixture_id] ||= {})[o.sel] = o.price;
+  const res = {};
+  for (const r of (await env.DB.prepare(`SELECT r.team_id, r.ts, r.is_home, r.gf, r.ga FROM results r WHERE r.team_id IN
+      (SELECT home_id FROM fixtures WHERE ts BETWEEN ?1 AND ?2 UNION SELECT away_id FROM fixtures WHERE ts BETWEEN ?1 AND ?2) ORDER BY r.ts DESC`).bind(from, to).all()).results)
+    (res[r.team_id] ||= []).push(r);
+  const tipsBy = {};
+  for (const t of tips.results) (tipsBy[t.fixture_id] ||= []).push(t);
+  for (const f of fx.results) {
+    f.odds = odds[f.id] || {};
+    f.model = scoreModel(f.odds, tipsBy[f.id] || []);
+    for (const side of ["home", "away"]) {
+      const list = (res[f[side + "_id"]] || []).filter((r) => r.ts < f.ts).slice(0, 10);
+      f[side + "_form"] = list.slice(0, 5).map((r) => [r.gf > r.ga ? "W" : r.gf < r.ga ? "L" : "D", r.gf + "-" + r.ga, r.is_home]);
+      f[side + "_gg"] = list.length ? list.filter((r) => r.gf > 0 && r.ga > 0).length / list.length : null;
+    }
+  }
   return { date, fixtures: fx.results, tips: out };
 }
 
