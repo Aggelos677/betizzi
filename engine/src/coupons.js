@@ -125,7 +125,7 @@ export async function apiCoupons(env, date) {
   return rows.map((r) => {
     const legs = JSON.parse(r.legs).map(([f, sel, price, prob, src]) => {
       const m = fx[f] || {};
-      const hide = src === "vip" && m.ts > now();
+      const hide = src === "vip" && m.ts + 600 > now(); // VIP ανοίγουν 10΄ μετά τη σέντρα
       const res = m.status === "FT" ? (won(sel, m.gh, m.ga) ? 1 : 0) : null;
       return { fixture_id: f, home: m.home, away: m.away, league: m.league, ts: m.ts, status: m.status, gh: m.gh, ga: m.ga,
         sel: hide ? null : sel, price: hide ? null : price, prob: hide ? null : prob, vip: src === "vip", locked: hide, result: res };

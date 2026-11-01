@@ -9,6 +9,7 @@ import { makeTips } from "./tips.js";
 
 const LEAGUE_IDS = new Set(LEAGUES.map((l) => l.id));
 const DAY = 86400;
+const VIP_OPEN = 600; // απόφαση Owner: τα VIP ανοίγουν σε όλους 10΄ μετά τη σέντρα
 
 // Ποιος adapter χρησιμοποιείται. Αλλαγή πηγής = αλλαγή μόνο εδώ.
 function sources(env) {
@@ -152,12 +153,12 @@ async function apiDay(env, date) {
       FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id
       WHERE f.ts BETWEEN ? AND ? ORDER BY l.tier, l.country, f.ts`).bind(from, to).all();
   const tips = await env.DB.prepare(`SELECT t.* FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE f.ts BETWEEN ? AND ?`).bind(from, to).all();
-  // VIP: η επιλογή/απόδοση/αιτιολόγηση ΔΕΝ φεύγουν δημόσια μέχρι τη σέντρα (μετά φαίνονται για το record).
+  // VIP: η επιλογή/απόδοση/αιτιολόγηση ΔΕΝ φεύγουν δημόσια μέχρι 10΄ μετά τη σέντρα (μετά φαίνονται για το record).
   // Όταν μπει login, ο συνδεδεμένος χρήστης θα παίρνει πλήρη VIP από ξεχωριστό endpoint.
   const t0 = now();
   const out = tips.results.map((t) => {
     const f = fx.results.find((x) => x.id === t.fixture_id);
-    if (t.tier === "vip" && f && f.ts > t0) return { fixture_id: t.fixture_id, tier: "vip", status: t.status, locked: true };
+    if (t.tier === "vip" && f && f.ts + VIP_OPEN > t0) return { fixture_id: t.fixture_id, tier: "vip", status: t.status, locked: true };
     return t;
   });
   // Για τη σελίδα: αποδόσεις, μοντέλο, φόρμα 5 αγώνων και GG στους 10, για κάθε αγώνα.
@@ -188,7 +189,7 @@ async function apiMatch(env, id) {
     FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id WHERE f.id=?`).bind(id).first();
   if (!f) return { error: "not found" };
   const tips = (await env.DB.prepare("SELECT * FROM tips WHERE fixture_id=? AND status='active'").bind(id).all()).results
-    .map((t) => (t.tier === "vip" && f.ts > now() ? { fixture_id: id, tier: "vip", status: t.status, locked: true } : t));
+    .map((t) => (t.tier === "vip" && f.ts + VIP_OPEN > now() ? { fixture_id: id, tier: "vip", status: t.status, locked: true } : t));
   const odds = {};
   for (const o of (await env.DB.prepare("SELECT market, sel, price FROM odds WHERE fixture_id=?").bind(id).all()).results) odds[o.sel] = o.price;
   const form = async (team) => (await env.DB.prepare("SELECT fixture_id, ts, is_home, gf, ga FROM results WHERE team_id=? AND ts < ? ORDER BY ts DESC LIMIT 10").bind(team, f.ts).all()).results;

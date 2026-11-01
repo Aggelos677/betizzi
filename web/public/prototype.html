@@ -923,7 +923,7 @@ function clState(t,m){var sc=(m.score||"0-0").split("-").map(Number),h=sc[0]||0,
   var hold=s==="Home"?h>a:s==="Away"?a>h:s==="Draw"?h===a:s==="1X"?h>=a:s==="X2"?a>=h:s==="12"?h!==a:false;
   return hold&&min>=85?"close":"wait";}
 function renderClose(){var box=$("closeBox");if(!box)return;var it=[],ms={};
-  MATCHES.forEach(function(m){if(!m.live)return;m.tips.forEach(function(t){if(!t.sel||(t.tier==="vip"&&!vipMember))return;ms[m.id]=1;it.push({m:m,t:t,s:clState(t,m)});});});
+  MATCHES.forEach(function(m){if(!m.live)return;m.tips.forEach(function(t){if(!t.sel)return; /* VIP: φαίνονται σε όλους όταν ο server τα ανοίξει (10΄ μετά τη σέντρα) */ms[m.id]=1;it.push({m:m,t:t,s:clState(t,m)});});});
   it=it.filter(function(x){return x.s!=="wait";});
   if(Object.keys(ms).length<3||!it.length){box.hidden=true;return;}
   var rk={won:0,close:1,wait:2};it.sort(function(a,b){return rk[a.s]-rk[b.s]||(b.m.min||0)-(a.m.min||0);});it=it.slice(0,6);
@@ -1008,7 +1008,7 @@ function tipState(t,m){
 }
 function pickBtn(m){
   if(!m.tips.length) return '<span class="r-pick none"><span>No tip</span></span>';
-  var t=m.tips[0], locked=t.tier==="vip"&&!vipMember;
+  var t=m.tips[0], locked=t.tier==="vip"&&!vipMember&&!t.sel;
   if(locked) return '<button type="button" class="r-pick vip locked" data-unlock="1" aria-label="VIP tip, sign up free to see"><span>VIP · free</span><b>0.00</b></button>';
   var st=m._hold?null:tipState(t,m);
   if(st==="won") return '<span class="r-pick paid'+(m._justPaid?' pop':'')+'" role="status" aria-label="'+esc(t.sel)+' landed"><span>✓ '+esc(t.sel)+'</span><b>Pay me please :)</b></span>';
@@ -1027,7 +1027,7 @@ function obtn(k){var s=SEL[k];if(!s)return '';return '<button type="button" clas
 function detailHTML(m){
   var h='';
   m.tips.forEach(function(t){
-    var locked=t.tier==="vip"&&!vipMember;
+    var locked=t.tier==="vip"&&!vipMember&&!t.sel;
     h+='<div class="tipbox'+(t.tier==="vip"?' vip':'')+'"><div class="tiprow">'+tierTag(t)+'<span class="label">Our tip</span>'+resTag(t,m)+'</div>'
       +(locked?'<div class="tiprow"><span class="hint">This is a VIP tip.</span><button type="button" class="btn vipb" data-unlock="1">Sign up free</button></div>'
       :'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+(t.odds?t.odds.toFixed(2):"🔒")+'</span><span class="hint">'+esc(t.book)+'</span></div><div class="why">'+esc(t.why)+'</div>')+'</div>';
@@ -1223,7 +1223,7 @@ $("q").addEventListener("input",function(){q=this.value;renderMatches();});
 
 /* ---------- tips ---------- */
 function tipCard(m,t){
-  var locked=t.tier==="vip"&&!vipMember;
+  var locked=t.tier==="vip"&&!vipMember&&!t.sel;
   return '<div class="tipcard'+(t.tier==="vip"?' vip':'')+(locked?' locked':'')+'"><div class="meta">'+tierTag(t)+'<span>'+esc(m.country)+' · '+esc(m.league)+' · '+(m.done?'FT '+esc(m.score):m.live?'Live '+esc(m.score):m.time)+'</span>'+resTag(t,m)+'</div>'
     +'<div class="mt">'+esc(m.home)+' v '+esc(m.away)+'</div>'
     +'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+(t.odds?t.odds.toFixed(2):"🔒")+'</span>'
