@@ -449,6 +449,16 @@ body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 @keyframes cbg{0%,82%{opacity:1}100%{opacity:0}}
 body.cshake .wrap.app{animation:cshk .5s ease .15s}
 @keyframes cshk{0%,100%{transform:none}20%{transform:translate(-6px,2px)}40%{transform:translate(6px,-2px)}60%{transform:translate(-4px,1px)}80%{transform:translate(3px,0)}}
+/* ο bookmaker μου */
+.bkrow{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.bkchips .chip{min-height:36px;padding:6px 11px;font-size:.8rem}
+.lowbk{font-style:normal;color:var(--warn);font-size:.85em}
+.lowtxt{display:inline-block;color:var(--warn);font-size:.78rem;font-weight:700}
+.bktot{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.bkt{display:flex;justify-content:space-between;font-size:.86rem;color:var(--muted);padding:3px 8px;border-radius:8px}
+.bkt b{color:var(--fg)}
+.bkt.top{background:var(--lime-soft);color:var(--lime);font-weight:800}.bkt.top b{color:var(--lime)}
+.bkt.mine{box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
 /* φίλτρα σε δύο γραμμές */
 .frows{display:flex;flex-direction:column;gap:8px}
 #mFilter a.chip,#lFilter a.chip{text-decoration:none;display:inline-flex;align-items:center}
@@ -566,7 +576,7 @@ header{position:relative}
   <div id="view-build" role="tabpanel" aria-labelledby="tab-build" class="wrap" hidden>
     <section class="card" aria-labelledby="b-title">
       <div class="secthead" style="flex-wrap:wrap"><h2 id="b-title">Build your slip</h2><div class="srcseg" id="srcSeg" role="radiogroup" aria-label="Build from"></div></div>
-      <div class="basket"><span class="bk-ico" aria-hidden="true">🧺</span><div><b>From our tips basket</b><div class="bk-n"><span id="bkFree" class="mono"></span> <span>Free tips</span> · <span id="bkVip" class="mono"></span> <span>VIP tips</span></div><div class="bk-s">Your slip is built only from these, never at random.</div></div></div><div class="hint" id="srcNote" style="margin-top:-8px"></div>
+      <div id="bkBuild"></div><div class="basket"><span class="bk-ico" aria-hidden="true">🧺</span><div><b>From our tips basket</b><div class="bk-n"><span id="bkFree" class="mono"></span> <span>Free tips</span> · <span id="bkVip" class="mono"></span> <span>VIP tips</span></div><div class="bk-s">Your slip is built only from these, never at random.</div></div></div><div class="hint" id="srcNote" style="margin-top:-8px"></div>
       
       <div class="field"><span class="label step" id="s1"><span class="n">1</span>How many picks</span><div class="seg c5" id="nSeg" role="radiogroup" aria-labelledby="s1"></div></div>
       <div class="field"><span class="label step" id="s2"><span class="n">2</span>Total odds</span><div class="oddbox" id="rSeg"></div></div>
@@ -632,6 +642,7 @@ var MATCHES = RAW.map(function(r){
     o:{h:r[13][0],x:r[13][1],a:r[13][2],o25:r[13][3],u25:r[13][4],gg:r[13][5],ng:r[13][6]},
     p:{h:r[14][0],x:r[14][1],a:r[14][2],o25:r[14][3],score:r[14][4]},
     tips:r[15].map(function(t){return {sel:t[0],odds:t[1],tier:t[2],why:t[3],r:t[5],book:t[7]};})};
+  m.bk=r[21]||[];
   if(r[17])m.min=r[17]; m.live=m.type==="inprogress"; m.done=m.type==="finished"; m.open=m.type==="notstarted";
   return m;
 });
@@ -664,6 +675,32 @@ MATCHES.forEach(function(m){
   m.tips.forEach(function(t){ var c=tipCode(t); t.key=addSel(m,c,tipLabel(m,t),t.sel,t.odds,probFor(m,c)); });
 });
 
+/* ---------- ο bookmaker μου: τιμές ενός bookmaker, σύγκριση με Pinnacle, καλύτερο σύνολο παρολί ---------- */
+var BOOKS=["Bet365","Betano","Pinnacle","1xBet","William Hill"],BKC=["1","X","2","O25","U25","GG","NG"],LOWBK=0.94;
+var myBook=load("ko-book","best");if(myBook!=="best"&&BOOKS.indexOf(myBook)<0)myBook="best";
+function bkP(m,code,b){var i=BKC.indexOf(code),bi=BOOKS.indexOf(b);if(i<0||bi<0||!m.bk||!m.bk[bi])return 0;return m.bk[bi][i]||0;}
+function applyBook(){
+  Object.keys(SEL).forEach(function(k){var s=SEL[k];if(s.best==null)s.best=s.odd;var c=k.split(":")[1],my=myBook!=="best";
+    var p=my?bkP(s.m,c,myBook):0,pin=bkP(s.m,c,"Pinnacle");
+    s.odd=p||s.best;s.nobk=my&&!p&&BKC.indexOf(c)>=0;s.pin=pin;
+    /* «δεν αξίζει εδώ»: η τιμή του bookmaker σου είναι πάνω από 6% κάτω από την Pinnacle */
+    s.low=!!(my&&myBook!=="Pinnacle"&&p&&pin&&p<pin*LOWBK);});
+  MATCHES.forEach(function(m){m.tips.forEach(function(t){if(t.best==null)t.best=t.odds;var s=t.key&&SEL[t.key];if(s&&t.best){t.odds=s.odd;t.nobk=s.nobk;t.low=s.low;t.pin=s.pin;}});});
+}
+function oddTxt(t){return t.odds?t.odds.toFixed(2)+(t.low?' <i class="lowbk" title="Low price at your bookmaker">⚠</i>':''):"🔒";}
+function bookRowHTML(){return '<div class="bkrow"><span class="label">My bookmaker</span><div class="hscroll bkchips">'
+  +[["best","Best price"]].concat(BOOKS.map(function(b){return [b,b];})).map(function(x){return '<button type="button" class="chip" data-book="'+esc(x[0])+'" aria-pressed="'+(myBook===x[0])+'">'+(x[0]==="best"?'<span>'+esc(x[1])+'</span>':esc(x[1]))+'</button>';}).join("")+'</div></div>';}
+function bindBookRow(root){Array.prototype.forEach.call(root.querySelectorAll("[data-book]"),function(b){if(b._b)return;b._b=1;b.addEventListener("click",function(){setBook(b.getAttribute("data-book"));});});}
+function setBook(b){if(b===myBook)return;myBook=b;store("ko-book",b);applyBook();
+  try{renderMatches();renderTips();renderBuilder();renderBar();if(!$("sheet").hidden)renderMySlip();renderSide();}catch(e){}
+  Array.prototype.forEach.call(document.querySelectorAll("[data-book]"),function(x){x.setAttribute("aria-pressed",x.getAttribute("data-book")===myBook?"true":"false");});
+  toast(b==="best"?"Showing the best price":"Prices from "+b);}
+/* σε ποιον bookmaker βγαίνει το καλύτερο σύνολο για όλο το παρολί (ένα παρολί παίζεται σε έναν bookmaker) */
+function bookTotalsHTML(keys){if(keys.length<2)return "";var rows=[];
+  BOOKS.forEach(function(b){var tot=1,ok=true;keys.forEach(function(k){var c=k.split(":")[1],p=bkP(SEL[k].m,c,b);if(!p)ok=false;else tot*=p;});if(ok)rows.push([b,tot]);});
+  if(!rows.length)return "";rows.sort(function(a,c){return c[1]-a[1];});
+  return '<div class="bktot"><span class="label">Total per bookmaker</span>'+rows.map(function(r,i){return '<div class="bkt'+(i===0?' top':'')+(r[0]===myBook?' mine':'')+'"><span>'+(i===0?'★ ':'')+esc(r[0])+'</span><b class="mono">x'+r[1].toFixed(2)+'</b></div>';}).join("")+'</div>';}
+applyBook();
 /* ---------- betizzi score + badges (derived from odds/model; heuristic) ---------- */
 function pois(l,k){var p=Math.exp(-l);for(var i=1;i<=k;i++)p*=l/i;return p;}
 function lamFromO25(o){ if(!o)return 2.6; o=Math.min(.9,Math.max(.1,o/100)); var lo=.3,hi=7;for(var i=0;i<40;i++){var m=(lo+hi)/2,u=pois(m,0)+pois(m,1)+pois(m,2);(1-u)>o?hi=m:lo=m;}return (lo+hi)/2;}
@@ -760,8 +797,8 @@ function renderBar(){var b=$("slipBarBtn"),t=totals();$("sbCount").textContent=s
   b.setAttribute("aria-label",slip.length?("My slip: "+slip.length+" picks, total odds "+t.odds.toFixed(2)+", return "+(stake*t.odds).toFixed(2)):"My slip is empty");}
 function syncPressed(){Array.prototype.forEach.call(document.querySelectorAll("button[data-key]"),function(b){b.setAttribute("aria-pressed",slip.indexOf(b.dataset.key)>=0?"true":"false");});}
 function legHTML(s,removable){
-  var m=s.m;
-  return '<div class="leg"><span class="lg">'+esc(m.country)+' · '+esc(m.league)+' · '+m.time+'</span><span class="tm">'+esc(m.home)+' v '+esc(m.away)+'</span><span class="mk">'+esc(s.label)+(s.p!=null?' <span style="color:var(--muted)">· model '+Math.round(s.p*100)+'%</span>':'')+'</span>'
+  var m=s.m,note=s.low?' <span class="lowtxt">⚠ <span>Low price here</span> · Pinnacle '+s.pin.toFixed(2)+'</span>':s.nobk?' <span class="lowtxt"><span>Not offered by your bookmaker</span></span>':'';
+  return '<div class="leg"><span class="lg">'+esc(m.country)+' · '+esc(m.league)+' · '+m.time+'</span><span class="tm">'+esc(m.home)+' v '+esc(m.away)+'</span><span class="mk">'+esc(s.label)+(s.p!=null?' <span style="color:var(--muted)">· model '+Math.round(s.p*100)+'%</span>':'')+note+'</span>'
     +'<span class="right"><span class="odd mono">'+s.odd.toFixed(2)+'</span>'+(removable?'<button type="button" class="rm" data-rm="'+esc(s.key)+'" aria-label="Remove '+esc(s.label)+'">×</button>':'')+'</span></div>';
 }
 var SSTEPS=[1,2,3,5,10,15,20,25,30,40,50,75,100,150,200,250,300,400,500,600,700,800,900,1000,1500,2000];
@@ -796,8 +833,9 @@ function renderMySlip(target){
   if(!slip.length){box.innerHTML='<div class="empty">Your slip is empty. Add a tip from Matches or Our tips, or tap Build.</div><button type="button" class="btn sec" id="goMatches">See matches</button>';
     $("goMatches").addEventListener("click",function(){closeSheet();showTab("matches");});return;}
   var t=totals(),ret=stake*t.odds;
-  var h='<div class="slip"><div class="slip-head"><span class="label">'+slip.length+(slip.length===1?' pick · single':' picks · accumulator')+'</span></div>';
+  var h=bookRowHTML()+'<div class="slip"><div class="slip-head"><span class="label">'+slip.length+(slip.length===1?' pick · single':' picks · accumulator')+'</span></div>';
   slip.forEach(function(k){h+=legHTML(SEL[k],true);});
+  h+=bookTotalsHTML(slip);
   h+=stakeHTML("sStake",t.odds);
   h+='<div class="stats"><div><span class="label">Stake</span><input type="number" id="stakeIn" inputmode="decimal" min="0.1" step="1" value="'+stake+'" aria-label="Stake"></div>'
     +'<div><span class="label">Potential return</span><b id="retOut">'+ret.toFixed(2)+'</b></div>'
@@ -808,7 +846,7 @@ function renderMySlip(target){
     +'<p class="aff">18+ · Sponsor link: we may earn a commission if you sign up. Bet only what you can afford to lose.</p>'
     +'<button type="button" class="btn" id="trackSlip" style="width:100%">🎟️ Track this coupon</button>'
     +'<div class="btn-row"><button type="button" class="btn quiet" id="clearSlip">Clear</button><button type="button" class="btn sec" id="copySlip">Copy</button></div>';
-  box.innerHTML=h;
+  box.innerHTML=h;bindBookRow(box);
   Array.prototype.forEach.call(box.querySelectorAll("[data-rm]"),function(b){b.addEventListener("click",function(){toggleSel(b.dataset.rm);});});
   $("stakeIn").addEventListener("input",function(){var v=parseFloat(this.value);if(v>0){stake=v;save();$("retOut").textContent=(stake*totals().odds).toFixed(2);updStake("sStake",totals().odds);renderBar();}});
   bindStake(box,"sStake",function(){return totals().odds;},function(v){$("stakeIn").value=v;$("retOut").textContent=(v*totals().odds).toFixed(2);});
@@ -1035,8 +1073,8 @@ function pickBtn(m){
   if(locked) return '<button type="button" class="r-pick vip locked" data-unlock="1" aria-label="VIP tip, sign up free to see"><span>VIP · free</span><b>0.00</b></button>';
   var st=m._hold?null:tipState(t,m);
   if(st==="won") return '<span class="r-pick paid'+(m._justPaid?' pop':'')+'" role="status" aria-label="'+esc(t.sel)+' landed"><span>✓ '+esc(t.sel)+'</span><b>Pay me please :)</b></span>';
-  if(st==="lost") return '<span class="r-pick lost"><span>✗ '+esc(t.sel)+'</span><b>'+(t.odds?t.odds.toFixed(2):"🔒")+'</b></span>';
-  return '<button type="button" class="r-pick'+(t.tier==="vip"?' vip':'')+'" data-key="'+esc(t.key)+'" aria-pressed="false" aria-label="'+esc((t.tier==="vip"?"VIP tip ":"Free tip ")+t.sel+" at "+t.odds)+'"><span>'+(t.tier==="vip"?"VIP · ":"TIP · ")+esc(t.sel)+'</span><b>'+(t.odds?t.odds.toFixed(2):"🔒")+'</b></button>';
+  if(st==="lost") return '<span class="r-pick lost"><span>✗ '+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></span>';
+  return '<button type="button" class="r-pick'+(t.tier==="vip"?' vip':'')+'" data-key="'+esc(t.key)+'" aria-pressed="false" aria-label="'+esc((t.tier==="vip"?"VIP tip ":"Free tip ")+t.sel+" at "+t.odds)+'"><span>'+(t.tier==="vip"?"VIP · ":"TIP · ")+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></button>';
 }
 function rowHTML(m){
   var sc = (m.live||m.done) ? '<span class="r-score'+(m.live?' live':'')+(m.hit?' hit':'')+'"'+(m.hit?' title="We called this score"':'')+'>'+esc(m.score||"–")+(m.hit?'<em>🎯</em>':'')+'</span>' : (m.type==="cancelled"?'<span class="r-score empty">Canc</span>':(m.bz?'<span class="r-score pred" title="Our score">'+m.bz+'</span>':'<span class="r-score empty">v</span>'));
@@ -1053,7 +1091,7 @@ function detailHTML(m){
     var locked=t.tier==="vip"&&!vipMember&&!t.sel;
     h+='<div class="tipbox'+(t.tier==="vip"?' vip':'')+'"><div class="tiprow">'+tierTag(t)+'<span class="label">Our tip</span>'+resTag(t,m)+'</div>'
       +(locked?'<div class="tiprow"><span class="hint">This is a VIP tip.</span><button type="button" class="btn vipb" data-unlock="1">Sign up free</button></div>'
-      :'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+(t.odds?t.odds.toFixed(2):"🔒")+'</span><span class="hint">'+esc(t.book)+'</span></div><div class="why">'+esc(t.why)+'</div>')+'</div>';
+      :'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+oddTxt(t)+'</span><span class="hint">'+esc(t.book)+'</span></div><div class="why">'+esc(t.why)+'</div>')+'</div>';
   });
   h+='<div class="tm2"><div class="tbox"><div class="nm">'+esc(m.home)+'</div><div class="pos">'+(m.hr||"–")+'<small>'+(m.nt?'of '+m.nt:'')+'</small></div>'+squares(m.hfd)+'</div>'
     +'<div class="tbox"><div class="nm">'+esc(m.away)+'</div><div class="pos">'+(m.ar||"–")+'<small>'+(m.nt?'of '+m.nt:'')+'</small></div>'+squares(m.afd)+'</div></div>'
@@ -1275,7 +1313,7 @@ function tipCard(m,t){
   var locked=t.tier==="vip"&&!vipMember&&!t.sel;
   return '<div class="tipcard'+(t.tier==="vip"?' vip':'')+(locked?' locked':'')+'"><div class="meta">'+tierTag(t)+'<span>'+esc(m.country)+' · '+esc(m.league)+' · '+(m.done?'FT '+esc(m.score):m.live?'Live '+esc(m.score):m.time)+'</span>'+resTag(t,m)+'</div>'
     +'<div class="mt">'+esc(m.home)+' v '+esc(m.away)+'</div>'
-    +'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+(t.odds?t.odds.toFixed(2):"🔒")+'</span>'
+    +'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+oddTxt(t)+'</span>'
     +(locked?'<button type="button" class="btn vipb" data-unlock="1" style="margin-left:auto">Sign up free</button>':(m.open?'<button type="button" class="btn sec" data-key="'+esc(t.key)+'" aria-pressed="false" style="margin-left:auto;min-height:40px;padding:6px 12px">Add</button><button type="button" class="btn quiet" data-track="'+esc(t.key)+'" title="Track this pick" aria-label="Track this pick" style="min-height:40px;padding:6px 10px">🎟️</button>':''))+'</div>'
     +'<div class="why" style="font-size:.82rem;color:var(--muted)">'+(locked?'Free sign-up to see the pick and the reason.':esc(t.why))+'</div></div>';
 }
@@ -1367,6 +1405,7 @@ function candidates(){
 }
 var SRC_NOTE={all:"Any match, picked by our model.",free:"Only from today's free tips.",vip:"Only from today's VIP tips.",both:"Only from today's free and VIP tips."};
 function renderBuilder(){
+  if($("bkBuild")){$("bkBuild").innerHTML=bookRowHTML();bindBookRow($("bkBuild"));}
   (function(){var f=0,v=0;MATCHES.forEach(function(m){m.tips.forEach(function(t){if(t.tier==="vip")v++;else f++;});});if($("bkFree"))$("bkFree").textContent=f;if($("bkVip"))$("bkVip").textContent=v;})();
   seg($("srcSeg"),[["free","Free"],["vip","VIP"],["both","Both"]].map(function(x){return {k:x[0],html:x[1]};}),function(it){return it.k===bSrc;},function(it){bSrc=it.k;saveB();renderBuilder();},"radio");
   var nT=0,seen={};candidates().forEach(function(s){seen[s.m.id]=1;});nT=Object.keys(seen).length;
@@ -1415,7 +1454,7 @@ function build(){
   lastSlip=best;
   var h='<div class="slip"><div class="slip-head"><span class="label">Your slip · '+bN+' picks</span><button type="button" class="btn quiet" id="again" style="min-height:36px;padding:6px 12px;font-size:.85rem">Another</button></div>';
   best.legs.forEach(function(s){var tp=null;s.m.tips.forEach(function(t){if(t.key===s.key)tp=t;});h+=legHTML(s,false).replace('<span class="mk">','<span class="mk">'+(tp?tierTag(tp)+' ':''));});
-  h+='<div class="frombk">✓ <span>Every pick is one of our tips</span></div>';
+  h+='<div class="frombk">✓ <span>Every pick is one of our tips</span></div>'+bookTotalsHTML(best.legs.map(function(s){return s.key;}));
   h+='<div class="slip-total"><span class="label" style="color:inherit">Total odds</span><span class="mono">'+best.tot.toFixed(2)+'</span></div>'
     +stakeHTML("bStake",best.tot)+'<div class="slip-foot">Our model: this slip wins about <b style="color:var(--fg)">1 time in '+oneIn(best.p)+'</b>. No win is guaranteed.</div></div>'
     +'<button type="button" class="btn" id="toSlip" style="margin-top:10px;width:100%">Add to my slip</button>';

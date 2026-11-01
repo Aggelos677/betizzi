@@ -238,6 +238,7 @@ async function template(env, url) {
 }
 
 // Μία γραμμή στη μορφή που διαβάζει η εφαρμογή (ίδια με το πρωτότυπο).
+const BOOKS = ["Bet365", "Betano", "Pinnacle", "1xBet", "William Hill"];
 const SELNAME = { "1": "Home", "2": "Away", X: "Draw", O25: "Over 2.5", U25: "Under 2.5", O15: "Over 1.5", O35: "Over 3.5", U35: "Under 3.5", GG: "GG", NG: "NG", "1X": "1X", X2: "X2", "12": "12" };
 function rawRow(x, hm) {
   const type = LIVE.has(x.status) ? "inprogress" : DONE.has(x.status) ? "finished" : ["PST", "CANC", "ABD", "AWD", "WO"].includes(x.status) ? "cancelled" : "notstarted";
@@ -254,6 +255,7 @@ function rawRow(x, hm) {
       : [SELNAME[tp.sel] || tp.sel, tp.price, tp.tier, tp.reason, 0, tp.result == null ? -1 : tp.result, 0, "best price", "A"]),
     x.status, x.minute || 0, x.home.form, x.away.form,
     { cr: null, yc: null, bts: gg.length ? Math.round((gg.reduce((a, b) => a + b, 0) / gg.length) * 100) : null },
+    BOOKS.map((b) => (x.books && x.books[b]) || 0), // [1,X,2,O25,U25,GG,NG] ανά bookmaker, σειρά BOOKS
   ];
 }
 

@@ -16,7 +16,7 @@ export async function getDay(env, date) {
       league: { id: f.league_id, name: f.league, country: f.country },
       home: { name: f.home, logo: f.home_logo, rank: f.home_rank, form: f.home_form || [], gg: f.home_gg },
       away: { name: f.away, logo: f.away_logo, rank: f.away_rank, form: f.away_form || [], gg: f.away_gg },
-      odds: f.odds || {}, model: f.model || null,
+      odds: f.odds || {}, books: f.bk || {}, model: f.model || null,
       tips: (tipsBy[f.id] || []).map((t) => ({
         tier: t.tier, locked: !!t.locked, market: t.market, sel: t.sel, price: t.price, prob: t.prob, reason: t.reason, result: t.result,
       })),

@@ -404,5 +404,12 @@ export const UI = {
   "We called the score!": ["Το βρήκαμε το σκορ!", "¡Acertamos el marcador!", "Acertamos o placar!", "On a trouvé le score !", "Ergebnis getroffen!", "Am ghicit scorul!", "Pogodili smo rezultat!", "Познахме резултата!"],
   "🏁 Win at full time": ["🏁 Νίκη στη λήξη", "🏁 Gana al final", "🏁 Vitória no fim", "🏁 Gagné au coup de sifflet", "🏁 Sieg bei Abpfiff", "🏁 Câștig la final", "🏁 Pobeda na kraju", "🏁 Победа накрая"],
   "Correct score": ["Σωστό σκορ", "Marcador exacto", "Placar exato", "Score exact", "Genaues Ergebnis", "Scor corect", "Tačan rezultat", "Точен резултат"],
+  "My bookmaker": ["Ο bookmaker μου", "Mi casa de apuestas", "Minha casa de apostas", "Mon bookmaker", "Mein Buchmacher", "Casa mea de pariuri", "Moja kladionica", "Моят букмейкър"],
+  "Best price": ["Καλύτερη τιμή", "Mejor cuota", "Melhor odd", "Meilleure cote", "Beste Quote", "Cea mai bună cotă", "Najbolja kvota", "Най-добър коефициент"],
+  "Total per bookmaker": ["Σύνολο ανά bookmaker", "Total por casa", "Total por casa", "Total par bookmaker", "Gesamt pro Buchmacher", "Total pe casă", "Ukupno po kladionici", "Общо по букмейкър"],
+  "Low price here": ["Χαμηλή τιμή εδώ", "Cuota baja aquí", "Odd baixa aqui", "Cote basse ici", "Niedrige Quote hier", "Cotă mică aici", "Niska kvota ovde", "Нисък коефициент тук"],
+  "Not offered by your bookmaker": ["Δεν το έχει ο bookmaker σου", "Tu casa no la ofrece", "Sua casa não oferece", "Pas proposé par ton bookmaker", "Nicht bei deinem Buchmacher", "Casa ta nu o oferă", "Tvoja kladionica ga nema", "Твоят букмейкър го няма"],
+  "Prices from": ["Τιμές από", "Cuotas de", "Odds da", "Cotes de", "Quoten von", "Cote de la", "Kvote od", "Коефициенти от"],
+  "Showing the best price": ["Δείχνουμε την καλύτερη τιμή", "Mostramos la mejor cuota", "Mostrando a melhor odd", "Meilleure cote affichée", "Beste Quote wird gezeigt", "Arătăm cea mai bună cotă", "Prikazujemo najbolju kvotu", "Показваме най-добрия коефициент"],
   "Upcoming": ["Επόμενοι", "Próximos", "Próximos", "À venir", "Demnächst", "Urmează", "Predstoje", "Предстоящи"],
 };
