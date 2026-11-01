@@ -390,6 +390,8 @@ details.mrow.calledrow>summary{background:radial-gradient(circle at 78% 50%,rgba
 .sharebox-in{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;max-width:420px;width:100%;display:flex;flex-direction:column;gap:10px;max-height:92vh;overflow:auto}
 .sharebox img{width:100%;border-radius:10px;border:1px solid var(--line)}
 .sharebtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sharebtns .btn{text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;min-height:44px;font-size:.95rem}
+.r-time .lmin{font:700 .78rem var(--f-mono);color:var(--bad);letter-spacing:0;text-transform:none}
+.r-time .lmin i{font-style:normal;animation:lvp 1.2s ease-in-out infinite}
 /* sponsor CTA */
 .sponsor{display:flex;justify-content:space-between;align-items:center;gap:10px;text-decoration:none;background:#fff;color:#0c0f0d;border-radius:12px;padding:14px 16px;min-height:52px;font:800 1.05rem var(--f-display);letter-spacing:.05em;text-transform:uppercase}
 .sponsor b{color:#0c0f0d;border-bottom:2px dashed #0c0f0d}
@@ -822,7 +824,7 @@ function pickBtn(m){
 }
 function rowHTML(m){
   var sc = (m.live||m.done) ? '<span class="r-score'+(m.live?' live':'')+(m.hit?' hit':'')+'"'+(m.hit?' title="We called this score"':'')+'>'+esc(m.score||"–")+(m.hit?'<em>🎯</em>':'')+'</span>' : (m.type==="cancelled"?'<span class="r-score empty">Canc</span>':(m.bz?'<span class="r-score pred" title="Our score">'+m.bz+'</span>':'<span class="r-score empty">v</span>'));
-  var time = m.live?'<b style="color:var(--bad)">LIVE</b><span>2nd half</span>':m.done?'<b>FT</b><span>'+m.time+'</span>':'<b>'+m.time+'</b><span class="bdgs">'+(m.badges.length?badgeIcons(m,2):'Sun')+'</span>';
+  var mn=m.min||(m.live?67:0);var time = m.live?'<b style="color:var(--bad)">LIVE</b><span class="lmin">'+(mn==="HT"?"HT":mn+'<i>\'</i>')+'</span>':m.done?'<b>FT</b><span>'+m.time+'</span>':'<b>'+m.time+'</b><span class="bdgs">'+(m.badges.length?badgeIcons(m,2):'Sun')+'</span>';
   return '<details class="mrow'+(m.hit?' hitrow':'')+'" data-mid="'+m.id+'"><summary><span class="r-time">'+time+'</span>'
     +'<span class="r-teams"><span class="tl"><span class="nm">'+esc(m.home)+'</span>'+(m.hr?'<span class="rk">'+m.hr+'</span>':'')+fbars(m.hf,m.home)+'</span>'
     +'<span class="tl"><span class="nm">'+esc(m.away)+'</span>'+(m.ar?'<span class="rk">'+m.ar+'</span>':'')+fbars(m.af,m.away)+'</span></span>'
@@ -960,16 +962,16 @@ function goalFx(mid,side){
 $("demoGoal").addEventListener("click",function(){
   var m=MATCHES.filter(function(x){return x.open&&x.tips.some(function(t){return t.sel==="Over 2.5"&&(t.tier==="free"||vipMember);});})[0];
   if(!m){toast("No open Over 2.5 tip to demo");return;}
-  m.type="inprogress";m.live=true;m.open=false;m.score="1-1";mFilter="live";q="";$("q").value="";renderFilters();renderMatches();
+  m.type="inprogress";m.live=true;m.open=false;m.score="1-1";m.min=71;mFilter="live";q="";$("q").value="";renderFilters();renderMatches();
   var row=document.querySelector('details.mrow[data-mid="'+m.id+'"]');if(row)row.scrollIntoView({block:"center"});
-  setTimeout(function(){m.score="2-1";m._hold=true;renderMatches();goalFx(m.id,"h");setTimeout(function(){m._hold=false;m._justPaid=true;renderMatches();var s=document.querySelector('details.mrow[data-mid="'+m.id+'"] .r-score');if(s)s.classList.add("goalflash");},1300);toast("⚽ Goal! "+m.home+" v "+m.away+" 2-1 · Over 2.5 landed");setTimeout(function(){m._justPaid=false;},2200);},1600);
+  setTimeout(function(){m.score="2-1";m.min=74;m._hold=true;renderMatches();goalFx(m.id,"h");setTimeout(function(){m._hold=false;m._justPaid=true;renderMatches();var s=document.querySelector('details.mrow[data-mid="'+m.id+'"] .r-score');if(s)s.classList.add("goalflash");},1300);toast("⚽ Goal! "+m.home+" v "+m.away+" 2-1 · Over 2.5 landed");setTimeout(function(){m._justPaid=false;},2200);},1600);
 });
 $("demoSmall").addEventListener("click",function(){
   var m=MATCHES.filter(function(x){return x.open&&!x._demo&&!x.tips.length;})[0];if(!m){toast("Nothing left to demo, refresh the page");return;}
-  m._demo=true;m.type="inprogress";m.live=true;m.open=false;m.score="0-0";mFilter="live";q="";$("q").value="";renderFilters();renderMatches();
+  m._demo=true;m.type="inprogress";m.live=true;m.open=false;m.score="0-0";m.min=12;mFilter="live";q="";$("q").value="";renderFilters();renderMatches();
   var row=document.querySelector('details.mrow[data-mid="'+m.id+'"]');if(row)row.scrollIntoView({block:"center"});
-  setTimeout(function(){m.score="0-1";renderMatches();goalFxSmall(m.id,"a");},1100);
-  setTimeout(function(){m.score="1-1";renderMatches();goalFxSmall(m.id,"h");},3000);
+  setTimeout(function(){m.score="0-1";m.min=14;renderMatches();goalFxSmall(m.id,"a");},1100);
+  setTimeout(function(){m.score="1-1";m.min=17;renderMatches();goalFxSmall(m.id,"h");},3000);
 });
 $("demoCalled").addEventListener("click",function(){
   var pool=MATCHES.filter(function(x){return x.open&&x.bz&&!x._demo;});if(pool.length<8){toast("Nothing left to demo, refresh the page");return;}
