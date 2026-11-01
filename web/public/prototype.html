@@ -408,6 +408,20 @@ details.mrow.calledrow>summary{background:radial-gradient(circle at 78% 50%,rgba
 .bzt,.bzs{font:500 .78rem var(--f-mono,monospace);color:var(--muted)}.bzs{color:var(--lime)}.bzw{color:#3ccf6e}.bzl{color:#ff6b6b}
 .bzp{font-weight:700;white-space:nowrap}.bzp.vip{color:var(--gold,#e8b931)}.bzo{color:var(--muted);font-size:.8rem}
 .bzfoot{display:flex;align-items:center;gap:10px;padding:10px 12px;flex-wrap:wrap}.bzfoot .hint{flex:1;min-width:180px;margin:0}.bzadd{min-height:44px}
+
+/* --- αλλαγές μετά την αξιολόγηση UX (01/11/2026) --- */
+:root{--muted:#b3c0b7}
+.vp{margin:2px 0 6px;color:var(--muted);font-size:.9rem}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;top:auto;margin:0;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);border-bottom:0;z-index:31;background:var(--bg)}
+.tab{min-height:48px;font-size:.8rem;letter-spacing:.02em;padding:8px 2px;line-height:1.1}
+.slipbar{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+.r-score.pred{color:var(--muted);border-color:var(--line);font-weight:600;font-size:.95rem}
+.r-score.pred::before{content:"≈";font-size:.7em;margin-right:2px;opacity:.8}
+.r-teams .tl span.nm,.r-teams span.nm{white-space:normal;font-size:.86rem;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.15}
+.bzm b{white-space:normal}
+.r-pick.none{border:0;background:none;min-height:0}.r-pick.none span{font-size:.72rem;font-weight:500;opacity:.7}
+.netp{text-align:right;font-size:.78rem;color:var(--muted);margin-top:-4px}
 </style>
 </head>
 <body>
@@ -415,6 +429,7 @@ details.mrow.calledrow>summary{background:radial-gradient(circle at 78% 50%,rgba
   <header>
     <span class="label">Smart football tips · <span id="today"></span></span>
     <h1 class="logo" aria-label="betizzi"><span class="lb" aria-hidden="true">bet</span><span class="li" aria-hidden="true"><span class="i">&#305;<b><svg viewBox="-10 -10 20 20"><circle r="9.2" fill="#fff" stroke="#0c0f0d" stroke-width="1"/><polygon points="0,-3.6 3.4,-1.1 2.1,2.9 -2.1,2.9 -3.4,-1.1" fill="#0c0f0d"/><path d="M0,-3.6V-9M3.4,-1.1L8.6,-2.8M2.1,2.9L5.3,7.3M-2.1,2.9L-5.3,7.3M-3.4,-1.1L-8.6,-2.8" stroke="#0c0f0d" stroke-width="1.1"/></svg></b></span>zz<span class="i">&#305;<b><svg viewBox="-10 -10 20 20"><circle r="9.2" fill="#fff" stroke="#0c0f0d" stroke-width="1"/><polygon points="0,-3.6 3.4,-1.1 2.1,2.9 -2.1,2.9 -3.4,-1.1" fill="#0c0f0d"/><path d="M0,-3.6V-9M3.4,-1.1L8.6,-2.8M2.1,2.9L5.3,7.3M-2.1,2.9L-5.3,7.3M-3.4,-1.1L-8.6,-2.8" stroke="#0c0f0d" stroke-width="1.1"/></svg></b></span></span></h1>
+    <p class="vp">Free football tips · ready-made coupons · build your own slip</p>
     <!--datanote-->
   </header>
 
@@ -486,7 +501,7 @@ details.mrow.calledrow>summary{background:radial-gradient(circle at 78% 50%,rgba
     <div class="foot-top"><span class="age">18+</span><span>Adults only. Please gamble responsibly.</span></div>
     <p style="margin:0">Tips and model chances describe probabilities and never guarantee a win. Every extra pick on an accumulator lowers its chance of winning.</p>
     <p style="margin:0">Set a money and time limit before you start. Never chase losses.</p>
-    <p style="margin:0">Absences and breaking news need a data feed that is not connected yet.</p>
+    <p style="margin:0"></p>
   </footer>
 </div>
 
@@ -660,13 +675,14 @@ function steps(){return smode==="win"?WSTEPS:SSTEPS;}
 function curVal(odds){return smode==="win"?WSTEPS[nIx(WSTEPS,stake*odds)]:stake;}
 function stakeHTML(id,odds){var a=steps(),i=nIx(a,curVal(odds));
   return '<div class="stakebox" id="'+id+'Box"><div class="srcseg smode" role="radiogroup" aria-label="Slider sets"><button type="button" class="chip" data-m="stake" aria-pressed="'+(smode==="stake")+'">I want to stake</button><button type="button" class="chip" data-m="win" aria-pressed="'+(smode==="win")+'">I want to win</button></div>'
-    +'<div class="ret-top"><span class="label" id="'+id+'L"></span><span class="ret-val"><small id="'+id+'S"></small> <span id="'+id+'R"></span> €</span></div>'
+    +'<div class="ret-top"><span class="label" id="'+id+'L"></span><span class="ret-val"><small id="'+id+'S"></small> <span id="'+id+'R"></span> €</span></div><div class="netp" id="'+id+'N"></div>'
     +'<input type="range" id="'+id+'" min="0" max="'+(a.length-1)+'" step="1" value="'+i+'" style="--fill:'+(i/(a.length-1)*100)+'%" aria-label="'+(smode==="win"?"Amount to win":"Stake")+'">'
     +'<div class="qk">'+(smode==="win"?[100,200,500,1000,2000]:[5,10,20,50,100]).map(function(v){return '<button type="button" data-q="'+v+'">'+v+'€</button>';}).join("")+'</div></div>';}
 function updStake(id,odds,target){
   var a=steps(),r=$(id);if(!r)return;var v=target!=null?target:(smode==="win"?stake*odds:stake),i=nIx(a,v);
   r.value=i;r.style.setProperty("--fill",(i/(a.length-1)*100)+"%");
-  /* πάντα: αριστερά τι ποντάρεις, δεξιά (πράσινο) τι κερδίζεις */
+  /* πάντα: αριστερά τι ποντάρεις, δεξιά (πράσινο) τι κερδίζεις · από κάτω μικρά τα καθαρά κέρδη */
+  var ret=smode==="win"?v:stake*odds,nn=$(id+"N");if(nn)nn.textContent="Net profit "+fmt(Math.max(0,ret-stake))+" €";
   if(smode==="win"){$(id+"L").innerHTML='<span>Stake</span> <b>'+fmt(stake)+'</b> €';$(id+"S").textContent="Potential return";$(id+"R").textContent=fmt(v);r.setAttribute("aria-valuetext","win "+v+" euro, stake "+fmt(stake)+" euro");}
   else{$(id+"L").innerHTML='<span>Stake</span> <b>'+fmt(stake)+'</b> €';$(id+"S").textContent="Potential return";$(id+"R").textContent=(stake*odds).toFixed(2);r.setAttribute("aria-valuetext",stake+" euro");}
 }
@@ -835,7 +851,7 @@ function tipState(t,m){
 function pickBtn(m){
   if(!m.tips.length) return '<span class="r-pick none"><span>No tip</span></span>';
   var t=m.tips[0], locked=t.tier==="vip"&&!vipMember;
-  if(locked) return '<button type="button" class="r-pick vip locked" data-unlock="1" aria-label="VIP tip, sign up free to see"><span>VIP · sign up</span><b>0.00</b></button>';
+  if(locked) return '<button type="button" class="r-pick vip locked" data-unlock="1" aria-label="VIP tip, sign up free to see"><span>VIP · free</span><b>0.00</b></button>';
   var st=m._hold?null:tipState(t,m);
   if(st==="won") return '<span class="r-pick paid'+(m._justPaid?' pop':'')+'" role="status" aria-label="'+esc(t.sel)+' landed"><span>✓ '+esc(t.sel)+'</span><b>Pay me please :)</b></span>';
   if(st==="lost") return '<span class="r-pick lost"><span>✗ '+esc(t.sel)+'</span><b>'+(t.odds?t.odds.toFixed(2):"🔒")+'</b></span>';
@@ -843,7 +859,7 @@ function pickBtn(m){
 }
 function rowHTML(m){
   var sc = (m.live||m.done) ? '<span class="r-score'+(m.live?' live':'')+(m.hit?' hit':'')+'"'+(m.hit?' title="We called this score"':'')+'>'+esc(m.score||"–")+(m.hit?'<em>🎯</em>':'')+'</span>' : (m.type==="cancelled"?'<span class="r-score empty">Canc</span>':(m.bz?'<span class="r-score pred" title="Our score">'+m.bz+'</span>':'<span class="r-score empty">v</span>'));
-  var mn=m.min||(m.live?67:0);var time = m.live?'<b style="color:var(--bad)">LIVE</b><span class="lmin">'+(mn==="HT"?"HT":mn+'<i>\'</i>')+'</span>':m.done?'<b>FT</b><span>'+m.time+'</span>':'<b>'+m.time+'</b><span class="bdgs">'+(m.badges.length?badgeIcons(m,2):'Sun')+'</span>';
+  var mn=m.min||(m.live?67:0);var time = m.live?'<b style="color:var(--bad)">LIVE</b><span class="lmin">'+(mn==="HT"?"HT":mn+'<i>\'</i>')+'</span>':m.done?'<b>FT</b><span>'+m.time+'</span>':'<b>'+m.time+'</b>';
   return '<details class="mrow'+(m.hit?' hitrow':'')+'" data-mid="'+m.id+'"><summary><span class="r-time">'+time+'</span>'
     +'<span class="r-teams"><span class="tl"><span class="nm">'+esc(m.home)+'</span>'+(m.hr?'<span class="rk">'+m.hr+'</span>':'')+fbars(m.hf,m.home)+'</span>'
     +'<span class="tl"><span class="nm">'+esc(m.away)+'</span>'+(m.ar?'<span class="rk">'+m.ar+'</span>':'')+fbars(m.af,m.away)+'</span></span>'
@@ -865,14 +881,14 @@ function detailHTML(m){
     var tot=(m.p.h+m.p.x+m.p.a)||1;
     h+='<div class="mgroup"><span class="glabel">Our model</span><div class="pbar" role="img" aria-label="Home '+m.p.h+'%, draw '+m.p.x+'%, away '+m.p.a+'%"><i class="h" style="width:'+(m.p.h/tot*100)+'%"></i><i class="d" style="width:'+(m.p.x/tot*100)+'%"></i><i class="a" style="width:'+(m.p.a/tot*100)+'%"></i></div>'
       +'<div class="plegend"><span>1 <b>'+m.p.h+'%</b></span><span>X <b>'+m.p.x+'%</b></span><span>2 <b>'+m.p.a+'%</b></span></div>'
-      +(m.capped?'<div class="hint" style="font-size:.72rem">Kept within 5 points of the bookmakers\' price · raw model 1 '+m.pRaw.h+'% · X '+m.pRaw.x+'% · 2 '+m.pRaw.a+'% · O2.5 '+m.pRaw.o25+'%</div>':'')+'<div class="dline"><span>Our score <b style="color:var(--lime)">'+esc(m.bz||"–")+'</b></span><span>Most likely <b>'+esc(m.bzTop||m.p.score||"–")+'</b></span><span>Over 2.5 <b>'+m.p.o25+'%</b></span></div></div>';
+      +(m.capped?'<div class="hint" style="font-size:.72rem">Kept within 5 points of the bookmakers\' price · raw model 1 '+m.pRaw.h+'% · X '+m.pRaw.x+'% · 2 '+m.pRaw.a+'% · O2.5 '+m.pRaw.o25+'%</div>':'')+'<div class="dline"><span>Our score <b style="color:var(--lime)">'+esc(m.bz||"–")+'</b></span><span>Over 2.5 <b>'+m.p.o25+'%</b></span></div></div>';
   if(m.badges.length)h+='<div class="bdglist">'+m.badges.map(function(k){return '<span><i>'+BADGE[k][0]+'</i>'+BADGE[k][1]+'</span>';}).join("")+'</div>';
   }
   if(m.o.h){
     h+='<div class="mgroup"><span class="glabel">Result</span><div class="odds c3">'+obtn(m.id+":1")+obtn(m.id+":X")+obtn(m.id+":2")+'</div></div>'
       +'<div class="mgroup"><span class="glabel">Goals</span><div class="odds c2">'+obtn(m.id+":O25")+obtn(m.id+":U25")+obtn(m.id+":GG")+obtn(m.id+":NG")+'</div></div>';
   }
-  h+='<div class="tm2"><div class="soon"><b>Missing players</b>Coming soon · needs an injuries feed</div><div class="soon"><b>Breaking news</b>Coming soon · only for important news</div></div>';
+  /* απουσίες & νέα: κρυφά μέχρι να υπάρχουν δεδομένα */
   return h;
 }
 function renderMatches(){
