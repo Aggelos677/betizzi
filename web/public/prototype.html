@@ -189,8 +189,8 @@ body{padding-top:env(safe-area-inset-top,0px)}
 .r-teams .tl{display:flex;align-items:center;gap:6px;min-width:0}
 .r-teams .tl span.nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .rk{font:600 .7rem var(--f-mono);color:var(--muted);flex:none}
-.r-score.live{color:#fff;background:rgba(60,207,110,.16);border-color:#3ccf6e;animation:livepulse 2s ease-in-out infinite}
-@keyframes livepulse{0%,100%{box-shadow:0 0 0 0 rgba(60,207,110,0)}50%{box-shadow:0 0 0 3px rgba(60,207,110,.25)}}
+.r-score.live{color:#e9f7ee;font-weight:600;background:rgba(60,207,110,.08);border-color:rgba(60,207,110,.6);animation:livepulse 2.4s ease-in-out infinite}
+@keyframes livepulse{0%,100%{box-shadow:0 0 0 0 rgba(60,207,110,0)}50%{box-shadow:0 0 0 2px rgba(60,207,110,.15)}}
 .r-score.empty{border-color:transparent;color:var(--muted);font-size:.8rem}
 .r-pick.vip{border-color:rgba(164,124,255,.6);background:var(--vip-soft)}
 .r-pick.vip span{color:var(--vip)}
@@ -477,6 +477,7 @@ details.mrow.calledrow>summary{background:radial-gradient(circle at 78% 50%,rgba
   <div id="view-coupons" role="tabpanel" aria-labelledby="tab-coupons" class="wrap" hidden>
     <div class="secthead"><h2>My coupons</h2><span class="hint" id="cpCount"></span></div>
     <p class="hint" style="margin:-8px 0 0">Played somewhere else? Build the same slip here, tap <b>Track this coupon</b> and follow every pick live.</p>
+    <button type="button" class="btn sec" id="addSingle" style="min-height:44px">+ Add a single game</button>
     <button type="button" class="btn sec" id="demoCoupon" style="min-height:44px;font-size:.9rem">🎟️ Demo: watch a coupon come in</button>
     <div id="cpList" style="display:flex;flex-direction:column;gap:12px"></div>
   </div>
@@ -722,7 +723,7 @@ function cpState(c){var st=c.legs.map(legState);if(st.indexOf("lost")>=0)return 
 function cpHTML(c){
   var st=c.legs.map(legState),won=st.filter(function(x){return x==="won";}).length,cs=cpState(c),ret=c.stake*c.odds;
   var lab={wait:"Not started",live:"In play",won:"Winner",lost:"Lost"}[cs];
-  var h='<div class="cp cp-'+cs+'" id="cp'+c.id+'"><div class="cp-head"><div><span class="label">Coupon #'+c.n+' · '+c.legs.length+' picks</span><div class="cp-odds mono">x'+c.odds.toFixed(2)+'</div></div>'
+  var h='<div class="cp cp-'+cs+'" id="cp'+c.id+'"><div class="cp-head"><div><span class="label">'+(c.legs.length===1?'Single':'Coupon #'+c.n+' · '+c.legs.length+' picks')+'</span><div class="cp-odds mono">x'+c.odds.toFixed(2)+'</div></div>'
     +'<div style="text-align:right"><span class="cp-st">'+lab+'</span><div class="cp-ret mono">'+fmt(c.stake)+' → <b>'+ret.toFixed(2)+'</b> €</div></div></div>'
     +'<div class="cp-prog"><i style="width:'+(won/c.legs.length*100)+'%"></i></div><div class="cp-legs">';
   c.legs.forEach(function(k,i){var s=SEL[k],m=s.m,x=st[i];
@@ -896,6 +897,7 @@ function bindMatchList(){
 }
 function bindButtons(root){
   Array.prototype.forEach.call(root.querySelectorAll("button[data-key]"),function(b){ if(b._b)return; b._b=1; b.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();toggleSel(b.dataset.key);}); });
+  Array.prototype.forEach.call(root.querySelectorAll("[data-track]"),function(b){ if(b._b)return; b._b=1; b.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();if(!SEL[b.dataset.track])return;saveCoupon([b.dataset.track],stake);toast("Added to My coupons");}); });
   Array.prototype.forEach.call(root.querySelectorAll("[data-unlock]"),function(b){ if(b._b)return; b._b=1; b.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();setVip(true);toast("Signed up (preview)");}); });
 }
 /* goal effect: a ball flies from the scoring team to the score, then the score flashes */
@@ -1031,6 +1033,7 @@ $("demoCalled").addEventListener("click",function(){
   }
   tick();setInterval(function(){if(!document.hidden)tick();},30000);
 })();
+$("addSingle").addEventListener("click",function(){showTab("matches");toast("Tap a pick, then Track this coupon in My slip");});
 $("demoCoupon").addEventListener("click",function(){
   var picks=[];MATCHES.forEach(function(m){if(picks.length<3&&m.open&&!m._demo)m.tips.forEach(function(t){var c=tipCode(t);if(picks.length<3&&(c==="O25"||c==="GG"||c==="1"||c==="2")&&(t.tier==="free"||vipMember)&&picks.every(function(p){return p.m!==m;}))picks.push({m:m,t:t,c:c});});});
   if(picks.length<3){toast("Nothing left to demo, refresh the page");return;}
@@ -1049,7 +1052,7 @@ function tipCard(m,t){
   return '<div class="tipcard'+(t.tier==="vip"?' vip':'')+(locked?' locked':'')+'"><div class="meta">'+tierTag(t)+'<span>'+esc(m.country)+' · '+esc(m.league)+' · '+(m.done?'FT '+esc(m.score):m.live?'Live '+esc(m.score):m.time)+'</span>'+resTag(t,m)+'</div>'
     +'<div class="mt">'+esc(m.home)+' v '+esc(m.away)+'</div>'
     +'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+(t.odds?t.odds.toFixed(2):"🔒")+'</span>'
-    +(locked?'<button type="button" class="btn vipb" data-unlock="1" style="margin-left:auto">Sign up free</button>':(m.open?'<button type="button" class="btn sec" data-key="'+esc(t.key)+'" aria-pressed="false" style="margin-left:auto;min-height:40px;padding:6px 12px">Add</button>':''))+'</div>'
+    +(locked?'<button type="button" class="btn vipb" data-unlock="1" style="margin-left:auto">Sign up free</button>':(m.open?'<button type="button" class="btn sec" data-key="'+esc(t.key)+'" aria-pressed="false" style="margin-left:auto;min-height:40px;padding:6px 12px">Add</button><button type="button" class="btn quiet" data-track="'+esc(t.key)+'" title="Track this pick" aria-label="Track this pick" style="min-height:40px;padding:6px 10px">🎟️</button>':''))+'</div>'
     +'<div class="why" style="font-size:.82rem;color:var(--muted)">'+(locked?'Free sign-up to see the pick and the reason.':esc(t.why))+'</div></div>';
 }
 /* έτοιμα κουπόνια του betizzi (βγαίνουν από τον server μία φορά τη μέρα) */

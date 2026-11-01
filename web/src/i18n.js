@@ -372,4 +372,10 @@ export const UI = {
   "Goals ·": ["Γκολ ·", "Goles ·", "Gols ·", "Buts ·", "Tore ·", "Goluri ·", "Golovi ·", "Голове ·"],
   "Mix ·": ["Μικτό ·", "Mixto ·", "Misto ·", "Mixte ·", "Gemischt ·", "Mixt ·", "Mešovito ·", "Микс ·"],
   " picks": [" επιλογές", " selecciones", " seleções", " sélections", " Tipps", " selecții", " parova", " избора"],
+  "+ Add a single game": ["+ Πρόσθεσε ένα παιχνίδι", "+ Añadir un partido", "+ Adicionar um jogo", "+ Ajouter un match", "+ Einzelspiel hinzufügen", "+ Adaugă un meci", "+ Dodaj jednu utakmicu", "+ Добави един мач"],
+  "Single": ["Μονό", "Simple", "Simples", "Simple", "Einzelwette", "Simplu", "Singl", "Единичен"],
+  "Added to My coupons": ["Μπήκε στα κουπόνια μου", "Añadido a Mis cupones", "Adicionado a Meus bilhetes", "Ajouté à Mes tickets", "Zu Meine Scheine hinzugefügt", "Adăugat la Biletele mele", "Dodato u Moje tikete", "Добавено в Моите фишове"],
+  "Tap a pick, then Track this coupon in My slip": ["Πάτα μια επιλογή και μετά «Παρακολούθησε το κουπόνι» στο δελτίο σου", "Toca una selección y luego «Seguir este cupón» en Mi apuesta", "Toque numa seleção e depois em «Acompanhar este bilhete» no Meu bilhete", "Touche une sélection, puis « Suivre ce ticket » dans Mon ticket", "Tipp antippen, dann „Schein verfolgen“ in Mein Wettschein", "Apasă o selecție, apoi «Urmărește biletul» în Biletul meu", "Dodirni par, pa «Prati ovaj tiket» u Mom tiketu", "Докосни избор, после «Следи фиша» в Моят фиш"],
+  "Track this pick": ["Παρακολούθησε αυτή την επιλογή", "Seguir esta selección", "Acompanhar esta seleção", "Suivre ce choix", "Diesen Tipp verfolgen", "Urmărește selecția", "Prati ovaj par", "Следи този избор"],
+  " tracked": [" σε παρακολούθηση", " en seguimiento", " acompanhando", " suivis", " verfolgt", " urmărite", " praćeno", " следени"],
 };
