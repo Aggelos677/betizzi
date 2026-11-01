@@ -424,10 +424,21 @@ body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .bzm b{white-space:normal}
 .r-pick.none{border:0;background:none;min-height:0}.r-pick.none span{font-size:.72rem;font-weight:500;opacity:.7}
 .netp{text-align:right;font-size:.78rem;color:var(--muted);margin-top:-4px}
+
+/* --- PC: πιο φαρδιά σελίδα, κουπόνια ημέρας σε στήλη δεξιά --- */
+.side{display:none}
+@media (min-width:1100px){
+  .wrap.app{max-width:1240px;display:grid;grid-template-columns:minmax(0,1fr) 380px;column-gap:28px;align-items:start}
+  .wrap.app > header,.wrap.app > nav.tabs{grid-column:1 / -1}
+  .wrap.app > .wrap{grid-column:1;max-width:none}
+  .side{display:block;grid-column:2;grid-row:3 / span 6;position:sticky;top:76px;max-height:calc(100vh - 160px);overflow:auto}
+  .side .card{margin:0}
+  #view-tips > section.card:has(#bzcList){display:none}
+}
 </style>
 </head>
 <body>
-<div class="wrap" lang="en">
+<div class="wrap app" lang="en">
   <header>
     <span class="label">Smart football tips · <span id="today"></span></span>
     <h1 class="logo" aria-label="betizzi"><span class="lb" aria-hidden="true">bet</span><span class="li" aria-hidden="true"><span class="i">&#305;<b><svg viewBox="-10 -10 20 20"><circle r="9.2" fill="#fff" stroke="#0c0f0d" stroke-width="1"/><polygon points="0,-3.6 3.4,-1.1 2.1,2.9 -2.1,2.9 -3.4,-1.1" fill="#0c0f0d"/><path d="M0,-3.6V-9M3.4,-1.1L8.6,-2.8M2.1,2.9L5.3,7.3M-2.1,2.9L-5.3,7.3M-3.4,-1.1L-8.6,-2.8" stroke="#0c0f0d" stroke-width="1.1"/></svg></b></span>zz<span class="i">&#305;<b><svg viewBox="-10 -10 20 20"><circle r="9.2" fill="#fff" stroke="#0c0f0d" stroke-width="1"/><polygon points="0,-3.6 3.4,-1.1 2.1,2.9 -2.1,2.9 -3.4,-1.1" fill="#0c0f0d"/><path d="M0,-3.6V-9M3.4,-1.1L8.6,-2.8M2.1,2.9L5.3,7.3M-2.1,2.9L-5.3,7.3M-3.4,-1.1L-8.6,-2.8" stroke="#0c0f0d" stroke-width="1.1"/></svg></b></span></span></h1>
@@ -453,6 +464,7 @@ body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
   </div>
 
   <!-- TIPS -->
+  <aside id="sidePanel" class="side" aria-label="Today's coupons"><section class="card"><div class="secthead"><h2>Today's coupons</h2></div><div id="bzcSide" class="bzc-list"></div></section></aside>
   <div id="view-tips" role="tabpanel" aria-labelledby="tab-tips" class="wrap" hidden>
     <label class="sw" hidden><input type="checkbox" id="vipMember"> Show as registered user (untick to see what a visitor sees)</label>
     <section class="card" aria-labelledby="bzc-title"><div class="secthead"><h2 id="bzc-title">Today's coupons</h2><span class="tag lime" id="bzcCount"></span></div><div id="bzcList" class="bzc-list"></div></section>
@@ -1076,8 +1088,9 @@ function tipCard(m,t){
 /* έτοιμα κουπόνια του betizzi (βγαίνουν από τον server μία φορά τη μέρα) */
 var BZC_SEL={"1":"1","2":"2","X":"X","O25":"Over 2.5","U25":"Under 2.5","O15":"Over 1.5","GG":"GG","NG":"NG"};
 var BZC_VAR={wins:"Wins",goals:"Goals",mix:"Mix",ucl:"Champions League",uel:"Europa League"};
-function renderBzCoupons(){var box=$("bzcList");if(!box)return;var L=(typeof BZC!=="undefined"&&BZC)||[];
-  $("bzcCount").textContent=L.length?L.length+"":"";
+function renderBzCoupons(){renderBzInto($("bzcList"));renderBzInto($("bzcSide"));}
+function renderBzInto(box){if(!box)return;var L=(typeof BZC!=="undefined"&&BZC)||[];
+  if($("bzcCount"))$("bzcCount").textContent=L.length?L.length+"":"";
   if(!L.length){box.innerHTML='<div class="empty">Today\'s coupons are not out yet.</div>';return;}
   box.innerHTML=L.map(function(c){
     var st=c.result===1?"won":c.result===0?"lost":c.legs.some(function(l){return l.status&&l.status!=="NS"&&l.status!=="TBD";})?"live":"wait";
@@ -1090,7 +1103,7 @@ function renderBzCoupons(){var box=$("bzcList");if(!box)return;var L=(typeof BZC
       +(st==="wait"&&keys.length?'<button type="button" class="btn sec bzadd" data-bzc="'+c.n+'">Add to my slip</button>':'')
       +(st==="won"?'<span class="res w">Won</span>':st==="lost"?'<span class="res l">Lost</span>':st==="live"?'<span class="res p">Live</span>':'')+'</div>';
     return '<div class="bzc bzc-'+st+'">'+head+legs+foot+'</div>';}).join("");
-  Array.prototype.forEach.call(box.querySelectorAll("[data-bzc]"),function(b){b.addEventListener("click",function(){var c=L.filter(function(x){return String(x.n)===b.dataset.bzc;})[0];if(!c)return;
+  Array.prototype.forEach.call(box.querySelectorAll("[data-bzc]"),function(b){if(b._b)return;b._b=1;b.addEventListener("click",function(){var c=L.filter(function(x){return String(x.n)===b.dataset.bzc;})[0];if(!c)return;
     var keys=c.legs.filter(function(l){return !l.locked;}).map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});if(keys.length)addLegs(keys);});});
 }
 function renderTips(){
