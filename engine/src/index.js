@@ -68,7 +68,10 @@ async function syncForm(env, batch = 40) {
       SELECT home_id team, ts FROM fixtures f WHERE ts BETWEEN ?1 AND ?2 AND EXISTS (SELECT 1 FROM odds o WHERE o.fixture_id=f.id)
       UNION ALL SELECT away_id, ts FROM fixtures f WHERE ts BETWEEN ?1 AND ?2 AND EXISTS (SELECT 1 FROM odds o WHERE o.fixture_id=f.id)) t
     LEFT JOIN (SELECT team_id, MAX(fetched) f FROM form_fetch GROUP BY team_id) ff ON ff.team_id=t.team
-    WHERE ff.f IS NULL OR ff.f < ?3 GROUP BY t.team ORDER BY ts LIMIT ?4`).bind(now(), now() + 3 * DAY, now() - 20 * 3600, batch).all();
+    WHERE ff.f IS NULL OR ff.f < ?3 GROUP BY t.team ORDER BY ts LIMIT ?4`).bind(now(), now() + 3 * DAY, now() - 14 * DAY, batch).all();
+  // Απόφαση Owner (01/11): όχι ξανά φόρμα για ομάδες που δεν έπαιξαν. Οι αγώνες των δικών μας λιγκών γράφονται
+  // στη φόρμα αυτόματα στη λήξη (formFromOurResults)· από το API μόνο ομάδες χωρίς φόρμα, και ανανέωση ανά 14 μέρες
+  // (για αγώνες σε διοργανώσεις που δεν παρακολουθούμε).
   let calls = 0;
   for (const r of results) {
     let games;
@@ -124,7 +127,17 @@ async function syncLive(env) {
   const ids = [...gone, ...stale].slice(0, 20);
   if (ids.length) await saveFixtures(env, await src.byIds(ids));
   await settleTips(env);
+  await formFromOurResults(env);
   return list.length;
+}
+
+// Η φόρμα ενημερώνεται από τους δικούς μας τελειωμένους αγώνες, χωρίς κλήση στο API.
+async function formFromOurResults(env) {
+  const since = now() - 3 * DAY;
+  for (const side of [["home_id", 1, "gh", "ga", "hth", "hta"], ["away_id", 0, "ga", "gh", "hta", "hth"]])
+    await env.DB.prepare(`INSERT OR IGNORE INTO results(team_id,fixture_id,ts,is_home,gf,ga,ht_gf,ht_ga)
+      SELECT ${side[0]}, id, ts, ${side[1]}, ${side[2]}, ${side[3]}, ${side[4]}, ${side[5]} FROM fixtures
+      WHERE status IN ('FT','AET','PEN') AND gh IS NOT NULL AND ts > ?`).bind(since).run();
 }
 
 // Κλείσιμο tips: μόνο σε κανονική λήξη (FT). Το αποτέλεσμα γράφεται μία φορά.
