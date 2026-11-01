@@ -21,3 +21,21 @@ export async function getDay(env, date) {
     })),
   };
 }
+
+export async function getMatch(env, id) {
+  const r = env.ENGINE
+    ? await env.ENGINE.fetch(`https://engine/api/match?id=${id}`)
+    : await fetch(`https://betizzi-engine.bettipsters79.workers.dev/api/match?id=${id}`);
+  const d = await r.json();
+  if (d.error) return null;
+  const f = d.fixture;
+  const form = (list) => list.map((g) => ({ ts: g.ts, home: !!g.is_home, gf: g.gf, ga: g.ga, res: g.gf > g.ga ? "W" : g.gf < g.ga ? "L" : "D" }));
+  return {
+    id: f.id, ts: f.ts, status: f.status, minute: f.elapsed, score: f.gh == null ? null : [f.gh, f.ga],
+    league: { id: f.league_id, name: f.league, country: f.country },
+    home: { name: f.home, logo: f.home_logo, form: form(d.form.home) },
+    away: { name: f.away, logo: f.away_logo, form: form(d.form.away) },
+    tips: d.tips.filter((t) => t.status !== "withdrawn").map((t) => ({ tier: t.tier, locked: !!t.locked, market: t.market, sel: t.sel, price: t.price, prob: t.prob, reason: t.reason, result: t.result })),
+    odds: d.odds, model: d.model,
+  };
+}
