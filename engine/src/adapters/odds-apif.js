@@ -4,13 +4,13 @@ const BASE = "https://v3.football.api-sports.io/";
 // Ήπιος ρυθμός: ~5 κλήσεις/δευτ., και μία επανάληψη αν απαντήσει 429 (όριο ανά λεπτό).
 let last = 0;
 async function apifFetch(url, key) {
-  for (let i = 0; i < 3; i++) {
-    const wait = Math.max(0, last + 220 - Date.now()); if (wait) await new Promise((r) => setTimeout(r, wait));
+  for (let i = 0; i < 6; i++) {
+    const wait = Math.max(0, last + 700 - Date.now()); if (wait) await new Promise((r) => setTimeout(r, wait));
     last = Date.now();
     const r = await fetch(url, { headers: { "x-apisports-key": key } });
     const body = r.status === 429 ? null : await r.text();
     if (body !== null && !body.slice(0, 300).includes('"rateLimit"')) return new Response(body, { status: r.status });
-    await new Promise((res) => setTimeout(res, 8000 * (i + 1)));
+    await new Promise((res) => setTimeout(res, 15000));
   }
   throw new Error("apif 429 " + url);
 }
