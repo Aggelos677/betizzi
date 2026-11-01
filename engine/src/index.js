@@ -161,11 +161,12 @@ export default {
   async scheduled(ev, env, ctx) {
     const d = new Date(ev.scheduledTime), m = d.getUTCMinutes(), h = d.getUTCHours();
     const tasks = [];
-    // live: κάθε λεπτό 11:00–21:59 UTC (13:00–23:59 Κύπρου), αλλιώς κάθε 2 λεπτά
-    if (h >= 11 && h <= 21 ? true : m % 2 === 0) tasks.push(syncLive(env));
+    // Αργός ρυθμός (01/11/2026, απόφαση Owner): μοιραζόμαστε το κλειδί API-Football με το MODIX90.
+    // Ανεβαίνει όταν πάμε live.
+    if (m % 5 === 0) tasks.push(syncLive(env));
     if (h === 3 && m === 5) tasks.push(seedLeagues(env).then(() => syncFixtures(env)));
-    if (m % 3 === 1) tasks.push(syncForm(env));
-    if (h % 6 === 0 && m === 20) tasks.push(syncOdds(env));
+    if (m % 6 === 1) tasks.push(syncForm(env));
+    if (h % 12 === 4 && m === 20) tasks.push(syncOdds(env));
     if (m === 40 && h % 3 === 0) tasks.push(runTips(env));
     if (h === 3 && m === 50) tasks.push(runTips(env));
     ctx.waitUntil(Promise.allSettled(tasks).then(async (r) => {

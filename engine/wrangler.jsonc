@@ -5,8 +5,7 @@
   "compatibility_date": "2026-10-01",
   "workers_dev": true,
   "preview_urls": false,
-  // Cron σε παύση (01/11/2026): τα δεδομένα θα έρχονται μόνο από το modix-bt-v2.
-  "triggers": { "crons": [] },
+  "triggers": { "crons": ["* * * * *"] },
   "d1_databases": [
     { "binding": "DB", "database_name": "betizzi-db", "database_id": "2d23c360-c1ef-4757-95b1-8b1dc4316c89" }
   ],
