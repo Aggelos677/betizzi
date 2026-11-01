@@ -974,12 +974,13 @@ function renderFilters(){
   var box=$("mFilter");box.innerHTML="";
   if(IS_TODAY&&nl)box.appendChild(chipEl('<span class="ldot"></span>Live <span class="c">'+cnt({t:"live"})+'</span>',mFilter==="live",function(){mFilter=mFilter==="live"?"all":"live";renderFilters();renderMatches();},"livechip"));
   DN.nav.forEach(function(d){if(d.n!==0&&d.n!==1)return;var on=d.d===DN.date&&mFilter!=="live";
-    box.appendChild(chipEl('<span>'+esc(d.lbl)+'</span>'+(on?' <span class="c">'+cnt({t:"all"})+'</span>':''),on,on?function(e){e.preventDefault();mFilter="all";renderFilters();renderMatches();}:null,"",on?"#":d.href));});
+    box.appendChild(chipEl('<span>'+esc(d.lbl)+'</span>'+(on?' <span class="c">'+cnt({t:"all"})+'</span>':''),on,on?function(e){e.preventDefault();if(mFilter==="all")return;var y=window.scrollY;mFilter="all";renderFilters();renderMatches();window.scrollTo(0,y);}:null,"",on?"#":d.href));});
   var other=DN.nav.filter(function(d){return d.d===DN.date&&d.n!==0&&d.n!==1;})[0];
   if(other)box.appendChild(chipEl('<span>'+esc(other.lbl)+'</span> <span class="c">'+cnt({t:"all"})+'</span>',true,null,""));
   box.appendChild(chipEl("📅",stripOpen,function(){stripOpen=!stripOpen;renderFilters();},"calchip"));
   var st=$("dayStrip");st.hidden=!stripOpen;
-  st.innerHTML=DN.nav.map(function(d){return '<a class="dayb'+(d.d===DN.date?' on':'')+'" href="'+esc(d.href)+'"><span>'+esc(d.lbl)+'</span><small class="mono">'+esc(d.d.slice(8,10)+"/"+d.d.slice(5,7))+'</small></a>';}).join("");
+  st.innerHTML=DN.nav.map(function(d){return '<a class="dayb'+(d.d===DN.date?' on':'')+'" href="'+(d.d===DN.date?'#':esc(d.href))+'"'+(d.d===DN.date?' data-cur="1"':'')+'><span>'+esc(d.lbl)+'</span><small class="mono">'+esc(d.d.slice(8,10)+"/"+d.d.slice(5,7))+'</small></a>';}).join("");
+  var cur=st.querySelector("[data-cur]");if(cur)cur.addEventListener("click",function(e){e.preventDefault();stripOpen=false;renderFilters();});
   var lb2=$("lFilter");lb2.innerHTML="";
   [["top5","Top 5"],["top30","Top 30"],["all","All"],["mine","My leagues"]].forEach(function(f){
     lb2.appendChild(chipEl('<span>'+esc(f[1])+'</span> <span class="c">'+cnt({l:f[0]})+'</span>',lFil===f[0],function(){
@@ -1044,7 +1045,8 @@ function detailHTML(m){
   /* απουσίες & νέα: κρυφά μέχρι να υπάρχουν δεδομένα */
   return h;
 }
-function renderMatches(){
+function renderMatches(){var _y=window.scrollY;renderMatches2();if(Math.abs(window.scrollY-_y)>2)window.scrollTo(0,_y);}
+function renderMatches2(){
   var list=MATCHES.filter(function(m){return passAll(m);});
   if(q){var s=q.toLowerCase();list=list.filter(function(m){return (m.home+" "+m.away+" "+m.league+" "+m.country).toLowerCase().indexOf(s)>=0;});}
   if(!list.length){$("matchList").innerHTML='<div class="empty" style="border:0">No matches for this filter.</div>';return;}
