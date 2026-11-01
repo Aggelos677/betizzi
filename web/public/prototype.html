@@ -403,7 +403,7 @@ details.mrow.calledrow>summary{background:radial-gradient(circle at 78% 50%,rgba
   <header>
     <span class="label">Smart football tips · <span id="today"></span></span>
     <h1 class="logo" aria-label="betizzi"><span class="lb" aria-hidden="true">bet</span><span class="li" aria-hidden="true"><span class="i">&#305;<b><svg viewBox="-10 -10 20 20"><circle r="9.2" fill="#fff" stroke="#0c0f0d" stroke-width="1"/><polygon points="0,-3.6 3.4,-1.1 2.1,2.9 -2.1,2.9 -3.4,-1.1" fill="#0c0f0d"/><path d="M0,-3.6V-9M3.4,-1.1L8.6,-2.8M2.1,2.9L5.3,7.3M-2.1,2.9L-5.3,7.3M-3.4,-1.1L-8.6,-2.8" stroke="#0c0f0d" stroke-width="1.1"/></svg></b></span>zz<span class="i">&#305;<b><svg viewBox="-10 -10 20 20"><circle r="9.2" fill="#fff" stroke="#0c0f0d" stroke-width="1"/><polygon points="0,-3.6 3.4,-1.1 2.1,2.9 -2.1,2.9 -3.4,-1.1" fill="#0c0f0d"/><path d="M0,-3.6V-9M3.4,-1.1L8.6,-2.8M2.1,2.9L5.3,7.3M-2.1,2.9L-5.3,7.3M-3.4,-1.1L-8.6,-2.8" stroke="#0c0f0d" stroke-width="1.1"/></svg></b></span></span></h1>
-    <div class="datanote" role="note"><span class="tag lime">Live data</span><div>Sunday's real fixtures from BTFStats (snapshot Sat 31 Oct, 22:46). Tips follow the <b>new proposed rules</b> (simulation): free ≈ 1 in 4 games, VIP ≈ 1 in 8. Everything is free; VIP needs a free sign-up.</div></div>
+    <!--datanote-->
   </header>
 
   <nav class="tabs" role="tablist" aria-label="Sections">
@@ -425,7 +425,7 @@ details.mrow.calledrow>summary{background:radial-gradient(circle at 78% 50%,rgba
 
   <!-- TIPS -->
   <div id="view-tips" role="tabpanel" aria-labelledby="tab-tips" class="wrap" hidden>
-    <label class="sw"><input type="checkbox" id="vipMember" checked> Show as registered user (untick to see what a visitor sees)</label>
+    <label class="sw"><input type="checkbox" id="vipMember"> Show as registered user (untick to see what a visitor sees)</label>
     <section class="card" aria-labelledby="free-title">
       <div class="secthead"><h2 id="free-title">Free tips</h2><span class="tag free" id="freeCount"></span></div>
       <div id="freeList" style="display:flex;flex-direction:column;gap:8px"></div>
@@ -505,7 +505,7 @@ var MATCHES = RAW.map(function(r){
     o:{h:r[13][0],x:r[13][1],a:r[13][2],o25:r[13][3],u25:r[13][4],gg:r[13][5],ng:r[13][6]},
     p:{h:r[14][0],x:r[14][1],a:r[14][2],o25:r[14][3],score:r[14][4]},
     tips:r[15].map(function(t){return {sel:t[0],odds:t[1],tier:t[2],why:t[3],r:t[5],book:t[7]};})};
-  m.live=m.type==="inprogress"; m.done=m.type==="finished"; m.open=m.type==="notstarted";
+  if(r[17])m.min=r[17]; m.live=m.type==="inprogress"; m.done=m.type==="finished"; m.open=m.type==="notstarted";
   return m;
 });
 MATCHES.sort(function(a,b){return topIx(a.key)-topIx(b.key)||a.key.localeCompare(b.key)||a.time.localeCompare(b.time);});
@@ -819,8 +819,8 @@ function pickBtn(m){
   if(locked) return '<button type="button" class="r-pick vip locked" data-unlock="1" aria-label="VIP tip, sign up free to see"><span>VIP · sign up</span><b>0.00</b></button>';
   var st=m._hold?null:tipState(t,m);
   if(st==="won") return '<span class="r-pick paid'+(m._justPaid?' pop':'')+'" role="status" aria-label="'+esc(t.sel)+' landed"><span>✓ '+esc(t.sel)+'</span><b>Pay me please :)</b></span>';
-  if(st==="lost") return '<span class="r-pick lost"><span>✗ '+esc(t.sel)+'</span><b>'+t.odds.toFixed(2)+'</b></span>';
-  return '<button type="button" class="r-pick'+(t.tier==="vip"?' vip':'')+'" data-key="'+esc(t.key)+'" aria-pressed="false" aria-label="'+esc((t.tier==="vip"?"VIP tip ":"Free tip ")+t.sel+" at "+t.odds)+'"><span>'+(t.tier==="vip"?"VIP · ":"TIP · ")+esc(t.sel)+'</span><b>'+t.odds.toFixed(2)+'</b></button>';
+  if(st==="lost") return '<span class="r-pick lost"><span>✗ '+esc(t.sel)+'</span><b>'+(t.odds?t.odds.toFixed(2):"🔒")+'</b></span>';
+  return '<button type="button" class="r-pick'+(t.tier==="vip"?' vip':'')+'" data-key="'+esc(t.key)+'" aria-pressed="false" aria-label="'+esc((t.tier==="vip"?"VIP tip ":"Free tip ")+t.sel+" at "+t.odds)+'"><span>'+(t.tier==="vip"?"VIP · ":"TIP · ")+esc(t.sel)+'</span><b>'+(t.odds?t.odds.toFixed(2):"🔒")+'</b></button>';
 }
 function rowHTML(m){
   var sc = (m.live||m.done) ? '<span class="r-score'+(m.live?' live':'')+(m.hit?' hit':'')+'"'+(m.hit?' title="We called this score"':'')+'>'+esc(m.score||"–")+(m.hit?'<em>🎯</em>':'')+'</span>' : (m.type==="cancelled"?'<span class="r-score empty">Canc</span>':(m.bz?'<span class="r-score pred" title="Our score">'+m.bz+'</span>':'<span class="r-score empty">v</span>'));
@@ -837,7 +837,7 @@ function detailHTML(m){
     var locked=t.tier==="vip"&&!vipMember;
     h+='<div class="tipbox'+(t.tier==="vip"?' vip':'')+'"><div class="tiprow">'+tierTag(t)+'<span class="label">Our tip</span>'+resTag(t,m)+'</div>'
       +(locked?'<div class="tiprow"><span class="hint">This is a VIP tip.</span><button type="button" class="btn vipb" data-unlock="1">Sign up free</button></div>'
-      :'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+t.odds.toFixed(2)+'</span><span class="hint">'+esc(t.book)+'</span></div><div class="why">'+esc(t.why)+'</div>')+'</div>';
+      :'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+(t.odds?t.odds.toFixed(2):"🔒")+'</span><span class="hint">'+esc(t.book)+'</span></div><div class="why">'+esc(t.why)+'</div>')+'</div>';
   });
   h+='<div class="tm2"><div class="tbox"><div class="nm">'+esc(m.home)+'</div><div class="pos">'+(m.hr||"–")+'<small>'+(m.nt?'of '+m.nt:'')+'</small></div>'+squares(m.hfd)+'</div>'
     +'<div class="tbox"><div class="nm">'+esc(m.away)+'</div><div class="pos">'+(m.ar||"–")+'<small>'+(m.nt?'of '+m.nt:'')+'</small></div>'+squares(m.afd)+'</div></div>'
@@ -1001,7 +1001,7 @@ function tipCard(m,t){
   var locked=t.tier==="vip"&&!vipMember;
   return '<div class="tipcard'+(t.tier==="vip"?' vip':'')+(locked?' locked':'')+'"><div class="meta">'+tierTag(t)+'<span>'+esc(m.country)+' · '+esc(m.league)+' · '+(m.done?'FT '+esc(m.score):m.live?'Live '+esc(m.score):m.time)+'</span>'+resTag(t,m)+'</div>'
     +'<div class="mt">'+esc(m.home)+' v '+esc(m.away)+'</div>'
-    +'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+t.odds.toFixed(2)+'</span>'
+    +'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+(t.odds?t.odds.toFixed(2):"🔒")+'</span>'
     +(locked?'<button type="button" class="btn vipb" data-unlock="1" style="margin-left:auto">Sign up free</button>':(m.open?'<button type="button" class="btn sec" data-key="'+esc(t.key)+'" aria-pressed="false" style="margin-left:auto;min-height:40px;padding:6px 12px">Add</button>':''))+'</div>'
     +'<div class="why" style="font-size:.82rem;color:var(--muted)">'+(locked?'Free sign-up to see the pick and the reason.':esc(t.why))+'</div></div>';
 }

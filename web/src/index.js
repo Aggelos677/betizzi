@@ -56,7 +56,7 @@ export default {
     if (p === "/") return Response.redirect(url.origin + "/en/", 301);
     const m = p.match(/^\/([a-z]{2})\/$/);
     if (m && LANGS.includes(m[1])) {
-      try { return html(await todayPage(env, m[1])); }
+      try { return html(await todayPage(env, m[1], url)); }
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
     }
     const mm = p.match(/^\/([a-z]{2})\/([a-z0-9-]+)-(\d{4}-\d{2}-\d{2})-(\d+)$/);
@@ -83,7 +83,7 @@ function html(body, status = 200) {
   });
 }
 
-async function todayPage(env, lang) {
+async function todayPage(env, lang, url) {
   const t = T[lang], tz = TZ[lang];
   const date = ymdIn(tz);
   const day = await getDay(env, date);
@@ -158,37 +158,54 @@ async function todayPage(env, lang) {
   ];
   const langNav = LANGS.map((l) => `<a href="/${l}/" hreflang="${HREFLANG[l]}"${l === lang ? ' aria-current="page"' : ""}>${l.toUpperCase()}</a>`).join("");
 
-  return `<!doctype html>
-<html lang="${HREFLANG[lang]}">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(t.title)} — ${esc(dLong)} | betizzi</title>
+  const ssr = `<h1 class="ssrh">${esc(t.title)}</h1><p class="ssra">${esc(answer)}</p>`;
+  const head = `<title>${esc(t.title)} — ${esc(dLong)} | betizzi</title>
 <meta name="description" content="${esc(t.desc)}">
 <link rel="canonical" href="${canonical}">
 ${alt}
 <meta property="og:type" content="website"><meta property="og:site_name" content="betizzi">
 <meta property="og:title" content="${esc(t.title)} — ${esc(dLong)}"><meta property="og:description" content="${esc(answer)}">
 <meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
-<meta name="theme-color" content="#0c0f0d">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>
-<style>${CSS}</style>
-</head>
-<body>
-<header><a class="logo" href="/${lang}/"><b>bet</b><i>izzi</i></a><nav class="l" aria-label="Language">${langNav}</nav></header>
-<main>
-<h1>${esc(t.title)}</h1>
-<p class="ans">${esc(answer)}</p>
-<h2>${esc(t.matches)} · ${esc(dLong)}</h2>
-${leaguesHtml}
-<h2>${esc(t.how)}</h2>
-<p class="how">${esc(t.howText)}</p>
-</main>
-<footer><p>${esc(t.rg)}</p><p>© betizzi · <time datetime="${nowIso}">${esc(dLong)}</time></p></footer>
-</body>
-</html>`;
+<style>.ssrh{font:800 1.15rem/1.15 "Fira Sans Extra Condensed",sans-serif;margin:4px 0 2px;text-transform:none;letter-spacing:0}.ssra{font-size:.8rem;color:var(--muted);margin:0 0 8px}
+.mlist .lg h3{margin:0;padding:8px 12px;font-size:.9rem}.mlist .lg ul{list-style:none;margin:0;padding:0}.mlist .m{display:flex;gap:8px;padding:6px 12px}</style>`;
+  const raw = matches.map((x) => rawRow(x, hm));
+  const top = TOP.map((id) => groups.get(id)).filter(Boolean).map((g) => g.league.country + "|" + g.league.name);
+  let tpl = await template(env, url);
+  tpl = tpl.replace('<html lang="en">', `<html lang="${HREFLANG[lang]}">`)
+    .replace(/<title>[\s\S]*?<\/title>/, () => head)
+    .replace(/var RAW = \[[\s\S]*?\];\n/, () => "var RAW = " + JSON.stringify(raw).replace(/</g, "\\u003c") + ";\n")
+    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";")
+    .replace('<div class="hscroll" id="mFilter"', () => ssr + '<div class="hscroll" id="mFilter"')
+    .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml);
+  if (!url.searchParams.has("demo")) tpl = tpl.replace('<div class="demorow">', '<div class="demorow" hidden>').replace('id="demoCoupon"', 'id="demoCoupon" hidden');
+  return tpl;
+}
+
+let TPL = null;
+async function template(env, url) {
+  if (!TPL) TPL = await (await env.ASSETS.fetch(new Request(url.origin + "/prototype.html"))).text();
+  return TPL;
+}
+
+// Μία γραμμή στη μορφή που διαβάζει η εφαρμογή (ίδια με το πρωτότυπο).
+const SELNAME = { "1": "Home", "2": "Away", X: "Draw", O25: "Over 2.5", U25: "Under 2.5", O15: "Over 1.5", O35: "Over 3.5", U35: "Under 3.5", GG: "GG", NG: "NG", "1X": "1X", X2: "X2", "12": "12" };
+function rawRow(x, hm) {
+  const type = LIVE.has(x.status) ? "inprogress" : DONE.has(x.status) ? "finished" : ["PST", "CANC", "ABD", "AWD", "WO"].includes(x.status) ? "cancelled" : "notstarted";
+  const o = x.odds, md = x.model;
+  const pc = (v) => (v == null ? null : Math.round(v * 100));
+  const fs = (f) => f.map((g) => g[0]).join("");
+  const gg = [x.home.gg, x.away.gg].filter((v) => v != null);
+  return [
+    x.id, hm(x.ts), x.league.country, x.league.name, x.home.name, x.away.name, type, x.score ? x.score.join("-") : "",
+    x.home.rank || 0, x.away.rank || 0, 0, fs(x.home.form), fs(x.away.form),
+    [o["1"] || null, o.X || null, o["2"] || null, o.O25 || null, o.U25 || null, o.GG || null, o.NG || null],
+    md ? [pc(md.p1), pc(md.px), 100 - pc(md.p1) - pc(md.px), pc(md.over25), md.score.join("-")] : [null, null, null, null, ""],
+    x.tips.map((tp) => tp.locked ? ["", 0, "vip", "", 0, -1, 0, "", "A"]
+      : [SELNAME[tp.sel] || tp.sel, tp.price, tp.tier, tp.reason, 0, tp.result == null ? -1 : tp.result, 0, "best price", "A"]),
+    x.status, x.minute || 0, x.home.form, x.away.form,
+    { cr: null, yc: null, bts: gg.length ? Math.round((gg.reduce((a, b) => a + b, 0) / gg.length) * 100) : null },
+  ];
 }
 
 // ---------- Σελίδα αγώνα ----------
