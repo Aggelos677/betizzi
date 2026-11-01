@@ -1,6 +1,7 @@
 // betizzi-web: σελίδες έτοιμες από τον server (SSR), μία ανά γλώσσα.
 // Μέχρι το άνοιγμα: noindex παντού (X-Robots-Tag) και robots.txt κλειστό.
-import { LANGS, HREFLANG, TZ, LOCALE, T, SEL } from "./i18n.js";
+import { LANGS, HREFLANG, TZ, LOCALE, T, SEL, UI, UI_ORDER } from "./i18n.js";
+import { TRANSLATOR } from "./translator.js";
 import { getDay, getMatch } from "./data.js";
 
 const SITE = "https://betizzi.com";
@@ -182,6 +183,14 @@ ${alt}
     .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";")
     .replace('<div class="hscroll" id="mFilter"', () => ssr + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml);
+  // μετάφραση της εφαρμογής + σωστή ημερομηνία στη γλώσσα της σελίδας
+  const dShort = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, weekday: "long", day: "numeric", month: "long" }).format(Date.now());
+  tpl = tpl.replace('"today").textContent="Sunday 1 November"', () => '"today").textContent=' + JSON.stringify(dShort));
+  if (lang !== "en") {
+    const i = UI_ORDER.indexOf(lang), dict = {};
+    for (const k in UI) dict[k] = UI[k][i];
+    tpl = tpl.replace(/<body([^>]*)>/, (m) => m + `<script>window.__I18N=${JSON.stringify(dict).replace(/</g, "\\u003c")};${TRANSLATOR}</script>`);
+  }
   if (!url.searchParams.has("demo")) tpl = tpl.replace('<div class="demorow">', '<div class="demorow" hidden>').replace('id="demoCoupon"', 'id="demoCoupon" hidden');
   return tpl;
 }
