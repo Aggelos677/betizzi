@@ -82,12 +82,13 @@ export default {
       if (want !== p) return Response.redirect(url.origin + want, 301); // σταθερό id, το slug διορθώνεται
       return html(matchPage(mm[1], x));
     }
-    const rm = p.match(/^\/([a-z]{2})\/([a-z-]+)$/);
+    const rm = p.match(/^\/([a-z]{2})\/([a-z-]+)(?:\/(\d{4}-\d{2}|all))?$/);
     if (rm && LANGS.includes(rm[1]) && Object.values(REC).some((r) => r.slug === rm[2])) {
-      if (rm[2] !== REC[rm[1]].slug) return Response.redirect(url.origin + `/${rm[1]}/${REC[rm[1]].slug}`, 301);
-      const key = "rec|" + rm[1], hit = PAGES.get(key);
+      if (rm[2] !== REC[rm[1]].slug) return Response.redirect(url.origin + `/${rm[1]}/${REC[rm[1]].slug}${rm[3] ? "/" + rm[3] : ""}${url.search}`, 301);
+      const mq = rm[3] || "", tq = ["free", "vip"].includes(url.searchParams.get("t")) ? url.searchParams.get("t") : "";
+      const key = `rec|${rm[1]}|${mq}|${tq}`, hit = PAGES.get(key);
       if (hit && Date.now() - hit.t < 5 * 60000) return html(hit.b);
-      try { const b = recordPage(rm[1], await getRecord(env)); PAGES.set(key, { t: Date.now(), b }); return html(b); }
+      try { const b = recordPage(rm[1], await getRecord(env), mq, tq); PAGES.set(key, { t: Date.now(), b }); return html(b); }
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
     }
     if (m === null && /^\/[a-z]{2}$/.test(p) && LANGS.includes(p.slice(1))) return Response.redirect(url.origin + p + "/", 301);
@@ -372,6 +373,23 @@ const RCSS = `
 .tg{font:700 10px "JetBrains Mono",monospace;padding:2px 5px;border-radius:5px;margin-right:4px;background:var(--lime);color:#0c0f0d}.tg.vip{background:var(--gold)}
 .tw{overflow-x:auto}.tw td:first-child,.tw th:first-child{text-align:left}
 details summary{cursor:pointer;color:var(--mu);margin:8px 0}
+.chips{display:flex;gap:6px;overflow-x:auto;margin:0 0 8px;padding-bottom:2px}.ch{flex:none;text-decoration:none;font:700 13px Manrope,sans-serif;padding:8px 12px;border-radius:999px;border:1px solid var(--ln);color:var(--mu);min-height:36px;text-transform:capitalize}
+.ch.on{background:var(--lime);color:#0c0f0d;border-color:var(--lime)}
+h2.rep{font-size:26px;text-transform:capitalize;margin-top:14px}
+.kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 0 8px}.kpi div{background:var(--c1);border:1px solid var(--ln);border-radius:12px;padding:10px 6px;text-align:center}
+.kpi b{display:block;font:700 22px "JetBrains Mono",monospace}.kpi small{color:var(--mu);font-size:11px;display:block}.kpi em{font:700 11px "JetBrains Mono",monospace;font-style:normal}
+.pos{color:var(--lime)}.neg{color:#ff6b6b}
+.big{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 0}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.card h3{margin:0 0 6px;font:700 16px "Fira Sans Extra Condensed",sans-serif}
+.gl{border-color:#3d5a1a}.bl{border-color:#5a2a2a}
+.gl li,.bl li{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid var(--ln);font-size:14px}.gl li:first-child,.bl li:first-child{border-top:0}
+.gl .r,.bl .r{text-align:right;white-space:nowrap}.gl small,.bl small{display:block;color:var(--mu);font-size:11px}
+.rr{display:grid;grid-template-columns:76px 1fr;gap:2px 8px;align-items:center;padding:6px 0;border-top:1px solid var(--ln)}.rr:first-of-type{border-top:0}
+.rr .lab{font:700 12px "JetBrains Mono",monospace}.rr .bar{height:8px;background:var(--c2);border-radius:4px;overflow:hidden}.rr .bar i{display:block;height:100%}.rr .bar .p{background:var(--lime)}.rr .bar .n{background:#ff6b6b}
+.rr .v{grid-column:2;font:500 11px "JetBrains Mono",monospace;color:var(--mu)}.rr.few{opacity:.5}
+.bdg{grid-column:2;justify-self:start;font:700 10px Manrope,sans-serif;padding:2px 6px;border-radius:5px;border:1px solid currentColor}
+@media(max-width:640px){.kpi{grid-template-columns:repeat(3,1fr)}.two,.three{grid-template-columns:1fr}}
 `;
 function recStats(a) {
   const n = a.length, w = a.filter((t) => t.result === 1).length;
@@ -382,55 +400,103 @@ function recStats(a) {
 const MKT = (sel) => (["1", "X", "2", "1X", "X2", "12"].includes(sel) ? "1X2" : /^[OU]\d/.test(sel) ? `Over/Under ${sel.slice(1, 2)}.${sel.slice(2)}` : sel === "GG" || sel === "NG" ? "GG/NG" : sel);
 const sgn = (v, d = 2) => (v > 0 ? "+" : "") + v.toFixed(d);
 
-function recordPage(lang, d) {
+const BANDS = [[1, 1.6, "< 1.60"], [1.6, 1.8, "1.60–1.79"], [1.8, 2, "1.80–1.99"], [2, 2.5, "2.00–2.49"], [2.5, 99, "2.50+"]];
+const MIN_L = 3, MIN_R = 5; // ελάχιστο δείγμα: λίγκα / εύρος απόδοσης
+
+function recordPage(lang, d, mq = "", tq = "") {
   const r = REC[lang], t = T[lang], tz = TZ[lang], loc = LOCALE[lang];
   const fD = (ts, o) => new Intl.DateTimeFormat(loc, { timeZone: tz, ...o }).format(ts * 1000);
   const dLong = (ts) => fD(ts, { day: "numeric", month: "long", year: "numeric" });
-  const S = d.settled, all = recStats(S), free = recStats(S.filter((x) => x.tier === "free")), vip = recStats(S.filter((x) => x.tier === "vip"));
-  const answer = S.length
+  const mKey = (ts) => ymdIn(tz, ts * 1000).slice(0, 7);
+  const mName = (k) => new Intl.DateTimeFormat(loc, { timeZone: "UTC", month: "long", year: "numeric" }).format(Date.UTC(+k.slice(0, 4), +k.slice(5) - 1, 15));
+  const ALL = d.settled, all = recStats(ALL);
+  const months = [...new Set(ALL.map((x) => mKey(x.ts)))].sort().reverse();
+  const mo = mq === "all" ? "all" : months.includes(mq) ? mq : months[0] || "";
+  const tierOk = (x) => !tq || x.tier === tq;
+  const inM = (x, k) => k === "all" || mKey(x.ts) === k;
+  const S = ALL.filter((x) => inM(x, mo) && tierOk(x));
+  const prevK = mo && mo !== "all" ? months[months.indexOf(mo) + 1] : null;
+  const ms = recStats(S), ps = prevK ? recStats(ALL.filter((x) => inM(x, prevK) && tierOk(x))) : null;
+  const answer = ALL.length
     ? r.ans.replace("{since}", dLong(d.since)).replace("{n}", all.n).replace("{w}", all.w).replace("{l}", all.l).replace("{hit}", all.hit)
         .replace("{u}", sgn(all.u)).replace("{roi}", sgn(all.roi, 1)).replace("{avg}", all.avg.toFixed(2)).replace("{wd}", d.withdrawn.length).replace("{upd}", dLong(d.updated))
     : r.empty;
-  const card = (label, s, cls = "") => `<div class="${cls}"><small>${esc(label)}</small><b>${s.n ? s.hit + "%" : "–"}</b><small>${s.w}/${s.n} · <span class="${s.u >= 0 ? "pos" : "neg"}">${sgn(s.u)}u</span></small></div>`;
+  const base = `/${lang}/${r.slug}`;
+  // Κάθε μήνας = δική του σελίδα (/…/2026-11) για Google/AI. Το φίλτρο TIP/VIP είναι ?t= και δεν ευρετηριάζεται.
+  const mPath = (m) => (m && m !== months[0] ? `/${m}` : "");
+  const q = (m, tt) => base + mPath(m) + (tt ? "?t=" + tt : "");
+  const chip = (href, label, on) => `<a class="ch${on ? " on" : ""}" href="${href}">${esc(label)}</a>`;
+  const chipsHtml = ALL.length ? `<div class="chips">${months.map((k) => chip(q(k, tq), mName(k), mo === k)).join("")}${chip(q("all", tq), r.allM, mo === "all")}</div>
+    <div class="chips">${chip(q(mo, ""), r.all, !tq)}${chip(q(mo, "free"), "TIP · Free", tq === "free")}${chip(q(mo, "vip"), "VIP", tq === "vip")}</div>` : "";
+  const delta = (a, b, unit) => { if (b == null) return ""; const v = a - b; return `<em class="${v >= 0 ? "pos" : "neg"}">${v >= 0 ? "▲" : "▼"} ${Math.abs(v).toFixed(unit === "%" ? 0 : 2)}${unit}</em>`; };
+  const kpi = S.length ? `<div class="kpi">
+    <div><small>${esc(r.tips)}</small><b>${ms.n}</b><small>${ms.w} ✓ · ${ms.l} ✗</small></div>
+    <div><small>${esc(r.hit)}</small><b>${ms.hit}%</b>${ps && ps.n ? delta(ms.hit, ps.hit, "%") : ""}</div>
+    <div><small>${esc(r.units)}</small><b class="${ms.u >= 0 ? "pos" : "neg"}">${sgn(ms.u)}</b>${ps && ps.n ? delta(ms.u, ps.u, "u") : ""}</div>
+    <div><small>${esc(r.roi)}</small><b class="${ms.roi >= 0 ? "pos" : "neg"}">${sgn(ms.roi, 1)}%</b></div>
+    <div><small>${esc(r.avg)}</small><b>${ms.avg.toFixed(2)}</b></div></div>${ps && ps.n ? `<p class="note">▲▼ ${esc(r.vsPrev)} (${esc(mName(prevK))})</p>` : ""}` : "";
+  const mp = (x) => matchPath(lang, { id: x.id, ts: x.ts, home: { name: x.home }, away: { name: x.away } });
+  const wins = S.filter((x) => x.result === 1).sort((a, b) => b.price - a.price).slice(0, 3);
+  const bigHtml = wins.length ? `<h2>${esc(mo === "all" ? r.big : r.top3)}</h2><div class="big">${wins.map((x, i) => `<a class="bw" href="${mp(x)}" style="text-decoration:none">
+    <div class="x">${["🥇", "🥈", "🥉"][i]} ${x.price.toFixed(2)}</div><div class="mt">${esc(x.home)} – ${esc(x.away)}${x.score ? ` · ${x.score[0]}–${x.score[1]}` : ""}</div>
+    <small><span class="tg ${x.tier}">${x.tier === "vip" ? "VIP" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} · ${esc(x.league)} · ${fD(x.ts, { day: "numeric", month: "short" })}</small></a>`).join("")}</div>` : "";
+  const by = (a, f) => { const m = new Map(); for (const x of a) { const k = f(x); (m.get(k) || m.set(k, []).get(k)).push(x); } return m; };
+  // Λίγκες: μόνο όσες έχουν τουλάχιστον MIN_L tips· κατάταξη σε μονάδες.
+  const lg = [...by(S, (x) => `${x.league} · ${x.country}`).entries()].map(([k, a]) => [k, recStats(a)]).filter(([, s]) => s.n >= MIN_L).sort((a, b) => b[1].u - a[1].u);
+  const lgRow = (k, s, good) => `<li><span>${esc(k)}</span><span class="r"><b class="${good ? "pos" : "neg"}">${sgn(s.u)}u</b><small>${s.w}/${s.n} · ${s.hit}%</small></span></li>`;
+  const good = lg.filter(([, s]) => s.u > 0).slice(0, 3), bad = lg.filter(([, s]) => s.u < 0).slice(-3).reverse();
+  const lgHtml = S.length ? `<div class="two">
+    <div class="card gl"><h3>🔥 ${esc(r.goodL)}</h3>${good.length ? `<ul>${good.map(([k, s]) => lgRow(k, s, true)).join("")}</ul>` : `<p class="note">${esc(r.needL)}</p>`}</div>
+    <div class="card bl"><h3>🧊 ${esc(r.badL)}</h3>${bad.length ? `<ul>${bad.map(([k, s]) => lgRow(k, s, false)).join("")}</ul>` : `<p class="note">${esc(r.needL)}</p>`}</div></div>` : "";
+  // Εύρη αποδόσεων ανά αγορά: όλα φαίνονται· «καλύτερο/χειρότερο» μόνο με τουλάχιστον MIN_R tips.
+  const rangeCard = (title, a) => {
+    if (!a.length) return "";
+    const rows = BANDS.map(([lo, hi, lab]) => [lab, recStats(a.filter((x) => x.price >= lo && x.price < hi))]).filter(([, s]) => s.n);
+    const q = rows.filter(([, s]) => s.n >= MIN_R);
+    // «Καλύτερο» μόνο αν είναι κερδοφόρο, «Χειρότερο» μόνο αν είναι χαμένο — όχι ταμπέλα σε κάτι που δεν την αξίζει.
+    let best = q.length >= 2 ? q.reduce((m, x) => (x[1].u > m[1].u ? x : m)) : null, worst = q.length >= 2 ? q.reduce((m, x) => (x[1].u < m[1].u ? x : m)) : null;
+    if (best && best[1].u <= 0) best = null; if (worst && worst[1].u >= 0) worst = null;
+    return `<div class="card rg"><h3>${esc(title)}</h3>${rows.map(([lab, s]) => {
+      const tag = best && lab === best[0] ? `<span class="bdg pos">${esc(r.bestR)}</span>` : worst && lab === worst[0] ? `<span class="bdg neg">${esc(r.worstR)}</span>` : "";
+      return `<div class="rr${s.n < MIN_R ? " few" : ""}"><span class="lab">${lab}</span><span class="bar"><i style="width:${s.hit}%" class="${s.u >= 0 ? "p" : "n"}"></i></span><span class="v">${s.hit}% · ${s.w}/${s.n} · <b class="${s.u >= 0 ? "pos" : "neg"}">${sgn(s.u)}u</b></span>${tag}</div>`;
+    }).join("")}${q.length < 2 ? `<p class="note">${esc(r.needR)}</p>` : ""}</div>`;
+  };
+  const isOU = (x) => /^[OU]\d/.test(x.sel), isGG = (x) => x.sel === "GG" || x.sel === "NG", is12 = (x) => ["1", "X", "2", "1X", "X2", "12"].includes(x.sel);
+  const rangesHtml = S.length ? `<h2>${esc(r.ranges)}</h2><div class="three">${rangeCard("Over/Under", S.filter(isOU))}${rangeCard("GG/NG", S.filter(isGG))}${rangeCard("1X2", S.filter(is12))}</div>` : "";
   const table = (title, head, groups) => {
     const rows = [...groups.entries()].map(([k, a]) => [k, recStats(a)]);
     return rows.length ? `<h2>${esc(title)}</h2><div class="card tw"><table><tr><th>${esc(head)}</th><th>${esc(r.tips)}</th><th>${esc(r.won)}</th><th>${esc(r.hit)}</th><th>${esc(r.units)}</th><th>${esc(r.roi)}</th><th>${esc(r.avg)}</th></tr>${
       rows.map(([k, s]) => `<tr><td>${esc(k)}</td><td>${s.n}</td><td>${s.w}</td><td>${s.hit}%</td><td>${sgn(s.u)}</td><td>${sgn(s.roi, 1)}%</td><td>${s.avg.toFixed(2)}</td></tr>`).join("")}</table></div>` : "";
   };
-  const by = (f) => { const m = new Map(); for (const x of S) { const k = f(x); (m.get(k) || m.set(k, []).get(k)).push(x); } return m; };
-  const byMonth = by((x) => fD(x.ts, { month: "long", year: "numeric" }));
-  const byLeague = new Map([...by((x) => `${x.league} (${x.country})`).entries()].sort((a, b) => b[1].length - a[1].length).slice(0, 25));
-  const mp = (x) => matchPath(lang, { id: x.id, ts: x.ts, home: { name: x.home }, away: { name: x.away } });
-  const wins = S.filter((x) => x.result === 1).sort((a, b) => b.price - a.price).slice(0, 6);
-  const bigHtml = wins.length ? `<h2>${esc(r.big)}</h2><div class="big">${wins.map((x) => `<a class="bw" href="${mp(x)}" style="text-decoration:none">
-    <div class="x">${x.price.toFixed(2)}</div><div class="mt">${esc(x.home)} – ${esc(x.away)}${x.score ? ` · ${x.score[0]}–${x.score[1]}` : ""}</div>
-    <small><span class="tg ${x.tier}">${x.tier === "vip" ? "VIP" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} · ${esc(x.league)} · ${fD(x.ts, { day: "numeric", month: "short" })}</small></a>`).join("")}</div>` : "";
+  const monthsTable = mo === "all" ? table(r.byMonth, r.month, new Map(months.map((k) => [mName(k), ALL.filter((x) => inM(x, k) && tierOk(x))]))) : "";
   const li = (x, wd) => `<li class="${wd ? "l" : x.result === 1 ? "w" : "l"}"><span class="d">${fD(x.ts, { day: "2-digit", month: "2-digit" })}<br>${fD(x.ts, { hour: "2-digit", minute: "2-digit", hourCycle: "h23" })}</span>
     <span><a href="${mp(x)}">${esc(x.home)} – ${esc(x.away)}</a><small>${esc(x.league)}${x.score && !wd ? ` · ${x.score[0]}–${x.score[1]}` : ""}</small></span>
     <span class="r"><span class="tg ${x.tier}">${x.tier === "vip" ? "VIP" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} @${x.price.toFixed(2)} ${wd ? "↩" : x.result === 1 ? '<span class="ok">✓</span>' : '<span class="ko">✗</span>'}</span></li>`;
   const listHtml = S.length ? `<h2>${esc(r.latest)}</h2><div class="card" style="padding:0"><ul class="rl">${S.slice(0, 400).map((x) => li(x)).join("")}</ul></div>` : "";
-  const wdHtml = d.withdrawn.length ? `<details><summary>${esc(r.withdrawn)} (${d.withdrawn.length})</summary><div class="card" style="padding:0"><ul class="rl">${d.withdrawn.map((x) => li(x, true)).join("")}</ul></div></details>` : "";
+  const WD = d.withdrawn.filter((x) => inM(x, mo) && tierOk(x));
+  const wdHtml = WD.length ? `<details><summary>${esc(r.withdrawn)} (${WD.length})</summary><div class="card" style="padding:0"><ul class="rl">${WD.map((x) => li(x, true)).join("")}</ul></div></details>` : "";
+  const repTitle = mo && mo !== "all" ? r.rep.replace("{m}", mName(mo)) : r.allM;
 
-  const canonical = `${SITE}/${lang}/${r.slug}`;
-  const alt = LANGS.map((l) => `<link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE}/${l}/${REC[l].slug}">`).join("") + `<link rel="alternate" hreflang="x-default" href="${SITE}/en/${REC.en.slug}">`;
-  const langNav = LANGS.map((l) => `<a href="/${l}/${REC[l].slug}" hreflang="${HREFLANG[l]}"${l === lang ? ' aria-current="page"' : ""}>${l.toUpperCase()}</a>`).join("");
+  const canonical = `${SITE}${base}${mPath(mo)}`;
+  const alt = LANGS.map((l) => `<link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE}/${l}/${REC[l].slug}${mPath(mo)}">`).join("") + `<link rel="alternate" hreflang="x-default" href="${SITE}/en/${REC.en.slug}${mPath(mo)}">`;
+  const langNav = LANGS.map((l) => `<a href="/${l}/${REC[l].slug}${mPath(mo)}" hreflang="${HREFLANG[l]}"${l === lang ? ' aria-current="page"' : ""}>${l.toUpperCase()}</a>`).join("");
   const nowIso = new Date((d.updated || Date.now() / 1000) * 1000).toISOString();
   const ld = [
-    { "@context": "https://schema.org", "@type": "Dataset", name: r.title, description: r.desc, url: canonical, inLanguage: HREFLANG[lang],
+    { "@context": "https://schema.org", "@type": "Dataset", name: r.title, description: r.desc, url: `${SITE}${base}`, inLanguage: HREFLANG[lang],
       creator: { "@type": "Organization", name: "betizzi", url: SITE }, dateModified: nowIso, temporalCoverage: d.since ? `${new Date(d.since * 1000).toISOString().slice(0, 10)}/..` : undefined,
       isAccessibleForFree: true, variableMeasured: [r.tips, r.won, r.hit, r.units, r.roi] },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
       { "@type": "ListItem", position: 1, name: "betizzi", item: `${SITE}/${lang}/` },
-      { "@type": "ListItem", position: 2, name: r.nav, item: canonical }] },
+      { "@type": "ListItem", position: 2, name: r.nav, item: `${SITE}${base}` }] },
   ];
   return `<!doctype html>
 <html lang="${HREFLANG[lang]}">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(r.title)}</title>
+<title>${esc(r.title)}${mo && mo !== months[0] ? " · " + esc(mo === "all" ? r.allM : mName(mo)) : ""}</title>
 <meta name="description" content="${esc(r.desc)}">
 <link rel="canonical" href="${canonical}">
-${alt}
+${tq ? '<meta name="robots" content="noindex,follow">' : alt}
 <meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:title" content="${esc(r.title)}">
 <meta property="og:description" content="${esc(answer)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
 <meta property="article:modified_time" content="${nowIso}"><meta name="theme-color" content="#0c0f0d">
@@ -445,13 +511,15 @@ ${alt}
 <nav class="bc"><a href="/${lang}/">betizzi</a> › ${esc(r.nav)}</nav>
 <h1>${esc(r.h1)}</h1>
 <p class="ans">${esc(answer)}</p>
-${S.length ? `<div class="st">${card(r.all, all)}${card("TIP · Free", free)}${card("VIP", vip, "vipb")}</div>` : ""}
-${S.length && S.length < 200 ? `<p class="note">${esc(r.small)}</p>` : ""}
+${chipsHtml}
+${S.length ? `<h2 class="rep">${esc(repTitle)}${tq ? ` · ${tq === "vip" ? "VIP" : "TIP"}` : ""}</h2>` : ""}
+${kpi}
+${ALL.length && ALL.length < 200 ? `<p class="note">${esc(r.small)}</p>` : ""}
 ${d.pending ? `<p class="note">${esc(r.pending.replace("{n}", d.pending))}</p>` : ""}
 ${bigHtml}
-${table(r.byMonth, r.month, byMonth)}
-${table(r.byMarket, r.market, by((x) => MKT(x.sel)))}
-${table(r.byLeague, r.league, byLeague)}
+${lgHtml}
+${rangesHtml}
+${monthsTable}
 ${listHtml}
 ${wdHtml}
 <h2>${esc(r.how)}</h2><p class="how">${esc(r.howText)}</p>
