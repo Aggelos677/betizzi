@@ -55,7 +55,7 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
   const out = [], usedBy = {};
   const plan = schedule(date, new Set(fx.map((f) => f.league_id)));
   for (const [kind, target, variant] of plan) {
-    let p = pool.filter((c) => c.price <= (target >= 50 ? 2.6 : target >= 10 ? 2.2 : 1.9));
+    let p = pool.filter((c) => c.price <= (target >= 50 ? 2.6 : target >= 10 ? 2.2 : 1.9) && c.price >= (target >= 50 ? 1.45 : target >= 10 ? 1.3 : 1.2)); // μεγάλα κουπόνια: λιγότερες, πιο «γεμάτες» επιλογές
     if (variant === "wins") p = p.filter((c) => WINS.has(c.sel));
     if (variant === "goals") p = p.filter((c) => GOALS.has(c.sel));
     if (variant === "ucl") p = p.filter((c) => leagueOf.get(c.f) === UCL);
