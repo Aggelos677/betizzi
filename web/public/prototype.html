@@ -452,6 +452,8 @@ body.cshake .wrap.app{animation:cshk .5s ease .15s}
 .pnote{font-size:.78rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px;margin-top:2px;line-height:1.5}
 .pnote b{color:var(--fg)}.pnote .below{color:var(--warn)}
 /* Φτιάξε: δύο τρόποι */
+#resultSideWrap:not(:empty){margin-bottom:6px}
+#resultSideWrap .empty{font-size:.85rem}
 .bmode{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .bmb{appearance:none;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-height:64px}
 .bmb b{font:800 1.05rem var(--f-display);letter-spacing:.04em;text-transform:uppercase}
@@ -566,7 +568,7 @@ header{position:relative}
   </div>
 
   <!-- TIPS -->
-  <aside id="sidePanel" class="side" aria-label="Side panel"><section class="card closebox" id="closeBox" hidden><div class="secthead"><h2>Cash it in!</h2><span class="livedot" aria-hidden="true"></span></div><div id="closeList"></div></section><section class="card" data-side="coupons"><div class="secthead"><h2>Parlay picks today</h2></div><div id="bzcSide" class="bzc-list"></div></section><section class="card" data-side="tips" hidden><div class="secthead"><h2>Our biggest wins today</h2></div><div id="winsSide" style="display:flex;flex-direction:column;gap:10px"></div></section><section class="card" data-side="build" hidden><div class="secthead"><h2>My slip</h2></div><div id="slipSide" style="display:flex;flex-direction:column;gap:12px"></div></section></aside>
+  <aside id="sidePanel" class="side" aria-label="Side panel"><section class="card closebox" id="closeBox" hidden><div class="secthead"><h2>Cash it in!</h2><span class="livedot" aria-hidden="true"></span></div><div id="closeList"></div></section><section class="card" data-side="coupons"><div class="secthead"><h2>Parlay picks today</h2></div><div id="bzcSide" class="bzc-list"></div></section><section class="card" data-side="tips" hidden><div class="secthead"><h2>Our biggest wins today</h2></div><div id="winsSide" style="display:flex;flex-direction:column;gap:10px"></div></section><section class="card" data-side="build" hidden><div id="resultSideWrap"></div><div class="secthead"><h2>My slip</h2></div><div id="slipSide" style="display:flex;flex-direction:column;gap:12px"></div></section></aside>
   <div id="view-tips" role="tabpanel" aria-labelledby="tab-tips" class="wrap" hidden>
     <label class="sw" hidden><input type="checkbox" id="vipMember"> Show as registered user (untick to see what a visitor sees)</label>
     <section class="card" aria-labelledby="bzc-title"><div class="secthead"><h2 id="bzc-title">Parlay picks today</h2><span class="tag lime" id="bzcCount"></span></div><div id="bzcList" class="bzc-list"></div></section>
@@ -984,6 +986,7 @@ function renderSide(){var p=$("sidePanel");if(!p)return;renderClose();var tab=cu
   Array.prototype.forEach.call(p.querySelectorAll("[data-side]"),function(s){s.hidden=s.getAttribute("data-side")!==mode;});
   if(mode==="tips")renderWins();
   if(mode==="build"){if(sideOn()&&$("sheet").hidden)renderMySlip($("slipSide"));else $("slipSide").innerHTML="";}
+  placeResult();
 }
 var CLPREV={};
 function clState(t,m){var sc=(m.score||"0-0").split("-").map(Number),h=sc[0]||0,a=sc[1]||0,g=h+a,min=m.min||0,s=t.sel||"",n;
@@ -1427,8 +1430,12 @@ function candidates(){
 var SRC_NOTE={all:"Any match, picked by our model.",free:"Only from today's free tips.",vip:"Only from today's VIP tips.",both:"Only from today's free and VIP tips."};
 /* Φτιάξε: δύο τρόποι (απόφαση Owner 01/11) — από τη λίστα των tips μας ή «φτιάξ' το για μένα» */
 var bMode=load("ko-bmode","list")==="auto"?"auto":"list",blSrc="both";
+/* PC: το παρολί του «Φτιάξ' το για μένα» βγαίνει δεξιά, όπως το δελτίο του «Διάλεξε» */
+function placeResult(){var r=$("result"),w=$("resultSideWrap");if(!r||!w)return;
+  if(sideOn()&&bMode==="auto"&&curTab()==="build"){if(r.parentNode!==w)w.appendChild(r);}
+  else if(r.parentNode===w){$("buildBtn").insertAdjacentElement("afterend",r);}}
 function renderBMode(){Array.prototype.forEach.call(document.querySelectorAll("[data-bm]"),function(b){var on=b.getAttribute("data-bm")===bMode;b.setAttribute("aria-checked",on?"true":"false");b.className="bmb"+(on?" on":"");});
-  $("bList").hidden=bMode!=="list";$("bAuto").hidden=bMode!=="auto";if(bMode==="list")renderBList();}
+  $("bList").hidden=bMode!=="list";$("bAuto").hidden=bMode!=="auto";if(bMode==="list")renderBList();placeResult();}
 function renderBList(){var box=$("blItems");if(!box)return;
   seg($("blSeg"),[["both","All"],["free","Free"],["vip","VIP"]].map(function(x){return {k:x[0],html:x[1]};}),function(it){return it.k===blSrc;},function(it){blSrc=it.k;renderBList();},"radio");
   if($("bkList")){$("bkList").innerHTML=bookRowHTML();bindBookRow($("bkList"));}
