@@ -3,6 +3,7 @@
 // και τα γράφει στη βάση betizzi-db. Η σελίδα διαβάζει ΜΟΝΟ από τη βάση (/api/...).
 import { makeCoupons, apiCoupons } from "./coupons.js";
 import { authStart, authVerify, authMe, authLogout, authVip } from "./auth.js";
+import { hit, isAdmin, aToday, aUsers, aUserAct, aExport, aPartners, aPartnerSave, aHealth, aAudit } from "./admin.js";
 import LEAGUES from "../data/leagues.json";
 import { apifStats } from "./adapters/stats-apif.js";
 import { apifOdds } from "./adapters/odds-apif.js";
@@ -353,6 +354,24 @@ export default {
           const from = Math.floor(Date.parse(date + "T00:00:00Z") / 1000) - 3 * 3600;
           return json(await authVip(env, tok, from, from + DAY + 6 * 3600));
         }
+        return json({ error: "not found" }, 404);
+      }
+      // μετρητής σελίδας (συγκεντρωτικά, χωρίς προσωπικά στοιχεία)
+      if (u.pathname === "/hit" && req.method === "POST") return json(await hit(env, await req.json().catch(() => ({})), req.headers.get("x-bz-country") || ""));
+      // Backoffice: μόνο admin (session με role=admin ή μυστικό ADMIN_TOKEN)
+      if (u.pathname.startsWith("/admin/")) {
+        const who = await isAdmin(env, req.headers.get("x-bz-session") || "", req.headers.get("x-bz-admin") || "");
+        if (!who) return json({ error: "forbidden" }, 403);
+        const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+        const p = u.pathname.slice(7);
+        if (p === "me") return json({ ok: true, who: who.who, email: who.email || null });
+        if (p === "today") return json(await aToday(env));
+        if (p === "users") return json(await aUsers(env, u.searchParams.get("q") || "", +u.searchParams.get("page") || 1));
+        if (p === "user" && req.method === "POST") return json(await aUserAct(env, who.who, body));
+        if (p === "export") return new Response(await aExport(env, who.who), { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": 'attachment; filename="betizzi-newsletter.csv"' } });
+        if (p === "partners") return json(req.method === "POST" ? await aPartnerSave(env, who.who, body) : await aPartners(env));
+        if (p === "health") return json(await aHealth(env));
+        if (p === "audit") return json(await aAudit(env));
         return json({ error: "not found" }, 404);
       }
       if (u.pathname === "/api/coupons") return json(await apiCoupons(env, u.searchParams.get("date") || ymd(now())));
