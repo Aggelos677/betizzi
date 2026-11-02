@@ -141,7 +141,7 @@ export async function apiCoupons(env, date) {
     const legs = JSON.parse(r.legs).map(([f, sel, price, prob, src]) => {
       const m = fx[f] || {};
       const hide = false; // απόφαση Owner 02/11: τα VIP μέσα στα δικά μας παρολί είναι ανοιχτά
-      const s90 = m.status === "FT" ? [m.gh, m.ga] : (m.status === "AET" || m.status === "PEN") && m.fth != null ? [m.fth, m.fta] : null;
+      const s90 = m.status === "FT" ? [m.gh, m.ga] : (m.status === "AET" || m.status === "PEN") && m.fth != null ? [m.fth, m.fta] : m.status === "PEN" && m.gh != null ? [m.gh, m.ga] : null;
       const res = s90 ? (won(sel, s90[0], s90[1]) ? 1 : 0) : null;
       return { fixture_id: f, home: m.home, away: m.away, league: m.league, ts: m.ts, status: m.status, gh: m.gh, ga: m.ga,
         sel: hide ? null : sel, price: hide ? null : price, prob: hide ? null : prob, vip: src === "vip", locked: hide, result: res };

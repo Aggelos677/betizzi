@@ -166,12 +166,14 @@ async function formFromOurResults(env) {
 }
 
 // Κλείσιμο tips: στο σκορ του 90λέπτου (όπως οι bookmakers). FT → τελικό σκορ· AET/PEN → σκορ 90΄ (fth/fta).
+// PEN χωρίς σκορ 90΄ από το API (πέναλτι χωρίς παράταση, π.χ. Australian Championship) → το τελικό σκορ είναι το 90λεπτο.
 // Το αποτέλεσμα γράφεται μία φορά.
 async function settleTips(env) {
   const rows = (await env.DB.prepare(`SELECT t.fixture_id, t.market, t.sel,
-      CASE WHEN f.status='FT' THEN f.gh ELSE f.fth END gh, CASE WHEN f.status='FT' THEN f.ga ELSE f.fta END ga
+      CASE WHEN f.status='FT' OR f.fth IS NULL THEN f.gh ELSE f.fth END gh, CASE WHEN f.status='FT' OR f.fth IS NULL THEN f.ga ELSE f.fta END ga
     FROM tips t JOIN fixtures f ON f.id=t.fixture_id
-    WHERE t.result IS NULL AND t.status='active' AND (f.status='FT' OR (f.status IN ('AET','PEN') AND f.fth IS NOT NULL))`).all()).results;
+    WHERE t.result IS NULL AND t.status='active' AND (f.status='FT' OR (f.status IN ('AET','PEN') AND f.fth IS NOT NULL)
+      OR (f.status='PEN' AND f.fth IS NULL AND f.gh IS NOT NULL AND f.ts < strftime('%s','now') - 4*3600))`).all()).results;
   const won = (s, i, j) => ({ "1": i > j, X: i === j, "2": i < j, "1X": i >= j, X2: i <= j, "12": i !== j, O15: i + j > 1, O25: i + j > 2, O35: i + j > 3,
     U25: i + j < 3, U35: i + j < 4, GG: i > 0 && j > 0, NG: i === 0 || j === 0 })[s];
   const st = rows.filter((r) => won(r.sel, r.gh, r.ga) !== undefined)
