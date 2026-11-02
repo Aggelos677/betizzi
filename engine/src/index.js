@@ -2,6 +2,7 @@
 // Τραβάει αγώνες/αποτελέσματα/live από τα «adapters», βγάζει tips με τους κανόνες του betizzi
 // και τα γράφει στη βάση betizzi-db. Η σελίδα διαβάζει ΜΟΝΟ από τη βάση (/api/...).
 import { makeCoupons, apiCoupons } from "./coupons.js";
+import { authStart, authVerify, authMe, authLogout, authVip } from "./auth.js";
 import LEAGUES from "../data/leagues.json";
 import { apifStats } from "./adapters/stats-apif.js";
 import { apifOdds } from "./adapters/odds-apif.js";
@@ -195,7 +196,7 @@ async function apiDay(env, date) {
       h.name home, h.logo home_logo, a.name away, a.logo away_logo
       FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id
       WHERE f.ts BETWEEN ? AND ? ORDER BY l.tier, l.country, f.ts`).bind(from, to).all();
-  const tips = await env.DB.prepare(`SELECT t.* FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE f.ts BETWEEN ? AND ?`).bind(from, to).all();
+  const tips = await env.DB.prepare(`SELECT t.* FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE f.ts BETWEEN ? AND ? ORDER BY t.rowid`).bind(from, to).all();
   // μόνο οι λίγκες που διάλεξε ο Owner (data/leagues.json, 01/11: 135)
   fx.results = fx.results.filter((f) => LEAGUE_IDS.has(f.league_id));
   { const ok = new Set(fx.results.map((f) => f.id)); tips.results = tips.results.filter((t) => ok.has(t.fixture_id)); }
@@ -337,6 +338,22 @@ export default {
           for (const tp of (await env.DB.prepare(`SELECT fixture_id, sel, tier FROM tips WHERE status='active' AND fixture_id IN (${part.map(() => "?").join(",")})`).bind(...part).all()).results) (tips[tp.fixture_id] ||= []).push([tp.sel, tp.tier]);
         }
         return json(rows.map((x) => ({ ...x, tips: tips[x.id] || [] })));
+      }
+      // Εγγραφή / σύνδεση (μόνο μέσω της σελίδας betizzi-web· το session έρχεται στο header x-bz-session)
+      if (u.pathname.startsWith("/auth/")) {
+        const tok = req.headers.get("x-bz-session") || "";
+        const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+        if (u.pathname === "/auth/start" && req.method === "POST") return json(await authStart(env, body, req.headers.get("x-bz-ip") || ""));
+        if (u.pathname === "/auth/verify" && req.method === "POST") return json(await authVerify(env, body));
+        if (u.pathname === "/auth/me") return json(await authMe(env, tok));
+        if (u.pathname === "/auth/logout" && req.method === "POST") return json(await authLogout(env, tok));
+        if (u.pathname === "/auth/vip") {
+          const date = u.searchParams.get("date") || ymd(now()); // ίδιο εύρος με το /api/day
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return json({ error: "date" }, 400);
+          const from = Math.floor(Date.parse(date + "T00:00:00Z") / 1000) - 3 * 3600;
+          return json(await authVip(env, tok, from, from + DAY + 6 * 3600));
+        }
+        return json({ error: "not found" }, 404);
       }
       if (u.pathname === "/api/coupons") return json(await apiCoupons(env, u.searchParams.get("date") || ymd(now())));
       if (u.pathname === "/api/record") return json(await apiRecord(env));
