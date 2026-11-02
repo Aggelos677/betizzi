@@ -159,3 +159,33 @@ export async function aHealth(env) {
 export async function aAudit(env) {
   return (await env.DB.prepare("SELECT datetime(ts,'unixepoch') at, who, action, target, detail FROM audit ORDER BY id DESC LIMIT 100").all()).results;
 }
+
+// ---------- Λίγκες (απόφαση Owner 02/11): ενεργή/ανενεργή + πώς πήγε τις τελευταίες 7 μέρες ----------
+export async function aLeagues(env) {
+  const since = now() - 7 * 86400, to = now();
+  const L = (await env.DB.prepare("SELECT id, country, name, type, tier, enabled FROM leagues ORDER BY country, tier, name").all()).results;
+  const st = (await env.DB.prepare(`SELECT f.league_id id, COUNT(*) n,
+      SUM(f.status IN ('FT','AET','PEN')) done, SUM(f.status IN ('FT','AET','PEN') AND f.gh IS NOT NULL) res,
+      SUM(f.ts < ? AND f.status IN ('NS','TBD','1H','2H','HT')) stuck,
+      SUM(EXISTS(SELECT 1 FROM odds o WHERE o.fixture_id=f.id)) wo,
+      SUM(EXISTS(SELECT 1 FROM odds_bk b WHERE b.fixture_id=f.id AND b.bk='Bet365')) b365
+    FROM fixtures f WHERE f.ts BETWEEN ? AND ? AND f.status NOT IN ('PST','CANC','ABD','SUSP') GROUP BY f.league_id`).bind(to - 4 * 3600, since, to + 2 * 86400).all()).results;
+  const tp = (await env.DB.prepare(`SELECT f.league_id id, SUM(t.result=1) w, SUM(t.result=0) l, COUNT(*) n FROM tips t JOIN fixtures f ON f.id=t.fixture_id
+    WHERE t.status='active' AND f.ts BETWEEN ? AND ? GROUP BY f.league_id`).bind(since, to + 2 * 86400).all()).results;
+  const S = Object.fromEntries(st.map((x) => [x.id, x])), P = Object.fromEntries(tp.map((x) => [x.id, x]));
+  return { rows: L.map((l) => ({ ...l, s: S[l.id] || null, t: P[l.id] || null })) };
+}
+export async function aLeagueSave(env, who, b) {
+  const ids = (Array.isArray(b.ids) ? b.ids : [b.id]).map(Number).filter(Boolean).slice(0, 600), on = b.on ? 1 : 0;
+  if (!ids.length) return { error: "id" };
+  for (let i = 0; i < ids.length; i += 90) {
+    const part = ids.slice(i, i + 90);
+    await env.DB.prepare(`UPDATE leagues SET enabled=? WHERE id IN (${part.map(() => "?").join(",")})`).bind(on, ...part).run();
+    // ανενεργή: σβήνονται οι μελλοντικοί αγώνες της που ΔΕΝ έχουν tip (όσοι έχουν tip μένουν για το record)
+    if (!on) await env.DB.prepare(`DELETE FROM fixtures WHERE league_id IN (${part.map(() => "?").join(",")}) AND status IN ('NS','TBD') AND ts > ?
+      AND NOT EXISTS (SELECT 1 FROM tips t WHERE t.fixture_id=fixtures.id)`).bind(...part, now()).run();
+  }
+  const names = (await env.DB.prepare(`SELECT country || ' – ' || name nm FROM leagues WHERE id IN (${ids.slice(0, 20).map(() => "?").join(",")})`).bind(...ids.slice(0, 20)).all()).results.map((x) => x.nm);
+  await audit(env, who, on ? "league_on" : "league_off", ids.length + " λίγκες", names.join(", "));
+  return { ok: true, n: ids.length };
+}

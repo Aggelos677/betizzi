@@ -3,13 +3,31 @@
 // και τα γράφει στη βάση betizzi-db. Η σελίδα διαβάζει ΜΟΝΟ από τη βάση (/api/...).
 import { makeCoupons, apiCoupons } from "./coupons.js";
 import { authStart, authVerify, authMe, authLogout, authVip } from "./auth.js";
-import { hit, isAdmin, aToday, aUsers, aUserAct, aExport, aPartners, aPartnerSave, aHealth, aAudit } from "./admin.js";
+import { hit, isAdmin, aToday, aUsers, aUserAct, aExport, aPartners, aPartnerSave, aHealth, aAudit, aLeagues, aLeagueSave } from "./admin.js";
 import LEAGUES from "../data/leagues.json";
+import LEAGUES_ALL from "../data/leagues_all.json";
 import { apifStats } from "./adapters/stats-apif.js";
 import { apifOdds } from "./adapters/odds-apif.js";
 import { makeTips } from "./tips.js";
 
-const LEAGUE_IDS = new Set(LEAGUES.map((l) => l.id));
+// Ενεργές λίγκες: από τη βάση (leagues.enabled), ώστε ο Owner να τις αλλάζει από το backoffice (απόφαση 02/11).
+// Πρώτη φορά: η βάση παίρνει τη λίστα του data/leagues.json (179). Cache 60΄΄.
+let LIDS = null, LIDS_T = 0;
+export async function leagueIds(env, fresh = false) {
+  if (!fresh && LIDS && Date.now() - LIDS_T < 60000) return LIDS;
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS kv(k TEXT PRIMARY KEY, v TEXT)").run();
+  if (!(await env.DB.prepare("SELECT v FROM kv WHERE k='leagues_v2'").first())) {
+    const on = new Set(LEAGUES.map((l) => l.id));
+    const st = LEAGUES_ALL.map((l) => env.DB.prepare("INSERT INTO leagues(id,country,name,type,tier,enabled) VALUES(?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET enabled=excluded.enabled")
+      .bind(l.id, l.country, l.name, l.type, l.tier, on.has(l.id) ? 1 : 0));
+    for (let i = 0; i < st.length; i += 90) await env.DB.batch(st.slice(i, i + 90));
+    await env.DB.prepare("INSERT OR REPLACE INTO kv(k,v) VALUES('leagues_v2', ?)").bind(String(Date.now())).run();
+  }
+  LIDS = new Set((await env.DB.prepare("SELECT id FROM leagues WHERE enabled=1").all()).results.map((r) => r.id));
+  if (!LIDS.size) LIDS = new Set(LEAGUES.map((l) => l.id)); // ασφάλεια: ποτέ άδειο
+  LIDS_T = Date.now();
+  return LIDS;
+}
 const DAY = 86400;
 const VIP_OPEN = 600; // απόφαση Owner: τα VIP ανοίγουν σε όλους 10΄ μετά τη σέντρα
 
@@ -28,11 +46,13 @@ async function log(env, job, ok, calls, note) {
 
 // ---------- jobs ----------
 async function seedLeagues(env) {
-  const stmts = LEAGUES.map((l) =>
-    env.DB.prepare("INSERT OR REPLACE INTO leagues(id,country,name,type,tier,enabled) VALUES(?,?,?,?,?,1)")
+  // ΔΕΝ αλλάζει το «ενεργή/ανενεργή» (το ορίζει ο Owner από το backoffice)· μόνο προσθέτει όσες λείπουν
+  await leagueIds(env);
+  const stmts = LEAGUES_ALL.map((l) =>
+    env.DB.prepare("INSERT OR IGNORE INTO leagues(id,country,name,type,tier,enabled) VALUES(?,?,?,?,?,0)")
       .bind(l.id, l.country, l.name, l.type, l.tier));
   for (let i = 0; i < stmts.length; i += 90) await env.DB.batch(stmts.slice(i, i + 90));
-  return LEAGUES.length;
+  return (await leagueIds(env, true)).size;
 }
 
 async function syncFixtures(env, days = 3) {
@@ -40,7 +60,8 @@ async function syncFixtures(env, days = 3) {
   let n = 0, calls = 0;
   for (let d = 0; d < days; d++) {
     const list = await src.fixturesByDate(ymd(now() + d * DAY)); calls++;
-    const keep = list.filter((f) => LEAGUE_IDS.has(f.league_id));
+    const LID = await leagueIds(env);
+    const keep = list.filter((f) => LID.has(f.league_id));
     await saveFixtures(env, keep);
     n += keep.length;
   }
@@ -121,7 +142,7 @@ async function syncOdds(env, maxPages = 8) {
     let c = await env.DB.prepare("SELECT * FROM odds_cursor WHERE date=?").bind(date).first();
     if (!c || (c.done && now() - c.started > 12 * 3600)) c = { date, next_page: 1, total: 1, started: now(), done: 0 };
     while (!c.done && calls < maxPages) {
-      const { rows, perBook = [], total } = await src.oddsPage(date, c.next_page, LEAGUE_IDS); calls++;
+      const { rows, perBook = [], total } = await src.oddsPage(date, c.next_page, await leagueIds(env)); calls++;
       // τιμή ανά bookmaker (για «καλύτερο παρολί» και «ο bookmaker μου»)
       const sb = perBook.map((o) => env.DB.prepare("INSERT OR REPLACE INTO odds_bk(fixture_id,bk,market,sel,price,updated) VALUES(?,?,?,?,?,?)")
         .bind(o.fixture_id, o.bk, o.market, o.sel, o.price, now()));
@@ -142,7 +163,8 @@ async function syncOdds(env, maxPages = 8) {
 
 async function syncLive(env) {
   const src = sources(env).stats;
-  const list = (await src.live()).filter((f) => LEAGUE_IDS.has(f.league_id));
+  const LID = await leagueIds(env);
+  const list = (await src.live()).filter((f) => LID.has(f.league_id));
   if (list.length) await saveFixtures(env, list);
   // όσοι ήταν live και δεν είναι πια στη λίστα → τελείωσαν: παίρνουμε το τελικό (έως 20 ανά λεπτό)
   const liveIds = new Set(list.map((f) => f.id));
@@ -199,7 +221,7 @@ async function apiDay(env, date) {
       WHERE f.ts BETWEEN ? AND ? ORDER BY l.tier, l.country, f.ts`).bind(from, to).all();
   const tips = await env.DB.prepare(`SELECT t.* FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE f.ts BETWEEN ? AND ? ORDER BY t.rowid`).bind(from, to).all();
   // μόνο οι λίγκες που διάλεξε ο Owner (data/leagues.json, 01/11: 135)
-  fx.results = fx.results.filter((f) => LEAGUE_IDS.has(f.league_id));
+  { const LID = await leagueIds(env); fx.results = fx.results.filter((f) => LID.has(f.league_id)); }
   { const ok = new Set(fx.results.map((f) => f.id)); tips.results = tips.results.filter((t) => ok.has(t.fixture_id)); }
   // VIP: η επιλογή/απόδοση/αιτιολόγηση ΔΕΝ φεύγουν δημόσια μέχρι 10΄ μετά τη σέντρα (μετά φαίνονται για το record).
   // Όταν μπει login, ο συνδεδεμένος χρήστης θα παίρνει πλήρη VIP από ξεχωριστό endpoint.
@@ -372,6 +394,16 @@ export default {
         if (p === "partners") return json(req.method === "POST" ? await aPartnerSave(env, who.who, body) : await aPartners(env));
         if (p === "health") return json(await aHealth(env));
         if (p === "audit") return json(await aAudit(env));
+        if (p === "leagues") {
+          if (req.method !== "POST") { await leagueIds(env); return json(await aLeagues(env)); }
+          const r = await aLeagueSave(env, who.who, body); await leagueIds(env, true); return json(r);
+        }
+        if (p === "sync" && req.method === "POST") { // τράβα τώρα τους αγώνες των νέων λιγκών (3 κλήσεις API· το πολύ 1 φορά / 10΄)
+          const k = await env.DB.prepare("SELECT v FROM kv WHERE k='admin_sync'").first();
+          if (k && Date.now() - +k.v < 600000) return json({ error: "wait" });
+          await env.DB.prepare("INSERT OR REPLACE INTO kv(k,v) VALUES('admin_sync', ?)").bind(String(Date.now())).run();
+          return json({ ok: true, result: await syncFixtures(env) });
+        }
         return json({ error: "not found" }, 404);
       }
       if (u.pathname === "/api/coupons") return json(await apiCoupons(env, u.searchParams.get("date") || ymd(now())));
