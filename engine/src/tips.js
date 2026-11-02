@@ -96,9 +96,11 @@ export async function makeTips(env, now) {
   const live = [];
   for (let i = 0; i < ids.length; i += 90) {
     const part = ids.slice(i, i + 90);
-    live.push(...(await env.DB.prepare(`SELECT fixture_id, sel, tier, price FROM tips WHERE status='active' AND fixture_id IN (${part.map(() => "?").join(",")})`).bind(...part).all()).results);
+    live.push(...(await env.DB.prepare(`SELECT fixture_id, sel, tier, price, status FROM tips WHERE fixture_id IN (${part.map(() => "?").join(",")})`).bind(...part).all()).results);
   }
+  // «have» = κάθε tip που υπάρχει ήδη (και τα παλιά αποσυρμένα): δεν ξαναμπαίνουν και ΔΕΝ πιάνουν θέση στο όριο.
   const have = new Set(live.map((t) => t.fixture_id + "|" + t.sel));
+  { const act = live.filter((t) => t.status === "active"); live.length = 0; live.push(...act); }
   for (const t of live) { (used[t.fixture_id] ||= new Set()).add(GROUP[t.sel]); }
   const vipHave = live.filter((t) => t.tier === "vip");
   const freeFx = new Set(live.filter((t) => t.tier !== "vip").map((t) => t.fixture_id)); // αγώνας με Free δεν παίρνει μετά VIP
