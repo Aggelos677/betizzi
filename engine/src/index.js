@@ -122,8 +122,9 @@ async function syncLive(env) {
   const liveIds = new Set(list.map((f) => f.id));
   const gone = (await env.DB.prepare("SELECT id FROM fixtures WHERE status IN ('1H','2H','HT','ET','BT','P','LIVE','INT','SUSP') AND ts > ?").bind(now() - 6 * 3600).all()).results
     .map((r) => r.id).filter((id) => !liveIds.has(id));
-  // και όσοι έπρεπε να έχουν αρχίσει πριν 2,5 ώρες αλλά δεν τους είδαμε ποτέ live
-  const stale = (await env.DB.prepare("SELECT id FROM fixtures WHERE status IN ('NS','TBD') AND ts BETWEEN ? AND ? LIMIT 20").bind(now() - 8 * 3600, now() - 150 * 60).all()).results.map((r) => r.id);
+  // και όσοι έπρεπε να έχουν αρχίσει πριν 2,5 ώρες αλλά δεν τους είδαμε ποτέ live.
+  // Παράθυρο 48 ωρών: αν το API κοπεί (όριο ημέρας), μαζεύουμε τα τελικά την επόμενη μέρα. 20 αγώνες = 1 κλήση/λεπτό.
+  const stale = (await env.DB.prepare("SELECT id FROM fixtures WHERE status IN ('NS','TBD') AND ts BETWEEN ? AND ? ORDER BY ts DESC LIMIT 20").bind(now() - 48 * 3600, now() - 150 * 60).all()).results.map((r) => r.id);
   const ids = [...gone, ...stale].slice(0, 20);
   if (ids.length) await saveFixtures(env, await src.byIds(ids));
   await settleTips(env);
