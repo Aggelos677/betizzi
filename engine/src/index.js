@@ -46,7 +46,29 @@ async function syncFixtures(env, days = 3) {
   return n;
 }
 
+// Γκολ (απόφαση Owner 02/11): η μηχανή κρατά κάθε αλλαγή σκορ ως γκολ, χωρίς έξτρα κλήσεις στο API.
+// Η σελίδα δείχνει «Τελευταία γκολ» (όλα, όχι μόνο όσα μας βολεύουν).
+async function recordGoals(env, list) {
+  if (!list.length) return;
+  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS goals(fixture_id INTEGER, gh INTEGER, ga INTEGER, side TEXT, minute TEXT, ts INTEGER, PRIMARY KEY(fixture_id, gh, ga))`).run();
+  const prev = {};
+  for (let i = 0; i < list.length; i += 90) {
+    const part = list.slice(i, i + 90).map((f) => f.id);
+    for (const r of (await env.DB.prepare(`SELECT id, gh, ga FROM fixtures WHERE id IN (${part.map(() => "?").join(",")})`).bind(...part).all()).results) prev[r.id] = r;
+  }
+  const st = [];
+  for (const f of list) {
+    const p = prev[f.id]; if (!p || f.gh == null || f.ga == null) continue;
+    const ph = p.gh ?? 0, pa = p.ga ?? 0;
+    if (f.gh + f.ga <= ph + pa || f.gh < ph || f.ga < pa) continue;
+    const side = f.gh > ph && f.ga === pa ? "h" : f.ga > pa && f.gh === ph ? "a" : "?";
+    st.push(env.DB.prepare("INSERT OR IGNORE INTO goals VALUES(?,?,?,?,?,?)").bind(f.id, f.gh, f.ga, side, f.elapsed != null ? String(f.elapsed) : null, now()));
+  }
+  if (st.length) await env.DB.batch(st);
+}
+
 async function saveFixtures(env, list) {
+  try { await recordGoals(env, list); } catch (e) { /* τα γκολ δεν σταματούν ποτέ την ενημέρωση */ }
   const st = [];
   for (const f of list) {
     st.push(env.DB.prepare(`INSERT INTO fixtures(id,ts,league_id,season,round,home_id,away_id,status,elapsed,gh,ga,hth,hta,fth,fta,updated)
@@ -299,6 +321,20 @@ export default {
       if (u.pathname === "/api/live") {
         const r = await env.DB.prepare("SELECT id, status, elapsed, gh, ga FROM fixtures WHERE ts BETWEEN ? AND ? AND status NOT IN ('NS','TBD')").bind(now() - 4 * 3600, now() + 600).all();
         return json(r.results.map((f) => [f.id, f.status, f.elapsed, f.gh, f.ga]));
+      }
+      if (u.pathname === "/api/goals") {
+        // τελευταία γκολ (6 ώρες), με ομάδες/λίγκα και τα tips του αγώνα που κρίνονται από το γκολ
+        const g = await env.DB.prepare(`SELECT g.fixture_id id, g.gh, g.ga, g.side, g.minute, g.ts, h.name home, a.name away, l.name league, l.country
+          FROM goals g JOIN fixtures f ON f.id=g.fixture_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id JOIN leagues l ON l.id=f.league_id
+          WHERE g.ts > ? ORDER BY g.ts DESC LIMIT 30`).bind(now() - 6 * 3600).all().catch(() => ({ results: [] }));
+        const rows = g.results;
+        const ids = [...new Set(rows.map((x) => x.id))];
+        const tips = {};
+        for (let i = 0; i < ids.length; i += 90) {
+          const part = ids.slice(i, i + 90);
+          for (const tp of (await env.DB.prepare(`SELECT fixture_id, sel, tier FROM tips WHERE status='active' AND fixture_id IN (${part.map(() => "?").join(",")})`).bind(...part).all()).results) (tips[tp.fixture_id] ||= []).push([tp.sel, tp.tier]);
+        }
+        return json(rows.map((x) => ({ ...x, tips: tips[x.id] || [] })));
       }
       if (u.pathname === "/api/coupons") return json(await apiCoupons(env, u.searchParams.get("date") || ymd(now())));
       if (u.pathname === "/api/record") return json(await apiRecord(env));
