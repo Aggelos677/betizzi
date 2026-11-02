@@ -38,7 +38,7 @@ export async function makeCoupons(env, date = ymd(now()), dry = false, opt = {})
   const fx = (await env.DB.prepare("SELECT f.id, h.name hn, a.name an FROM fixtures f JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id WHERE f.ts BETWEEN ? AND ? AND f.status IN ('NS','TBD')").bind(start, to).all()).results;
   const ok = new Set(fx.filter((f) => !NOT_FIRST_TEAM.test(f.hn) && !NOT_FIRST_TEAM.test(f.an)).map((f) => f.id));
   // τα tips μας, με «ποιότητα»: VIP πρώτα, μετά επίπεδο (Α/Β/Γ), ισχύς, και πόσο κοντά είναι η τιμή στον «πάτο» του VIP
-  const tips = (await env.DB.prepare("SELECT fixture_id f, sel, price, prob, tier, strength s, level, min_price FROM tips WHERE status='active' AND fixture_id IN (SELECT id FROM fixtures WHERE ts BETWEEN ? AND ? AND status IN ('NS','TBD'))").bind(start, to).all()).results
+  const tips = (await env.DB.prepare("SELECT t.fixture_id f, t.sel, t.price, t.prob, t.tier, t.strength s, t.level, t.min_price, f.ts FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE t.status='active' AND f.ts BETWEEN ? AND ? AND f.status IN ('NS','TBD')").bind(start, to).all()).results
     .filter((x) => ok.has(x.f) && x.price && x.prob)
     .map((x) => {
       const near = x.tier === "vip" ? 1 : x.min_price ? Math.min(1, x.price / (x.min_price / 0.97)) : 0.9;
@@ -47,6 +47,11 @@ export async function makeCoupons(env, date = ymd(now()), dry = false, opt = {})
     .sort((a, b) => b.q - a.q);
 
   const wd = new Date(date + "T12:00:00Z").getUTCDay(), weekend = wd === 0 || wd === 6;
+  // Ζώνες ώρας (απόφαση Owner 02/11, ώρα Ελλάδας/Κύπρου): έως τις 17:00 και μετά τις 17:00.
+  // Σάβ–Κυρ: παρολί και στις δύο ζώνες (όταν χάσουν τα απογευματινά, υπάρχουν τα βραδινά).
+  // Καθημερινές: πρώτα αγώνες μετά τις 17:00· αν δεν φτάνουν, και νωρίτερα.
+  const hAth = (ts) => +new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", hour: "2-digit", hourCycle: "h23" }).format(ts * 1000);
+  for (const x of tips) x.late = hAth(x.ts) >= 17;
   const usedFx = new Set(); // κάθε αγώνας (άρα και κάθε tip) σε ΕΝΑ παρολί
   function build(lo, hi, variant, style, pool, maxLegs = 12) {
     const band = STYLE[style];
@@ -72,20 +77,25 @@ export async function makeCoupons(env, date = ymd(now()), dry = false, opt = {})
     return { legs, odds: Math.round(tot * 100) / 100, prob: legs.reduce((a, l) => a * l.prob, 1), value: legs.reduce((a, l) => a + l.q, 0) / legs.length };
   }
   const out = [];
-  const make = (zone, lo, hi, variant, style) => {
-    const c = build(lo, hi, variant, style, tips.filter((t) => !usedFx.has(t.f)));
+  const make = (zone, lo, hi, variant, style, win) => {
+    const free = tips.filter((t) => !usedFx.has(t.f));
+    let c = win === "early" ? build(lo, hi, variant, style, free.filter((t) => !t.late))
+      : win === "late" ? build(lo, hi, variant, style, free.filter((t) => t.late))
+      : (build(lo, hi, variant, style, free.filter((t) => t.late)) || build(lo, hi, variant, style, free));
     if (!c) return;
     c.legs.forEach((l) => usedFx.add(l.f));
     out.push({ kind: zone, variant, style, ...c });
   };
   // 1) ένα από κάθε ζώνη (Μικτό, Ισορροπημένο) 2) οι εναλλακτικές 3) τα Φαβορί του σαββατοκύριακου
-  for (const [z, lo, hi] of ZONES) make(z, lo, hi, "mix", "bal");
-  for (const [z, lo, hi] of ZONES) for (const v of ["wins", "goals"]) make(z, lo, hi, v, "bal");
-  if (weekend) for (const [z, lo, hi] of ZONES) for (const v of ["mix", "wins", "goals"]) make(z, lo, hi, v, "fav");
+  const wins = weekend ? ["early", "late"] : [null];
+  for (const w of wins) for (const [z, lo, hi] of ZONES) make(z, lo, hi, "mix", "bal", w);
+  for (const w of wins) for (const [z, lo, hi] of ZONES) for (const v of ["wins", "goals"]) make(z, lo, hi, v, "bal", w);
+  if (weekend) for (const w of wins) for (const [z, lo, hi] of ZONES) for (const v of ["mix", "wins", "goals"]) make(z, lo, hi, v, "fav", w);
   // 4) το «τρελό» x100: ό,τι περισσεύει + έως 3 από τα πιο δυνατά tips της μέρας
   {
-    const [z, lo, hi] = CRAZY, strong = tips.filter((t) => usedFx.has(t.f)).slice(0, 3);
-    const c = build(lo, hi, "mix", "bal", [...strong, ...tips.filter((t) => !usedFx.has(t.f))].sort((a, b) => b.q - a.q), 14);
+    const [z, lo, hi] = CRAZY, strong = tips.filter((t) => usedFx.has(t.f) && t.late).slice(0, 3);
+    const pool = [...strong, ...tips.filter((t) => !usedFx.has(t.f))].sort((a, b) => (b.late - a.late) || (b.q - a.q)); // x100: πρώτα βραδινοί
+    const c = build(lo, hi, "mix", "bal", pool, 14);
     if (c) out.push({ kind: z, variant: "mix", style: "bal", ...c });
   }
   // επιλογή της ημέρας ανά ζώνη: το καλύτερο value
