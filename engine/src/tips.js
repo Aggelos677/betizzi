@@ -7,8 +7,8 @@ async function sha256(s) {
   return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
 }
 export const RULES = {
-  freeShare: 1 / 3,         // free: το πολύ 1 στους 3 αγώνες με αποδόσεις (απόφαση Owner 02/11), τα καλύτερα πρώτα
-  vipShare: 1 / 8,          // VIP ≈ 1 στους 8
+  freeShare: 0.30,          // free: το πολύ 30% των αγώνων με αποδόσεις (απόφαση Owner 02/11), τα καλύτερα πρώτα
+  vipShare: 0.10,          // VIP ≈ 10% των αγώνων με αποδόσεις (απόφαση Owner 02/11)
   free: { min: 1.40, max: 4.00 },
   freeBelowVip: 0.97,       // απόφαση Owner 01/11: το Free θέλει τιμή έως 3% κάτω από τον «πάτο» του VIP
   vip: { max: 3.50, floor: 1.50 },
