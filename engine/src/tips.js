@@ -1,14 +1,18 @@
 // Κανόνες tips betizzi (01/11/2026). Όλα τα όρια εδώ, σε ένα σημείο.
 // Ομάδες που δεν παίρνουν ποτέ tip/κουπόνι (κανόνας λιγκών): Β ομάδες, reserves, νέοι, γυναικείες.
 export const NOT_FIRST_TEAM = /(^Jong | II$| III$| B$| C$|\bU-?(1[6-9]|2[0-3])\b|\bReserves?\b|\(W\)| W$|\bWomen\b|\bYouth\b)/i;
-export const MODEL_VERSION = "rules-2026-11-02b";
+export const MODEL_VERSION = "rules-2026-11-02c";
 async function sha256(s) {
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
 }
 export const RULES = {
-  freeShare: 0.30,          // free: το πολύ 30% των αγώνων με αποδόσεις (απόφαση Owner 02/11), τα καλύτερα πρώτα
-  vipShare: 0.10,          // VIP ≈ 10% των αγώνων με αποδόσεις (απόφαση Owner 02/11)
+  // Απόφαση Owner 02/11 (17:12): ΤΟΥΛΑΧΙΣΤΟΝ 33% Free + 10% VIP των αγώνων με αποδόσεις.
+  // Πρώτα τα δυνατά· αν δεν φτάνουν, συμπληρώνει με πιο αδύναμα (επίπεδο D) μέχρι τον στόχο.
+  freeShare: 0.33,
+  vipShare: 0.10,
+  fallback: { goals: 6, formPts: 8, formDiff: 4 }, // επίπεδο D: 6/10 αγώνες ή φόρμα ≥8 πόντοι με διαφορά ≥4
+  vipFill: 0.90,            // VIP συμπλήρωση: δυνατό tip (A/B) με τιμή έως 10% κάτω από τον «πάτο» του VIP
   free: { min: 1.40, max: 4.00 },
   freeBelowVip: 0.97,       // απόφαση Owner 01/11: το Free θέλει τιμή έως 3% κάτω από τον «πάτο» του VIP
   vip: { max: 3.50, floor: 1.50 },
@@ -28,7 +32,7 @@ export const RULES = {
 };
 const GROUP = { "1": "RES", "X": "RES", "2": "RES", O25: "GOALS", U25: "GOALS", GG: "BTTS", NG: "BTTS" };
 const MARKET = { "1": "1X2", "X": "1X2", "2": "1X2", O25: "OU", U25: "OU", GG: "BTTS", NG: "BTTS" };
-const LEVEL = { A: 0, B: 1, C: 2 };
+const LEVEL = { A: 0, B: 1, C: 2, D: 3 };
 
 export async function makeTips(env, now) {
   const DAY = 86400;
@@ -65,7 +69,13 @@ export async function makeTips(env, now) {
     // «Πάτος» τιμής για το «όχι κάτω από»: VIP = ο πάτος, Free = 3% κάτω από τον πάτο του VIP (τουλάχιστον 1.40) ή η τιμή έκδοσης αν είναι πιο χαμηλή
     const freeMin = (fl) => Math.max(RULES.free.min, Math.round(fl * RULES.freeBelowVip * 100) / 100);
     for (const k of ["O25", "U25", "GG", "NG"]) {
-      const s = sig[k], p = o[k]; if (s < 7 || !p) continue;
+      const s = sig[k], p = o[k]; if (!p) continue;
+      if (s === RULES.fallback.goals) { // επίπεδο D (συμπλήρωση): ποτέ VIP
+        const fl = RULES.vipTarget[k][7] + 0.10;
+        cands.push({ f, k, s, p, vip: false, fb: true, fl, fmin: freeMin(fl), level: "D", prob: prob[k], why: `${s}/10 games` });
+        continue;
+      }
+      if (s < 7) continue;
       const fl = Math.max(RULES.vip.floor, RULES.vipTarget[k][s]);
       const vip = p >= fl && p <= RULES.vip.max;
       cands.push({ f, k, s, p, vip, fl, fmin: freeMin(fl), level: s >= 9 ? "A" : s === 8 ? "B" : "C", prob: prob[k], why: `${s}/10 games` });
@@ -79,6 +89,9 @@ export async function makeTips(env, now) {
         const fl = Math.max(RULES.vip.floor, RULES.vipTarget12(side, diff));
         const vip = p >= fl && p <= RULES.vip.max;
           cands.push({ f, k: side, s: 100 + diff, p, vip, fl, fmin: freeMin(fl), level: me >= 13 && diff >= 9 ? "A" : "B", prob: prob[side], why: `form ${hp}-${ap} pts` });
+      } else if (me >= RULES.fallback.formPts && diff >= RULES.fallback.formDiff && p) { // επίπεδο D (συμπλήρωση)
+        const fl = Math.max(RULES.vip.floor, RULES.vipTarget12(side, 6));
+        cands.push({ f, k: side, s: 100 + diff, p, vip: false, fb: true, fl, fmin: freeMin(fl), level: "D", prob: prob[side], why: `form ${hp}-${ap} pts` });
       }
     }
     const px = o["X"];
@@ -109,14 +122,22 @@ export async function makeTips(env, now) {
   const vipQuota = Math.round(withOdds * RULES.vipShare);
   const VIP = [];
   for (const c of fresh.filter((c) => c.vip).sort((a, b) => b.s - a.s)) { if (vipHave.length + VIP.length >= vipQuota) break; if (freeFx.has(c.f.id)) continue; if (take(c)) VIP.push(c); }
+  // Συμπλήρωση VIP μέχρι το 10%: δυνατά (A/B) tips με τιμή λίγο κάτω από τον πάτο· ο πάτος τους γίνεται η τιμή τους.
+  if (vipHave.length + VIP.length < vipQuota)
+    for (const c of fresh.filter((c) => !c.vip && !c.fb && c.level !== "C" && c.p >= Math.max(RULES.vip.floor, c.fl * RULES.vipFill) && c.p <= RULES.vip.max)
+      .sort((a, b) => b.p / b.fl - a.p / a.fl || b.s - a.s)) {
+      if (vipHave.length + VIP.length >= vipQuota) break; if (freeFx.has(c.f.id)) continue;
+      if (take(c)) { c.vip = true; c.fl = c.p; VIP.push(c); }
+    }
   // Free: πιο κοντά στο VIP πρώτα, αναλογία ανά ομάδα αγορών, 1 X τη μέρα, λίγα ψηλά, μέσος ≈1.70–1.75
   const freeQuota = Math.round(withOdds * RULES.freeShare);
   // Αγώνας με VIP δεν παίρνει και Free (το VIP είναι το επόμενο σκαλί).
   const vipFx = new Set([...VIP.map((c) => c.f.id), ...vipHave.map((t) => t.fixture_id)]);
-  const pool = fresh.filter((c) => !vipFx.has(c.f.id) && c.p >= RULES.free.min && c.p <= RULES.free.max)
+  const poolAll = fresh.filter((c) => !vipFx.has(c.f.id) && !VIP.includes(c) && c.p >= RULES.free.min && c.p <= RULES.free.max)
     // πιο κοντά στο VIP πρώτα: όσα θα ήταν VIP (έμειναν έξω λόγω ορίου), μετά όσο πιο κοντά είναι η τιμή στον «πάτο» του VIP
     .map((c) => ({ c, near: c.vip ? 2 : Math.min(1, c.p / c.fl) }))
     .sort((a, b) => b.near - a.near || LEVEL[a.c.level] - LEVEL[b.c.level] || b.c.s - a.c.s).map((x) => x.c);
+  const pool = poolAll.filter((c) => !c.fb), poolFb = poolAll.filter((c) => c.fb);
   // Free: στόχος ≈ 1 στους 4 αγώνες με αποδόσεις, μετρώντας και τα ήδη δημοσιευμένα. Όσο έρχονται αποδόσεις για
   // περισσότερους αγώνες, ο στόχος μεγαλώνει και μπαίνουν καινούρια tips. Τίποτα δεν βγαίνει για να «χωρέσει».
   const freeHave = live.filter((t) => t.tier !== "vip").length;
@@ -147,6 +168,8 @@ export async function makeTips(env, now) {
   for (const c of pool) if (!FREE.includes(c)) tryFree(c, false, 2);
   for (const c of pool) if (!FREE.includes(c)) tryFree(c, false, 1);
   for (const c of pool) if (!FREE.includes(c)) tryFree(c, false, 0);
+  // 5) ελάχιστο 33% (απόφαση Owner 02/11): συμπλήρωση με επίπεδο D, πρώτα όσα έχουν τιμή πιο κοντά στο 1.70
+  for (const c of poolFb.sort((a, b) => Math.abs(a.p - 1.72) - Math.abs(b.p - 1.72))) if (!FREE.includes(c)) tryFree(c, false, 0);
 
   // Αμετάβλητο record: ένα tip που δημοσιεύτηκε ΔΕΝ αλλάζει και ΔΕΝ σβήνεται ποτέ.
   // Αν δεν ισχύει πια πριν τη σέντρα → status 'withdrawn' (φαίνεται δημόσια ως αποσυρμένο).
