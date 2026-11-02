@@ -706,7 +706,7 @@ header{position:relative}
 .pc-tm{width:40px;font:500 .7rem var(--f-mono);color:var(--muted)}
 .pc-m{flex:1;min-width:0}.pc-m b{display:block;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pc-m small{font-size:.74rem;color:var(--muted)}
 .pc-o{font:700 .9rem var(--f-mono)}.pc-r{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:var(--bg)}
-.pc-r.w{background:#4dff8a;color:#06210f;box-shadow:0 0 0 3px rgba(77,255,138,.22),0 0 12px rgba(77,255,138,.55);font-size:.78rem}.pc-r.l{background:var(--bad)}
+.pc-r.w{background:#4dff8a;color:#06210f;box-shadow:0 0 0 3px rgba(77,255,138,.22),0 0 12px rgba(77,255,138,.55);font-size:.78rem}.pc-r.l{background:var(--bad)}.pc-r.v{background:var(--line);color:var(--fg)}.pc-o s{opacity:.5;font-size:.7em}.pc-was{opacity:.5;font-size:.42em;display:block;text-align:right}
 .vipt{color:#e8b931;font-weight:800;font-size:.62rem;margin-left:4px}
 .cm{margin-top:12px;background:var(--panel-2);border-radius:12px;padding:10px 12px}
 .cm-t{display:flex;justify-content:space-between;font-size:.84rem}.cm-t b{font-family:var(--f-mono);color:var(--lime)}.cm-t small{color:var(--muted);font-size:.7rem}
@@ -1288,7 +1288,7 @@ function clState(t,m){var sc=(m.score||"0-0").split("-").map(Number),h=sc[0]||0,
   return hold&&min>=85?"close":"wait";}
 var WONAT={};
 /* κουπόνια betizzi: πότε ΜΟΛΙΣ κέρδισαν (από τα ζωντανά σκορ) → πάρτι σαν το σωστό σκορ (απόφαση Owner) */
-function legWon(l){if(l.result===1)return true;if(l.result===0)return false;
+function legWon(l){if(l.result===1||l.result===2)return true;if(l.result===0)return false;
   var m=null;for(var i=0;i<MATCHES.length;i++)if(MATCHES[i].id===l.fixture_id){m=MATCHES[i];break;}
   if(!m||!(m.live||m.done)||!m.score||m.score.indexOf("-")<0)return false;
   var p=m.score.split("-"),a=+p[0],b=+p[1],s=l.sel;
@@ -1727,7 +1727,7 @@ function winLbl(team){return '<span>Win</span>: '+esc(team||"");}
 function legPick(l){if(l.sel==="1")return winLbl(l.home);if(l.sel==="2")return winLbl(l.away);return esc(BZC_SEL[l.sel]||l.sel);}
 function parlayHTML(c,feat){
   var st=c.result===1?"won":c.result===0?"lost":c.legs.some(function(l){return l.status&&l.status!=="NS"&&l.status!=="TBD";})?"live":"wait";
-  var legs=c.legs.slice().sort(function(a,b){return (a.ts||0)-(b.ts||0);}).map(function(l){var r=l.result===1?'<span class="pc-r w">✓</span>':l.result===0?'<span class="pc-r l">✗</span>':'';
+  var legs=c.legs.slice().sort(function(a,b){return (a.ts||0)-(b.ts||0);}).map(function(l){var r=l.result===1?'<span class="pc-r w">✓</span>':l.result===0?'<span class="pc-r l">✗</span>':l.result===2?'<span class="pc-r v" title="void">–</span>':'';
     /* ζωντανά: το σκορ/λεπτό από τους αγώνες της σελίδας (ανανεώνονται κάθε 30΄΄), αλλιώς από το κουπόνι */
     var mm=null;for(var q=0;q<MATCHES.length;q++)if(String(MATCHES[q].id)===String(l.fixture_id)){mm=MATCHES[q];break;}
     var lv=mm?mm.live:(l.status&&["1H","2H","HT","ET","BT","P","LIVE","INT"].indexOf(l.status)>=0),dn=mm?mm.done:(["FT","AET","PEN"].indexOf(l.status)>=0);
@@ -1737,17 +1737,18 @@ function parlayHTML(c,feat){
     if(!r&&(lv||dn)&&sc){var es=tipState({sel:({"1":"home","2":"away","X":"x","O25":"over 2.5","O15":"over 1.5","U25":"under 2.5","GG":"gg","NG":"ng"})[l.sel]||""},{live:lv,done:dn,score:sc});
       if(es==="won")r='<span class="pc-r w">✓</span>';else if(es==="lost")r='<span class="pc-r l">✗</span>';}
     var tm=lv?'<span class="pc-live"><i class="ldot2"></i><b>'+esc(sc||"0-0")+'</b><small>'+esc(mn||"LIVE")+'</small></span>':dn?'<span class="pc-ft"><b>'+esc(sc)+'</b><small>FT</small></span>':esc(l.time||"");
-    return '<li'+(lv?' class="lv"':'')+'><span class="pc-tm">'+tm+'</span><span class="pc-m"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+legPick(l)+(l.vip?'<span class="vipt">VIP</span>':'')+'</small></span>'+r+'<span class="pc-o">'+(l.price?fx2(l.price):"")+'</span></li>';}).join("");
+    if(l.result===2)tm='<span class="pc-ft"><b>–</b><small>'+esc(l.status||"PST")+'</small></span>';
+    return '<li'+(lv?' class="lv"':'')+'><span class="pc-tm">'+tm+'</span><span class="pc-m"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+legPick(l)+(l.vip?'<span class="vipt">VIP</span>':'')+'</small></span>'+r+'<span class="pc-o">'+(l.result===2?'<s>'+fx2(l.price)+'</s> 1.00':l.price?fx2(l.price):"")+'</span></li>';}).join("");
   var keys=c.legs.map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});
   /* απόφαση Owner 02/11: το είδος μεγάλο με δικό του χρώμα (Γκολ πορτοκαλοκίτρινο, 1X2 γαλάζιο), το στυλ μικρό */
   var name='<span class="pv pv-'+esc(c.variant)+'">'+esc(BZC_VAR[c.variant]||c.variant)+'</span>'+(c.style?' <small class="pc-sty">· <span>'+esc(STY[c.style]||c.style)+'</span></small>':'');
   var tl=c.legs.filter(function(l){return l.time;}).slice().sort(function(a,b){return (a.ts||0)-(b.ts||0);}),first=tl.length?tl[0].time:"",last=tl.length?tl[tl.length-1].time:"";
-  var btns=st==="won"?'<span class="pc-res w">✓ <span>Won</span> · x'+fx2(c.odds)+'</span>':st==="lost"?'<span class="pc-res l">✗ <span>Lost</span></span>':st==="live"?'<span class="pc-res lv"><i class="ldot2"></i> LIVE</span>'
+  var btns=st==="won"?'<span class="pc-res w">✓ <span>Won</span> · x'+fx2(c.odds_now||c.odds)+'</span>':st==="lost"?'<span class="pc-res l">✗ <span>Lost</span></span>':st==="live"?'<span class="pc-res lv"><i class="ldot2"></i> LIVE</span>'
     :(keys.length?'<button type="button" class="pc-take" data-take="'+c.n+'">🎟️ <span>Take it</span> → <span>My slip</span></button>':'');
   return '<article class="pc'+(feat?' feat':'')+(st==="won"?' won':st==="lost"?' lost':'')+'">'
     +'<div class="pc-top"><div>'
     +'<h3 class="pc-t">'+name+'</h3><p class="pc-s">'+c.legs.length+' <span>picks</span>'+(first?' · <span class="pc-tr">⏱ '+esc(first)+(last&&last!==first?'–'+esc(last):'')+'</span>':'')+'</p></div>'
-    +'<div class="pc-odd">x'+fx2(c.odds)+'</div></div><ul class="pc-legs">'+legs+'</ul>'+chanceHTML(c.prob)
+    +'<div class="pc-odd">'+(c.odds_now?'<s class="pc-was">x'+fx2(c.odds)+'</s> ':'')+'x'+fx2(c.odds_now||c.odds)+'</div></div><ul class="pc-legs">'+legs+'</ul>'+chanceHTML(c.prob)
     +'<div class="pc-btns">'+btns+'<button type="button" class="pc-sh" data-bzsh="'+c.n+'" aria-label="Share">↗</button></div>'
 
     +'<p class="pc-foot">€10 → <b>€'+fx2(c.odds*10)+'</b> <span>if all win</span></p></article>';}

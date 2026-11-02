@@ -202,6 +202,10 @@ async function settleTips(env) {
     U25: i + j < 3, U35: i + j < 4, GG: i > 0 && j > 0, NG: i === 0 || j === 0 })[s];
   const st = rows.filter((r) => won(r.sel, r.gh, r.ga) !== undefined)
     .map((r) => env.DB.prepare("UPDATE tips SET result=? WHERE fixture_id=? AND market=? AND sel=? AND result IS NULL").bind(won(r.sel, r.gh, r.ga) ? 1 : 0, r.fixture_id, r.market, r.sel));
+  // απόφαση Owner 02/11: αγώνας που αναβλήθηκε/ακυρώθηκε/διακόπηκε = void (result 2), όπως στους bookmakers (μετρά 1.00).
+  // Δεν μετρά ούτε νίκη ούτε ήττα στο Record. Κρίνεται 1 ώρα μετά την αρχική ώρα σέντρας.
+  st.push(env.DB.prepare(`UPDATE tips SET result=2 WHERE result IS NULL AND status='active' AND fixture_id IN
+    (SELECT id FROM fixtures WHERE status IN ('PST','CANC','ABD','AWD','WO') AND ts < strftime('%s','now') - 3600)`));
   for (let i = 0; i < st.length; i += 90) await env.DB.batch(st.slice(i, i + 90));
 }
 
@@ -269,7 +273,7 @@ async function apiRecord(env) {
   const q = `SELECT t.fixture_id, t.market, t.sel, t.tier, t.price, t.result, t.status, t.created_at, t.withdrawn_at, t.model_version, t.hash,
       f.ts, f.gh, f.ga, f.league_id, l.name league, l.country, h.name home, a.name away
     FROM tips t JOIN fixtures f ON f.id=t.fixture_id JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id`;
-  const settled = (await env.DB.prepare(q + " WHERE t.status='active' AND t.result IS NOT NULL ORDER BY f.ts DESC").all()).results;
+  const settled = (await env.DB.prepare(q + " WHERE t.status='active' AND t.result IN (0,1) ORDER BY f.ts DESC").all()).results; // void (2) δεν μετρά
   const withdrawn = (await env.DB.prepare(q + " WHERE t.status='withdrawn' AND f.ts < ? ORDER BY f.ts DESC LIMIT 200").bind(now() + 86400).all()).results;
   const pending = (await env.DB.prepare("SELECT COUNT(*) n FROM tips WHERE status='active' AND result IS NULL").first()).n;
   const first = (await env.DB.prepare("SELECT MIN(created_at) t FROM tips").first()).t;

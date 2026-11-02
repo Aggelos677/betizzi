@@ -142,11 +142,14 @@ export async function apiCoupons(env, date) {
       const m = fx[f] || {};
       const hide = false; // απόφαση Owner 02/11: τα VIP μέσα στα δικά μας παρολί είναι ανοιχτά
       const s90 = m.status === "FT" ? [m.gh, m.ga] : (m.status === "AET" || m.status === "PEN") && m.fth != null ? [m.fth, m.fta] : m.status === "PEN" && m.gh != null ? [m.gh, m.ga] : null;
-      const res = s90 ? (won(sel, s90[0], s90[1]) ? 1 : 0) : null;
+      // αναβολή/ακύρωση/διακοπή = void (2): μετρά 1.00 και το παρολί κλείνει χωρίς αυτόν (απόφαση Owner 02/11)
+      const VOIDST = ["PST", "CANC", "ABD", "AWD", "WO"].includes(m.status) && m.ts < Date.now() / 1000 - 3600;
+      const res = VOIDST ? 2 : s90 ? (won(sel, s90[0], s90[1]) ? 1 : 0) : null;
       return { fixture_id: f, home: m.home, away: m.away, league: m.league, ts: m.ts, status: m.status, gh: m.gh, ga: m.ga,
         sel: hide ? null : sel, price: hide ? null : price, prob: hide ? null : prob, vip: src === "vip", locked: hide, result: res };
     });
-    const result = legs.some((l) => l.result === 0) ? 0 : legs.every((l) => l.result === 1) ? 1 : null;
-    return { n: r.n, kind: r.kind, variant: r.variant, style: r.style || null, slot: r.slot || null, pick: false, odds: r.odds, prob: r.prob, created_at: r.created_at, hash: r.hash, result, legs };
+    const result = legs.some((l) => l.result === 0) ? 0 : legs.every((l) => l.result === 1 || l.result === 2) && legs.some((l) => l.result === 1) ? 1 : null;
+    const oddsNow = Math.round(legs.reduce((a, l) => a * (l.result === 2 ? 1 : l.price || 1), 1) * 100) / 100; // απόδοση χωρίς τα void
+    return { n: r.n, kind: r.kind, variant: r.variant, style: r.style || null, slot: r.slot || null, pick: false, odds: r.odds, odds_now: legs.some((l) => l.result === 2) ? oddsNow : null, prob: r.prob, created_at: r.created_at, hash: r.hash, result, legs };
   });
 }
