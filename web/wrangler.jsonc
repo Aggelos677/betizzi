@@ -13,5 +13,10 @@
   ],
   "workers_dev": true,
   "preview_urls": true,
-  "observability": { "enabled": true }
+  "observability": { "enabled": true },
+  // Δοκιμαστικό link (Worker Previews): κάθε branch εκτός main → <branch>-betizzi-web...workers.dev
+  // Διαβάζει τα ίδια δεδομένα από το betizzi-engine (μόνο ανάγνωση).
+  "previews": {
+    "services": [{ "binding": "ENGINE", "service": "betizzi-engine" }]
+  }
 }

@@ -2,7 +2,7 @@
 // Μέχρι το άνοιγμα: noindex παντού (X-Robots-Tag) και robots.txt κλειστό.
 import { LANGS, HREFLANG, TZ, LOCALE, T, SEL, UI, UI_ORDER, REC } from "./i18n.js";
 import { TRANSLATOR } from "./translator.js";
-import { getDay, getMatch, getRecord } from "./data.js";
+import { getDay, getMatch, getRecord, getCoupons } from "./data.js";
 import { PG, PG_ORDER, OP } from "./i18n-pages.js";
 
 const SITE = "https://betizzi.com";
@@ -66,10 +66,16 @@ export default {
     const p = url.pathname;
     if (url.hostname === "www.betizzi.com") return Response.redirect("https://betizzi.com" + p + url.search, 301);
     if (p === "/") return Response.redirect(url.origin + "/en/", 301);
+    if (p === "/goals.json") {
+      const r = env.ENGINE ? await env.ENGINE.fetch("https://engine/api/goals") : await fetch("https://betizzi-engine.bettipsters79.workers.dev/api/goals");
+      return new Response(r.ok ? await r.text() : "[]", { headers: { "content-type": "application/json", "cache-control": "public, max-age=20" } });
+    }
     if (p === "/live.json") {
       const r = env.ENGINE ? await env.ENGINE.fetch("https://engine/api/live") : await fetch("https://betizzi-engine.bettipsters79.workers.dev/api/live");
       return new Response(await r.text(), { headers: { "content-type": "application/json", "cache-control": "public, max-age=20" } });
     }
+    // Εγγραφή / σύνδεση (απόφαση Owner 02/11): η σελίδα μιλάει με το engine· το session ζει σε cookie HttpOnly.
+    if (p.startsWith("/auth/") || p === "/me.json" || p === "/vip.json") return authRoute(req, env, url);
     const m = p.match(/^\/([a-z]{2})\/$/);
     if (m && LANGS.includes(m[1])) {
       // Γρήγορη φόρτωση: έτοιμη σελίδα από τη μνήμη (έως 60΄΄), ανανέωση στο παρασκήνιο.
@@ -96,9 +102,11 @@ export default {
     if (rm && LANGS.includes(rm[1]) && Object.values(REC).some((r) => r.slug === rm[2])) {
       if (rm[2] !== REC[rm[1]].slug) return Response.redirect(url.origin + `/${rm[1]}/${REC[rm[1]].slug}${rm[3] ? "/" + rm[3] : ""}${url.search}`, 301);
       const mq = rm[3] || "", tq = ["free", "vip"].includes(url.searchParams.get("t")) ? url.searchParams.get("t") : "";
-      const key = `rec|${rm[1]}|${mq}|${tq}`, hit = PAGES.get(key);
+      const fq = ["w", "l"].includes(url.searchParams.get("f")) ? url.searchParams.get("f") : "", pq = Math.max(1, Math.min(999, parseInt(url.searchParams.get("p")) || 1));
+      const key = `rec|${rm[1]}|${mq}|${tq}|${fq}|${pq}`, hit = PAGES.get(key);
       if (hit && Date.now() - hit.t < 5 * 60000) return html(hit.b, 200, age21(req, rm[1]));
-      try { const b = recordPage(rm[1], await getRecord(env), mq, tq); PAGES.set(key, { t: Date.now(), b }); return html(b, 200, age21(req, rm[1])); }
+      try { const [rd, sd] = await Promise.all([getRecord(env), stripData(env, rm[1], TZ[rm[1]])]);
+        const b = recordPage(rm[1], rd, mq, tq, fq, pq, sd && sd.last); PAGES.set(key, { t: Date.now(), b }); return html(b, 200, age21(req, rm[1])); }
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
     }
     const sp = p.match(/^\/([a-z]{2})\/([a-z0-9-]+)$/);
@@ -114,6 +122,50 @@ export default {
   },
 };
 
+const AUTH_COOKIE = "bz_s";
+function cookieTok(req) {
+  const m = (req.headers.get("cookie") || "").match(/(?:^|;\s*)bz_s=([a-f0-9]{64})/);
+  return m ? m[1] : "";
+}
+async function authRoute(req, env, url) {
+  const p = url.pathname, tok = cookieTok(req);
+  const eng = (path, init = {}) => {
+    const h = { "content-type": "application/json", "x-bz-session": tok, "x-bz-ip": req.headers.get("cf-connecting-ip") || "" };
+    return env.ENGINE ? env.ENGINE.fetch("https://engine" + path, { ...init, headers: h })
+      : fetch("https://betizzi-engine.bettipsters79.workers.dev" + path, { ...init, headers: h });
+  };
+  const J = (o, extra = {}) => new Response(JSON.stringify(o), { headers: { "content-type": "application/json", "cache-control": "private, no-store", ...extra } });
+  const same = (req.headers.get("origin") || url.origin) === url.origin; // μόνο από τη δική μας σελίδα
+  if (req.method === "POST" && !same) return J({ error: "origin" });
+  const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+  if (p === "/auth/start" && req.method === "POST")
+    return J(await (await eng("/auth/start", { method: "POST", body: JSON.stringify({ email: body.email, lang: body.lang }) })).json());
+  if (p === "/auth/verify" && req.method === "POST") {
+    const r = await (await eng("/auth/verify", { method: "POST", body: JSON.stringify({ email: body.email, code: body.code, lang: body.lang,
+      adult: !!body.adult, news: !!body.news, country: req.headers.get("cf-ipcountry") || "" }) })).json();
+    if (!r.ok) return J(r);
+    return J({ ok: true, isNew: r.isNew }, { "set-cookie": `${AUTH_COOKIE}=${r.token}; Path=/; Max-Age=${r.maxAge}; HttpOnly; Secure; SameSite=Lax` });
+  }
+  if (p === "/auth/logout" && req.method === "POST") {
+    await eng("/auth/logout", { method: "POST", body: "{}" });
+    return J({ ok: true }, { "set-cookie": `${AUTH_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` });
+  }
+  if (p === "/me.json") return J(tok ? await (await eng("/auth/me")).json() : { user: null });
+  if (p === "/vip.json") {
+    if (!tok) return J({ error: "login" });
+    const d = (url.searchParams.get("d") || "").match(/^\d{4}-\d{2}-\d{2}$/) ? url.searchParams.get("d") : new Date().toISOString().slice(0, 10);
+    const sh = (n) => { const [y, mo, da] = d.split("-").map(Number); return new Date(Date.UTC(y, mo - 1, da + n)).toISOString().slice(0, 10); };
+    const rs = await Promise.all([sh(-1), d, sh(1)].map((x) => eng("/auth/vip?date=" + x).then((q) => q.json()).catch(() => ({}))));
+    if (!rs[1].tips) return J(rs[1]);
+    const seen = new Set(), r = { tips: [] };
+    for (const q of rs) for (const tp of q.tips || []) if (!seen.has(tp.rid)) { seen.add(tp.rid); r.tips.push(tp); }
+    r.tips.sort((a, b) => a.rid - b.rid);
+    // ίδια μορφή με τα tips της σελίδας (RAW[15])
+    return J({ tips: r.tips.map((tp) => [tp.fixture_id, [SELNAME[tp.sel] || tp.sel, tp.price, "vip", tp.reason, 0, tp.result == null ? -1 : tp.result, 0, "best price", "A", tp.min_price || 0, tp.created_at || 0]]) });
+  }
+  return J({ error: "not found" });
+}
+
 function html(body, status = 200, a21 = false) {
   if (a21) body = body.replace(/18\+/g, "21+");
   return new Response(body, {
@@ -126,6 +178,47 @@ function html(body, status = 200, a21 = false) {
   });
 }
 
+
+// Λωρίδα «Χθες · Μήνας» της αρχικής (απόφαση Owner 02/11): μόνο W/L και %, χωρίς σχόλιο.
+// Τις πρώτες 5 μέρες του μήνα δείχνει τον προηγούμενο μήνα (μέχρι να χτιστεί record).
+let RECC = null;
+async function stripData(env, lang, tz) {
+  try {
+    if (!RECC || Date.now() - RECC.t > 10 * 60 * 1000) {
+      // παρολί των τελευταίων 10 ημερών (UTC), για «επιλογές της ημέρας χθες» και «τελευταίο που κέρδισε»
+      const days = [...Array(10)].map((_, i) => new Date(Date.now() - (i + 1) * 86400000).toISOString().slice(0, 10));
+      const [d, ...cps] = await Promise.all([getRecord(env), ...days.map((x) => getCoupons(env, x).catch(() => []))]);
+      RECC = { t: Date.now(), d, cps: days.map((x, i) => ({ date: x, list: cps[i] || [] })) };
+    }
+    const d = RECC.d, today = ymdIn(tz);
+    const [y, m, dd] = today.split("-").map(Number);
+    const yday = new Date(Date.UTC(y, m - 1, dd - 1)).toISOString().slice(0, 10);
+    const mm = dd <= 5 ? new Date(Date.UTC(y, m - 2, 15)) : new Date(Date.UTC(y, m - 1, 15));
+    const mKey = mm.toISOString().slice(0, 7);
+    const mLabel = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", month: "long" }).format(mm);
+    const day = (x) => ymdIn(tz, x.ts * 1000);
+    const Y = d.settled.filter((x) => day(x) === yday && (x.result === 0 || x.result === 1)).sort((a, b) => a.ts - b.ts);
+    const M = d.settled.filter((x) => day(x).slice(0, 7) === mKey && (x.result === 0 || x.result === 1));
+    const big = (L) => L.filter((x) => x.result === 1).sort((a, b) => b.price - a.price)[0] || null;
+    const pack = (b) => b && { sel: SEL[b.sel] || b.sel, price: b.price, home: b.home, away: b.away, vip: b.tier === "vip" };
+    // παρολί: μετράνε μόνο οι «επιλογές της ημέρας» (στα παλιά χωρίs σήμανση: όλα)
+    const cp = (c, date) => ({ kind: c.kind, odds: c.odds, r: c.result, date, variant: c.variant,
+      legs: (c.legs || []).map((l) => ({ h: l.home, a: l.away, sel: SEL[l.sel] || l.sel, p: l.price })) });
+    const yc = (RECC.cps[0] || { list: [] }), ylist = yc.list.some((c) => c.pick) ? yc.list.filter((c) => c.pick) : yc.list;
+    const settled = ylist.filter((c) => c.result === 0 || c.result === 1);
+    let last = null;
+    for (const day of RECC.cps) { const w = day.list.filter((c) => c.result === 1).sort((a, b) => b.odds - a.odds)[0]; if (w) { last = cp(w, day.date); break; } }
+    const b10 = yc.list.filter((c) => c.result === 1 && c.odds >= 10).sort((a, b) => b.odds - a.odds)[0];
+    const dlbl = (x) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "long", day: "numeric", month: "numeric" }).format(Date.parse(x + "T12:00:00Z"));
+    if (last) last.label = dlbl(last.date);
+    return {
+      pk: { won: settled.filter((c) => c.result === 1).length, total: settled.length, rows: settled.map((c) => ({ kind: c.kind, odds: c.odds, r: c.result })) },
+      last, big10: b10 ? cp(b10, yc.date) : null,
+      y: { won: Y.filter((x) => x.result === 1).length, total: Y.length, rows: Y.slice(0, 40).map((x) => ({ h: x.home, o: x.price, r: x.result })), big: pack(big(Y)) },
+      m: { won: M.filter((x) => x.result === 1).length, total: M.length, label: mLabel, big: pack(big(M)) },
+    };
+  } catch (e) { return null; }
+}
 async function todayPage(env, lang, url) {
   const t = T[lang], tz = TZ[lang];
   const today = ymdIn(tz);
@@ -137,7 +230,7 @@ async function todayPage(env, lang, url) {
   // ο engine μετράει μέρα σε UTC: παίρνουμε και τη γειτονική μέρα UTC, για να μη χάνονται αγώνες τα ξημερώματα
   const [y0, m0, d0] = date.split("-").map(Number);
   const nb = ymdIn(tz, Date.UTC(y0, m0 - 1, d0)) === date ? shift(date, -1) : shift(date, 1);
-  const [day, day2] = await Promise.all([getDay(env, date), getDay(env, nb).catch(() => null)]);
+  const [day, day2, strip] = await Promise.all([getDay(env, date), getDay(env, nb).catch(() => null), stripData(env, lang, tz)]);
   const seen = new Set(), all = [];
   for (const x of [...day.matches, ...(day2 ? day2.matches : [])]) if (!seen.has(x.id)) { seen.add(x.id); all.push(x); }
   // κρατάμε τους αγώνες που πέφτουν αυτή τη μέρα στην ώρα της χώρας
@@ -236,7 +329,7 @@ ${alt}
   tpl = tpl.replace('<html lang="en">', `<html lang="${HREFLANG[lang]}">`)
     .replace(/<title>[\s\S]*?<\/title>/, () => head)
     .replace(/var RAW = \[[\s\S]*?\];\n/, () => "var RAW = " + JSON.stringify(raw).replace(/</g, "\\u003c") + ";\n")
-    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";")
+    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";")
     .replace('<div class="hscroll" id="mFilter"', () => ssr + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml)
     .replace("<!--datanote-->", () => `<nav class="langs" aria-label="Language">${langNav}</nav>`)
@@ -377,6 +470,20 @@ ${oddsHtml ? `<h2>${esc(t.odds)}</h2><div class="card">${oddsHtml}</div>` : ""}
 
 // ---------- Record: όλα τα tips, κερδισμένα και χαμένα ----------
 const RCSS = `
+.gb h2{margin-top:22px}.gbt{display:flex;flex-wrap:wrap;gap:6px}.gbt input{position:absolute;opacity:0;pointer-events:none}
+.gbt label{font-size:.8rem;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted);cursor:pointer}
+.gbt input:checked+label{background:#e8efe9;color:#0c0f0d;border-color:#e8efe9}
+.gbp{display:none;width:100%}
+.gbt input:nth-of-type(1):checked~.gbp-l,.gbt input:nth-of-type(2):checked~.gbp-r,.gbt input:nth-of-type(3):checked~.gbp-t{display:block}
+.gbl{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.gbl li{background:var(--panel,#141a16);border:1px solid rgba(60,207,110,.5);border-radius:14px;padding:10px 12px}.gbl.bd li{border-color:rgba(255,107,107,.5)}
+.gb1{display:flex;justify-content:space-between;gap:10px}.gb1 b:last-child{font-family:'JetBrains Mono',monospace}
+.gbl small{display:block;margin-top:4px;color:var(--muted);font:500 .78rem 'JetBrains Mono',monospace}
+td.pos{color:#3ccf6e}td.neg{color:#ff6b6b}
+.lp{margin-top:16px;display:flex;flex-direction:column;gap:6px}.lp small{color:var(--muted)}.lp1{display:flex;gap:10px;align-items:center;justify-content:space-between;font-size:.85rem}
+.lpw{background:rgba(60,207,110,.15);color:#3ccf6e;border-radius:999px;padding:5px 10px;font:800 .78rem 'JetBrains Mono',monospace;white-space:nowrap}
+.pg{display:flex;justify-content:space-between;align-items:center;margin:10px 0;font-size:.85rem;color:var(--muted)}.pg a{color:var(--lime,#b6f23a);font-weight:800;text-decoration:none;padding:6px 14px;border:1px solid var(--line);border-radius:10px}
+
 .st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}.st div{background:var(--c1);border:1px solid var(--ln);border-radius:12px;padding:10px;text-align:center}
 .st b{display:block;font:700 24px "JetBrains Mono",monospace}.st small{color:var(--mu);font-size:12px}.st .vipb{border-color:#5a4a14}.st .pos{color:var(--lime)}.st .neg{color:#ff6b6b}
 .note{color:var(--mu);font-size:13px;margin:-4px 0 12px}
@@ -424,7 +531,7 @@ const sgn = (v, d = 2) => (v > 0 ? "+" : "") + v.toFixed(d);
 const BANDS = [[1, 1.6, "< 1.60"], [1.6, 1.8, "1.60–1.79"], [1.8, 2, "1.80–1.99"], [2, 2.5, "2.00–2.49"], [2.5, 99, "2.50+"]];
 const MIN_L = 3, MIN_R = 5; // ελάχιστο δείγμα: λίγκα / εύρος απόδοσης
 
-function recordPage(lang, d, mq = "", tq = "") {
+function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) {
   const r = REC[lang], t = T[lang], tz = TZ[lang], loc = LOCALE[lang];
   const fD = (ts, o) => new Intl.DateTimeFormat(loc, { timeZone: tz, ...o }).format(ts * 1000);
   const dLong = (ts) => fD(ts, { day: "numeric", month: "long", year: "numeric" });
@@ -461,30 +568,31 @@ function recordPage(lang, d, mq = "", tq = "") {
     <div class="x">${["🥇", "🥈", "🥉"][i]} ${x.price.toFixed(2)}</div><div class="mt">${esc(x.home)} – ${esc(x.away)}${x.score ? ` · ${x.score[0]}–${x.score[1]}` : ""}</div>
     <small><span class="tg ${x.tier}">${x.tier === "vip" ? "VIP" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} · ${esc(x.league)} · ${fD(x.ts, { day: "numeric", month: "short" })}</small></a>`).join("")}</div>` : "";
   const by = (a, f) => { const m = new Map(); for (const x of a) { const k = f(x); (m.get(k) || m.set(k, []).get(k)).push(x); } return m; };
-  // Λίγκες: μόνο όσες έχουν τουλάχιστον MIN_L tips· κατάταξη σε μονάδες.
-  const lg = [...by(S, (x) => `${x.league} · ${x.country}`).entries()].map(([k, a]) => [k, recStats(a)]).filter(([, s]) => s.n >= MIN_L).sort((a, b) => b[1].hit - a[1].hit || b[1].n - a[1].n);
-  const lgRow = (k, s, good) => `<li><span>${esc(k)}</span><span class="r"><b class="${good ? "pos" : "neg"}">${s.hit}%</b><small>${s.w}/${s.n} ✓</small></span></li>`;
-  const good = lg.slice(0, 3), bad = lg.slice(3).slice(-3).reverse();
-  const lgHtml = S.length ? `<div class="two">
-    <div class="card gl"><h3>🔥 ${esc(r.goodL)}</h3>${good.length ? `<ul>${good.map(([k, s]) => lgRow(k, s, true)).join("")}</ul>` : `<p class="note">${esc(r.needL)}</p>`}</div>
-    <div class="card bl"><h3>🧊 ${esc(r.badL)}</h3>${bad.length ? `<ul>${bad.map(([k, s]) => lgRow(k, s, false)).join("")}</ul>` : `<p class="note">${esc(r.needL)}</p>`}</div></div>` : "";
-  // Εύρη αποδόσεων ανά αγορά: όλα φαίνονται· «καλύτερο/χειρότερο» μόνο με τουλάχιστον MIN_R tips.
-  const rangeCard = (title, a) => {
-    if (!a.length) return "";
-    const rows = BANDS.map(([lo, hi, lab]) => { const b = a.filter((x) => x.price >= lo && x.price < hi), st = recStats(b);
-      st.ex = b.length ? st.w / st.n - b.reduce((z, x) => z + 1 / x.price, 0) / b.length : 0; return [lab, st]; }).filter(([, s]) => s.n);
-    const q = rows.filter(([, s]) => s.n >= MIN_R);
-    // «Καλύτερο» μόνο αν είναι κερδοφόρο, «Χειρότερο» μόνο αν είναι χαμένο — όχι ταμπέλα σε κάτι που δεν την αξίζει.
-    // Κρίνουμε με το «πόσο πάνω/κάτω από ό,τι έδινε η απόδοση» (αλλιώς οι χαμηλές αποδόσεις θα κέρδιζαν πάντα).
-    let best = q.length >= 2 ? q.reduce((m, x) => (x[1].ex > m[1].ex ? x : m)) : null, worst = q.length >= 2 ? q.reduce((m, x) => (x[1].ex < m[1].ex ? x : m)) : null;
-    if (best && best[1].ex <= 0) best = null; if (worst && worst[1].ex >= 0) worst = null;
-    return `<div class="card rg"><h3>${esc(title)}</h3>${rows.map(([lab, s]) => {
-      const tag = best && lab === best[0] ? `<span class="bdg pos">${esc(r.bestR)}</span>` : worst && lab === worst[0] ? `<span class="bdg neg">${esc(r.worstR)}</span>` : "";
-      return `<div class="rr${s.n < MIN_R ? " few" : ""}"><span class="lab">${lab}</span><span class="bar"><i style="width:${s.hit}%" class="${s.ex >= 0 ? "p" : "n"}"></i></span><span class="v"><b>${s.hit}%</b> · ${s.w}/${s.n} ✓</span>${tag}</div>`;
-    }).join("")}${q.length < 2 ? `<p class="note">${esc(r.needR)}</p>` : ""}</div>`;
+  // Απόφαση Owner 02/11: «πού πάμε καλά / πού όχι» ανά λίγκα, εύρος απόδοσης, είδος tip, με ΟΛΑ τα νούμερα
+  // (tips, W/L, μέση απόδοση, %, ROI). Μπαίνει μόνο κατηγορία με αρκετά tips: 10 στον μήνα, 30 σε όλους τους μήνες.
+  const MINN = mo === "all" ? 30 : 10;
+  const band = (x) => (BANDS.find(([lo, hi]) => x.price >= lo && x.price < hi) || BANDS[BANDS.length - 1])[2];
+  const kindOf = (x) => (["1", "X", "2"].includes(x.sel) ? "1X2 · " + x.sel : SEL[x.sel] || x.sel); // όροι στοιχήματος όπως τους λέει ο κόσμος
+  const dims = [["l", r.league, (x) => `${x.league} · ${x.country}`], ["r", r.rangeH, band], ["t", r.tabT, kindOf]];
+  const lineHtml = (k, s, good) => `<li><div class="gb1"><b>${esc(k)}</b><b class="${good ? "pos" : "neg"}">ROI ${sgn(s.roi, 1)}%</b></div>
+    <small>${s.n} tips · ${s.w}W ${s.l}L · ${esc(r.avg)} ${s.avg.toFixed(2)} · ${s.hit}%</small></li>`;
+  const gbBlock = (good) => {
+    const id = good ? "g" : "b";
+    const tabs = dims.map(([k, lab], i) => `<input type="radio" name="gb${id}" id="gb${id}${k}"${i ? "" : " checked"}><label for="gb${id}${k}">${esc(lab)}</label>`).join("");
+    const panes = dims.map(([k, , f]) => {
+      const rows = [...by(S, f).entries()].map(([kk, a]) => [kk, recStats(a)]).filter(([, s]) => s.n >= MINN && (good ? s.roi > 0 : s.roi < 0))
+        .sort((a, b) => (good ? b[1].roi - a[1].roi : a[1].roi - b[1].roi)).slice(0, 5);
+      return `<div class="gbp gbp-${k}">${rows.length ? `<ul class="gbl ${good ? "gd" : "bd"}">${rows.map(([kk, s]) => lineHtml(kk, s, good)).join("")}</ul>` : `<p class="note">${esc(r.needN.replace("{n}", MINN))}</p>`}</div>`;
+    }).join("");
+    return `<section class="gb gb${id}"><h2 class="${good ? "pos" : "neg"}">${good ? "✓ " + esc(r.goodH) : "✗ " + esc(r.badH)}</h2><div class="gbt">${tabs}${panes}</div></section>`;
   };
-  const isOU = (x) => /^[OU]\d/.test(x.sel), isGG = (x) => x.sel === "GG" || x.sel === "NG", is12 = (x) => ["1", "X", "2", "1X", "X2", "12"].includes(x.sel);
-  const rangesHtml = S.length ? `<h2>${esc(r.ranges)}</h2><div class="three">${rangeCard("Over/Under", S.filter(isOU))}${rangeCard("GG/NG", S.filter(isGG))}${rangeCard("1X2", S.filter(is12))}</div>` : "";
+  const lgHtml = S.length ? gbBlock(true) + gbBlock(false) : "";
+  // πίνακας ανά εύρος απόδοσης: W–L, %, ROI
+  const rangesHtml = S.length ? `<h2>${esc(r.tblR)}</h2><div class="card tw"><table><tr><th>${esc(r.rangeH)}</th><th>W–L</th><th>%</th><th>ROI</th></tr>${
+    BANDS.map(([lo, hi, lab]) => [lab, recStats(S.filter((x) => x.price >= lo && x.price < hi))]).filter(([, s]) => s.n)
+      .map(([lab, s]) => `<tr><td>${lab}</td><td>${s.w}–${s.l}</td><td>${s.hit}%</td><td class="${s.roi >= 0 ? "pos" : "neg"}">${sgn(s.roi, 1)}%</td></tr>`).join("")}</table></div>` : "";
+  // τελευταίο παρολί που κέρδισε (τα παρολί δεν μετράνε στο Record, μόνο αυτό φαίνεται)
+  const parHtml = lastPar ? `<div class="card lp"><small>${esc(r.lastPar)} · ${esc(lastPar.label || lastPar.date)}</small><div class="lp1"><span>${lastPar.legs.slice(0, 3).map((l) => `${esc(l.h)}–${esc(l.a)} <b class="pos">${esc(l.sel)}</b>`).join(" · ")}${lastPar.legs.length > 3 ? " · …" : ""}</span><b class="lpw">✓ WIN x${lastPar.odds.toFixed(2)}</b></div></div>` : "";
   const table = (title, head, groups) => {
     const rows = [...groups.entries()].map(([k, a]) => [k, recStats(a)]);
     return rows.length ? `<h2>${esc(title)}</h2><div class="card tw"><table><tr><th>${esc(head)}</th><th>${esc(r.tips)}</th><th>${esc(r.won)}</th><th>${esc(r.lost)}</th><th>${esc(r.hit)}</th></tr>${
@@ -494,7 +602,12 @@ function recordPage(lang, d, mq = "", tq = "") {
   const li = (x, wd) => `<li class="${wd ? "l" : x.result === 1 ? "w" : "l"}"><span class="d">${fD(x.ts, { day: "2-digit", month: "2-digit" })}<br>${fD(x.ts, { hour: "2-digit", minute: "2-digit", hourCycle: "h23" })}</span>
     <span><a href="${mp(x)}">${esc(x.home)} – ${esc(x.away)}</a><small>${esc(x.league)}${x.score && !wd ? ` · ${x.score[0]}–${x.score[1]}` : ""}</small></span>
     <span class="r"><span class="tg ${x.tier}">${x.tier === "vip" ? "VIP" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} @${x.price.toFixed(2)} ${wd ? "↩" : x.result === 1 ? '<span class="ok">✓</span>' : '<span class="ko">✗</span>'}</span></li>`;
-  const listHtml = S.length ? `<h2>${esc(r.latest)}</h2><div class="card" style="padding:0"><ul class="rl">${S.slice(0, 400).map((x) => li(x)).join("")}</ul></div>` : "";
+  const LF = fq === "w" ? S.filter((x) => x.result === 1) : fq === "l" ? S.filter((x) => x.result !== 1) : S;
+  const PER = 10, pages = Math.max(1, Math.ceil(LF.length / PER)), pg = Math.min(pq, pages);
+  const lq = (f, p) => base + mPath(mo) + "?" + [tq ? "t=" + tq : "", f ? "f=" + f : "", p > 1 ? "p=" + p : ""].filter(Boolean).join("&") + "#all";
+  const pager = pages > 1 ? `<nav class="pg">${pg > 1 ? `<a href="${lq(fq, pg - 1)}">←</a>` : "<span></span>"}<span>${esc(r.page.replace("{p}", pg).replace("{n}", pages))}</span>${pg < pages ? `<a href="${lq(fq, pg + 1)}">→</a>` : "<span></span>"}</nav>` : "";
+  const listHtml = S.length ? `<h2 id="all">${esc(r.latest)}</h2><div class="chips">${chip(lq("", 1), r.all, !fq)}${chip(lq("w", 1), r.won, fq === "w")}${chip(lq("l", 1), r.lost, fq === "l")}</div>
+    <div class="card" style="padding:0"><ul class="rl">${LF.slice((pg - 1) * PER, pg * PER).map((x) => li(x)).join("")}</ul></div>${pager}` : "";
   const WD = d.withdrawn.filter((x) => inM(x, mo) && tierOk(x));
   const wdHtml = WD.length ? `<details><summary>${esc(r.withdrawn)} (${WD.length})</summary><div class="card" style="padding:0"><ul class="rl">${WD.map((x) => li(x, true)).join("")}</ul></div></details>` : "";
   const repTitle = mo && mo !== "all" ? r.rep.replace("{m}", mName(mo)) : r.allM;
@@ -518,7 +631,7 @@ function recordPage(lang, d, mq = "", tq = "") {
 <title>${esc(r.title)}${mo && mo !== months[0] ? " · " + esc(mo === "all" ? r.allM : mName(mo)) : ""}</title>
 <meta name="description" content="${esc(r.desc)}">
 <link rel="canonical" href="${canonical}">
-${tq ? '<meta name="robots" content="noindex,follow">' : alt}
+${tq || fq || pq > 1 ? '<meta name="robots" content="noindex,follow">' : alt}
 <meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:title" content="${esc(r.title)}">
 <meta property="og:description" content="${esc(answer)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
 <meta property="article:modified_time" content="${nowIso}"><meta name="theme-color" content="#0c0f0d">
@@ -538,9 +651,10 @@ ${S.length ? `<h2 class="rep">${esc(repTitle)}${tq ? ` · ${tq === "vip" ? "VIP"
 ${kpi}
 ${ALL.length && ALL.length < 200 ? `<p class="note">${esc(r.small)}</p>` : ""}
 ${d.pending ? `<p class="note">${esc(r.pending.replace("{n}", d.pending))}</p>` : ""}
-${bigHtml}
 ${lgHtml}
 ${rangesHtml}
+${parHtml}
+${bigHtml}
 ${monthsTable}
 ${listHtml}
 ${wdHtml}

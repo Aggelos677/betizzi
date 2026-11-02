@@ -56,3 +56,12 @@ export async function getRecord(env) {
   });
   return { since: d.since, pending: d.pending, updated: d.updated, settled: d.settled.map(row), withdrawn: d.withdrawn.map(row) };
 }
+
+// Έτοιμα παρολί μιας μέρας (UTC) με αποτέλεσμα, για τη λωρίδα «Χθες» και το «τελευταίο που κέρδισε».
+export async function getCoupons(env, date) {
+  const r = env.ENGINE
+    ? await env.ENGINE.fetch(`https://engine/api/coupons?date=${date}`)
+    : await fetch(`https://betizzi-engine.bettipsters79.workers.dev/api/coupons?date=${date}`);
+  if (!r.ok) return [];
+  return (await r.json()) || [];
+}

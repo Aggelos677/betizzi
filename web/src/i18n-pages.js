@@ -14,24 +14,24 @@ export const PG = {
     slug: { en: "about", el: "poioi-eimaste", es: "quienes-somos", pt: "quem-somos", fr: "qui-sommes-nous", de: "ueber-uns", ro: "despre-noi", sr: "o-nama", bg: "za-nas" },
     title: { en: "About betizzi", el: "Ποιοι είμαστε", es: "Quiénes somos", pt: "Quem somos", fr: "Qui sommes-nous", de: "Über uns", ro: "Despre noi", sr: "O nama", bg: "За нас" },
     desc: {
-      en: "betizzi is a free football tips site: model-based tips, honest win chances and a slip builder. Not a bookmaker.",
-      el: "Το betizzi είναι δωρεάν site με tips ποδοσφαίρου: tips από μοντέλο, τίμιες πιθανότητες και φτιάξιμο δελτίου. Δεν είναι bookmaker.",
-      es: "betizzi es una web gratuita de pronósticos de fútbol: tips con modelo, probabilidades honestas y creador de apuestas. No es una casa de apuestas.",
-      pt: "O betizzi é um site gratuito de palpites de futebol: palpites por modelo, chances honestas e montador de bilhetes. Não é uma casa de apostas.",
-      fr: "betizzi est un site gratuit de pronostics foot : tips issus d'un modèle, chances honnêtes et créateur de tickets. Pas un bookmaker.",
-      de: "betizzi ist eine kostenlose Fußball-Tipps-Seite: modellbasierte Tipps, ehrliche Gewinnchancen und ein Wettschein-Baukasten. Kein Buchmacher.",
-      ro: "betizzi este un site gratuit de ponturi la fotbal: ponturi din model, șanse oneste și constructor de bilete. Nu este casă de pariuri.",
-      sr: "betizzi je besplatan sajt sa fudbalskim tipovima: tipovi iz modela, poštene šanse i pravljenje tiketa. Nije kladionica.",
-      bg: "betizzi е безплатен сайт с футболни прогнози: прогнози от модел, честни шансове и създаване на фишове. Не е букмейкър.",
+      en: "betizzi is a free football tips site: model-based tips, a public record of every tip and ready-made parlays every day. Not a bookmaker.",
+      el: "Το betizzi είναι δωρεάν site με tips ποδοσφαίρου: tips από μοντέλο, δημόσιο ιστορικό κάθε tip και έτοιμα παρολί κάθε μέρα. Δεν είναι bookmaker.",
+      es: "betizzi es una web gratuita de pronósticos de fútbol: tips con modelo, un historial público de cada tip y combinadas listas cada día. No es una casa de apuestas.",
+      pt: "O betizzi é um site gratuito de palpites de futebol: palpites por modelo, histórico público de cada palpite e múltiplas prontas todos os dias. Não é uma casa de apostas.",
+      fr: "betizzi est un site gratuit de pronostics foot : tips issus d'un modèle, un historique public de chaque tip et des combinés prêts chaque jour. Pas un bookmaker.",
+      de: "betizzi ist eine kostenlose Fußball-Tipps-Seite: modellbasierte Tipps, eine öffentliche Bilanz jedes Tipps und fertige Kombis jeden Tag. Kein Buchmacher.",
+      ro: "betizzi este un site gratuit de ponturi la fotbal: ponturi din model, istoric public al fiecărui pont și bilete gata făcute în fiecare zi. Nu este casă de pariuri.",
+      sr: "betizzi je besplatan sajt sa fudbalskim tipovima: tipovi iz modela, javna istorija svakog tipa i gotove kombinacije svaki dan. Nije kladionica.",
+      bg: "betizzi е безплатен сайт с футболни прогнози: прогнози от модел, публична история на всяка прогноза и готови комбинации всеки ден. Не е букмейкър.",
     },
     body: {
       en: `betizzi is a free football tips site for people who bet for fun. We look at the day's matches, filter them, and give a tip only where our model sees a clear signal — not on every game.
 
 ## What you get
 - Free tips and VIP tips, each with a short reason and the price when we published it.
-- An honest chance for every tip and slip ("wins about 1 in X"), never "sure win".
+- A public record of every tip, wins and losses. We never promise a win.
 - Odds from several bookmakers, so you can see where a price is better.
-- A slip builder, ready-made parlays and live scores to follow your games.
+- Ready-made parlays every day, your own slip and live scores to follow your games.
 
 ## How tips are made
 We look at each team's recent form (last 10 games, home and away), the league table and bookmaker prices. A tip appears only when the numbers agree. Every tip is published before kick-off and is never edited afterwards; results, wins and losses, are shown on our [Record](/en/record) page.
@@ -45,9 +45,9 @@ We are not a bookmaker and we do not take bets. We may earn a commission from bo
 
 ## Τι βρίσκεις εδώ
 - Free και VIP tips, το καθένα με σύντομη αιτιολόγηση και την απόδοση τη στιγμή που το δημοσιεύσαμε.
-- Τίμια πιθανότητα για κάθε tip και δελτίο («κερδίζει περίπου 1 στις X»), ποτέ «σίγουρο».
+- Δημόσιο ιστορικό κάθε tip, με νίκες και ήττες. Δεν υποσχόμαστε ποτέ κέρδος.
 - Αποδόσεις από πολλούς bookmakers, για να βλέπεις πού είναι καλύτερη η τιμή.
-- Φτιάξιμο δελτίου, έτοιμα παρολί και live σκορ για να παρακολουθείς τα παιχνίδια σου.
+- Έτοιμα παρολί κάθε μέρα, το δικό σου δελτίο και live σκορ για να παρακολουθείς τα παιχνίδια σου.
 
 ## Πώς βγαίνουν τα tips
 Κοιτάμε τη φόρμα κάθε ομάδας (τελευταία 10 παιχνίδια, εντός και εκτός), τη βαθμολογία και τις αποδόσεις. Tip βγαίνει μόνο όταν τα νούμερα συμφωνούν. Κάθε tip δημοσιεύεται πριν τη σέντρα και δεν αλλάζει ποτέ μετά· τα αποτελέσματα, νίκες και ήττες, φαίνονται στη σελίδα [Record](/el/istoriko-tips).
@@ -61,9 +61,9 @@ We are not a bookmaker and we do not take bets. We may earn a commission from bo
 
 ## Qué encontrarás
 - Tips gratis y VIP, cada uno con un breve motivo y la cuota en el momento de publicarlo.
-- Una probabilidad honesta para cada tip y apuesta («gana más o menos 1 de cada X»), nunca «apuesta segura».
+- Un historial público de cada tip, con aciertos y fallos. Nunca prometemos ganar.
 - Cuotas de varias casas, para ver dónde está el mejor precio.
-- Creador de apuestas, combinadas listas y resultados en directo.
+- Combinadas listas cada día, tu propio boleto y resultados en directo.
 
 ## Cómo hacemos los tips
 Miramos la forma reciente de cada equipo (últimos 10 partidos, en casa y fuera), la clasificación y las cuotas. Solo hay tip cuando los números coinciden. Cada tip se publica antes del partido y nunca se modifica; los resultados, aciertos y fallos, están en nuestro [Historial](/es/historial).
@@ -77,9 +77,9 @@ No somos una casa de apuestas y no aceptamos apuestas. Podemos recibir una comis
 
 ## O que você encontra
 - Palpites grátis e VIP, cada um com um motivo curto e a odd no momento da publicação.
-- Uma chance honesta para cada palpite e bilhete («ganha mais ou menos 1 em cada X»), nunca «aposta certa».
+- Um histórico público de cada palpite, com acertos e erros. Nunca prometemos ganhos.
 - Odds de várias casas, para ver onde o preço está melhor.
-- Montador de bilhetes, múltiplas prontas e placares ao vivo.
+- Múltiplas prontas todos os dias, seu próprio bilhete e placares ao vivo.
 
 ## Como fazemos os palpites
 Olhamos a forma recente de cada time (últimos 10 jogos, em casa e fora), a classificação e as odds. Só sai palpite quando os números concordam. Cada palpite é publicado antes do jogo e nunca é alterado; os resultados, acertos e erros, estão no nosso [Histórico](/pt/historico).
@@ -93,9 +93,9 @@ Não somos casa de apostas e não aceitamos apostas. Podemos receber comissão d
 
 ## Ce que vous trouvez ici
 - Des tips gratuits et VIP, chacun avec une courte explication et la cote au moment de la publication.
-- Une chance honnête pour chaque tip et ticket (« gagne environ 1 fois sur X »), jamais de « pari sûr ».
+- Un historique public de chaque tip, gagnés et perdus. Nous ne promettons jamais de gain.
 - Les cotes de plusieurs bookmakers, pour voir où le prix est meilleur.
-- Un créateur de tickets, des combinés prêts à jouer et des scores en direct.
+- Des combinés prêts chaque jour, ton propre ticket et des scores en direct.
 
 ## Comment nous faisons les tips
 Nous regardons la forme récente de chaque équipe (10 derniers matchs, à domicile et à l'extérieur), le classement et les cotes. Un tip n'apparaît que si les chiffres concordent. Chaque tip est publié avant le coup d'envoi et n'est jamais modifié ; les résultats, gains et pertes, figurent dans notre [Historique](/fr/historique).
@@ -109,9 +109,9 @@ Nous ne sommes pas un bookmaker et nous n'acceptons pas de paris. Nous pouvons p
 
 ## Was du hier findest
 - Free- und VIP-Tipps, jeweils mit kurzer Begründung und der Quote zum Zeitpunkt der Veröffentlichung.
-- Eine ehrliche Chance für jeden Tipp und Wettschein („gewinnt etwa 1 von X“), nie „sichere Wette“.
+- Eine öffentliche Bilanz jedes Tipps, mit Treffern und Niederlagen. Wir versprechen nie einen Gewinn.
 - Quoten mehrerer Buchmacher, damit du siehst, wo der Preis besser ist.
-- Wettschein-Baukasten, fertige Kombis und Live-Ergebnisse.
+- Fertige Kombis jeden Tag, dein eigener Wettschein und Live-Ergebnisse.
 
 ## Wie die Tipps entstehen
 Wir betrachten die aktuelle Form jedes Teams (letzte 10 Spiele, heim und auswärts), die Tabelle und die Quoten. Ein Tipp erscheint nur, wenn die Zahlen übereinstimmen. Jeder Tipp wird vor Anpfiff veröffentlicht und danach nie geändert; die Ergebnisse, Treffer und Niederlagen, stehen in unserer [Bilanz](/de/bilanz).
@@ -125,9 +125,9 @@ Wir sind kein Buchmacher und nehmen keine Wetten an. Wir können Provisionen von
 
 ## Ce găsești aici
 - Ponturi gratuite și VIP, fiecare cu o scurtă explicație și cota din momentul publicării.
-- O șansă onestă pentru fiecare pont și bilet („câștigă cam 1 din X”), niciodată „pont sigur”.
+- Un istoric public al fiecărui pont, cu câștiguri și pierderi. Nu promitem niciodată câștig.
 - Cote de la mai multe case de pariuri, ca să vezi unde e prețul mai bun.
-- Constructor de bilete, bilete gata făcute și scoruri live.
+- Bilete gata făcute în fiecare zi, biletul tău și scoruri live.
 
 ## Cum facem ponturile
 Ne uităm la forma recentă a fiecărei echipe (ultimele 10 meciuri, acasă și în deplasare), clasament și cote. Un pont apare doar când cifrele se potrivesc. Fiecare pont e publicat înainte de start și nu se modifică niciodată; rezultatele, câștiguri și pierderi, sunt în [Istoricul](/ro/istoric) nostru.
@@ -141,9 +141,9 @@ Nu suntem casă de pariuri și nu acceptăm pariuri. Putem primi comision de la 
 
 ## Šta ovde nalaziš
 - Free i VIP tipove, svaki sa kratkim obrazloženjem i kvotom u trenutku objave.
-- Poštenu šansu za svaki tip i tiket („prolazi otprilike 1 od X“), nikad „siguran tip“.
+- Javnu istoriju svakog tipa, sa pogocima i promašajima. Nikad ne obećavamo dobitak.
 - Kvote više kladionica, da vidiš gde je cena bolja.
-- Pravljenje tiketa, gotove kombinacije i rezultate uživo.
+- Gotove kombinacije svaki dan, svoj tiket i rezultate uživo.
 
 ## Kako nastaju tipovi
 Gledamo skorašnju formu svakog tima (poslednjih 10 utakmica, kod kuće i u gostima), tabelu i kvote. Tip se pojavljuje samo kad se brojke slažu. Svaki tip se objavljuje pre početka i posle se nikad ne menja; rezultati, pogoci i promašaji, su u našoj [Istoriji](/sr/istorija).
@@ -157,9 +157,9 @@ Nismo kladionica i ne primamo opklade. Možemo dobiti proviziju od kladionica: p
 
 ## Какво ще намериш тук
 - Безплатни и VIP прогнози, всяка с кратко обяснение и коефициента в момента на публикуване.
-- Честен шанс за всяка прогноза и фиш („печели приблизително 1 от X“), никога „сигурна прогноза“.
+- Публична история на всяка прогноза, с печалби и загуби. Никога не обещаваме печалба.
 - Коефициенти от няколко букмейкъра, за да видиш къде цената е по-добра.
-- Създаване на фишове, готови комбинации и резултати на живо.
+- Готови комбинации всеки ден, твоят собствен фиш и резултати на живо.
 
 ## Как правим прогнозите
 Гледаме скорошната форма на всеки отбор (последните 10 мача, у дома и като гост), класирането и коефициентите. Прогноза има само когато числата съвпадат. Всяка прогноза се публикува преди началото и никога не се променя; резултатите, печалби и загуби, са в нашата [История](/bg/istoria).
