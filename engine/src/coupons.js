@@ -1,12 +1,12 @@
-// Τα έτοιμα κουπόνια (παρολί) του betizzi. Βγαίνουν μία φορά τη μέρα και δεν αλλάζουν μετά (record).
+// Τα έτοιμα κουπόνια (παρολί) του betizzi. Ό,τι δημοσιεύτηκε δεν αλλάζει (record)· μέσα στη μέρα μόνο ΠΡΟΣΤΙΘΕΝΤΑΙ όσα λείπουν.
 // Κανόνες (απόφαση Owner 02/11/2026, βλ. project «Tips και παρολί — κανόνες»):
-//  Ζώνες x3–5, x8–12, x20–30: Νίκες (1X2) · Γκολ (Over 2.5 + GG) · Μικτό. Και ένα «τρελό» ~x100.
+//  Ζώνες x3–5, x8–12, x20–30: Νίκες (1X2) · Γκολ (Over 2.5 + GG) · Μικτό. Και ~x100.
+//  Καθημερινές: 9 + 1 x100 = 10 (κυρίως αγώνες μετά τις 17:00).
+//  Σάβ–Κυρ: διπλά, ένα σετ έως τις 17:00 και ένα μετά = 18 + 2 x100 (ένα για κάθε ζώνη ώρας) = 20.
 //  Μόνο από τα tips μας (Free + VIP· τα VIP μέσα στα παρολί είναι ανοιχτά), με σειρά ποιότητας.
-//  Στυλ: Φαβορί (1X2 1.40–1.65, γκολ 1.50–1.75) · Ισορροπημένο (1.50–2.10). Ποτέ 1.40 με 3.80 μαζί.
-//  Καθημερινές: ένα από το καθένα (Ισορροπημένο). Σάβ–Κυρ: διπλά, ένα Φαβορί + ένα Ισορροπημένο.
-//  Κάθε tip σε ΕΝΑ παρολί· μόνο το x100 ξαναπαίρνει λίγα από τα πιο δυνατά.
-//  Σειρά: πρώτα ένα από κάθε ζώνη, μετά οι εναλλακτικές, τελευταίο το x100. Ό,τι δεν βγαίνει, δεν βγαίνει.
-//  «Επιλογή της ημέρας» ανά ζώνη: το παρολί με το καλύτερο value (επιλογές πιο κοντά στο VIP). Μόνο αυτή μετρά στο record.
+//  Στυλ: Ισορροπημένο (1.50–2.10)· αν δεν βγαίνει, Φαβορί (1X2 1.40–1.65, γκολ 1.50–1.75). Ποτέ 1.40 με 3.80 μαζί.
+//  Κάθε tip σε ΕΝΑ παρολί· το x100 μπορεί να ξαναπάρει έως τις ΜΙΣΕΣ επιλογές του από άλλα παρολί.
+//  Ό,τι δεν βγαίνει, δεν βγαίνει· ξαναδοκιμάζεται όταν μπουν νέα tips.
 import { MODEL_VERSION, NOT_FIRST_TEAM } from "./tips.js";
 
 const DAY = 86400;
@@ -22,16 +22,19 @@ const STYLE = {
 const LEVEL = { A: 2, B: 1, C: 0 };
 const typeOf = (sel) => (WINS.has(sel) ? "wins" : GOALS.has(sel) ? "goals" : "other");
 
-export async function makeCoupons(env, date = ymd(now()), dry = false, opt = {}) {
+export async function makeCoupons(env, date = ymd(now()), dry = false) {
   await env.DB.prepare(`CREATE TABLE IF NOT EXISTS coupons(date TEXT, n INTEGER, kind TEXT, variant TEXT, legs TEXT, odds REAL, prob REAL,
     created_at INTEGER, model_version TEXT, hash TEXT, PRIMARY KEY(date, n))`).run();
-  for (const col of ["style TEXT", "pick INTEGER"]) { try { await env.DB.prepare("ALTER TABLE coupons ADD COLUMN " + col).run(); } catch (e) { /* υπάρχει */ } }
-  const done = await env.DB.prepare("SELECT COUNT(*) c, SUM(style IS NOT NULL) s, MAX(n) mx FROM coupons WHERE date=?").bind(date).first();
-  // Μετάβαση 02/11: αν η μέρα έχει μόνο παλιά κουπόνια (χωρίς στυλ), βγαίνει ΕΝΑ σετ με τους νέους κανόνες
-  // για τους αγώνες που δεν έχουν αρχίσει. Τα παλιά μένουν (record)· κανένα κουπόνι δεν σβήνεται.
-  const upgrade = opt.upgrade && done.c && !done.s;
-  if (done.c && !dry && !upgrade) return { date, skipped: "already made" };
-  const base = upgrade ? (done.mx || 0) : 0;
+  for (const col of ["style TEXT", "pick INTEGER", "slot TEXT"]) { try { await env.DB.prepare("ALTER TABLE coupons ADD COLUMN " + col).run(); } catch (e) { /* υπάρχει */ } }
+  // ό,τι υπάρχει ήδη: οι θέσεις (ζώνη|είδος|ώρα) που καλύφθηκαν και οι αγώνες που χρησιμοποιήθηκαν.
+  // Τα πολύ παλιά (πριν 02/11, χωρίς στυλ) αγνοούνται εδώ και κρύβονται στη σελίδα.
+  const prev = (await env.DB.prepare("SELECT n, kind, variant, style, slot, legs FROM coupons WHERE date=?").bind(date).all()).results;
+  const base = prev.reduce((m, r) => Math.max(m, r.n), 0);
+  const have = new Set(), usedFx = new Set();
+  for (const r of prev.filter((r) => r.style)) {
+    have.add(r.slot || `${r.kind}|${r.variant}|day`);
+    if (r.kind !== CRAZY[0]) for (const l of JSON.parse(r.legs)) usedFx.add(l[0]);
+  }
 
   const from = Math.floor(Date.parse(date + "T00:00:00Z") / 1000), to = from + DAY;
   const start = Math.max(now() + 45 * 60, from); // μόνο αγώνες που δεν έχουν αρχίσει (περιθώριο 45΄)
@@ -47,12 +50,9 @@ export async function makeCoupons(env, date = ymd(now()), dry = false, opt = {})
     .sort((a, b) => b.q - a.q);
 
   const wd = new Date(date + "T12:00:00Z").getUTCDay(), weekend = wd === 0 || wd === 6;
-  // Ζώνες ώρας (απόφαση Owner 02/11, ώρα Ελλάδας/Κύπρου): έως τις 17:00 και μετά τις 17:00.
-  // Σάβ–Κυρ: παρολί και στις δύο ζώνες (όταν χάσουν τα απογευματινά, υπάρχουν τα βραδινά).
-  // Καθημερινές: πρώτα αγώνες μετά τις 17:00· αν δεν φτάνουν, και νωρίτερα.
+  // Ζώνες ώρας (ώρα Ελλάδας/Κύπρου): έως τις 17:00 και μετά τις 17:00.
   const hAth = (ts) => +new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", hour: "2-digit", hourCycle: "h23" }).format(ts * 1000);
   for (const x of tips) x.late = hAth(x.ts) >= 17;
-  const usedFx = new Set(); // κάθε αγώνας (άρα και κάθε tip) σε ΕΝΑ παρολί
   function build(lo, hi, variant, style, pool, maxLegs = 12) {
     const band = STYLE[style];
     let p = pool.filter((c) => {
@@ -67,7 +67,6 @@ export async function makeCoupons(env, date = ymd(now()), dry = false, opt = {})
     const mid = Math.sqrt(lo * hi);
     while (legs.length < maxLegs && tot < lo) {
       const left = avail(); if (!left.length) break;
-      // αν μία επιλογή «κλείνει» μέσα στη ζώνη: η καλύτερη ποιοτικά από αυτές
       const fin = left.filter((c) => tot * c.price >= lo && tot * c.price <= hi);
       if (fin.length && legs.length >= 1) { add(fin.sort((a, b) => b.q - a.q || Math.abs(tot * a.price - mid) - Math.abs(tot * b.price - mid))[0]); break; }
       const nxt = left.find((c) => tot * c.price <= hi); if (!nxt) break;
@@ -76,45 +75,49 @@ export async function makeCoupons(env, date = ymd(now()), dry = false, opt = {})
     if (tot < lo || tot > hi || legs.length < 2) return null;
     return { legs, odds: Math.round(tot * 100) / 100, prob: legs.reduce((a, l) => a * l.prob, 1), value: legs.reduce((a, l) => a + l.q, 0) / legs.length };
   }
+  const inWin = (t, win) => win === "early" ? !t.late : win === "late" ? t.late : true;
   const out = [];
-  const make = (zone, lo, hi, variant, style, win) => {
+  // μία θέση: ζώνη + είδος + ώρα. Πρώτα Ισορροπημένο, αν δεν βγαίνει Φαβορί.
+  const make = (zone, lo, hi, variant, win) => {
+    const slot = `${zone}|${variant}|${win}`; if (have.has(slot)) return;
     const free = tips.filter((t) => !usedFx.has(t.f));
-    let c = win === "early" ? build(lo, hi, variant, style, free.filter((t) => !t.late))
-      : win === "late" ? build(lo, hi, variant, style, free.filter((t) => t.late))
-      : (build(lo, hi, variant, style, free.filter((t) => t.late)) || build(lo, hi, variant, style, free));
-    if (!c) return;
-    c.legs.forEach((l) => usedFx.add(l.f));
-    out.push({ kind: zone, variant, style, ...c });
+    for (const style of ["bal", "fav"]) {
+      const c = win === "day" ? (build(lo, hi, variant, style, free.filter((t) => t.late)) || build(lo, hi, variant, style, free))
+        : build(lo, hi, variant, style, free.filter((t) => inWin(t, win)));
+      if (!c) continue;
+      c.legs.forEach((l) => usedFx.add(l.f)); have.add(slot);
+      out.push({ kind: zone, variant, style, slot, ...c }); return;
+    }
   };
-  // 1) ένα από κάθε ζώνη (Μικτό, Ισορροπημένο) 2) οι εναλλακτικές 3) τα Φαβορί του σαββατοκύριακου
-  const wins = weekend ? ["early", "late"] : [null];
-  for (const w of wins) for (const [z, lo, hi] of ZONES) make(z, lo, hi, "mix", "bal", w);
-  for (const w of wins) for (const [z, lo, hi] of ZONES) for (const v of ["wins", "goals"]) make(z, lo, hi, v, "bal", w);
-  if (weekend) for (const w of wins) for (const [z, lo, hi] of ZONES) for (const v of ["mix", "wins", "goals"]) make(z, lo, hi, v, "fav", w);
-  // 4) το «τρελό» x100: ό,τι περισσεύει + έως 3 από τα πιο δυνατά tips της μέρας
-  {
-    const [z, lo, hi] = CRAZY, strong = tips.filter((t) => usedFx.has(t.f) && t.late).slice(0, 3);
-    const pool = [...strong, ...tips.filter((t) => !usedFx.has(t.f))].sort((a, b) => (b.late - a.late) || (b.q - a.q)); // x100: πρώτα βραδινοί
-    const c = build(lo, hi, "mix", "bal", pool, 14);
-    if (c) out.push({ kind: z, variant: "mix", style: "bal", ...c });
+  const wins = weekend ? ["early", "late"] : ["day"];
+  for (const w of wins) for (const [z, lo, hi] of ZONES) make(z, lo, hi, "mix", w);
+  for (const w of wins) for (const [z, lo, hi] of ZONES) for (const v of ["wins", "goals"]) make(z, lo, hi, v, w);
+  // ~x100: ένα τη μέρα (κυρίως βραδινοί)· Σάβ–Κυρ ένα έως τις 17:00 και ένα μετά.
+  // Ό,τι περισσεύει + έως τις ΜΙΣΕΣ επιλογές από τα πιο δυνατά tips που μπήκαν ήδη σε άλλα παρολί.
+  for (const w of wins) {
+    const [z, lo, hi] = CRAZY, slot = `${z}|mix|${w}`; if (have.has(slot)) continue;
+    const ok = (t) => w === "day" || inWin(t, w);
+    const rest = tips.filter((t) => !usedFx.has(t.f) && ok(t)), reused = tips.filter((t) => usedFx.has(t.f) && ok(t));
+    const sortP = (a) => a.sort((x, y) => (w === "day" ? y.late - x.late : 0) || (y.q - x.q));
+    let c = null;
+    for (let k = Math.min(7, reused.length); k >= 0 && !c; k--) {
+      const r = new Set(reused.slice(0, k).map((t) => t.f));
+      const x = build(lo, hi, "mix", "bal", sortP([...reused.slice(0, k), ...rest]), 14);
+      if (x && x.legs.filter((l) => r.has(l.f)).length * 2 <= x.legs.length) c = x;
+    }
+    if (c) { c.legs.forEach((l) => usedFx.add(l.f)); have.add(slot); out.push({ kind: z, variant: "mix", style: "bal", slot, ...c }); }
   }
-  // επιλογή της ημέρας ανά ζώνη: το καλύτερο value
-  for (const z of new Set(out.map((c) => c.kind))) {
-    const best = out.filter((c) => c.kind === z).sort((a, b) => b.value - a.value)[0]; best.pick = 1;
-  }
-  const order = [...ZONES.map((x) => x[0]), CRAZY[0]];
-  out.sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind) || (b.pick || 0) - (a.pick || 0));
-  if (dry) return { date, dry: true, weekend, tips: tips.length, made: out.map((c) => ({ kind: c.kind, variant: c.variant, style: c.style, pick: !!c.pick, odds: c.odds, prob: Math.round(c.prob * 1000) / 10, value: Math.round(c.value * 100) / 100, legs: c.legs.map((l) => l.sel + "@" + l.price + "(" + l.src + ")") })) };
+  if (dry) return { date, dry: true, weekend, tips: tips.length, had: [...have].length - out.length, made: out.map((c) => ({ slot: c.slot, style: c.style, odds: c.odds, prob: Math.round(c.prob * 1000) / 10, value: Math.round(c.value * 100) / 100, legs: c.legs.map((l) => l.sel + "@" + l.price + "(" + l.src + ")") })) };
   const t = now(), st = [];
   for (let i = 0; i < out.length; i++) {
     const c = out[i];
     const legs = JSON.stringify(c.legs.map((l) => [l.f, l.sel, l.price, Math.round(l.prob * 1000) / 1000, l.src]));
     const hash = await sha256([date, base + i + 1, c.kind, legs, t, MODEL_VERSION].join("|"));
-    st.push(env.DB.prepare("INSERT OR IGNORE INTO coupons(date,n,kind,variant,legs,odds,prob,created_at,model_version,hash,style,pick) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)")
-      .bind(date, base + i + 1, c.kind, c.variant, legs, c.odds, c.prob, t, MODEL_VERSION, hash, c.style, c.pick || 0));
+    st.push(env.DB.prepare("INSERT OR IGNORE INTO coupons(date,n,kind,variant,legs,odds,prob,created_at,model_version,hash,style,pick,slot) VALUES(?,?,?,?,?,?,?,?,?,?,?,0,?)")
+      .bind(date, base + i + 1, c.kind, c.variant, legs, c.odds, c.prob, t, MODEL_VERSION, hash, c.style, c.slot));
   }
   if (st.length) await env.DB.batch(st);
-  return { date, made: out.map((c) => `${c.kind} ${c.variant} ${c.style}${c.pick ? " ★" : ""} ${c.legs.length} legs x${c.odds}`) };
+  return { date, made: out.map((c) => `${c.slot} ${c.style} ${c.legs.length} legs x${c.odds}`) };
 }
 
 async function sha256(s) {
@@ -124,7 +127,8 @@ async function sha256(s) {
 
 // Για τη σελίδα: κουπόνια μιας μέρας με στοιχεία αγώνων. Επιλογές από VIP tips κρυφές ως τη σέντρα.
 export async function apiCoupons(env, date) {
-  const rows = (await env.DB.prepare("SELECT * FROM coupons WHERE date=? ORDER BY n").bind(date).all().catch(() => ({ results: [] }))).results;
+  let rows = (await env.DB.prepare("SELECT * FROM coupons WHERE date=? ORDER BY n").bind(date).all().catch(() => ({ results: [] }))).results;
+  if (rows.some((r) => r.style)) rows = rows.filter((r) => r.style); // τα παλιά (πριν 02/11) κρύβονται όταν υπάρχουν νέα
   const ids = [...new Set(rows.flatMap((r) => JSON.parse(r.legs).map((l) => l[0])))];
   const fx = {};
   for (let i = 0; i < ids.length; i += 90) {
@@ -143,6 +147,6 @@ export async function apiCoupons(env, date) {
         sel: hide ? null : sel, price: hide ? null : price, prob: hide ? null : prob, vip: src === "vip", locked: hide, result: res };
     });
     const result = legs.some((l) => l.result === 0) ? 0 : legs.every((l) => l.result === 1) ? 1 : null;
-    return { n: r.n, kind: r.kind, variant: r.variant, style: r.style || null, pick: !!r.pick, odds: r.odds, prob: r.prob, created_at: r.created_at, hash: r.hash, result, legs };
+    return { n: r.n, kind: r.kind, variant: r.variant, style: r.style || null, slot: r.slot || null, pick: false, odds: r.odds, prob: r.prob, created_at: r.created_at, hash: r.hash, result, legs };
   });
 }

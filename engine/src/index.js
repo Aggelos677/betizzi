@@ -379,8 +379,7 @@ export default {
     if (h === 3 && m === 50) tasks.push(runTips(env));
     if (m % 2 === 0) tasks.push(cacheDays(env));
     if (h === 6 && m === 50) tasks.push(makeCoupons(env)); // μετά τα tips των 06:40 UTC
-    // μετάβαση 02/11: μέρα με μόνο παλιά κουπόνια → ένα σετ με τους νέους κανόνες (κάνει δουλειά μία φορά)
-    if (h >= 7 && h < 20 && m % 10 === 5) tasks.push(makeCoupons(env, undefined, false, { upgrade: true }));
+    if (h >= 7 && h < 21 && m % 10 === 5) tasks.push(makeCoupons(env)); // συμπληρώνει όσα παρολί λείπουν (νέα tips)
     ctx.waitUntil(Promise.allSettled(tasks).then(async (r) => {
       const bad = r.filter((x) => x.status === "rejected");
       if (bad.length) await log(env, "cron", false, 0, bad.map((b) => String(b.reason)).join(" | "));
