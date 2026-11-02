@@ -705,7 +705,7 @@ header{position:relative}
 .pc-tm{width:40px;font:500 .7rem var(--f-mono);color:var(--muted)}
 .pc-m{flex:1;min-width:0}.pc-m b{display:block;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pc-m small{font-size:.74rem;color:var(--muted)}
 .pc-o{font:700 .9rem var(--f-mono)}.pc-r{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:var(--bg)}
-.pc-r.w{background:#3ccf6e}.pc-r.l{background:var(--bad)}
+.pc-r.w{background:#4dff8a;color:#06210f;box-shadow:0 0 0 3px rgba(77,255,138,.22),0 0 12px rgba(77,255,138,.55);font-size:.78rem}.pc-r.l{background:var(--bad)}
 .vipt{color:#e8b931;font-weight:800;font-size:.62rem;margin-left:4px}
 .cm{margin-top:12px;background:var(--panel-2);border-radius:12px;padding:10px 12px}
 .cm-t{display:flex;justify-content:space-between;font-size:.84rem}.cm-t b{font-family:var(--f-mono);color:var(--lime)}.cm-t small{color:var(--muted);font-size:.7rem}
@@ -827,7 +827,7 @@ header{position:relative}
     <h2 class="op-h">Today's picks</h2>
     <section class="bw10" id="bigWin" hidden></section>
     <section class="ys" id="yStrip" aria-label="Our results" hidden></section>
-    <div class="opsub" role="group" aria-label="Show"><button type="button" class="opsb" data-op="parlays" aria-pressed="true">Parlays</button><button type="button" class="opsb" data-op="singles" aria-pressed="false"><span>Singles</span> <span class="mono" id="sgN"></span></button></div>
+    <div class="opsub" role="group" aria-label="Show"><button type="button" class="opsb" data-op="parlays" aria-pressed="true"><span>Parlays</span> <span class="mono" id="pkN"></span></button><button type="button" class="opsb" data-op="singles" aria-pressed="false"><span>Singles</span> <span class="mono" id="sgN"></span></button></div>
     <div id="opParlays">
       <div class="ztabs" id="zTabs" role="group" aria-label="Total odds"></div>
       <div id="zMain" style="display:flex;flex-direction:column;gap:12px"></div>
@@ -1730,12 +1730,15 @@ function parlayHTML(c,feat){
     var mm=null;for(var q=0;q<MATCHES.length;q++)if(String(MATCHES[q].id)===String(l.fixture_id)){mm=MATCHES[q];break;}
     var lv=mm?mm.live:(l.status&&["1H","2H","HT","ET","BT","P","LIVE","INT"].indexOf(l.status)>=0),dn=mm?mm.done:(["FT","AET","PEN"].indexOf(l.status)>=0);
     var sc=mm&&mm.score?mm.score:(l.gh!=null?l.gh+"-"+l.ga:""),mn=mm&&mm.min?(mm.min==="HT"?"HT":mm.min+"'"):"";
+    /* απόφαση Owner 02/11: Over/GG που «μπήκε» στο live φαίνεται ήδη κερδισμένο (και Under/NG που «χάλασε», χαμένο) */
+    if(!r&&lv&&sc){var es=tipState({sel:({"O25":"over 2.5","O15":"over 1.5","U25":"under 2.5","GG":"gg","NG":"ng"})[l.sel]||""},{live:true,score:sc});
+      if(es==="won")r='<span class="pc-r w">✓</span>';else if(es==="lost")r='<span class="pc-r l">✗</span>';}
     var tm=lv?'<span class="pc-live"><i class="ldot2"></i><b>'+esc(sc||"0-0")+'</b><small>'+esc(mn||"LIVE")+'</small></span>':dn?'<span class="pc-ft"><b>'+esc(sc)+'</b><small>FT</small></span>':esc(l.time||"");
     return '<li'+(lv?' class="lv"':'')+'><span class="pc-tm">'+tm+'</span><span class="pc-m"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+legPick(l)+(l.vip?'<span class="vipt">VIP</span>':'')+'</small></span>'+r+'<span class="pc-o">'+(l.price?fx2(l.price):"")+'</span></li>';}).join("");
   var keys=c.legs.map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});
   /* απόφαση Owner 02/11: το είδος μεγάλο με δικό του χρώμα (Γκολ πορτοκαλοκίτρινο, 1X2 γαλάζιο), το στυλ μικρό */
   var name='<span class="pv pv-'+esc(c.variant)+'">'+esc(BZC_VAR[c.variant]||c.variant)+'</span>'+(c.style?' <small class="pc-sty">· <span>'+esc(STY[c.style]||c.style)+'</span></small>':'');
-  var tms=c.legs.map(function(l){return l.time||"";}).filter(Boolean).sort(),first=tms[0]||"",last=tms[tms.length-1]||"";
+  var tl=c.legs.filter(function(l){return l.time;}).slice().sort(function(a,b){return (a.ts||0)-(b.ts||0);}),first=tl.length?tl[0].time:"",last=tl.length?tl[tl.length-1].time:"";
   var btns=st==="won"?'<span class="pc-res w">✓ <span>Won</span> · x'+fx2(c.odds)+'</span>':st==="lost"?'<span class="pc-res l">✗ <span>Lost</span></span>':st==="live"?'<span class="pc-res lv"><i class="ldot2"></i> LIVE</span>'
     :(keys.length?'<button type="button" class="pc-take" data-take="'+c.n+'">🎟️ <span>Take it</span> → <span>My slip</span></button>':'');
   return '<article class="pc'+(feat?' feat':'')+(st==="won"?' won':st==="lost"?' lost':'')+'">'
@@ -1790,6 +1793,7 @@ function renderPicks(){
   var L=(typeof BZC!=="undefined"&&BZC)||[];if(L.some(function(c){return c.style;}))L=L.filter(function(c){return c.style;}); /* νέοι κανόνες: τα παλιά της μετάβασης μένουν μόνο στο record */
   /* απόφαση Owner 02/11: παρολί που χάνει φεύγει από τη λίστα της ημέρας (μένουν όσα «ζουν» ή κέρδισαν) */
   L=L.filter(function(c){return c.result!==0&&!c.legs.some(function(l){return l.result===0;});});
+  if($("pkN"))$("pkN").textContent=L.length?"· "+L.length:""; /* απόφαση Owner 02/11: πόσα παρολί «ζουν», όπως στα Μονά */
   var zones=ZORDER.filter(function(z){return L.some(function(c){return c.kind===z;});});
   L.forEach(function(c){if(zones.indexOf(c.kind)<0)zones.push(c.kind);});
   if(zones.indexOf(opZone)<0)opZone=zones[0]||"";
