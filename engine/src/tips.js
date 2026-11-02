@@ -1,7 +1,7 @@
 // Κανόνες tips betizzi (01/11/2026). Όλα τα όρια εδώ, σε ένα σημείο.
 // Ομάδες που δεν παίρνουν ποτέ tip/κουπόνι (κανόνας λιγκών): Β ομάδες, reserves, νέοι, γυναικείες.
 export const NOT_FIRST_TEAM = /(^Jong | II$| III$| B$| C$|\bU-?(1[6-9]|2[0-3])\b|\bReserves?\b|\(W\)| W$|\bWomen\b|\bYouth\b)/i;
-export const MODEL_VERSION = "rules-2026-11-02a";
+export const MODEL_VERSION = "rules-2026-11-02b";
 async function sha256(s) {
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
@@ -21,6 +21,10 @@ export const RULES = {
   vipTarget12: (side, diff) => diff >= 10 ? (side === "1" ? 1.55 : 1.80) : diff >= 8 ? (side === "1" ? 1.75 : 2.00) : (side === "1" ? 2.00 : 2.25),
   groupShare: { RES: 0.4, GOALS: 0.4, BTTS: 0.2 },
   maxPerMatch: 2,
+  // Free (απόφαση Owner 02/11, ισχύουν όταν υπάρχουν αρκετές επιλογές): λίγα «ψηλά» 2.60–4.00 (έως 5%),
+  // μέση τιμή όσο γίνεται 1.70–1.75, και προτεραιότητα σε όσα είναι πιο κοντά στο VIP.
+  freeHigh: { from: 2.60, share: 0.05 },
+  freeAvg: { lo: 1.70, hi: 1.75 },
 };
 const GROUP = { "1": "RES", "X": "RES", "2": "RES", O25: "GOALS", U25: "GOALS", GG: "BTTS", NG: "BTTS" };
 const MARKET = { "1": "1X2", "X": "1X2", "2": "1X2", O25: "OU", U25: "OU", GG: "BTTS", NG: "BTTS" };
@@ -92,7 +96,7 @@ export async function makeTips(env, now) {
   const live = [];
   for (let i = 0; i < ids.length; i += 90) {
     const part = ids.slice(i, i + 90);
-    live.push(...(await env.DB.prepare(`SELECT fixture_id, sel, tier FROM tips WHERE status='active' AND fixture_id IN (${part.map(() => "?").join(",")})`).bind(...part).all()).results);
+    live.push(...(await env.DB.prepare(`SELECT fixture_id, sel, tier, price FROM tips WHERE status='active' AND fixture_id IN (${part.map(() => "?").join(",")})`).bind(...part).all()).results);
   }
   const have = new Set(live.map((t) => t.fixture_id + "|" + t.sel));
   for (const t of live) { (used[t.fixture_id] ||= new Set()).add(GROUP[t.sel]); }
@@ -103,27 +107,44 @@ export async function makeTips(env, now) {
   const vipQuota = Math.round(withOdds * RULES.vipShare);
   const VIP = [];
   for (const c of fresh.filter((c) => c.vip).sort((a, b) => b.s - a.s)) { if (vipHave.length + VIP.length >= vipQuota) break; if (freeFx.has(c.f.id)) continue; if (take(c)) VIP.push(c); }
-  // Free: επίπεδα Α→Β→Γ, αναλογία ανά ομάδα αγορών, 1 X τη μέρα
+  // Free: πιο κοντά στο VIP πρώτα, αναλογία ανά ομάδα αγορών, 1 X τη μέρα, λίγα ψηλά, μέσος ≈1.70–1.75
   const freeQuota = Math.round(withOdds * RULES.freeShare);
   // Αγώνας με VIP δεν παίρνει και Free (το VIP είναι το επόμενο σκαλί).
   const vipFx = new Set([...VIP.map((c) => c.f.id), ...vipHave.map((t) => t.fixture_id)]);
   const pool = fresh.filter((c) => !vipFx.has(c.f.id) && c.p >= RULES.free.min && c.p <= RULES.free.max)
-    .sort((a, b) => LEVEL[a.level] - LEVEL[b.level] || b.s - a.s);
+    // πιο κοντά στο VIP πρώτα: όσα θα ήταν VIP (έμειναν έξω λόγω ορίου), μετά όσο πιο κοντά είναι η τιμή στον «πάτο» του VIP
+    .map((c) => ({ c, near: c.vip ? 2 : Math.min(1, c.p / c.fl) }))
+    .sort((a, b) => b.near - a.near || LEVEL[a.c.level] - LEVEL[b.c.level] || b.c.s - a.c.s).map((x) => x.c);
   // Free: στόχος ≈ 1 στους 4 αγώνες με αποδόσεις, μετρώντας και τα ήδη δημοσιευμένα. Όσο έρχονται αποδόσεις για
   // περισσότερους αγώνες, ο στόχος μεγαλώνει και μπαίνουν καινούρια tips. Τίποτα δεν βγαίνει για να «χωρέσει».
   const freeHave = live.filter((t) => t.tier !== "vip").length;
   const FREE = [], byG = { RES: 0, GOALS: 0, BTTS: 0 }; let xs = live.filter((t) => t.sel === "X").length;
   for (const t of live) if (t.tier !== "vip") byG[GROUP[t.sel]]++;
-  const tryFree = (c, capG) => {
+  const freeLive = live.filter((t) => t.tier !== "vip");
+  let sumP = freeLive.reduce((a, t) => a + (t.price || 0), 0), nP = freeLive.filter((t) => t.price).length;
+  let highN = freeLive.filter((t) => t.price >= RULES.freeHigh.from).length;
+  const highMax = Math.floor(freeQuota * RULES.freeHigh.share);
+  const tryFree = (c, capG, strict) => {
     if (freeHave + FREE.length >= freeQuota) return;
     const g = GROUP[c.k];
     if (capG && byG[g] >= Math.round(freeQuota * RULES.groupShare[g])) return;
+    if (strict >= 1 && c.p >= RULES.freeHigh.from && highN >= highMax) return;
+    if (strict >= 2) {
+      const avg = nP ? sumP / nP : null;
+      if (avg !== null && avg > RULES.freeAvg.hi && c.p > avg) return;   // ο μέσος ανεβαίνει πολύ → όχι πιο ψηλά
+      if (avg !== null && avg < RULES.freeAvg.lo && c.p < avg) return;   // ο μέσος πέφτει πολύ → όχι πιο χαμηλά
+    }
     if (c.k === "X" && xs >= 1) return;
     if (!take(c)) return;
     FREE.push(c); byG[g]++; if (c.k === "X") xs++;
+    sumP += c.p; nP++; if (c.p >= RULES.freeHigh.from) highN++;
   };
-  for (const c of pool) tryFree(c, true);
-  for (const c of pool) if (!FREE.includes(c)) tryFree(c, false);
+  // Γέμισμα σε σκαλιά: 1) όλοι οι κανόνες, 2) χωρίς αναλογία αγορών, 3) χωρίς τον μέσο όρο τιμής,
+  // 4) αν ακόμα λείπουν: και χωρίς το όριο των ψηλών τιμών (καλύτερα γεμάτο παρά άδειο).
+  for (const c of pool) tryFree(c, true, 2);
+  for (const c of pool) if (!FREE.includes(c)) tryFree(c, false, 2);
+  for (const c of pool) if (!FREE.includes(c)) tryFree(c, false, 1);
+  for (const c of pool) if (!FREE.includes(c)) tryFree(c, false, 0);
 
   // Αμετάβλητο record: ένα tip που δημοσιεύτηκε ΔΕΝ αλλάζει και ΔΕΝ σβήνεται ποτέ.
   // Αν δεν ισχύει πια πριν τη σέντρα → status 'withdrawn' (φαίνεται δημόσια ως αποσυρμένο).
