@@ -873,6 +873,7 @@ header{position:relative}
 
   <!-- MY COUPONS -->
   <div id="view-coupons" role="tabpanel" aria-labelledby="tab-coupons" class="wrap" hidden>
+    <div id="liveMob"></div>
     <div class="secthead"><h2>My coupons</h2><span class="hint" id="cpCount"></span></div>
     <div class="opsub" role="group" aria-label="Show"><button type="button" class="opsb" data-cpt="open" aria-pressed="true"><span>Open</span> <span class="mono" id="cpOpenN"></span></button><button type="button" class="opsb" data-cpt="done" aria-pressed="false"><span>Settled</span> <span class="mono" id="cpDoneN"></span></button></div>
     <button type="button" class="btn sec" id="addSingle" hidden>+ Add a single game</button>
@@ -1267,7 +1268,12 @@ TABS.forEach(function(t){$("tab-"+t).addEventListener("click",function(){showTab
 /* ---------- πλαϊνό (PC): αλλάζει ανάλογα με την καρτέλα ---------- */
 function sideOn(){return !!(window.matchMedia&&window.matchMedia("(min-width:1100px)").matches);}
 function curTab(){var c="matches";(TABS||[]).forEach(function(t){var e=$("tab-"+t);if(e&&e.getAttribute("aria-selected")==="true")c=t;});return c;}
-function renderSide(){var p=$("sidePanel");if(!p)return;renderClose();var tab=curTab(),mode=tab==="tips"?"tips":tab==="build"?"build":"coupons";
+/* απόφαση Owner 02/11: στο κινητό (χωρίς δεξιά στήλη) το «Τελευταία γκολ / Τα παιχνίδια μου live» μπαίνει πάνω στα Κουπόνια μου */
+function placeLive(){var c=$("liveSide");if(!c)return;var mob=!sideOn(),tgt=mob?$("liveMob"):$("sidePanel");
+  if(mob){if(c.parentNode!==tgt){tgt.appendChild(c);if(sideView==="goals"&&cpTabFirst){sideView="mylive";renderSideView();}}}
+  else if(c.parentNode!==tgt){var after=$("closeBox");tgt.insertBefore(c,after?after.nextSibling:tgt.firstChild);}}
+var cpTabFirst=true;
+function renderSide(){var p=$("sidePanel");if(!p)return;try{placeLive();}catch(e){}renderClose();var tab=curTab(),mode=tab==="tips"?"tips":tab==="build"?"build":"coupons";
   Array.prototype.forEach.call(p.querySelectorAll("[data-side]"),function(s){s.hidden=s.getAttribute("data-side")!==mode;});
   if(mode==="tips")renderWins();
   try{renderMyLive();}catch(e){}
