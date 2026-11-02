@@ -112,13 +112,6 @@
 "tier": 1
 },
 {
-"id": 397,
-"country": "Angola",
-"name": "Girabola",
-"type": "League",
-"tier": 1
-},
-{
 "id": 128,
 "country": "Argentina",
 "name": "Liga Profesional Argentina",
@@ -182,13 +175,6 @@
 "tier": 2
 },
 {
-"id": 417,
-"country": "Bahrain",
-"name": "Premier League",
-"type": "League",
-"tier": 1
-},
-{
 "id": 116,
 "country": "Belarus",
 "name": "Premier League",
@@ -224,25 +210,11 @@
 "tier": 0
 },
 {
-"id": 415,
-"country": "Benin",
-"name": "Championnat National",
-"type": "League",
-"tier": 1
-},
-{
 "id": 344,
 "country": "Bolivia",
 "name": "Primera División",
 "type": "League",
 "tier": 1
-},
-{
-"id": 710,
-"country": "Bolivia",
-"name": "Nacional B",
-"type": "League",
-"tier": 2
 },
 {
 "id": 315,
@@ -287,30 +259,9 @@
 "tier": 2
 },
 {
-"id": 423,
-"country": "Burkina-Faso",
-"name": "Ligue 1",
-"type": "League",
-"tier": 1
-},
-{
-"id": 566,
-"country": "Burundi",
-"name": "Ligue A",
-"type": "League",
-"tier": 1
-},
-{
 "id": 410,
 "country": "Cambodia",
 "name": "C-League",
-"type": "League",
-"tier": 1
-},
-{
-"id": 411,
-"country": "Cameroon",
-"name": "Elite One",
 "type": "League",
 "tier": 1
 },
@@ -581,13 +532,6 @@
 "tier": 2
 },
 {
-"id": 363,
-"country": "Ethiopia",
-"name": "Premier League",
-"type": "League",
-"tier": 1
-},
-{
 "id": 244,
 "country": "Finland",
 "name": "Veikkausliiga",
@@ -651,13 +595,6 @@
 "tier": 1
 },
 {
-"id": 1196,
-"country": "Ghana",
-"name": "Division One League",
-"type": "League",
-"tier": 2
-},
-{
 "id": 197,
 "country": "Greece",
 "name": "Super League 1",
@@ -691,13 +628,6 @@
 "name": "Indian Super League",
 "type": "League",
 "tier": 1
-},
-{
-"id": 324,
-"country": "India",
-"name": "I-League",
-"type": "League",
-"tier": 2
 },
 {
 "id": 274,
@@ -763,13 +693,6 @@
 "tier": 0
 },
 {
-"id": 386,
-"country": "Ivory-Coast",
-"name": "Ligue 1",
-"type": "League",
-"tier": 1
-},
-{
 "id": 322,
 "country": "Jamaica",
 "name": "Premier League",
@@ -803,13 +726,6 @@
 "name": "Superliga",
 "type": "League",
 "tier": 1
-},
-{
-"id": 1195,
-"country": "Kosovo",
-"name": "Liga E Pare",
-"type": "League",
-"tier": 2
 },
 {
 "id": 330,
@@ -854,20 +770,6 @@
 "tier": 1
 },
 {
-"id": 598,
-"country": "Mali",
-"name": "Première Division",
-"type": "League",
-"tier": 1
-},
-{
-"id": 762,
-"country": "Mauritania",
-"name": "Premier League",
-"type": "League",
-"tier": 1
-},
-{
 "id": 262,
 "country": "Mexico",
 "name": "Liga MX",
@@ -908,13 +810,6 @@
 "name": "Botola Pro",
 "type": "League",
 "tier": 1
-},
-{
-"id": 201,
-"country": "Morocco",
-"name": "Botola 2",
-"type": "League",
-"tier": 2
 },
 {
 "id": 88,
@@ -1146,13 +1041,6 @@
 "name": "Premier Soccer League",
 "type": "League",
 "tier": 1
-},
-{
-"id": 289,
-"country": "South-Africa",
-"name": "1st Division",
-"type": "League",
-"tier": 2
 },
 {
 "id": 508,
