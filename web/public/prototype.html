@@ -1352,7 +1352,8 @@ setInterval(function(){if(!document.hidden)renderClose();},15000);
 function renderWins(){var box=$("winsSide");if(!box)return;
   var wins=[];MATCHES.forEach(function(m){if(!m.done||m.type==="cancelled")return;m.tips.forEach(function(t){if(t.r===1)wins.push({m:m,t:t});});});
   wins.sort(function(a,b){return (b.t.odds||0)-(a.t.odds||0);});
-  var L=(typeof BZC!=="undefined"&&BZC)||[],cw=L.filter(function(c){return c.result===1;}).sort(function(a,b){return b.odds-a.odds;});
+  /* απόφαση Owner 02/11: παρολί που κλείνει κερδισμένο μπαίνει από πάνω, μόλις κλείσει (και πριν το ενημερώσει ο server) */
+  var L=(typeof BZC!=="undefined"&&BZC)||[],cw=L.filter(cpWon).sort(function(a,b){return b.odds-a.odds;});
   var h;
   if(!cw.length&&!wins.length)h='<div class="empty">No wins yet today. Matches are still running.</div>';
   else{
@@ -1662,7 +1663,7 @@ $("demoCalled").addEventListener("click",function(){
         if(done&&!m.done&&sc===m.bz)fx.push(function(){calledIt(m);m.hit=true;});
         m.score=sc;m.min=x[2]||0;m.live=live;m.done=done;m.open=!live&&!done;m.type=live?"inprogress":done?"finished":m.type;
       });
-      if(changed){renderFilters();renderMatches();try{renderTips();renderCoupons();renderBar();renderMyLive();}catch(e){}fx.forEach(function(f,i){setTimeout(f,250+i*700);});}
+      if(changed){renderFilters();renderMatches();try{renderTips();renderCoupons();renderBar();renderMyLive();renderWins();}catch(e){}fx.forEach(function(f,i){setTimeout(f,250+i*700);});}
     }).catch(function(){});
   }
   tick();setInterval(function(){if(!document.hidden)tick();},30000);
