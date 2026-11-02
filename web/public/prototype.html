@@ -1733,7 +1733,8 @@ function parlayHTML(c,feat){
     var lv=mm?mm.live:(l.status&&["1H","2H","HT","ET","BT","P","LIVE","INT"].indexOf(l.status)>=0),dn=mm?mm.done:(["FT","AET","PEN"].indexOf(l.status)>=0);
     var sc=mm&&mm.score?mm.score:(l.gh!=null?l.gh+"-"+l.ga:""),mn=mm&&mm.min?(mm.min==="HT"?"HT":mm.min+"'"):"";
     /* απόφαση Owner 02/11: Over/GG που «μπήκε» στο live φαίνεται ήδη κερδισμένο (και Under/NG που «χάλασε», χαμένο) */
-    if(!r&&lv&&sc){var es=tipState({sel:({"O25":"over 2.5","O15":"over 1.5","U25":"under 2.5","GG":"gg","NG":"ng"})[l.sel]||""},{live:true,score:sc});
+    /* και όταν ο αγώνας τελείωσε αλλά το παρολί δεν έχει ενημερωθεί ακόμα από τον server: το κρίνουμε από το τελικό σκορ */
+    if(!r&&(lv||dn)&&sc){var es=tipState({sel:({"1":"home","2":"away","X":"x","O25":"over 2.5","O15":"over 1.5","U25":"under 2.5","GG":"gg","NG":"ng"})[l.sel]||""},{live:lv,done:dn,score:sc});
       if(es==="won")r='<span class="pc-r w">✓</span>';else if(es==="lost")r='<span class="pc-r l">✗</span>';}
     var tm=lv?'<span class="pc-live"><i class="ldot2"></i><b>'+esc(sc||"0-0")+'</b><small>'+esc(mn||"LIVE")+'</small></span>':dn?'<span class="pc-ft"><b>'+esc(sc)+'</b><small>FT</small></span>':esc(l.time||"");
     return '<li'+(lv?' class="lv"':'')+'><span class="pc-tm">'+tm+'</span><span class="pc-m"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+legPick(l)+(l.vip?'<span class="vipt">VIP</span>':'')+'</small></span>'+r+'<span class="pc-o">'+(l.price?fx2(l.price):"")+'</span></li>';}).join("");
