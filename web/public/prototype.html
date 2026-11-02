@@ -674,6 +674,7 @@ header{position:relative}
 .authbg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:90}
 .authbox{position:fixed;z-index:91;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,calc(100vw - 24px));background:#141a16;border:1px solid #2a352e;border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 .authbox[hidden],.authbg[hidden]{display:none}
+.myl-list{max-height:50vh;overflow:auto;display:flex;flex-direction:column;gap:8px;padding-right:4px}
 .authbox h2{margin:0;font:800 1.5rem 'Fira Sans Extra Condensed',sans-serif;text-transform:uppercase}
 .authbox>div{display:flex;flex-direction:column;gap:12px}
 .authp{margin:0;color:var(--muted);font-size:.9rem;line-height:1.45}
@@ -1382,10 +1383,14 @@ function tierTag(t){return t.tier==="vip"?'<span class="tag vip">VIP</span>':'<s
 var mFilter="all", q="";
 /* φίλτρα: γραμμή 1 = χρόνος (Live · Σήμερα · Αύριο · 📅), γραμμή 2 = λίγκες (Top 5 · Top 30 · Όλα · Οι δικές μου) │ Με tip · 🎯 */
 var DN=(typeof DAYNAV!=="undefined"&&DAYNAV)||{date:"",today:"",nav:[]},IS_TODAY=!DN.date||DN.date===DN.today;
-var lFil=load("ko-lfil","all");if(["top30","all","mine"].indexOf(lFil)<0)lFil="all";
+/* απόφαση Owner 02/11: δύο κουμπιά, «⭐ Τα πρωταθλήματά μου» (ξεκινάει με τα 50 σημαντικά) και «Όλα».
+   Αλλαγή της λίστας μόνο με λογαριασμό (αλλιώς → εγγραφή). */
+var lFil=load("ko-lfil2","mine");if(["all","mine"].indexOf(lFil)<0)lFil="mine";
+var MYL=load("ko-myl",null); /* null = τα 50 σημαντικά */
+function inMyL(k){return MYL&&ACC?MYL.indexOf(k)>=0:topIx(k)<999;}
 var tipF=false,calF=false,favF=false,stripOpen=false,FAV=new Set(load("ko-fav",[])||[]);
 function isTop5(k){return TOP5.indexOf(k)>=0||k==="Spain|La Liga";}
-function passL(m,l){if(l==="top5")return isTop5(m.key);if(l==="top30")return topIx(m.key)<999;if(l==="mine")return typeof bLg!=="undefined"&&bLg.has(m.key);return true;}
+function passL(m,l){if(l==="top5")return isTop5(m.key);if(l==="top30")return topIx(m.key)<999;if(l==="mine")return inMyL(m.key);return true;}
 function passF(m,f){ if(f==="called")return !!m.hit; if(f==="tips")return m.tips.length>0; if(f==="top")return topIx(m.key)<999; if(f==="live")return m.live; if(f==="upcoming")return m.open; return true; }
 function passAll(m,o){o=o||{};var tf=o.t!=null?o.t:mFilter,lf=o.l!=null?o.l:lFil,tp=o.tip!=null?o.tip:tipF,cf=o.c!=null?o.c:calF;
   var ff=o.f!=null?o.f:favF;
@@ -1408,10 +1413,10 @@ function renderFilters(){
   st.innerHTML=DN.nav.map(function(d){return '<a class="dayb'+(d.d===DN.date?' on':'')+'" href="'+(d.d===DN.date?'#':esc(d.href))+'"'+(d.d===DN.date?' data-cur="1"':'')+'><span>'+esc(d.lbl)+'</span><small class="mono">'+esc(d.d.slice(8,10)+"/"+d.d.slice(5,7))+'</small></a>';}).join("");
   var cur=st.querySelector("[data-cur]");if(cur)cur.addEventListener("click",function(e){e.preventDefault();stripOpen=false;renderFilters();});
   var lb2=$("lFilter");lb2.innerHTML="";
-  [["top30","Top 30"],["all","All"],["mine","My leagues"]].forEach(function(f){
-    lb2.appendChild(chipEl('<span>'+esc(f[1])+'</span> <span class="c">'+cnt({l:f[0]})+'</span>',lFil===f[0],function(){
-      if(f[0]==="mine"&&(typeof bLg==="undefined"||!bLg.size)){toast("Pick your leagues in Build → My leagues");return;}
-      lFil=f[0];store("ko-lfil",lFil);renderFilters();renderMatches();}));});
+  [["mine","My leagues"],["all","All"]].forEach(function(f){
+    lb2.appendChild(chipEl((f[0]==="mine"?"⭐ ":"")+'<span>'+esc(f[1])+'</span> <span class="c">'+cnt({l:f[0]})+'</span>',lFil===f[0],function(){
+      lFil=f[0];store("ko-lfil2",lFil);renderFilters();renderMatches();}));});
+  lb2.appendChild(chipEl('✎',false,function(){openMyL();},"tog"));
   var sep=document.createElement("span");sep.className="fsep";sep.setAttribute("aria-hidden","true");lb2.appendChild(sep);
   lb2.appendChild(chipEl('<span>With tip</span> <span class="c">'+cnt({tip:true})+'</span>',tipF,function(){tipF=!tipF;renderFilters();renderMatches();},"tog"));
   lb2.appendChild(chipEl('<span>⭐ My games</span> <span class="c">'+FAV.size+'</span>',favF,function(){if(!FAV.size&&!favF){toast("Tap ☆ on a match to follow it");return;}favF=!favF;renderFilters();renderMatches();},"tog"));
@@ -2033,9 +2038,21 @@ document.addEventListener("click",function(e){var p=$("sndPop");if(!p.hidden&&!e
 /* οι browsers αφήνουν ήχο μόνο μετά από πάτημα: ξυπνάμε τον ήχο στο πρώτο πάτημα οπουδήποτε */
 document.addEventListener("pointerdown",function w(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();}catch(x){}document.removeEventListener("pointerdown",w);});
 sndRender();
+/* ---------- «Τα πρωταθλήματά μου»: διαλέγει λίγκες (μόνο με λογαριασμό) ---------- */
+function openMyL(){if(!ACC){toast("Sign up free to pick your own leagues");openAuth();return;}
+  var keys=[];MATCHES.forEach(function(m){if(keys.indexOf(m.key)<0)keys.push(m.key);});keys.sort(function(a,b){return topIx(a)-topIx(b)||a.localeCompare(b);});
+  var cur=MYL||keys.filter(function(k){return topIx(k)<999;});
+  var box=$("authBox");authStep(0);["authS1","authS2","authS3"].forEach(function(i){$(i).hidden=true;});
+  var d=$("mylS");if(!d){d=document.createElement("div");d.id="mylS";box.insertBefore(d,$("authErr"));}d.hidden=false;
+  d.innerHTML='<h2><span>My leagues</span></h2><p class="authp"><span>Pick the leagues you follow. Today\'s leagues are listed.</span></p><div class="myl-list">'+keys.map(function(k){var p=k.split("|");return '<label class="authc"><input type="checkbox" value="'+esc(k)+'"'+(cur.indexOf(k)>=0?" checked":"")+'> <span>'+esc(p[0])+' · '+esc(p[1])+'</span></label>';}).join("")+'</div>'
+    +'<button type="button" class="btn authgo" id="mylOk"><span>Save</span></button><button type="button" class="btn quiet" id="mylReset"><span>Back to the 50 main leagues</span></button>';
+  $("authBg").hidden=false;box.hidden=false;
+  $("mylOk").onclick=function(){var sel=Array.prototype.map.call(d.querySelectorAll("input:checked"),function(i){return i.value;});var keep=(MYL||[]).filter(function(k){return keys.indexOf(k)<0;});
+    MYL=keep.concat(sel);store("ko-myl",MYL);lFil="mine";store("ko-lfil2",lFil);d.hidden=true;closeAuth();renderFilters();renderMatches();toast("Saved");};
+  $("mylReset").onclick=function(){MYL=null;store("ko-myl",null);d.hidden=true;closeAuth();renderFilters();renderMatches();};}
 /* ---------- λογαριασμός (εγγραφή με κωδικό στο email) ---------- */
 var ACC=null,authMail="";
-function authStep(n){[1,2,3].forEach(function(i){$("authS"+i).hidden=i!==n;});$("authErr").hidden=true;}
+function authStep(n){[1,2,3].forEach(function(i){$("authS"+i).hidden=i!==n;});if($("mylS"))$("mylS").hidden=true;$("authErr").hidden=true;}
 function authErr(m){var e=$("authErr");e.textContent=m;e.hidden=false;}
 function openAuth(){authStep(ACC?3:1);if(ACC){$("accMail").textContent=ACC.email;$("accCr").textContent=ACC.credits;}
   $("authBg").hidden=false;$("authBox").hidden=false;setTimeout(function(){var i=ACC?null:$("authEmail");if(i)i.focus();},50);}
@@ -2066,7 +2083,7 @@ function loadVip(){var d=(window.DAYNAV&&DAYNAV.date)||"";fetch("/vip.json"+(d?"
   if(!j.tips)return;var by={};j.tips.forEach(function(x){(by[x[0]]=by[x[0]]||[]).push(x[1]);});
   MATCHES.forEach(function(m){var q=by[m.id];if(!q)return;var i=0;m.tips.forEach(function(t,k){if(t.tier==="vip"&&!t.sel&&q[i]){var a=q[i++];var nt={sel:a[0],odds:a[1],tier:"vip",why:a[3],r:a[5],book:a[7],min:a[9]||0,at:hmTs(a[10])},c=tipCode(nt);nt.key=addSel(m,c,tipLabel(m,nt),nt.sel,nt.odds,probFor(m,c));m.tips[k]=nt;}});});
   try{applyBook();}catch(e){}setVip(true);}).catch(function(){});}
-function loadMe(){if(location.protocol==="file:")return;fetch("/me.json",{credentials:"same-origin"}).then(function(r){return r.json();}).then(function(j){ACC=j.user||null;accRender();if(ACC)loadVip();}).catch(function(){});}
+function loadMe(){if(location.protocol==="file:")return;fetch("/me.json",{credentials:"same-origin"}).then(function(r){return r.json();}).then(function(j){ACC=j.user||null;accRender();if(ACC)loadVip();if(ACC&&MYL){renderFilters();renderMatches();}}).catch(function(){});}
 loadMe();
 /* λογότυπο = αρχική (απόφαση Owner 02/11): στην ίδια σελίδα πάει στις Προτάσεις και πάνω-πάνω, χωρίς φόρτωμα */
 document.querySelector(".logoa").addEventListener("click",function(e){if(location.search)return;e.preventDefault();try{showTab("tips");}catch(x){}window.scrollTo({top:0,behavior:"smooth"});});
