@@ -3,7 +3,7 @@
 // και τα γράφει στη βάση betizzi-db. Η σελίδα διαβάζει ΜΟΝΟ από τη βάση (/api/...).
 import { makeCoupons, apiCoupons } from "./coupons.js";
 import { authStart, authVerify, authMe, authLogout, authVip } from "./auth.js";
-import { hit, isAdmin, aToday, aUsers, aUserAct, aExport, aPartners, aPartnerSave, aHealth, aAudit, aLeagues, aLeagueSave } from "./admin.js";
+import { hit, isAdmin, aToday, aUsers, aUserAct, aExport, aPartners, aPartnerSave, aHealth, aAudit, aLeagues, aLeagueSave, aMkt } from "./admin.js";
 import LEAGUES from "../data/leagues.json";
 import LEAGUES_ALL from "../data/leagues_all.json";
 import { apifStats } from "./adapters/stats-apif.js";
@@ -390,7 +390,9 @@ export default {
         if (!who) return json({ error: "forbidden" }, 403);
         const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
         const p = u.pathname.slice(7);
-        if (p === "me") return json({ ok: true, who: who.who, email: who.email || null });
+        if (p === "me") return json({ ok: true, who: who.who, email: who.email || null, role: who.role });
+        if (p === "mkt") return json(await aMkt(env));
+        if (who.role !== "admin") return json({ error: "forbidden" }, 403); // marketing: μόνο η σελίδα Marketing
         if (p === "today") return json(await aToday(env));
         if (p === "users") return json(await aUsers(env, u.searchParams.get("q") || "", +u.searchParams.get("page") || 1));
         if (p === "user" && req.method === "POST") return json(await aUserAct(env, who.who, body));

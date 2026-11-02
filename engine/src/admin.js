@@ -49,10 +49,12 @@ export async function hit(env, b, country) {
 
 // ---------- πρόσβαση ----------
 export async function isAdmin(env, token, key) {
-  if (key && env.ADMIN_TOKEN && key === env.ADMIN_TOKEN) return { who: "key" };
+  if (key && env.ADMIN_TOKEN && key === env.ADMIN_TOKEN) return { who: "key", role: "admin" };
+  // υπεύθυνος marketing (secret MKT_PASS): βλέπει ΜΟΝΟ τη σελίδα Marketing, συγκεντρωτικά νούμερα
+  if (key && env.MKT_PASS && key === env.MKT_PASS) return { who: "mkt", role: "mkt" };
   await adminTables(env);
   const u = await userFrom(env, token);
-  return u && (u.role === "admin" || u.email === OWNER) ? { who: "user:" + u.id, email: u.email } : null;
+  return u && (u.role === "admin" || u.email === OWNER) ? { who: "user:" + u.id, email: u.email, role: "admin" } : null;
 }
 const audit = (env, who, action, target, detail) =>
   env.DB.prepare("INSERT INTO audit(ts, who, action, target, detail) VALUES(?,?,?,?,?)").bind(now(), who, action, String(target ?? ""), detail ? String(detail).slice(0, 500) : null).run();
@@ -188,4 +190,33 @@ export async function aLeagueSave(env, who, b) {
   const names = (await env.DB.prepare(`SELECT country || ' – ' || name nm FROM leagues WHERE id IN (${ids.slice(0, 20).map(() => "?").join(",")})`).bind(...ids.slice(0, 20)).all()).results.map((x) => x.nm);
   await audit(env, who, on ? "league_on" : "league_off", ids.length + " λίγκες", names.join(", "));
   return { ok: true, n: ids.length };
+}
+
+// ---------- Marketing (όπως στο Pattern90): μόνο ανάγνωση, μόνο συγκεντρωτικά, χωρίς κανένα email/όνομα ----------
+// Δεν μετράνε: emails με «+test», ids στο Variable MKT_EXCLUDE (με κόμμα), emails μιας χρήσης.
+const DISPOSABLE = /@(mailinator|guerrillamail|10minutemail|tempmail|temp-mail|yopmail|trashmail|getnada|sharklasers|moblha|goldvester|agaexpress|hiringview|37xiao|ofags|playfine|hopefunder|dispostable|maildrop|fakeinbox|throwawaymail)\./i;
+export async function aMkt(env) {
+  const excl = new Set(String(env.MKT_EXCLUDE || "").split(",").map((x) => +x.trim()).filter(Boolean));
+  const U = (await env.DB.prepare("SELECT id, email, country, lang, created_at, last_seen, news, status, role FROM users").all()).results
+    .filter((u) => !/\+test/i.test(u.email) && !excl.has(u.id) && !DISPOSABLE.test(u.email) && u.role !== "admin");
+  const disp = (await env.DB.prepare("SELECT email FROM users").all()).results.filter((u) => DISPOSABLE.test(u.email)).length;
+  const t = now(), dk = (s) => day(s), days = [...Array(30)].map((_, i) => day(t - (29 - i) * 86400));
+  const perDay = Object.fromEntries(days.map((d) => [d, 0])); for (const u of U) { const k = dk(u.created_at); if (k in perDay) perDay[k]++; }
+  const wk = (n) => U.filter((u) => u.created_at >= t - n * 86400).length;
+  const group = (rows, f, min = 3) => { const m = {}; for (const r of rows) { const k = f(r) || "—"; m[k] = (m[k] || 0) + (r.n || 1); }
+    const out = [], other = [0]; for (const [k, v] of Object.entries(m).sort((a, b) => b[1] - a[1])) (v < min ? (other[0] += v) : out.push([k, v])); if (other[0]) out.push(["Άλλες", other[0]]); return out; };
+  const H = (await env.DB.prepare("SELECT day, kind, lang, country, src, n FROM hits WHERE day>=?").bind(days[0]).all()).results;
+  const pv = Object.fromEntries(days.map((d) => [d, 0])), bk = Object.fromEntries(days.map((d) => [d, 0]));
+  for (const h of H) { if (h.kind === "pv" && h.day in pv) pv[h.day] += h.n; if (h.kind === "bk" && h.day in bk) bk[h.day] += h.n; }
+  const H7 = H.filter((h) => h.day >= day(t - 6 * 86400));
+  const su7 = H7.filter((h) => h.kind === "su").reduce((a, h) => a + h.n, 0);
+  return {
+    updated: t,
+    users: { total: U.length, d1: wk(1), d7: wk(7), d30: wk(30), active7: U.filter((u) => u.last_seen >= t - 7 * 86400).length, perDay: Object.entries(perDay), byCountry: group(U, (u) => u.country), byLang: group(U, (u) => u.lang, 1) },
+    news: { yes: U.filter((u) => u.news === 1 && u.status === "active").length, pct: U.length ? Math.round(U.filter((u) => u.news === 1).length * 100 / U.length) : 0 },
+    traffic: { perDay: Object.entries(pv), bkPerDay: Object.entries(bk), src7: group(H7.filter((h) => h.kind === "pv"), (h) => h.src || "απευθείας / άγνωστο", 1),
+      country7: group(H7.filter((h) => h.kind === "pv"), (h) => h.country), lang7: group(H7.filter((h) => h.kind === "pv"), (h) => h.lang, 1),
+      pv7: H7.filter((h) => h.kind === "pv").reduce((a, h) => a + h.n, 0), bk7: H7.filter((h) => h.kind === "bk").reduce((a, h) => a + h.n, 0), suOpen7: su7, signups7: wk(7) },
+    excluded: { disposable: disp },
+  };
 }
