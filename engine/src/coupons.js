@@ -22,12 +22,16 @@ const STYLE = {
 const LEVEL = { A: 2, B: 1, C: 0 };
 const typeOf = (sel) => (WINS.has(sel) ? "wins" : GOALS.has(sel) ? "goals" : "other");
 
-export async function makeCoupons(env, date = ymd(now()), dry = false) {
+export async function makeCoupons(env, date = ymd(now()), dry = false, opt = {}) {
   await env.DB.prepare(`CREATE TABLE IF NOT EXISTS coupons(date TEXT, n INTEGER, kind TEXT, variant TEXT, legs TEXT, odds REAL, prob REAL,
     created_at INTEGER, model_version TEXT, hash TEXT, PRIMARY KEY(date, n))`).run();
   for (const col of ["style TEXT", "pick INTEGER"]) { try { await env.DB.prepare("ALTER TABLE coupons ADD COLUMN " + col).run(); } catch (e) { /* υπάρχει */ } }
-  const done = await env.DB.prepare("SELECT COUNT(*) c FROM coupons WHERE date=?").bind(date).first();
-  if (done.c && !dry) return { date, skipped: "already made" };
+  const done = await env.DB.prepare("SELECT COUNT(*) c, SUM(style IS NOT NULL) s, MAX(n) mx FROM coupons WHERE date=?").bind(date).first();
+  // Μετάβαση 02/11: αν η μέρα έχει μόνο παλιά κουπόνια (χωρίς στυλ), βγαίνει ΕΝΑ σετ με τους νέους κανόνες
+  // για τους αγώνες που δεν έχουν αρχίσει. Τα παλιά μένουν (record)· κανένα κουπόνι δεν σβήνεται.
+  const upgrade = opt.upgrade && done.c && !done.s;
+  if (done.c && !dry && !upgrade) return { date, skipped: "already made" };
+  const base = upgrade ? (done.mx || 0) : 0;
 
   const from = Math.floor(Date.parse(date + "T00:00:00Z") / 1000), to = from + DAY;
   const start = Math.max(now() + 45 * 60, from); // μόνο αγώνες που δεν έχουν αρχίσει (περιθώριο 45΄)
@@ -95,9 +99,9 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
   for (let i = 0; i < out.length; i++) {
     const c = out[i];
     const legs = JSON.stringify(c.legs.map((l) => [l.f, l.sel, l.price, Math.round(l.prob * 1000) / 1000, l.src]));
-    const hash = await sha256([date, i + 1, c.kind, legs, t, MODEL_VERSION].join("|"));
+    const hash = await sha256([date, base + i + 1, c.kind, legs, t, MODEL_VERSION].join("|"));
     st.push(env.DB.prepare("INSERT OR IGNORE INTO coupons(date,n,kind,variant,legs,odds,prob,created_at,model_version,hash,style,pick) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)")
-      .bind(date, i + 1, c.kind, c.variant, legs, c.odds, c.prob, t, MODEL_VERSION, hash, c.style, c.pick || 0));
+      .bind(date, base + i + 1, c.kind, c.variant, legs, c.odds, c.prob, t, MODEL_VERSION, hash, c.style, c.pick || 0));
   }
   if (st.length) await env.DB.batch(st);
   return { date, made: out.map((c) => `${c.kind} ${c.variant} ${c.style}${c.pick ? " ★" : ""} ${c.legs.length} legs x${c.odds}`) };
