@@ -2,7 +2,7 @@
 // Τα email φεύγουν από τον λογαριασμό Brevo του betizzi (secret BREVO_KEY, αποστολέας noreply@betizzi.com).
 // Η σελίδα (betizzi-web) μιλάει με αυτά τα endpoints μέσω service binding και κρατά το session σε cookie HttpOnly.
 // Προσωπικά δεδομένα: μόνο email, γλώσσα, χώρα (από Cloudflare), συγκαταθέσεις. Τίποτα άλλο.
-import { MAIL } from "./auth-texts.js";
+import { MAIL, WELCOME } from "./auth-texts.js";
 
 const now = () => Math.floor(Date.now() / 1000);
 const CODE_TTL = 10 * 60, SESSION_TTL = 90 * 86400, MAX_TRIES = 5;
@@ -41,6 +41,35 @@ async function bump(env, k, win, max) {
     await env.DB.prepare("UPDATE auth_rate SET n=n+1 WHERE k=?").bind(k).run();
   } else await env.DB.prepare("INSERT OR REPLACE INTO auth_rate(k,n,win) VALUES(?,1,?)").bind(k, t).run();
   return true;
+}
+
+async function brevo(env, to, subject, html, text, tag) {
+  if (!env.BREVO_KEY) throw new Error("mail not configured");
+  const r = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: { "api-key": env.BREVO_KEY, "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify({ sender: { name: "betizzi", email: env.MAIL_FROM || "noreply@betizzi.com" }, to: [{ email: to }], subject, htmlContent: html, textContent: text, tags: [tag] }),
+  });
+  if (!r.ok) throw new Error("mail " + r.status + " " + (await r.text()).slice(0, 120));
+}
+const LOGO = '<div style="font-size:26px;font-weight:800">bet<span style="color:#b6f23a;font-style:italic">izzi</span></div>';
+const BOX = (inner) => `<div style="font-family:Arial,sans-serif;max-width:440px;margin:auto;padding:24px;background:#0c0f0d;color:#eef3ee;border-radius:14px">${LOGO}${inner}</div>`;
+
+// Καλωσόρισμα: μία φορά, μετά την πρώτη σύνδεση (transactional, χωρίς προσφορές)
+async function sendWelcome(env, to, lang) {
+  const W = WELCOME[lang] || WELCOME.en, site = `https://betizzi.com/${WELCOME[lang] ? lang : "en"}/`;
+  const html = BOX(`<h2 style="margin:16px 0 6px;font-size:20px">${W.hi}</h2>
+<p style="font-size:15px;margin:6px 0">${W.got}</p>
+<div style="margin:14px 0;padding:14px;border:1px solid #2a352e;border-radius:12px;background:#141a16"><div style="font:700 30px monospace;color:#b6f23a">100 / 1000</div>
+<div style="height:8px;border-radius:99px;background:#2a352e;margin-top:8px"><div style="width:10%;height:8px;border-radius:99px;background:#b6f23a"></div></div>
+<p style="font-size:13px;color:#9aa89f;margin:10px 0 0">${W.goal}</p></div>
+<p style="font-size:14px;font-weight:700;margin:14px 0 4px">${W.how}</p>
+<ul style="font-size:14px;margin:0;padding-left:18px">${W.ways.map((w) => `<li style="margin:4px 0">${w}</li>`).join("")}</ul>
+<p style="font-size:14px;margin:14px 0">${W.vip}</p>
+<p style="margin:18px 0"><a href="${site}" style="display:inline-block;background:#b6f23a;color:#14200a;font-weight:800;text-decoration:none;padding:12px 18px;border-radius:10px">${W.go}</a></p>
+<p style="font-size:11px;color:#9aa89f">${W.foot}</p>`);
+  const text = [W.hi, W.got.replace(/<[^>]+>/g, ""), W.goal.replace(/<[^>]+>/g, ""), W.how + ":", ...W.ways.map((w) => "- " + w), W.vip, site, W.foot].join("\n");
+  await brevo(env, to, W.subject, html, text, "welcome");
 }
 
 async function sendMail(env, to, lang, code) {
@@ -101,6 +130,9 @@ export async function authVerify(env, body) {
       env.DB.prepare("INSERT OR IGNORE INTO credits(user_id, ts, kind, amount, day) VALUES(?,?,?,?,?)").bind(u.id, t, "signup", CREDITS.signup, "once"),
       env.DB.prepare("INSERT INTO audit(ts, who, action, target) VALUES(?,?,?,?)").bind(t, "user:" + u.id, "signup", email),
     ]);
+    // καλωσόρισμα: αν αποτύχει, η εγγραφή δεν χαλάει (καταγράφεται στο audit)
+    try { await sendWelcome(env, email, lang); }
+    catch (e) { await env.DB.prepare("INSERT INTO audit(ts, who, action, target, detail) VALUES(?,?,?,?,?)").bind(t, "system", "welcome_fail", email, String(e.message).slice(0, 200)).run(); }
   }
   if (u.status !== "active") return { error: "blocked" };
   const token = rnd(32);
