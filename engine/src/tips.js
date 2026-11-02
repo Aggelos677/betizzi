@@ -1,7 +1,7 @@
 // Κανόνες tips betizzi (01/11/2026). Όλα τα όρια εδώ, σε ένα σημείο.
 // Ομάδες που δεν παίρνουν ποτέ tip/κουπόνι (κανόνας λιγκών): Β ομάδες, reserves, νέοι, γυναικείες.
 export const NOT_FIRST_TEAM = /(^Jong | II$| III$| B$| C$|\bU-?(1[6-9]|2[0-3])\b|\bReserves?\b|\(W\)| W$|\bWomen\b|\bYouth\b)/i;
-export const MODEL_VERSION = "rules-2026-11-01b";
+export const MODEL_VERSION = "rules-2026-11-02a";
 async function sha256(s) {
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
@@ -87,19 +87,35 @@ export async function makeTips(env, now) {
     if (u.size >= RULES.maxPerMatch || u.has(GROUP[c.k])) return false;
     u.add(GROUP[c.k]); return true;
   };
-  // VIP: τα πιο δυνατά πρώτα, μέχρι το όριο
+  // Απόφαση Owner 02/11: ένα tip που δημοσιεύτηκε ΔΕΝ αποσύρεται ποτέ (ούτε αν πέσει η τιμή· τότε φαίνεται «⚠ η τιμή έπεσε»).
+  // Τα ήδη δημοσιευμένα πιάνουν πρώτα τις θέσεις τους· κάθε εκτέλεση μόνο ΠΡΟΣΘΕΤΕΙ καινούρια καλά tips.
+  const live = [];
+  for (let i = 0; i < ids.length; i += 90) {
+    const part = ids.slice(i, i + 90);
+    live.push(...(await env.DB.prepare(`SELECT fixture_id, sel, tier FROM tips WHERE status='active' AND fixture_id IN (${part.map(() => "?").join(",")})`).bind(...part).all()).results);
+  }
+  const have = new Set(live.map((t) => t.fixture_id + "|" + t.sel));
+  for (const t of live) { (used[t.fixture_id] ||= new Set()).add(GROUP[t.sel]); }
+  const vipHave = live.filter((t) => t.tier === "vip");
+  const freeFx = new Set(live.filter((t) => t.tier !== "vip").map((t) => t.fixture_id)); // αγώνας με Free δεν παίρνει μετά VIP
+  const fresh = cands.filter((c) => !have.has(c.f.id + "|" + c.k));
+  // VIP: τα πιο δυνατά πρώτα, μέχρι το όριο (μετράνε και τα ήδη δημοσιευμένα VIP)
   const vipQuota = Math.round(withOdds * RULES.vipShare);
   const VIP = [];
-  for (const c of cands.filter((c) => c.vip).sort((a, b) => b.s - a.s)) { if (VIP.length >= vipQuota) break; if (take(c)) VIP.push(c); }
+  for (const c of fresh.filter((c) => c.vip).sort((a, b) => b.s - a.s)) { if (vipHave.length + VIP.length >= vipQuota) break; if (freeFx.has(c.f.id)) continue; if (take(c)) VIP.push(c); }
   // Free: επίπεδα Α→Β→Γ, αναλογία ανά ομάδα αγορών, 1 X τη μέρα
   const freeQuota = Math.round(withOdds * RULES.freeShare);
   // Αγώνας με VIP δεν παίρνει και Free (το VIP είναι το επόμενο σκαλί).
-  const vipFx = new Set(VIP.map((c) => c.f.id));
-  const pool = cands.filter((c) => !vipFx.has(c.f.id) && c.p >= RULES.free.min && c.p <= RULES.free.max)
+  const vipFx = new Set([...VIP.map((c) => c.f.id), ...vipHave.map((t) => t.fixture_id)]);
+  const pool = fresh.filter((c) => !vipFx.has(c.f.id) && c.p >= RULES.free.min && c.p <= RULES.free.max)
     .sort((a, b) => LEVEL[a.level] - LEVEL[b.level] || b.s - a.s);
-  const FREE = [], byG = { RES: 0, GOALS: 0, BTTS: 0 }; let xs = 0;
+  // Free: στόχος ≈ 1 στους 4 αγώνες με αποδόσεις, μετρώντας και τα ήδη δημοσιευμένα. Όσο έρχονται αποδόσεις για
+  // περισσότερους αγώνες, ο στόχος μεγαλώνει και μπαίνουν καινούρια tips. Τίποτα δεν βγαίνει για να «χωρέσει».
+  const freeHave = live.filter((t) => t.tier !== "vip").length;
+  const FREE = [], byG = { RES: 0, GOALS: 0, BTTS: 0 }; let xs = live.filter((t) => t.sel === "X").length;
+  for (const t of live) if (t.tier !== "vip") byG[GROUP[t.sel]]++;
   const tryFree = (c, capG) => {
-    if (FREE.length >= freeQuota) return;
+    if (freeHave + FREE.length >= freeQuota) return;
     const g = GROUP[c.k];
     if (capG && byG[g] >= Math.round(freeQuota * RULES.groupShare[g])) return;
     if (c.k === "X" && xs >= 1) return;
@@ -111,10 +127,8 @@ export async function makeTips(env, now) {
 
   // Αμετάβλητο record: ένα tip που δημοσιεύτηκε ΔΕΝ αλλάζει και ΔΕΝ σβήνεται ποτέ.
   // Αν δεν ισχύει πια πριν τη σέντρα → status 'withdrawn' (φαίνεται δημόσια ως αποσυρμένο).
-  const keep = new Set([...VIP, ...FREE].map((c) => c.f.id + "|" + MARKET[c.k] + "|" + c.k));
-  const old = (await env.DB.prepare("SELECT fixture_id, market, sel FROM tips WHERE status='active' AND result IS NULL AND fixture_id IN (SELECT id FROM fixtures WHERE ts > ? AND status IN ('NS','TBD'))").bind(now + 15 * 60).all()).results;
-  const st = old.filter((t) => !keep.has(t.fixture_id + "|" + t.market + "|" + t.sel))
-    .map((t) => env.DB.prepare("UPDATE tips SET status='withdrawn', withdrawn_at=? WHERE fixture_id=? AND market=? AND sel=?").bind(now, t.fixture_id, t.market, t.sel));
+  // (Μέχρι 02/11 εδώ γινόταν απόσυρση όσων δεν ξαναδιαλέγονταν. Καταργήθηκε: τίποτα δεν αποσύρεται.)
+  const st = [];
   try { await env.DB.prepare("ALTER TABLE tips ADD COLUMN min_price REAL").run(); } catch (e) { /* υπάρχει ήδη */ }
   for (const [tier, list] of [["vip", VIP], ["free", FREE]])
     for (const c of list) {
