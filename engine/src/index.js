@@ -108,6 +108,8 @@ async function syncOdds(env, maxPages = 8) {
       n += rows.length; c.total = total; c.next_page++;
       if (c.next_page > total) c.done = 1;
     }
+    // 0 τιμές για όλη τη μέρα = μάλλον όριο του API ή δεν βγήκαν ακόμα: ξαναδοκιμάζουμε σε 1 ώρα, όχι σε 12.
+    if (c.done && n === 0 && c.total <= 1) c.started = now() - 11 * 3600;
     await env.DB.prepare("INSERT OR REPLACE INTO odds_cursor VALUES(?,?,?,?,?)").bind(c.date, c.next_page, c.total, c.started, c.done).run();
   }
   if (calls) await log(env, "odds", true, calls, n + " prices");
