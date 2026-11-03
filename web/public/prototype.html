@@ -159,6 +159,7 @@ input:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visib
 .slipbar .tot{font-family:var(--f-mono);font-size:.98rem}
 .cpl .cv,.bwleg.cv{opacity:.55}.cpl em{max-width:9em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .m-an{margin:2px 0 8px;line-height:1.55;font-size:.86rem;color:#d9e2da}.m-url{display:inline-block;margin:0 0 10px;color:var(--lime);font-weight:700;font-size:.82rem;text-decoration:none}
+.zsec{margin:10px 0 -2px;font:800 1.05rem 'Fira Sans Extra Condensed',sans-serif;color:var(--lime);scroll-margin-top:12px}.zsec small{color:var(--muted);font-weight:600}
 .stb{margin:0 0 14px}.stb-c .pc-take{flex:none;margin-top:auto;min-height:44px}.stb-h{display:flex;align-items:center;gap:8px;margin:0 0 8px;font:800 1.05rem "Fira Sans Extra Condensed",sans-serif;text-transform:uppercase;letter-spacing:.02em;color:var(--lime)}
 .stb-g{display:grid;grid-template-columns:1fr;gap:10px}@media(min-width:900px){.stb-g{grid-template-columns:repeat(3,1fr)}}
 .stb-c{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
@@ -1387,7 +1388,7 @@ function renderWins(){var box=$("winsSide");if(!box)return;
     if(top.length)h+='<div>'+top.map(function(x,i){return '<div class="winrow" style="--d:'+(i*90)+'ms"><span class="wm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+' · FT '+esc(x.m.score)+'</small></span><span class="wo">✓ '+(x.t.odds?x.t.odds.toFixed(2):'')+'</span></div>';}).join("")+'</div>';
   }
   if(box._h===h)return;box._h=h;box.innerHTML=h;}
-if(window.matchMedia){var _sm=window.matchMedia("(min-width:1100px)");var _sf=function(){renderSide();};if(_sm.addEventListener)_sm.addEventListener("change",_sf);else if(_sm.addListener)_sm.addListener(_sf);}
+if(window.matchMedia){var _sm=window.matchMedia("(min-width:1100px)");var _sf=function(){renderSide();try{renderPicks();}catch(e){}};if(_sm.addEventListener)_sm.addEventListener("change",_sf);else if(_sm.addListener)_sm.addListener(_sf);}
 
 /* ---------- helpers ---------- */
 function fbars(s,who){return '<span class="fb" role="img" aria-label="'+esc(who)+' last 5, older to newer: '+(s||"no data")+'">'+(s||"").split("").map(function(c){return '<i class="f'+c+'"></i>';}).join("")+'</span>';}
@@ -1856,11 +1857,19 @@ function renderPicks(){
   var inZ=L.filter(function(c){return c.kind===opZone;}).sort(function(a,b){return a.odds-b.odds;}),main=inZ[0],alts=inZ.filter(function(c){return c!==main;});
   // απόφαση Owner 02/11: όλα τα παρολί της ζώνης το ένα κάτω από το άλλο (πρώτα τα πριν τις 17:00, μετά από τη μικρότερη απόδοση)
   inZ.sort(function(a,b){var w=function(c){return /\|early$/.test(c.slot||"")?0:1;};return w(a)-w(b)||a.odds-b.odds;});
-  $("zMain").innerHTML=main?inZ.map(function(c){return parlayHTML(c,true);}).join(""):'<div class="opempty"><b>Today\'s parlays are coming</b><span>We make them every morning from our tips.</span></div>';
+  /* απόφαση Owner 03/11: στο κινητό ΟΛΑ τα παρολί (όλες οι ζώνες) το ένα κάτω από το άλλο, με σκρολ· τα tabs απλώς πάνε στη ζώνη */
+  var allMob=!sideOn()&&zones.length>1;
+  if(allMob){var srt=function(a,b){var w=function(c){return /\|early$/.test(c.slot||"")?0:1;};return w(a)-w(b)||a.odds-b.odds;};
+    $("zMain").innerHTML=zones.map(function(z){var lz=L.filter(function(c){return c.kind===z;}).sort(srt);
+      return '<h3 class="zsec" id="zsec-'+esc(z)+'">'+esc(z.replace("-","–"))+' <small>'+lz.length+'</small></h3>'+lz.map(function(c){return parlayHTML(c,true);}).join("");}).join("");
+    Array.prototype.forEach.call($("zTabs").querySelectorAll("[data-z]"),function(b){b.setAttribute("aria-pressed","false");});}
+  else $("zMain").innerHTML=main?inZ.map(function(c){return parlayHTML(c,true);}).join(""):'<div class="opempty"><b>Today\'s parlays are coming</b><span>We make them every morning from our tips.</span></div>';
   var opts=main?[main].concat(alts):[];
   opts=[];$("zAltH").hidden=true;$("zAltK").textContent=opZone.replace("-","–")+" · "+opts.length;
   $("zAlts").innerHTML=opts.length<2?"":opts.map(function(c,i){return '<button type="button" class="opalt" data-alt="'+i+'" aria-pressed="'+((opAlt||0)===i)+'"><b><span>'+esc(BZC_VAR[c.variant]||c.variant)+'</span></b><small>'+(c.style?'<span>'+esc(STY[c.style]||c.style)+'</span> · ':'')+c.legs.length+' <span>picks</span></small><em>x'+fx2(c.odds)+'</em></button>';}).join("");
-  Array.prototype.forEach.call($("zTabs").querySelectorAll("[data-z]"),function(b){b.addEventListener("click",function(){opZone=b.dataset.z;opAlt=0;store("ko-zone",opZone);renderPicks();});});
+  Array.prototype.forEach.call($("zTabs").querySelectorAll("[data-z]"),function(b){b.addEventListener("click",function(){
+    if(allMob){var s=$("zsec-"+b.dataset.z);if(s){var y=s.getBoundingClientRect().top+window.pageYOffset-12;window.scrollTo({top:y,behavior:"smooth"});}return;}
+    opZone=b.dataset.z;opAlt=0;store("ko-zone",opZone);renderPicks();});});
   Array.prototype.forEach.call($("zAlts").querySelectorAll("[data-alt]"),function(b){b.addEventListener("click",function(){opAlt=+b.dataset.alt;renderPicks();});});
   Array.prototype.forEach.call($("zMain").querySelectorAll("[data-take]"),function(b){b.addEventListener("click",function(){var c=L.filter(function(x){return String(x.n)===b.dataset.take;})[0];if(!c)return;
     var keys=c.legs.map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});if(!keys.length)return;
