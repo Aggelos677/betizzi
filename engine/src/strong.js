@@ -1,6 +1,6 @@
 // «Τα δυνατά της ημέρας» (απόφαση Owner 03/11/2026): 3 κάρτες, κάθε μέρα στις 10:00 ώρα Ελλάδας/Κύπρου.
-//  1) Νίκη (1 ή 2) σε απόδοση 1.50–1.80: VIP αν υπάρχει, αλλιώς Free
-//  2) Γκολ: Over 2.5 ή GG: VIP αν υπάρχει, αλλιώς Free
+//  1) Νίκη (1 ή 2) σε απόδοση 1.60–1.85: VIP αν υπάρχει, αλλιώς Free
+//  2) Γκολ: Over 2.5 ή GG σε απόδοση 1.60–1.85: VIP αν υπάρχει, αλλιώς Free
 //  3) Τριάδα: τα 3 πιο δυνατά VIP που μένουν, κάθε επιλογή 1.50–1.80 (διαφορετικοί αγώνες)· αν λείπουν, από Free
 // Τα VIP εδώ είναι ανοιχτά για όλους. Μόνο αγώνες που αρχίζουν τουλάχιστον 45΄ μετά.
 // Βγαίνει μία φορά τη μέρα και ΔΕΝ αλλάζει (record, με hash). Τα αποτελέσματα διαβάζονται από τα tips.
@@ -34,8 +34,9 @@ export async function makeStrong(env, date = ymd(now()), force = false) {
     for (const pool of [vip, free]) { const c = pool.find((x) => !used.has(x.f) && test(x)); if (c) { used.add(c.f); return c; } }
     return null;
   };
-  const win = pick((x) => (x.sel === "1" || x.sel === "2") && x.price >= 1.5 && x.price <= 1.8);
-  const goals = pick((x) => x.sel === "O25" || x.sel === "GG");
+  // απόφαση Owner 03/11: οι δύο κάρτες «μονών» (Νίκη, Γκολ) σε απόδοση 1.60–1.85
+  const win = pick((x) => (x.sel === "1" || x.sel === "2") && x.price >= 1.6 && x.price <= 1.85);
+  const goals = pick((x) => (x.sel === "O25" || x.sel === "GG") && x.price >= 1.6 && x.price <= 1.85);
   const treble = [];
   // απόφαση Owner 03/11: κάθε επιλογή της τριάδας 1.50–1.80
   for (const pool of [vip, free]) for (const x of pool) if (treble.length < 3 && !used.has(x.f) && x.price >= 1.5 && x.price <= 1.8) { used.add(x.f); treble.push(x); }
