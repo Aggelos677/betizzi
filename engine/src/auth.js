@@ -43,7 +43,10 @@ async function bump(env, k, win, max) {
   return true;
 }
 
+// Αποστολή email (03/11/2026): πρώτα Cloudflare Email Sending (binding EMAIL, χωρίς κλειδί/τηλέφωνο)· αλλιώς Brevo (BREVO_KEY).
 async function brevo(env, to, subject, html, text, tag) {
+  const from = env.MAIL_FROM || "noreply@betizzi.com";
+  if (env.EMAIL && env.EMAIL.send) { await env.EMAIL.send({ from: { email: from, name: "betizzi" }, to, subject, html, text }); return; }
   if (!env.BREVO_KEY) throw new Error("mail not configured");
   const r = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
@@ -74,19 +77,12 @@ async function sendWelcome(env, to, lang) {
 
 async function sendMail(env, to, lang, code) {
   const T = MAIL[lang] || MAIL.en;
-  if (!env.BREVO_KEY) throw new Error("mail not configured");
   const html = `<div style="font-family:Arial,sans-serif;max-width:420px;margin:auto;padding:24px;background:#0c0f0d;color:#eef3ee;border-radius:14px">
 <div style="font-size:26px;font-weight:800">bet<span style="color:#b6f23a;font-style:italic">izzi</span></div>
 <p style="font-size:15px">${T.body}</p>
 <div style="font:700 34px/1.2 monospace;letter-spacing:8px;color:#b6f23a;margin:18px 0">${code}</div>
 <p style="font-size:12px;color:#9aa89f">${T.foot}</p></div>`;
-  const r = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST",
-    headers: { "api-key": env.BREVO_KEY, "content-type": "application/json", accept: "application/json" },
-    body: JSON.stringify({ sender: { name: "betizzi", email: env.MAIL_FROM || "noreply@betizzi.com" }, to: [{ email: to }],
-      subject: T.subject.replace("{code}", code), htmlContent: html, textContent: `${T.body}\n\n${code}\n\n${T.foot}`, tags: ["login-code"] }),
-  });
-  if (!r.ok) throw new Error("mail " + r.status + " " + (await r.text()).slice(0, 120));
+  await brevo(env, to, T.subject.replace("{code}", code), html, `${T.body}\n\n${code}\n\n${T.foot}`, "login-code");
 }
 
 // POST /auth/start {email, lang}  → στέλνει κωδικό
