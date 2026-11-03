@@ -42,6 +42,7 @@ export async function hit(env, b, country) {
   await adminTables(env);
   const kind = KINDS.has(b.k) ? b.k : null; if (!kind) return { ok: false };
   const lang = String(b.l || "").slice(0, 2), src = String(b.s || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 24);
+  if (src === "bzqa") return { ok: true, qa: true }; // δοκιμαστές: δεν μετράνε
   await env.DB.prepare(`INSERT INTO hits(day, kind, lang, country, src, n) VALUES(?,?,?,?,?,1)
     ON CONFLICT(day, kind, lang, country, src) DO UPDATE SET n=n+1`).bind(day(), kind, lang, String(country || "").slice(0, 2), src).run();
   return { ok: true };
