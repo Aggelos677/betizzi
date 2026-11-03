@@ -169,6 +169,7 @@ async function authRoute(req, env, url) {
     await eng("/auth/logout", { method: "POST", body: "{}" });
     return J({ ok: true }, { "set-cookie": `${AUTH_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` });
   }
+  if (p === "/auth/tg" && req.method === "POST") { try { return J(await (await eng("/auth/tg", { method: "POST", body: "{}" })).json()); } catch (e) { return J({ error: "engine" }); } }
   if (p === "/auth/app" && req.method === "POST") { try { return J(await (await eng("/auth/app", { method: "POST", body: "{}" })).json()); } catch (e) { return J({ error: "engine" }); } }
   if (p === "/me.json") return J(tok ? await (await eng("/auth/me")).json() : { user: null });
   if (p === "/vip.json") {

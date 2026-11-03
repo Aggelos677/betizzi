@@ -153,7 +153,7 @@ export async function authMe(env, token) {
     env.DB.prepare("INSERT OR IGNORE INTO credits(user_id, ts, kind, amount, day) VALUES(?,?,?,?,?)").bind(u.id, t, "visit", CREDITS.visit, day),
   ]);
   const c = await env.DB.prepare("SELECT COALESCE(SUM(amount),0) s FROM credits WHERE user_id=?").bind(u.id).first();
-  return { user: { email: u.email, credits: c.s, since: u.created_at, ref: u.ref_code, tg: !!u.tg_id } };
+  return { user: { email: u.email, credits: c.s, since: u.created_at, ref: u.ref_code, tg: !!u.tg_id, tgUntil: u.tg_until || 0 } };
 }
 
 // POST /auth/app → +500 credits μία φορά, όταν ο χρήστης ανοίγει το betizzi ως εφαρμογή (PWA) συνδεδεμένος

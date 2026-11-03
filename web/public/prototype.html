@@ -809,6 +809,10 @@ header{position:relative}
     <p class="authp" id="accMail"></p>
     <p class="acccr"><b class="mono" id="accCr">0</b> <span>credits</span></p>
     <p class="authp"><span>1000 credits = 1 month of our strongest picks on Telegram.</span></p>
+    <p class="authp" id="tgSt" hidden></p>
+    <button type="button" class="btn" id="tgJoin">⚡ <span>Join Strongest on Telegram</span></button>
+    <a class="btn sec" id="tgLink" href="#" target="_blank" rel="noopener" hidden>📲 <span>Open your invite</span></a>
+    <p class="authp"><a href="https://t.me/betizzi_tips" target="_blank" rel="noopener">t.me/betizzi_tips</a> · <span>our free channel</span></p>
     <button type="button" class="btn quiet" id="authOut"><span>Sign out</span></button>
   </div>
   <p class="autherr" id="authErr" hidden></p>
@@ -2138,7 +2142,7 @@ function openMyL(){if(!ACC){toast("Sign up free to pick your own leagues");openA
 var ACC=null,authMail="";
 function authStep(n){[1,2,3].forEach(function(i){$("authS"+i).hidden=i!==n;});if($("mylS"))$("mylS").hidden=true;$("authErr").hidden=true;}
 function authErr(m){var e=$("authErr");e.textContent=m;e.hidden=false;}
-function openAuth(){authStep(ACC?3:1);if(ACC){$("accMail").textContent=ACC.email;$("accCr").textContent=ACC.credits;}
+function openAuth(){authStep(ACC?3:1);if(ACC){$("accMail").textContent=ACC.email;$("accCr").textContent=ACC.credits;tgRender();}
   $("authBg").hidden=false;$("authBox").hidden=false;setTimeout(function(){var i=ACC?null:$("authEmail");if(i)i.focus();},50);}
 function closeAuth(){$("authBg").hidden=true;$("authBox").hidden=true;}
 var AERR={email:"Please check your email address.",wait:"Too many tries. Wait a few minutes and try again.",busy:"Too many sign-ups right now. Try again later.",
@@ -2158,7 +2162,17 @@ function authVerify(){var c=$("authCode").value.replace(/\D/g,"");if(c.length!==
   }).catch(function(){b.disabled=false;authErr(AERR.net);});}
 $("authOk").addEventListener("click",authVerify);$("authCode").addEventListener("input",function(){if(this.value.replace(/\D/g,"").length===6)authVerify();});
 $("authBack").addEventListener("click",function(){authStep(1);});
+$("tgJoin").addEventListener("click",tgJoinGo);
 $("authOut").addEventListener("click",function(){apost("/auth/logout",{}).then(function(){location.reload();});});
+/* Telegram ⚡ Strongest (απόφαση Owner 03/11): 1000 credits = 30 μέρες, προσωπικό link μίας χρήσης */
+function tgRender(){var st=$("tgSt");if(!st||!ACC)return;var u=ACC.tgUntil||0,on=u*1000>Date.now(),I=window.__I18N||{};
+  if(on){st.hidden=false;st.textContent=(I["Active until"]||"Active until")+" "+new Date(u*1000).toLocaleDateString();}else st.hidden=true;
+  var k=on?"Get a new invite link":"Join Strongest on Telegram";$("tgJoin").querySelector("span").textContent=I[k]||k;}
+function tgJoinGo(){var b=$("tgJoin");b.disabled=true;
+  fetch("/auth/tg",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:"{}"}).then(function(r){return r.json();}).then(function(j){b.disabled=false;
+    if(j&&j.ok){ACC.tgUntil=j.until;ACC.credits=j.credits;accRender();$("accCr").textContent=j.credits;tgRender();var a=$("tgLink");a.href=j.link;a.hidden=false;toast("Tap «Open your invite» to join",5000);return;}
+    if(j&&j.error==="credits"){toast("You need 1000 credits. You have "+j.have+".",5000);return;}
+    toast("Telegram is not ready yet. Try again later.",4000);}).catch(function(){b.disabled=false;toast("Telegram is not ready yet. Try again later.",4000);});}
 function accRender(){var b=$("accBtn");if(ACC){b.classList.add("in");b.innerHTML='👤 <span class="mono">'+ACC.credits+'</span> <span>credits</span>';}
   else{b.classList.remove("in");b.innerHTML='<span>Sign up free</span>';}}
 function hmTs(ts){if(!ts)return "";var d=new Date(ts*1000);return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);}

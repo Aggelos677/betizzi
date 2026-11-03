@@ -4,7 +4,8 @@
 import { makeStrong, apiStrong, strongKeys } from "./strong.js";
 import { aiStrong } from "./ai.js";
 import { makeCoupons, apiCoupons } from "./coupons.js";
-import { authStart, authVerify, authMe, authLogout, authVip, authApp } from "./auth.js";
+import { authStart, authVerify, authMe, authLogout, authVip, authApp, userFrom } from "./auth.js";
+import { tgPoll, tgJoin, tgExpire, tgPostStrong, tgStatus } from "./tg.js";
 import { hit, isAdmin, aToday, aUsers, aUserAct, aExport, aPartners, aPartnerSave, aHealth, aAudit, aLeagues, aLeagueSave, aMkt } from "./admin.js";
 import LEAGUES from "../data/leagues.json";
 import LEAGUES_ALL from "../data/leagues_all.json";
@@ -416,6 +417,7 @@ export default {
         if (u.pathname === "/auth/me") return json(await authMe(env, tok));
         if (u.pathname === "/auth/logout" && req.method === "POST") return json(await authLogout(env, tok));
         if (u.pathname === "/auth/app" && req.method === "POST") return json(await authApp(env, tok));
+        if (u.pathname === "/auth/tg" && req.method === "POST") { const us = await userFrom(env, tok); return json(us ? await tgJoin(env, us).catch((e) => ({ error: "tg", msg: e.message })) : { error: "login" }); }
         if (u.pathname === "/auth/vip") {
           const date = u.searchParams.get("date") || ymd(now()); // ίδιο εύρος με το /api/day
           if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return json({ error: "date" }, 400);
@@ -473,7 +475,7 @@ export default {
           return json({ key_tail: String(env.APIF_KEY || "").slice(-4), plan: j.response?.subscription?.plan, account: j.response?.account?.firstname,
             today: j.response?.requests, per_min_limit: r.headers.get("x-ratelimit-limit"), per_min_left: r.headers.get("x-ratelimit-remaining"), errors: j.errors });
         }
-        const jobs = { ai_strong: (e) => aiStrong(e, new Date().toISOString().slice(0, 10)), strong: makeStrong, strong_force: (e) => makeStrong(e, undefined, true), coupons: makeCoupons, coupons_dry: (e) => makeCoupons(e, undefined, true), cache: cacheDays, seed: seedLeagues, fixtures: syncFixtures, form: syncForm, odds: syncOdds, live: syncLive, tips: runTips };
+        const jobs = { tg_status: tgStatus, tg_poll: tgPoll, tg_post: tgPostStrong, ai_strong: (e) => aiStrong(e, new Date().toISOString().slice(0, 10)), strong: makeStrong, strong_force: (e) => makeStrong(e, undefined, true), coupons: makeCoupons, coupons_dry: (e) => makeCoupons(e, undefined, true), cache: cacheDays, seed: seedLeagues, fixtures: syncFixtures, form: syncForm, odds: syncOdds, live: syncLive, tips: runTips };
         if (!jobs[job]) return json({ error: "unknown job", jobs: Object.keys(jobs) }, 400);
         return json({ job, result: await jobs[job](env) });
       }
@@ -498,7 +500,12 @@ export default {
     if (m % 2 === 0) tasks.push(cacheDays(env));
     if (h === 6 && m === 50) tasks.push(makeCoupons(env)); // μετά τα tips των 06:40 UTC
     if (h >= 7 && h < 21 && m % 10 === 5) tasks.push(makeCoupons(env)); // συμπληρώνει όσα παρολί λείπουν (νέα tips)
-    if (h >= 6 && h < 14 && m % 10 === 0) tasks.push(makeStrong(env)); // «Τα δυνατά της ημέρας»: βγαίνουν στις 10:00 ώρα Ελλάδας (η ίδια η συνάρτηση περιμένει την ώρα· μία φορά τη μέρα)
+    if (h >= 6 && h < 14 && m % 10 === 0) tasks.push(makeStrong(env));
+    if (env.TG_BOT_TOKEN) {
+      tasks.push(tgPoll(env)); // Telegram: νέα μέλη / κανάλια (1 κλήση/λεπτό στο Telegram, όχι στο API-Football)
+      if (m === 30) tasks.push(tgExpire(env)); // κάθε ώρα: όσοι έληξαν βγαίνουν
+      if (h >= 7 && h < 14 && m % 10 === 2) tasks.push(tgPostStrong(env)); // 10:00 Ελλάδας: τα δυνατά στο ιδιωτικό κανάλι (μία φορά)
+    } // «Τα δυνατά της ημέρας»: βγαίνουν στις 10:00 ώρα Ελλάδας (η ίδια η συνάρτηση περιμένει την ώρα· μία φορά τη μέρα)
     if (h >= 6 && h < 14 && m % 10 === 3 && env.ANTHROPIC_KEY) tasks.push(aiStrong(env, new Date().toISOString().slice(0, 10))); // AI ανάλυση (EL/EN) για τα δυνατά· γράφει μόνο όσα λείπουν
     ctx.waitUntil(Promise.allSettled(tasks).then(async (r) => {
       const bad = r.filter((x) => x.status === "rejected");
