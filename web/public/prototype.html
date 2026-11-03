@@ -746,7 +746,7 @@ header{position:relative}
 .opalt[aria-pressed="true"]{border-color:var(--lime)}
 .pc-tr{font-family:var(--f-mono);color:var(--fg);opacity:.85}
 .opalt b{display:block;font-size:.92rem}.opalt small{display:block;font-size:.7rem;color:var(--muted)}.opalt em{display:block;font-style:normal;font:700 1.1rem var(--f-mono);color:var(--lime);margin-top:6px}
-.opempty{background:var(--panel);border:1px dashed var(--line);border-radius:18px;padding:24px;text-align:center;color:var(--muted)}
+.pend{border:1px solid var(--line);border-radius:12px;padding:10px 12px;opacity:.85}.pend>summary{cursor:pointer;font-weight:700;color:var(--mut,#9aa59e);min-height:28px}.opempty{background:var(--panel);border:1px dashed var(--line);border-radius:18px;padding:24px;text-align:center;color:var(--muted)}
 .opempty b{display:block;font:800 1.4rem var(--f-display);text-transform:uppercase;color:var(--fg);margin-bottom:4px}
 .sglist{display:flex;flex-direction:column;gap:12px}
 .sg{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px;transition:border-color .2s}
@@ -1799,8 +1799,13 @@ function chanceHTML(p){return ""; /* απόφαση Owner 02/11: δεν δείχ
   return '<div class="cm"><div class="cm-t"><span><span>Wins about</span> <b>1 <span>in</span> '+n+'</b></span><small>≈'+Math.max(1,Math.round(100/n))+'% <span>chance</span></small></div><div class="cm-bar" aria-hidden="true">'+b+'</div></div>';}
 function winLbl(team){return '<span>Win</span>: '+esc(team||"");}
 function legPick(l){if(l.sel==="1")return winLbl(l.home);if(l.sel==="2")return winLbl(l.away);return esc(BZC_SEL[l.sel]||l.sel);}
+/* απόφαση Owner 03/11: παρολί που χάνεται δείχνει «✗ Χάθηκε» αμέσως (και από live σκορ) και μετά από 2΄ πάει στα «Έληξαν» */
+var PL_LOST={},PL_FIRST=true,PL_TMR=null,PL_SELMAP={"1":"home","2":"away","X":"x","O25":"over 2.5","O15":"over 1.5","U25":"under 2.5","GG":"gg","NG":"ng"};
+function legLost(l){if(l.result===0)return true;if(l.result!=null)return false;var mm=null;for(var q=0;q<MATCHES.length;q++)if(String(MATCHES[q].id)===String(l.fixture_id)){mm=MATCHES[q];break;}
+  if(!mm||!(mm.live||mm.done)||!mm.score)return false;return tipState({sel:PL_SELMAP[l.sel]||""},{live:mm.live,done:mm.done,score:mm.score})==="lost";}
+function parlayLost(c){return c.result===0||(c.result!==1&&c.legs.some(legLost));}
 function parlayHTML(c,feat){
-  var st=c.result===1?"won":c.result===0?"lost":c.legs.some(function(l){return l.status&&l.status!=="NS"&&l.status!=="TBD";})?"live":"wait";
+  var st=c.result===1?"won":parlayLost(c)?"lost":c.legs.some(function(l){return l.status&&l.status!=="NS"&&l.status!=="TBD";})?"live":"wait";
   var legs=c.legs.slice().sort(function(a,b){return (a.ts||0)-(b.ts||0);}).map(function(l){var r=l.result===1?'<span class="pc-r w">✓</span>':l.result===0?'<span class="pc-r l">✗</span>':l.result===2?'<span class="pc-r v" title="void">–</span>':'';
     /* ζωντανά: το σκορ/λεπτό από τους αγώνες της σελίδας (ανανεώνονται κάθε 30΄΄), αλλιώς από το κουπόνι */
     var mm=null;for(var q=0;q<MATCHES.length;q++)if(String(MATCHES[q].id)===String(l.fixture_id)){mm=MATCHES[q];break;}
@@ -1811,7 +1816,7 @@ function parlayHTML(c,feat){
     if(!r&&(lv||dn)&&sc){var es=tipState({sel:({"1":"home","2":"away","X":"x","O25":"over 2.5","O15":"over 1.5","U25":"under 2.5","GG":"gg","NG":"ng"})[l.sel]||""},{live:lv,done:dn,score:sc});
       if(es==="won")r='<span class="pc-r w">✓</span>';else if(es==="lost")r='<span class="pc-r l">✗</span>';}
     var tm=lv?'<span class="pc-live"><i class="ldot2"></i><b>'+esc(sc||"0-0")+'</b><small>'+esc(mn||"LIVE")+'</small></span>':dn?'<span class="pc-ft"><b>'+esc(sc)+'</b><small>FT</small></span>':esc(l.time||"");
-    if(l.result===2)tm='<span class="pc-ft"><b>–</b><small>'+esc(l.status||"PST")+'</small></span>';
+    if(l.result===2)tm='<span class="pc-ft"><b>–</b><small>'+(l.status==="PST"||!l.status?'<span>Postponed</span>':'<span>Cancelled</span>')+' · <span>Void</span></small></span>';
     return '<li'+(lv?' class="lv"':'')+'><span class="pc-tm">'+tm+'</span><span class="pc-m"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+legPick(l)+(l.vip?'<span class="vipt">VIP</span>':'')+'</small></span>'+r+'<span class="pc-o">'+(l.result===2?'<s>'+fx2(l.price)+'</s> 1.00':l.price?fx2(l.price):"")+'</span></li>';}).join("");
   var keys=c.legs.map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});
   /* απόφαση Owner 02/11: το είδος μεγάλο με δικό του χρώμα (Γκολ πορτοκαλοκίτρινο, 1X2 γαλάζιο), το στυλ μικρό */
@@ -1825,7 +1830,7 @@ function parlayHTML(c,feat){
     +'<div class="pc-odd">'+(c.odds_now?'<s class="pc-was">x'+fx2(c.odds)+'</s> ':'')+'x'+fx2(c.odds_now||c.odds)+'</div></div><ul class="pc-legs">'+legs+'</ul>'+chanceHTML(c.prob)
     +'<div class="pc-btns">'+btns+'<button type="button" class="pc-sh" data-bzsh="'+c.n+'" aria-label="Share">↗</button></div>'
 
-    +'<p class="pc-foot">€10 → <b>€'+fx2(cpX(c)*10)+'</b> <span>if all win</span></p></article>';}
+    +(st==="lost"?'':st==="won"?'<p class="pc-foot"><span>Won</span>: €10 → <b>€'+fx2(cpX(c)*10)+'</b></p>':'<p class="pc-foot">€10 → <b>€'+fx2(cpX(c)*10)+'</b> <span>if all win</span></p>')+'</article>';}
 function tracked(keys){var s=keys.slice().sort().join("|");return coupons.some(function(c){return c.legs.slice().sort().join("|")===s;});}
 function trkBtn(attr,keys){var on=keys.length&&tracked(keys);return '<button type="button" class="trk'+(on?' on':'')+'" '+attr+(on?' disabled':'')+'>'+(on?'✓ <span>In My coupons</span>':'🎟️ <span>To My coupons</span>')+'</button>';}
 var SPONSOR_A='<a class="spb" href="#" role="button" rel="sponsored nofollow" data-spon="1"><span>Bet now</span> →</a>';
@@ -1890,7 +1895,11 @@ function renderPicks(){
   /* παρολί */
   var L=(typeof BZC!=="undefined"&&BZC)||[];if(L.some(function(c){return c.style;}))L=L.filter(function(c){return c.style;}); /* νέοι κανόνες: τα παλιά της μετάβασης μένουν μόνο στο record */
   /* απόφαση Owner 02/11: παρολί που χάνει φεύγει από τη λίστα της ημέρας (μένουν όσα «ζουν» ή κέρδισαν) */
-  L=L.filter(function(c){return c.result!==0&&!c.legs.some(function(l){return l.result===0;});});
+  var plNow=Date.now(),plEnded=[],plSoon=false;
+  L=L.filter(function(c){if(!parlayLost(c))return true;var k=String(c.n);if(PL_LOST[k]==null)PL_LOST[k]=PL_FIRST?0:plNow;
+    if(plNow-PL_LOST[k]<120000){plSoon=true;return true;}plEnded.push(c);return false;});
+  PL_FIRST=false;if(plSoon&&!PL_TMR)PL_TMR=setTimeout(function(){PL_TMR=null;try{renderPicks();}catch(e){}},20000);
+  var plEndH=plEnded.length?'<details class="pend"><summary><span>Ended</span> · '+plEnded.length+' <small>(<span>Lost</span>)</small></summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">'+plEnded.map(function(c){return parlayHTML(c,false);}).join("")+'</div></details>':'';
   if($("pkN"))$("pkN").textContent=L.length?"· "+L.length:""; /* απόφαση Owner 02/11: πόσα παρολί «ζουν», όπως στα Μονά */
   var zones=ZORDER.filter(function(z){return L.some(function(c){return c.kind===z;});});
   L.forEach(function(c){if(zones.indexOf(c.kind)<0)zones.push(c.kind);});
@@ -1904,9 +1913,9 @@ function renderPicks(){
   var allMob=!sideOn()&&zones.length>1;
   if(allMob){var srt=function(a,b){var w=function(c){return /\|early$/.test(c.slot||"")?0:1;};return w(a)-w(b)||a.odds-b.odds;};
     $("zMain").innerHTML=zones.map(function(z){var lz=L.filter(function(c){return c.kind===z;}).sort(srt);
-      return '<h3 class="zsec" id="zsec-'+esc(z)+'">'+esc(z.replace("-","–"))+' <small>'+lz.length+'</small></h3>'+lz.map(function(c){return parlayHTML(c,true);}).join("");}).join("");
+      return '<h3 class="zsec" id="zsec-'+esc(z)+'">'+esc(z.replace("-","–"))+' <small>'+lz.length+'</small></h3>'+lz.map(function(c){return parlayHTML(c,true);}).join("");}).join("")+plEndH;
     Array.prototype.forEach.call($("zTabs").querySelectorAll("[data-z]"),function(b){b.setAttribute("aria-pressed","false");});}
-  else $("zMain").innerHTML=main?inZ.map(function(c){return parlayHTML(c,true);}).join(""):'<div class="opempty"><b>Today\'s parlays are coming</b><span>We make them every morning from our tips.</span></div>';
+  else $("zMain").innerHTML=(main?inZ.map(function(c){return parlayHTML(c,true);}).join(""):plEnded.length?'<div class="opempty"><b>Today\'s parlays are settled</b><span>See them below. New ones every morning.</span></div>':'<div class="opempty"><b>Today\'s parlays are coming</b><span>We make them every morning from our tips.</span></div>')+plEndH;
   var opts=main?[main].concat(alts):[];
   opts=[];$("zAltH").hidden=true;$("zAltK").textContent=opZone.replace("-","–")+" · "+opts.length;
   $("zAlts").innerHTML=opts.length<2?"":opts.map(function(c,i){return '<button type="button" class="opalt" data-alt="'+i+'" aria-pressed="'+((opAlt||0)===i)+'"><b><span>'+esc(BZC_VAR[c.variant]||c.variant)+'</span></b><small>'+(c.style?'<span>'+esc(STY[c.style]||c.style)+'</span> · ':'')+c.legs.length+' <span>picks</span></small><em>x'+fx2(c.odds)+'</em></button>';}).join("");
