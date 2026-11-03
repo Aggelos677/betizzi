@@ -1357,7 +1357,7 @@ function showCB(c){
   var big=c.odds>=10,closed=false;
   function done(){if(closed)return;closed=true;o.remove();document.body.classList.remove("cshake");setTimeout(cbNext,400);}
   var cr=cpX(c)>=50?500:200; /* απόφαση Owner: share νικητήριου παρολί μας = 200 credits, x50 = 500 */
-  var o=document.createElement("div");o.className="cbig"+(big?" cbig-long":"");o.setAttribute("role","status");
+  var o=document.createElement("div");o.className="cbig cbig-long"; /* 03/11: όλα τα κερδισμένα παρολί μένουν μέχρι να τα κλείσει (όχι αόρατο στρώμα που μπλοκάρει πατήματα) */o.setAttribute("role","status");
   o.innerHTML='<div class="cbig-in cpbig"><span class="cbig-t">🏆 WINNER</span><span class="cbig-m">betizzi · <span>Parlay</span> · '+esc(String(c.kind).replace("-","–"))+'</span><b class="mono">x'+cpX(c).toFixed(2)+'</b><div class="cpl">'
     +c.legs.map(function(l){var v=cpVoid(l);return '<div'+(v?' class="cv"':'')+'><i>'+(v?'–':'✓')+'</i><span>'+esc(l.home||"")+' – '+esc(l.away||"")+'</span><em>'+(v?'<span>Postponed</span>':l.locked?'VIP':esc(BZC_SEL[l.sel]||l.sel))+'</em></div>';}).join("")+'</div><small>Cash it in!</small>'
     +('<div class="cbshare"><span><span>Share it with your friends and win</span> <b class="mono">'+cr+'</b> <span>credits</span></span><button type="button" class="btn" data-sh="1">📤 <span>Share</span></button></div><button type="button" class="cbx" data-x="1" aria-label="Close">×</button>')+'</div>';
