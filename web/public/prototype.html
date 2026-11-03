@@ -159,6 +159,14 @@ input:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visib
 .slipbar .tot{font-family:var(--f-mono);font-size:.98rem}
 .cpl .cv,.bwleg.cv{opacity:.55}.cpl em{max-width:9em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .m-an{margin:2px 0 8px;line-height:1.55;font-size:.86rem;color:#d9e2da}.m-url{display:inline-block;margin:0 0 10px;color:var(--lime);font-weight:700;font-size:.82rem;text-decoration:none}
+.stb{margin:0 0 14px}.stb-h{display:flex;align-items:center;gap:8px;margin:0 0 8px;font:800 1.05rem "Fira Sans Extra Condensed",sans-serif;text-transform:uppercase;letter-spacing:.02em;color:var(--lime)}
+.stb-g{display:grid;grid-template-columns:1fr;gap:10px}@media(min-width:900px){.stb-g{grid-template-columns:repeat(3,1fr)}}
+.stb-c{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.stb-t{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.9rem}.stb-t small{color:var(--muted);margin-left:auto;font-size:.75rem}
+.stb-m{font-weight:700;font-size:.95rem}.stb-p{display:flex;align-items:center;gap:10px}.stb-sel{font-weight:800;color:var(--lime)}.stb-o{font-weight:700}
+.stb-add{margin-left:auto;min-height:44px;min-width:44px;padding:0 12px;font-size:1.2rem}.stb-why{margin:0;font-size:.82rem;line-height:1.5;color:#cfd8d0}
+.stb-warn{font-size:.8rem;color:var(--gold)}.stb-now{font-size:.8rem;color:var(--muted)}.stb-wait{color:var(--muted);font-size:.9rem;padding:12px;border:1px dashed var(--line);border-radius:12px}
+.stb-l{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}.stb-l li{display:flex;align-items:center;gap:8px;font-size:.85rem}.stb-l li>span:first-child{flex:1;min-width:0}.stb-l small{color:var(--muted)}
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-height:88%;overflow-y:auto;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:14px 16px calc(18px + env(safe-area-inset-bottom,0px))}
 .sheet-in{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
@@ -829,6 +837,7 @@ header{position:relative}
   <div id="view-tips" role="tabpanel" aria-labelledby="tab-tips" class="wrap op" hidden>
     <label class="sw" hidden><input type="checkbox" id="vipMember"> Show as registered user (untick to see what a visitor sees)</label>
     <h2 class="op-h">Today's picks</h2>
+    <section class="stb" id="strongBox" aria-label="Today's strongest picks" hidden></section>
     <section class="bw10" id="bigWin" hidden></section>
     <section class="ys" id="yStrip" aria-label="Our results" hidden></section>
     <div class="opsub" role="group" aria-label="Show"><button type="button" class="opsb" data-op="parlays" aria-pressed="true"><span>Parlays</span> <span class="mono" id="pkN"></span></button><button type="button" class="opsb" data-op="singles" aria-pressed="false"><span>Singles</span> <span class="mono" id="sgN"></span></button></div>
@@ -1449,7 +1458,7 @@ function pickBtn(m){
   var st=m._hold?null:tipState(t,m);
   if(st==="won") return '<span class="r-pick paid'+(m._justPaid?' pop':'')+'" role="status" aria-label="'+esc(t.sel)+' landed"><span>✓ '+esc(t.sel)+'</span><b>Pay me please :)</b></span>';
   if(st==="lost") return '<span class="r-pick lost"><span>✗ '+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></span>';
-  return '<button type="button" class="r-pick'+(t.tier==="vip"?' vip':'')+'" data-key="'+esc(t.key)+'" aria-pressed="false" aria-label="'+esc((t.tier==="vip"?"VIP tip ":"Free tip ")+t.sel+" at "+t.odds)+'"><span>'+(t.tier==="vip"?"VIP · ":"TIP · ")+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></button>';
+  return '<button type="button" class="r-pick'+(t.tier==="vip"?' vip':'')+'" data-key="'+esc(t.key)+'" aria-pressed="false" aria-label="'+esc((t.tier==="vip"?"VIP tip ":"Free tip ")+t.sel+" at "+t.odds)+'"><span>'+(STRONG_IDS[t.key]?'⚡ ':'')+(t.tier==="vip"?"VIP · ":"TIP · ")+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></button>';
 }
 function rowHTML(m){
   var sc = (m.live||m.done) ? '<span class="r-score'+(m.live?' live':'')+(m.hit?' hit':'')+'"'+(m.hit?' title="We called this score"':'')+'>'+esc(m.score||"–")+(m.hit?'<em>🎯</em>':'')+'</span>' : (m.type==="cancelled"?'<span class="r-score empty">Canc</span>':(m.bz?'<span class="r-score pred" title="Our score"><small>likely</small>'+m.bz+'</span>':'<span class="r-score empty">v</span>'));
@@ -1711,6 +1720,8 @@ function tipCard(m,t){
     +'<div class="why" style="font-size:.82rem;color:var(--muted)">'+(locked?'Free sign-up to see the pick and the reason.':esc(t.why))+'</div>'+(locked?'':priceNote(t))+'</div>';
 }
 /* έτοιμα κουπόνια του betizzi (βγαίνουν από τον server μία φορά τη μέρα) */
+if(typeof BZS==="undefined")var BZS=null;
+var STRONG_IDS=(function(){var s={};if(BZS){[BZS.win,BZS.goals].concat(BZS.treble?BZS.treble.legs:[]).forEach(function(c){if(c)s[c.id+":"+c.sel]=1;});}return s;})();
 var BZC_SEL={"1":"1","2":"2","X":"X","O25":"Over 2.5","U25":"Under 2.5","O15":"Over 1.5","GG":"GG","NG":"NG"};
 var BZC_VAR={wins:"Wins",goals:"Goals",mix:"Parlay",ucl:"Champions League",uel:"Europa League"};
 function renderBzCoupons(){renderBzInto($("bzcList"));renderBzInto($("bzcSide"));}
@@ -1808,8 +1819,28 @@ function renderBig10(Y){var box=$("bigWin");if(!box)return;var c=Y&&Y.big10;if(!
   box.innerHTML='<button type="button" class="bw-row"><span class="bw-k">🏆 <span>Yesterday it landed</span></span><b>WINNER x'+fx2(c.odds)+'</b><span class="bw-go" aria-hidden="true">›</span></button>';
   box.querySelector("button").addEventListener("click",function(){couponBig({kind:String(c.kind).replace("-","–"),variant:c.variant||"mix",odds:c.odds,
     legs:(c.legs||[]).map(function(l){return {home:l.h,away:l.a,sel:l.sel==="1"?l.h:l.sel==="2"?l.a:l.sel,result:l.v?2:null};})});});}
+/* ---------- «Τα δυνατά της ημέρας» (απόφαση Owner 03/11): 3 κάρτες πάνω-πάνω, στις 10:00 ώρα Ελλάδας ---------- */
+function renderStrong(){var box=$("strongBox");if(!box)return;
+  var isToday=!window.DAYNAV||DAYNAV.date===DAYNAV.today;
+  if(!BZS){box.hidden=!isToday||location.protocol==="file:";if(!box.hidden)box.innerHTML='<div class="stb-h"><b>⚡ <span>Today\'s strongest</span></b></div><div class="stb-wait"><span>Our strongest picks come out at 10:00.</span></div>';return;}
+  box.hidden=false;
+  var res=function(r){return r===1?'<span class="pc-r w">✓</span>':r===0?'<span class="pc-r l">✗</span>':r===2?'<span class="pc-r v">–</span>':'';};
+  var priceNow=function(c){if(c.result!=null)return '';if(c.now&&c.min&&c.now<c.min)return '<div class="stb-warn">⚠ <span>Not worth it at this price anymore</span> ('+c.now.toFixed(2)+')</div>';if(c.now&&c.now<c.price-0.005)return '<div class="stb-now"><span>now</span> '+c.now.toFixed(2)+'</div>';return '';};
+  var card=function(c,ic,lab){if(!c)return '';var k=c.id+":"+c.sel;
+    return '<article class="stb-c"><div class="stb-t">'+ic+' <b><span>'+lab+'</span></b>'+(c.tier==="vip"?' <span class="vipt">VIP</span>':'')+'<small>'+esc(c.league||"")+' · '+esc(c.time||"")+'</small></div>'
+      +'<div class="stb-m">'+esc(c.home)+' – '+esc(c.away)+'</div>'
+      +'<div class="stb-p"><span class="stb-sel">'+esc(BZC_SEL[c.sel]||c.sel)+'</span><span class="mono stb-o">'+Number(c.price).toFixed(2)+'</span>'+res(c.result)
+      +(c.result==null&&SEL[k]?'<button type="button" class="btn sec stb-add" data-key="'+esc(k)+'" aria-pressed="false" aria-label="Add to slip">+</button>':'')+'</div>'
+      +priceNow(c)+(c.why?'<p class="stb-why">'+esc(c.why)+'</p>':'')+(c.url?'<a class="m-url" href="'+esc(c.url)+'"><span>All about this match</span> →</a>':'')+'</article>';};
+  var tr=BZS.treble,h='<div class="stb-h"><b>⚡ <span>Today\'s strongest</span></b></div><div class="stb-g">'+card(BZS.win,'🏆','Win')+card(BZS.goals,'⚽','Goals');
+  if(tr){var keys=tr.legs.map(function(c){return c.id+":"+c.sel;}).filter(function(k){return SEL[k];});
+    h+='<article class="stb-c"><div class="stb-t">🎯 <b><span>Treble</span></b> <span class="mono stb-o">x'+Number(tr.odds).toFixed(2)+'</span>'+res(tr.result)+'</div><ul class="stb-l">'
+      +tr.legs.map(function(c){return '<li><span>'+esc(c.home)+' – '+esc(c.away)+' <small>'+esc(c.time||"")+'</small></span><b>'+esc(BZC_SEL[c.sel]||c.sel)+'</b>'+(c.tier==="vip"?'<span class="vipt">VIP</span>':'')+'<span class="mono">'+Number(c.price).toFixed(2)+'</span>'+res(c.result)+'</li>';}).join("")+'</ul>'
+      +(tr.result==null&&keys.length===3?'<button type="button" class="pc-take" id="stbTake">🎟️ <span>Take it</span> → <span>My slip</span></button>':'')+'</article>';}
+  h+='</div>';box.innerHTML=h;bindButtons(box);syncPressed();
+  var tk=$("stbTake");if(tk)tk.addEventListener("click",function(){var keys=tr.legs.map(function(c){return c.id+":"+c.sel;}).filter(function(k){return SEL[k];});slip=keys.slice();sStk={};store("ko-sstk",sStk);afterSlip();toast("In your slip");if(!sideOn())openSheet();});}
 function renderPicks(){
-  renderStrip();
+  renderStrip();try{renderStrong();}catch(e){}
   Array.prototype.forEach.call(document.querySelectorAll("[data-op]"),function(b){b.setAttribute("aria-pressed",b.dataset.op===opView?"true":"false");});
   $("opParlays").hidden=opView!=="parlays";$("opSingles").hidden=opView!=="singles";
   /* παρολί */

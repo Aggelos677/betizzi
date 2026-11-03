@@ -11,6 +11,7 @@ export async function getDay(env, date) {
   return {
     date,
     coupons: d.coupons || [],
+    strong: d.strong || null,
     matches: d.fixtures.map((f) => ({
       id: f.id, ts: f.ts, status: f.status, minute: f.elapsed, score: f.gh == null ? null : [f.gh, f.ga], round: f.round || "",
       league: { id: f.league_id, name: f.league, country: f.country },
@@ -38,7 +39,7 @@ export async function getMatch(env, id) {
     home: { name: f.home, logo: f.home_logo, rank: f.home_rank, form: form(d.form.home) },
     away: { name: f.away, logo: f.away_logo, rank: f.away_rank, form: form(d.form.away) },
     tips: d.tips.filter((t) => t.status !== "withdrawn").map((t) => ({ tier: t.tier, locked: !!t.locked, market: t.market, sel: t.sel, price: t.price, prob: t.prob, reason: t.reason, result: t.result })),
-    odds: d.odds, model: d.model,
+    odds: d.odds, model: d.model, strong: d.strong || [],
   };
 }
 

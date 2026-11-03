@@ -260,6 +260,16 @@ export function analysis(lang, x, SEL) {
   // tip: γιατί (με τα ίδια νούμερα)
   const tip = (x.tips || []).find((t) => !t.locked), locked = (x.tips || []).some((t) => t.locked);
   if (tip) {
+    out.push(...tipWhyParts(lang, x, tip, SEL));
+  } else if (locked) out.push(T.vip);
+  else if (out.length) out.push(T.none);
+  return out.length >= 2 ? out.join(" ") : "";
+}
+
+// Το «γιατί» ενός tip: 1 πρόταση με νούμερα (αν βγαίνει) + συμπέρασμα που δένει με την πρότασή μας.
+function tipWhyParts(lang, x, tip, SEL) {
+  const T = A[lang] || A.en, out = [];
+  const H = x.home.name, Aw = x.away.name, h = norm(x.home.form).slice(0, 5), a = norm(x.away.form).slice(0, 5);
     const sel = (SEL && SEL[tip.sel]) || tip.sel, O = Number(tip.price).toFixed(2), s = tip.sel;
     const both = h.concat(a), avg = both.length ? (both.reduce((q, g) => q + g.gf + g.ga, 0) / both.length) : null;
     const G = avg == null ? "" : avg.toFixed(1);
@@ -275,7 +285,6 @@ export function analysis(lang, x, SEL) {
     if (st) out.push(st);
     const PC = tip.prob ? Math.round(tip.prob * 100) : null;
     out.push(ev && PC ? fill(T.concl[(x.id >> 1) % T.concl.length], { EV: ev, PC, SEL: sel, O }) : fill(T.gen, { SEL: sel, O }));
-  } else if (locked) out.push(T.vip);
-  else if (out.length) out.push(T.none);
-  return out.length >= 2 ? out.join(" ") : "";
+  return out;
 }
+export function tipWhy(lang, x, tip, SEL) { return tipWhyParts(lang, x, tip, SEL).join(" "); }

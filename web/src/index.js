@@ -1,6 +1,6 @@
 // betizzi-web: σελίδες έτοιμες από τον server (SSR), μία ανά γλώσσα.
 // Μέχρι το άνοιγμα: noindex παντού (X-Robots-Tag) και robots.txt κλειστό.
-import { analysis } from "./analysis.js";
+import { analysis, tipWhy } from "./analysis.js";
 import { LANGS, HREFLANG, TZ, LOCALE, T, SEL, UI, UI_ORDER, REC } from "./i18n.js";
 import { TRANSLATOR } from "./translator.js";
 import { getDay, getMatch, getRecord, getCoupons } from "./data.js";
@@ -42,7 +42,7 @@ ul{list-style:none;margin:0;padding:0}
 .teams{text-decoration:none;display:flex;flex-direction:column;gap:3px;min-width:0}.tm{display:flex;gap:6px;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm img{flex:none;border-radius:3px}
 .tips{display:flex;gap:4px;align-items:center}.more{font:700 11px "JetBrains Mono",monospace;color:var(--lime);border:1px solid var(--ln);border-radius:6px;padding:3px 5px}
 .tip{display:inline-block;margin-bottom:6px;font:700 12px "JetBrains Mono",monospace;padding:6px 8px;border-radius:8px;white-space:nowrap}.tip.free{background:var(--lime);color:#0c0f0d}.tip.vip{background:var(--gold);color:#0c0f0d}.tip i{font-style:normal;opacity:.75}
-.how{color:var(--mu)}.an{line-height:1.6;margin:0 0 12px}footer{color:var(--mu);font-size:13px;text-align:center;padding:22px 14px 40px;border-top:1px solid var(--ln);margin-top:20px}
+.how{color:var(--mu)}.strongb{display:block;font:800 12px Manrope,sans-serif;color:var(--lime);margin:0 0 6px}.an{line-height:1.6;margin:0 0 12px}footer{color:var(--mu);font-size:13px;text-align:center;padding:22px 14px 40px;border-top:1px solid var(--ln);margin-top:20px}
 
 .bc{font-size:13px;color:var(--mu);margin:4px 0}.bc a{text-decoration:none}
 .vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;text-align:center;background:var(--c1);border:1px solid var(--ln);border-radius:12px;padding:14px;margin:10px 0}
@@ -340,14 +340,26 @@ ${alt}
 <style>.ssrh{font:800 1.15rem/1.15 "Fira Sans Extra Condensed",sans-serif;margin:4px 0 2px;text-transform:none;letter-spacing:0}.ssra{font-size:.8rem;color:var(--muted);margin:0 0 8px}
 .mlist .lg h3{margin:0;padding:8px 12px;font-size:.9rem}.mlist .lg ul{list-style:none;margin:0;padding:0}.mlist .m{display:flex;gap:8px;padding:6px 12px}</style>`;
   const raw = matches.map((x) => rawRow(x, hm, lang));
+  // «Τα δυνατά της ημέρας» (απόφαση Owner 03/11): 3 κάρτες, VIP ανοιχτά, με το «γιατί» στη γλώσσα της σελίδας
+  const S = day.strong;
+  const sCard = (c) => {
+    if (!c) return null;
+    const x = matches.find((m) => m.id === c.fixture_id);
+    return { id: c.fixture_id, home: c.home, away: c.away, league: c.league, country: c.country, time: c.ts ? hm(c.ts) : "", ts: c.ts,
+      sel: c.sel, price: c.price, now: c.now, min: c.min, tier: c.tier, result: c.result, status: c.status, gh: c.gh, ga: c.ga,
+      why: (c.ai && c.ai[lang]) || (x ? tipWhy(lang, x, { sel: c.sel, price: c.price, prob: c.prob }, SEL) : ""), url: x ? matchPath(lang, x) : "" }; // why: AI (εγκεκριμένο από τον ελεγκτή) ή «καλούπι»
+  };
+  const BZS = S ? { win: sCard(S.win), goals: sCard(S.goals), treble: S.treble ? { odds: S.treble.odds, result: S.treble.result, legs: S.treble.legs.map(sCard) } : null } : null;
+  const sLine = BZS && t.strongS ? t.strongS.replace("{d}", dLong).replace("{list}", [BZS.win, BZS.goals].filter(Boolean)
+    .map((c) => `${SEL[c.sel] || c.sel} ${c.home} – ${c.away} (${Number(c.price).toFixed(2)})`).concat(BZS.treble ? [`${t.treble} x${BZS.treble.odds.toFixed(2)}`] : []).join("; ")) : "";
   const coupons = (day.coupons || []).map((c) => ({ ...c, legs: c.legs.map((l) => ({ ...l, time: l.ts ? hm(l.ts) : "" })) }));
   const top = TOP.map((id) => groups.get(id)).filter(Boolean).map((g) => g.league.country + "|" + g.league.name);
   let tpl = await template(env, url);
   tpl = tpl.replace('<html lang="en">', `<html lang="${HREFLANG[lang]}">`)
     .replace(/<title>[\s\S]*?<\/title>/, () => head)
     .replace(/var RAW = \[[\s\S]*?\];\n/, () => "var RAW = " + JSON.stringify(raw).replace(/</g, "\\u003c") + ";\n")
-    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";")
-    .replace('<div class="hscroll" id="mFilter"', () => ssr + '<div class="hscroll" id="mFilter"')
+    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";var BZS = " + JSON.stringify(BZS).replace(/</g, "\\u003c") + ";")
+    .replace('<div class="hscroll" id="mFilter"', () => ssr + (sLine ? `<p class="ssra">${esc(sLine)}</p>` : "") + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml)
     .replace("<!--datanote-->", () => `<nav class="langs" aria-label="Language">${langNav}</nav>`)
     .replace("<!--footlinks-->", () => `<p class="footl" style="margin:0;opacity:.7;font-size:.8rem;line-height:1.9">${footLinks(lang, ' style="color:inherit"')}</p>`);
@@ -427,7 +439,7 @@ function matchPage(lang, x) {
   const anTxt = analysis(lang, x, SEL);
   const tipsHtml = x.tips.length ? x.tips.map((y) => y.locked
     ? `<div class="tipc"><div><span class="tip vip">VIP 🔒</span><small>${esc(t.vipLock)}</small></div></div>`
-    : `<div class="tipc"><div><span class="tip ${y.tier}">${y.tier === "vip" ? "VIP" : "TIP"} <b>${esc(SEL[y.sel] || y.sel)}</b> <i>${y.price.toFixed(2)}</i>${y.result === 1 ? " ✓" : y.result === 0 ? " ✗" : ""}</span>
+    : `<div class="tipc"><div>${(x.strong || []).includes(y.sel) ? `<span class="strongb">⚡ ${esc(t.strongB)}</span>` : ""}<span class="tip ${y.tier}">${y.tier === "vip" ? "VIP" : "TIP"} <b>${esc(SEL[y.sel] || y.sel)}</b> <i>${y.price.toFixed(2)}</i>${y.result === 1 ? " ✓" : y.result === 0 ? " ✗" : ""}</span>
        <small>${esc(t.why)}: ${esc(y.reason)} · ${pc(y.prob)}% ${esc(t.chance)}</small></div>
        <button class="add" data-fx="${x.id}" data-sel="${esc(y.sel)}" data-price="${y.price}">${esc(t.add)}</button></div>`).join("")
     : `<p class="how">${esc(t.noTipM)}</p>`;
