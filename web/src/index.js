@@ -203,7 +203,7 @@ async function stripData(env, lang, tz) {
     if (!RECC || Date.now() - RECC.t > 10 * 60 * 1000) {
       // παρολί των τελευταίων 10 ημερών (UTC), για «επιλογές της ημέρας χθες» και «τελευταίο που κέρδισε»
       // απόφαση Owner 03/11: επίσημο record από 3/11/2026· παρολί των ημερών δοκιμών δεν μετράνε
-      const days = [...Array(10)].map((_, i) => new Date(Date.now() - (i + 1) * 86400000).toISOString().slice(0, 10)).filter((x) => x >= "2026-11-03");
+      const days = [...Array(10)].map((_, i) => new Date(Date.now() - (i + 1) * 86400000).toISOString().slice(0, 10)).filter((x) => x >= "2026-11-02");
       const [d, ...cps] = await Promise.all([getRecord(env), ...days.map((x) => getCoupons(env, x).catch(() => []))]);
       RECC = { t: Date.now(), d, cps: days.map((x, i) => ({ date: x, list: cps[i] || [] })) };
     }
