@@ -936,7 +936,7 @@ var MATCHES = RAW.map(function(r){
   if(r[17])m.min=r[17]; m.live=m.type==="inprogress"; m.done=m.type==="finished"; m.open=m.type==="notstarted";
   return m;
 });
-MATCHES.sort(function(a,b){return topIx(a.key)-topIx(b.key)||a.key.localeCompare(b.key)||a.time.localeCompare(b.time);});
+MATCHES.sort(function(a,b){return topIx(a.key)-topIx(b.key)||a.key.localeCompare(b.key)||((a.ts&&b.ts)?a.ts-b.ts:a.time.localeCompare(b.time));});
 /* keep our numbers close to the market: the model may differ from the bookmakers fair price by at most 5 points */
 var MAXGAP=.05;
 MATCHES.forEach(function(m){
@@ -1439,10 +1439,12 @@ function renderFilters(){
   var _sl1=$("mFilter").scrollLeft,_sl2=$("lFilter").scrollLeft;
   var box=$("mFilter");box.innerHTML="";
   if(IS_TODAY&&nl)box.appendChild(chipEl('<span class="ldot"></span>Live <span class="c">'+cnt({t:"live"})+'</span>',mFilter==="live",function(){mFilter=mFilter==="live"?"all":"live";renderFilters();renderMatches();},"livechip"));
-  DN.nav.forEach(function(d){if(d.n!==0&&d.n!==1)return;var cur=d.d===DN.date,on=cur&&mFilter!=="live";
+  DN.nav.forEach(function(d){if(d.n!==0&&d.n!==1)return;var cur=!DN.all&&d.d===DN.date,on=cur&&mFilter!=="live";
     /* η μέρα της σελίδας είναι κουμπί (χωρίς ξαναφόρτωμα) και από το Live· οι άλλες μέρες είναι σύνδεσμοι */
     box.appendChild(chipEl('<span>'+esc(d.lbl)+'</span>'+(cur?' <span class="c">'+cnt({t:"all"})+'</span>':''),on,cur?function(e){e.preventDefault();if(mFilter==="all")return;mFilter="all";renderFilters();renderMatches();}:null,"",cur?null:d.href));});
-  var other=DN.nav.filter(function(d){return d.d===DN.date&&d.n!==0&&d.n!==1;})[0];
+  /* απόφαση Owner 03/11: «Όλες οι μέρες» = σήμερα έως μεθαύριο σε μία λίστα */
+  box.appendChild(chipEl('<span>All days</span>'+(DN.all?' <span class="c">'+cnt({t:"all"})+'</span>':''),!!DN.all&&mFilter!=="live",DN.all?function(e){e.preventDefault();mFilter="all";renderFilters();renderMatches();}:null,"",DN.all?null:"?d=all"));
+  var other=DN.all?null:DN.nav.filter(function(d){return d.d===DN.date&&d.n!==0&&d.n!==1;})[0];
   if(other)box.appendChild(chipEl('<span>'+esc(other.lbl)+'</span> <span class="c">'+cnt({t:"all"})+'</span>',true,null,""));
   box.appendChild(chipEl("📅",stripOpen,function(){stripOpen=!stripOpen;renderFilters();},"calchip"));
   var st=$("dayStrip");st.hidden=!stripOpen;
@@ -1904,7 +1906,7 @@ function renderPicks(){
   /* μονά */
   var all=[];MATCHES.forEach(function(m){m.tips.forEach(function(x){all.push({m:m,t:x});});});
   var ord=function(x){return x.m.open?0:x.m.live?1:2;};
-  all.sort(function(a,b){return ord(a)-ord(b)||a.m.time.localeCompare(b.m.time);});
+  all.sort(function(a,b){return ord(a)-ord(b)||((a.m.ts&&b.m.ts)?a.m.ts-b.m.ts:a.m.time.localeCompare(b.m.time));});
   $("sgN").textContent=all.length?"· "+all.length:"";
   $("sgList").innerHTML=all.map(function(x){return singleHTML(x.m,x.t);}).join("")||'<div class="opempty"><b>No tips yet today</b></div>';
   bindButtons($("sgList"));
@@ -1995,7 +1997,7 @@ function renderBList(){var box=$("blItems");if(!box)return;
   seg($("blSeg"),[["both","All"],["free","Free"],["vip","VIP"]].map(function(x){return {k:x[0],html:x[1]};}),function(it){return it.k===blSrc;},function(it){blSrc=it.k;renderBList();},"radio");
   if($("bkList")){$("bkList").innerHTML=bookRowHTML();bindBookRow($("bkList"));}
   var all=[];MATCHES.forEach(function(m){if(!m.open)return;m.tips.forEach(function(t){if(blSrc!=="both"&&t.tier!==blSrc)return;all.push({m:m,t:t});});});
-  all.sort(function(a,b){return a.m.time.localeCompare(b.m.time)||topIx(a.m.key)-topIx(b.m.key);});
+  all.sort(function(a,b){return ((a.m.ts&&b.m.ts)?a.m.ts-b.m.ts:a.m.time.localeCompare(b.m.time))||topIx(a.m.key)-topIx(b.m.key);});
   box.innerHTML=all.map(function(x){return tipCard(x.m,x.t);}).join("")||'<div class="empty">No open tips right now. Check tomorrow.</div>';
   bindButtons(box);syncPressed();}
 Array.prototype.forEach.call(document.querySelectorAll("[data-bm]"),function(b){b.addEventListener("click",function(){bMode=b.getAttribute("data-bm");store("ko-bmode",bMode);renderBMode();});});
@@ -2075,7 +2077,7 @@ function renderMyLive(){var box=$("myLiveSide");if(!box)return;var seen={},rows=
     if(!seen[m.id]){seen[m.id]={m:m,picks:[]};rows.push(seen[m.id]);}if(seen[m.id].picks.indexOf(x.short||x.label)<0)seen[m.id].picks.push(x.short||x.label);});});
   /* απόφαση Owner 02/11: και οι αγώνες με ★ (Τα παιχνίδια μου) */
   MATCHES.forEach(function(m){if(FAV.has(String(m.id))&&!seen[m.id]){seen[m.id]={m:m,picks:["★"]};rows.push(seen[m.id]);}});
-  rows.sort(function(a,b){return String(a.m.time).localeCompare(String(b.m.time));});
+  rows.sort(function(a,b){return (a.m.ts&&b.m.ts)?a.m.ts-b.m.ts:String(a.m.time).localeCompare(String(b.m.time));});
   var live=rows.filter(function(r){return r.m.live&&!r.m.done;}),next=rows.filter(function(r){return !r.m.live&&!r.m.done;});
   if($("myLiveN"))$("myLiveN").textContent=live.length?live.length:"";
   /* απόφαση Owner 02/11: ίδια εμφάνιση με τα «Τελευταία γκολ»· στο γκολ το κουτί γίνεται πράσινο για λίγο (μαζί με τον ήχο) */

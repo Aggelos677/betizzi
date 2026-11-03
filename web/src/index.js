@@ -276,15 +276,19 @@ async function todayPage(env, lang, url) {
   const shift = (d, n) => { const [y, mo, da] = d.split("-").map(Number); return new Date(Date.UTC(y, mo - 1, da + n)).toISOString().slice(0, 10); };
   const dq = url.searchParams.get("d");
   const okD = dq && /^\d{4}-\d{2}-\d{2}$/.test(dq) && dq >= shift(today, -7) && dq <= shift(today, 2);
+  // ?d=all (απόφαση Owner 03/11): «Όλες οι μέρες» = σήμερα, αύριο και μεθαύριο σε μία λίστα
+  const allDays = dq === "all";
   const date = okD ? dq : today, isToday = date === today;
   // ο engine μετράει μέρα σε UTC: παίρνουμε και τη γειτονική μέρα UTC, για να μη χάνονται αγώνες τα ξημερώματα
   const [y0, m0, d0] = date.split("-").map(Number);
   const nb = ymdIn(tz, Date.UTC(y0, m0 - 1, d0)) === date ? shift(date, -1) : shift(date, 1);
-  const [day, day2, strip] = await Promise.all([getDay(env, date), getDay(env, nb).catch(() => null), stripData(env, lang, tz)]);
+  const extra = allDays ? [1, 2, 3].map((n) => getDay(env, shift(date, n)).catch(() => null)) : [];
+  const [day, day2, strip, ...more] = await Promise.all([getDay(env, date), getDay(env, nb).catch(() => null), stripData(env, lang, tz), ...extra]);
   const seen = new Set(), all = [];
-  for (const x of [...day.matches, ...(day2 ? day2.matches : [])]) if (!seen.has(x.id)) { seen.add(x.id); all.push(x); }
-  // κρατάμε τους αγώνες που πέφτουν αυτή τη μέρα στην ώρα της χώρας
-  const matches = all.filter((x) => ymdIn(tz, x.ts * 1000) === date);
+  for (const x of [...day.matches, ...(day2 ? day2.matches : []), ...more.flatMap((d) => (d ? d.matches : []))]) if (!seen.has(x.id)) { seen.add(x.id); all.push(x); }
+  // κρατάμε τους αγώνες που πέφτουν αυτή τη μέρα (ή, στο «Όλες οι μέρες», σήμερα έως μεθαύριο) στην ώρα της χώρας
+  const last = shift(date, 2);
+  const matches = all.filter((x) => { const d = ymdIn(tz, x.ts * 1000); return allDays ? d >= date && d <= last : d === date; });
   const noon = Date.UTC(y0, m0 - 1, d0, 12);
   const title = isToday ? t.title : t.title.replace(/\s+\S+$/, "");
   const nav = [-1, 0, 1, 2].map((n) => {
@@ -295,7 +299,9 @@ async function todayPage(env, lang, url) {
   const tipsFree = matches.reduce((a, x) => a + x.tips.filter((y) => y.tier === "free").length, 0);
   const tipsVip = matches.reduce((a, x) => a + x.tips.filter((y) => y.tier === "vip").length, 0);
   const dLong = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(noon);
-  const hm = (ts) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(ts * 1000);
+  const hm0 = (ts) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(ts * 1000);
+  const wd = (ts) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, weekday: "short" }).format(ts * 1000);
+  const hm = allDays ? (ts) => (ymdIn(tz, ts * 1000) === date ? "" : wd(ts) + " ") + hm0(ts) : hm0;
 
   // ομαδοποίηση ανά λίγκα
   const groups = new Map();
@@ -392,7 +398,7 @@ ${alt}
   tpl = tpl.replace('<html lang="en">', `<html lang="${HREFLANG[lang]}">`)
     .replace(/<title>[\s\S]*?<\/title>/, () => head)
     .replace(/var RAW = \[[\s\S]*?\];\n/, () => "var RAW = " + JSON.stringify(raw).replace(/</g, "\\u003c") + ";\n")
-    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";var BZS = " + JSON.stringify(BZS).replace(/</g, "\\u003c") + ";")
+    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav, all: allDays }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";var BZS = " + JSON.stringify(BZS).replace(/</g, "\\u003c") + ";")
     .replace('<div class="hscroll" id="mFilter"', () => ssr + (sLine ? `<p class="ssra">${esc(sLine)}</p>` : "") + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml)
     .replace("<!--datanote-->", () => `<nav class="langs" aria-label="Language">${langNav}</nav>`)

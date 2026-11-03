@@ -547,6 +547,7 @@ export const UI = {
   "Every pick is one of our tips": ["Κάθε επιλογή είναι tip μας", "Cada selección es un tip nuestro", "Cada seleção é um palpite nosso", "Chaque choix est un de nos tips", "Jede Auswahl ist ein Tipp von uns", "Fiecare selecție e un pont de-al nostru", "Svaki par je naš tip", "Всеки избор е наша прогноза"],
   "Yesterday": ["Χθες", "Ayer", "Ontem", "Hier", "Gestern", "Ieri", "Juče", "Вчера"],
   "Today": ["Σήμερα", "Hoy", "Hoje", "Aujourd'hui", "Heute", "Azi", "Danas", "Днес"],
+  "All days": ["Όλες οι μέρες", "Todos los días", "Todos os dias", "Tous les jours", "Alle Tage", "Toate zilele", "Svi dani", "Всички дни"],
   "Tomorrow": ["Αύριο", "Mañana", "Amanhã", "Demain", "Morgen", "Mâine", "Sutra", "Утре"],
   "Pick your leagues in Build → My leagues": ["Διάλεξε τα πρωταθλήματά σου στο Φτιάξε → Τα πρωταθλήματά μου", "Elige tus ligas en Crear → Mis ligas", "Escolha suas ligas em Montar → Minhas ligas", "Choisis tes ligues dans Créer → Mes ligues", "Wähle deine Ligen unter Bauen → Meine Ligen", "Alege-ți ligile în Creează → Ligile mele", "Izaberi lige u Napravi → Moje lige", "Избери лигите си в Създай → Моите лиги"],
   "Cash it in!": ["Πάμε ταμείο!", "¡A cobrar!", "Hora de receber!", "Encaisse !", "Ab zur Kasse!", "La casierie!", "Na kasu!", "Към касата!"],
