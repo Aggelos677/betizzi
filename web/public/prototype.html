@@ -1709,6 +1709,7 @@ $("demoCalled").addEventListener("click",function(){
   var LV={"1H":1,"2H":1,"HT":1,"ET":1,"BT":1,"P":1,"LIVE":1,"INT":1},FIN={"FT":1,"AET":1,"PEN":1};
   function landed(t,i,j){var s=(t.sel||"").toLowerCase(),n;
     if(s==="gg")return i>0&&j>0; if((n=s.match(/^over\s*([\d.]+)/)))return i+j>parseFloat(n[1]); return false;}
+  window.bzTick=function(){tick();};
   function tick(){
     fetch("/live.json",{cache:"no-store"}).then(function(r){return r.json();}).then(function(list){
       var changed=false,fx=[];
@@ -2183,6 +2184,15 @@ function loadVip(){var d=(window.DAYNAV&&DAYNAV.date)||"";fetch("/vip.json"+(d?"
   try{applyBook();}catch(e){}setVip(true);}).catch(function(){});}
 function loadMe(){if(location.protocol==="file:")return;fetch("/me.json",{credentials:"same-origin"}).then(function(r){return r.json();}).then(function(j){ACC=j.user||null;accRender();if(ACC)loadVip();if(ACC&&MYL){renderFilters();renderMatches();}if(window.bzClaim)bzClaim();}).catch(function(){});}
 loadMe();
+/* επιστροφή στη σελίδα/εφαρμογή (03/11): το κινητό «παγώνει» τις σελίδες στο παρασκήνιο και στο iPhone η εφαρμογή δεν έχει «τράβα για ανανέωση».
+   Μετά από 10΄ στο παρασκήνιο (ή αν άλλαξε η μέρα) φορτώνουμε ξανά τη σελίδα· αλλιώς ανανεώνουμε αμέσως τα live. */
+(function(){var hid=0,day=new Date().toDateString();
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden){hid=Date.now();return;}
+    if(!hid)return;var away=Date.now()-hid;hid=0;
+    if(away>10*60000||new Date().toDateString()!==day){try{sessionStorage.setItem("ko-y",String(window.scrollY));}catch(e){}location.reload();return;}
+    try{if(window.bzTick)bzTick();}catch(e){}});
+})();
 /* ---------- Εφαρμογή στο κινητό (PWA) · απόφαση Owner 03/11: +500 credits μία φορά ---------- */
 (function(){
   if(location.protocol==="file:")return;
