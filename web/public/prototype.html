@@ -932,7 +932,7 @@ var MATCHES = RAW.map(function(r){
     o:{h:r[13][0],x:r[13][1],a:r[13][2],o25:r[13][3],u25:r[13][4],gg:r[13][5],ng:r[13][6]},
     p:{h:r[14][0],x:r[14][1],a:r[14][2],o25:r[14][3],score:r[14][4]},
     tips:r[15].map(function(t){return {sel:t[0],odds:t[1],tier:t[2],why:t[3],r:t[5],book:t[7],min:t[9]||0,at:t[10]||""};})};
-  m.bk=r[21]||[];m.an=r[22]||"";m.url=r[23]||"";
+  m.bk=r[21]||[];m.an=r[22]||"";m.url=r[23]||"";m.ts=r[24]||0;
   if(r[17])m.min=r[17]; m.live=m.type==="inprogress"; m.done=m.type==="finished"; m.open=m.type==="notstarted";
   return m;
 });
@@ -1079,7 +1079,7 @@ var toastT;
 function toast(msg){var t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true},1800);}
 function toggleSel(k){
   if(!SEL[k])return;
-  if(!SEL[k].m.open){toast("This match has already started");return;}
+  if(!SEL[k].m.open||(SEL[k].m.ts&&Date.now()/1000>=SEL[k].m.ts)){toast("This match has already started");return;}
   var i=slip.indexOf(k);
   if(i>=0){slip.splice(i,1);toast("Removed from your slip");}
   else{var mid=midOf(k),prev=-1;slip.forEach(function(x,ix){if(midOf(x)===mid)prev=ix;});
@@ -1694,6 +1694,8 @@ $("demoCalled").addEventListener("click",function(){
   function tick(){
     fetch("/live.json",{cache:"no-store"}).then(function(r){return r.json();}).then(function(list){
       var changed=false,fx=[];
+      /* κλείδωμα στη σέντρα, ακόμα κι αν το live αργεί (03/11) */
+      var nowS=Date.now()/1000;MATCHES.forEach(function(m){if(m.open&&m.ts&&nowS>=m.ts){m.open=false;changed=true;}});
       list.forEach(function(x){
         var m=MATCHES.find(function(y){return y.id===x[0];});if(!m||m._demo)return;
         var st=x[1],sc=(x[3]==null?"":x[3]+"-"+x[4]),old=m.score;

@@ -443,6 +443,7 @@ function rawRow(x, hm, lang) {
     BOOKS.map((b) => (x.books && x.books[b]) || 0), // [1,X,2,O25,U25,GG,NG] ανά bookmaker, σειρά BOOKS
     lang ? analysis(lang, x, SEL) : "", // [22] σύντομη ανάλυση (απόφαση Owner 03/11)
     lang ? matchPath(lang, x) : "", // [23] σελίδα του αγώνα
+    x.ts, // [24] ώρα σέντρας (unix): κλείδωμα tips στη σέντρα, ακόμα κι αν αργήσει το live (03/11)
   ];
 }
 
