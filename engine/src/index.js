@@ -257,10 +257,12 @@ async function apiDay(env, date) {
     (res[r.team_id] ||= []).push(r);
   const tipsBy = {};
   for (const t of out) (tipsBy[t.fixture_id] ||= []).push(t); // μόνο τα ορατά tips (το σκορ δεν προδίδει VIP)
+  const frozen = await frozenScores(env, fx.results, tips.results, odds);
   for (const f of fx.results) {
     f.odds = odds[f.id] || {};
     f.bk = bkOdds[f.id] || {};
     f.model = scoreModel(f.odds, tipsBy[f.id] || []);
+    if (f.model && frozen[f.id]) f.model.score = frozen[f.id];
     for (const side of ["home", "away"]) {
       const list = (res[f[side + "_id"]] || []).filter((r) => r.ts < f.ts).slice(0, 10);
       f[side + "_form"] = list.slice(0, 5).map((r) => [r.gf > r.ga ? "W" : r.gf < r.ga ? "L" : "D", r.gf + "-" + r.ga, r.is_home]);
@@ -299,7 +301,36 @@ async function apiMatch(env, id) {
   for (const o of (await env.DB.prepare("SELECT market, sel, price FROM odds WHERE fixture_id=?").bind(id).all()).results) odds[o.sel] = o.price;
   const form = async (team) => (await env.DB.prepare("SELECT fixture_id, ts, is_home, gf, ga FROM results WHERE team_id=? AND ts < ? ORDER BY ts DESC LIMIT 10").bind(team, f.ts).all()).results;
   const model = scoreModel(odds, tips.filter((t) => t.sel));
+  if (model) { const fz = await frozenScores(env, [f], (await env.DB.prepare("SELECT * FROM tips WHERE fixture_id=? AND status='active'").bind(id).all()).results, { [id]: odds }); if (fz[id]) model.score = fz[id]; }
   return { fixture: f, tips, odds, form: { home: await form(f.home_id), away: await form(f.away_id) }, model, strong: sk.filter((k) => k.startsWith(f.id + ":")).map((k) => k.split(":")[1]) };
+}
+
+// Πιθανό σκορ «κλειδωμένο» (απόφαση Owner 03/11): ό,τι δημοσιεύεται δεν αλλάζει. Υπολογίζεται μία φορά (με όλα τα tips του αγώνα)
+// και μένει ίδιο, ακόμα κι αν κινηθούν οι αποδόσεις. Ξαναϋπολογίζεται ΜΟΝΟ αν μπει νέο tip που το σκορ θα αντέφασκε.
+const FITS = (i, j, sel) => ({ "1": i > j, X: i === j, "2": i < j, "1X": i >= j, X2: i <= j, "12": i !== j,
+  O15: i + j > 1, O25: i + j > 2, O35: i + j > 3, U25: i + j < 3, U35: i + j < 4, GG: i > 0 && j > 0, NG: i === 0 || j === 0 })[sel] !== false;
+async function frozenScores(env, fixtures, allTips, oddsBy) {
+  const out = {};
+  try {
+    await env.DB.prepare("CREATE TABLE IF NOT EXISTS pred(fixture_id INTEGER PRIMARY KEY, h INTEGER, a INTEGER, at INTEGER, note TEXT)").run();
+    const ids = fixtures.map((f) => f.id);
+    if (!ids.length) return out;
+    const have = {};
+    for (const r of (await env.DB.prepare("SELECT p.fixture_id, p.h, p.a FROM pred p WHERE p.fixture_id IN (SELECT value FROM json_each(?))").bind(JSON.stringify(ids)).all()).results) have[r.fixture_id] = [r.h, r.a];
+    const tb = {};
+    for (const t of allTips) if (t.sel && t.status === "active") (tb[t.fixture_id] ||= []).push(t);
+    const ins = [];
+    for (const f of fixtures) {
+      const tp = tb[f.id] || [], cur = have[f.id];
+      if (cur && tp.every((t) => FITS(cur[0], cur[1], t.sel))) { out[f.id] = cur; continue; }
+      const m = scoreModel(oddsBy[f.id] || {}, tp);
+      if (!m) { if (cur) out[f.id] = cur; continue; }
+      out[f.id] = m.score;
+      ins.push(env.DB.prepare("INSERT OR REPLACE INTO pred(fixture_id,h,a,at,note) VALUES(?,?,?,?,?)").bind(f.id, m.score[0], m.score[1], now(), cur ? "new tip: was " + cur.join("-") : "first"));
+    }
+    for (let i = 0; i < ins.length; i += 50) await env.DB.batch(ins.slice(i, i + 50));
+  } catch (e) { /* αν αποτύχει, δείχνουμε το υπολογισμένο */ }
+  return out;
 }
 
 // Μοντέλο: πιθανότητες από τις αποδόσεις (χωρίς το περιθώριο του bookmaker) και Poisson για το σκορ.
