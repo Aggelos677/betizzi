@@ -2178,8 +2178,10 @@ loadMe();
     /* οδηγίες βήμα-βήμα που μένουν μέχρι να τις κλείσει (03/11) */
     var st=ios?["Tap Share ⬆️ (Share)","Tap «Add to Home Screen»","Tap «Add» and open betizzi from the new icon"]:["Open the browser menu ⋮","Tap «Install app» or «Add to Home screen»","Open betizzi from the new icon"];
     var I=window.__I18N||{},hw=$("abHow");hw.innerHTML=st.map(function(x){return "<li>"+esc(I[x]||x)+"</li>";}).join("");hw.hidden=false;$("abGo").hidden=true;});
-  window.addEventListener("appinstalled",function(){bar.hidden=true;toast("Open betizzi from your home screen to collect your 1000 credits");});
+  function ga(n){try{if(window.gtag)gtag("event",n);}catch(e){}}
+  window.addEventListener("appinstalled",function(){ga("app_install");bar.hidden=true;toast("Open betizzi from your home screen to collect your 1000 credits");});
   if(!std)return;
+  ga("app_open"); /* μέτρηση: πόσοι ανοίγουν το betizzi ως εφαρμογή */
   var tries=0;
   function claim(){if(tries++>20)return;try{if(localStorage.getItem("bz-app-cr")==="1")return;}catch(e){}
     if(!ACC){$("abTxt").textContent="Sign up free to collect your credits";$("abGo").textContent=(window.__I18N&&__I18N["Sign up free"])||"Sign up free";bar.hidden=false;setTimeout(claim,5000);return;}

@@ -81,7 +81,7 @@ export default {
     // Εφαρμογή (PWA, απόφαση Owner 03/11): manifest ανά γλώσσα
     const mf = p.match(/^\/([a-z]{2})\/manifest\.webmanifest$/);
     if (mf && LANGS.includes(mf[1])) return new Response(JSON.stringify({
-      name: "betizzi", short_name: "betizzi", description: T[mf[1]].desc, lang: mf[1], start_url: `/${mf[1]}/?src=app`, scope: "/", id: `/${mf[1]}/`,
+      name: "betizzi", short_name: "betizzi", description: T[mf[1]].desc, lang: mf[1], start_url: `/${mf[1]}/?utm_source=pwa&utm_medium=app`, scope: "/", id: `/${mf[1]}/`,
       display: "standalone", background_color: "#0c0f0d", theme_color: "#0c0f0d", orientation: "portrait",
       icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }, { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
         { src: "/icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }],
