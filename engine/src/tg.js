@@ -36,7 +36,9 @@ export async function tgPoll(env) {
   if (!env.TG_BOT_TOKEN) return { skip: true };
   await kvInit(env);
   const off = +(await kvGet(env, "tg_off")) || 0;
-  const ups = await tg(env, "getUpdates", { offset: off, timeout: 0, allowed_updates: ["my_chat_member", "chat_member", "message"] });
+  let ups;
+  try { ups = await tg(env, "getUpdates", { offset: off, timeout: 0, allowed_updates: ["my_chat_member", "chat_member", "message", "channel_post"] }); }
+  catch (e) { await env.DB.prepare("INSERT INTO runs(ts,job,ok,calls,note) VALUES(?,?,?,?,?)").bind(now(), "tg", 0, 0, String(e.message).slice(0, 300)).run(); return { error: e.message }; }
   let last = off - 1;
   for (const u of ups) {
     last = Math.max(last, u.update_id);
@@ -46,6 +48,12 @@ export async function tgPoll(env) {
         const key = (mc.chat.username || "").toLowerCase() === TG.publicChat.slice(1) ? "tg_chan_public" : "tg_chan_vip";
         await kvSet(env, key, mc.chat.id);
         await kvSet(env, key + "_title", mc.chat.title || "");
+      }
+      // οποιοδήποτε post στο κανάλι (π.χ. ο Owner γράφει «hi») → κρατάμε το id του καναλιού
+      const cp = u.channel_post;
+      if (cp && cp.chat) {
+        const pub = (cp.chat.username || "").toLowerCase() === TG.publicChat.slice(1);
+        if (pub || /strongest/i.test(cp.chat.title || "")) { const key = pub ? "tg_chan_public" : "tg_chan_vip"; await kvSet(env, key, cp.chat.id); await kvSet(env, key + "_title", cp.chat.title || ""); }
       }
       const cm = u.chat_member;
       if (cm && String(cm.chat.id) === (await kvGet(env, "tg_chan_vip")) && cm.new_chat_member?.status === "member") {
@@ -64,6 +72,7 @@ export async function tgPoll(env) {
     } catch (e) { /* ένα κακό γεγονός δεν σταματά τα υπόλοιπα */ }
   }
   if (ups.length) await kvSet(env, "tg_off", last + 1);
+  if (ups.length) await env.DB.prepare("INSERT INTO runs(ts,job,ok,calls,note) VALUES(?,?,?,?,?)").bind(now(), "tg", 1, 1, ups.length + " updates").run();
   return { updates: ups.length };
 }
 
