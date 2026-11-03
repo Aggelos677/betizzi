@@ -834,7 +834,7 @@ header{position:relative}
 
   <!-- TIPS -->
   <aside id="sidePanel" class="side" aria-label="Side panel"><section class="card sideslip" id="sideSlip"><div id="resultSideWrap"></div><div class="secthead"><h2>My slip</h2><span class="tag lime" id="sideSlipN"></span></div><div id="slipSide" style="display:flex;flex-direction:column;gap:12px"></div></section><section class="card closebox" id="closeBox" hidden><div class="secthead"><h2>Cash it in!</h2><span class="livedot" aria-hidden="true"></span></div><div id="closeList"></div></section><section class="card" id="liveSide"><div class="opsub" role="group" aria-label="Show"><button type="button" class="opsb" data-sv="goals" aria-pressed="true">⚽ <span>Latest goals</span></button><button type="button" class="opsb" data-sv="mylive" aria-pressed="false">📺 <span>My games live</span> <span class="mono" id="myLiveN"></span></button></div>
-<div id="goalsSide" class="gl-list"></div><div id="myLiveSide" class="gl-list" hidden></div><div id="bzcSide" class="bzc-list" hidden></div></section><section class="card" data-side="tips" hidden><div class="secthead"><h2 id="winsH">Our biggest wins today</h2></div><div id="winsSide" style="display:flex;flex-direction:column;gap:10px"></div></section></aside>
+<div id="goalsSide" class="gl-list"></div><div id="myLiveSide" class="gl-list" hidden></div><div id="bzcSide" class="bzc-list" hidden></div></section><section class="card" data-sk="wins" hidden><div class="secthead"><h2 id="winsH">Our biggest wins today</h2></div><div id="winsSide" style="display:flex;flex-direction:column;gap:10px"></div></section></aside>
   <div id="view-tips" role="tabpanel" aria-labelledby="tab-tips" class="wrap op" hidden>
     <label class="sw" hidden><input type="checkbox" id="vipMember"> Show as registered user (untick to see what a visitor sees)</label>
     <h2 class="op-h">Today's picks</h2>
@@ -1288,9 +1288,14 @@ function placeLive(){var c=$("liveSide");if(!c)return;var mob=!sideOn(),tgt=mob?
   if(mob){if(c.parentNode!==tgt){tgt.appendChild(c);if(sideView==="goals"&&cpTabFirst){sideView="mylive";renderSideView();}}}
   else if(c.parentNode!==tgt){var after=$("closeBox");tgt.insertBefore(c,after?after.nextSibling:tgt.firstChild);}}
 var cpTabFirst=true;
+/* ποια κουτιά δείχνει η δεξιά στήλη σε κάθε σελίδα: coupons = Αγώνες, tips = Προτάσεις, build = Φτιάξε δελτίο */
+var SIDE_CFG={coupons:["wins"],tips:["wins"],build:["wins"]};
 function renderSide(){var p=$("sidePanel");if(!p)return;try{placeLive();}catch(e){}renderClose();var tab=curTab(),mode=tab==="tips"?"tips":tab==="build"?"build":"coupons";
+  /* απόφαση Owner 03/11: η δεξιά στήλη ίδια σε όλες τις σελίδες. Ρυθμίζεται ανά σελίδα στο SIDE_CFG (π.χ. άλλος χορηγός/bookmaker ανά σελίδα) */
+  var cfg=SIDE_CFG[mode]||SIDE_CFG.coupons;
+  Array.prototype.forEach.call(p.querySelectorAll("[data-sk]"),function(s){s.hidden=cfg.indexOf(s.getAttribute("data-sk"))<0;});
   Array.prototype.forEach.call(p.querySelectorAll("[data-side]"),function(s){s.hidden=s.getAttribute("data-side")!==mode;});
-  if(mode==="tips")renderWins();
+  if(cfg.indexOf("wins")>=0)renderWins();
   try{renderMyLive();}catch(e){}
   /* PC: το δελτίο μου πάντα πάνω δεξιά, όπως στους bookmakers (κινητό: η μπάρα κάτω) */
   if(sideOn()&&$("sheet").hidden)renderMySlip($("slipSide"));else $("slipSide").innerHTML="";
@@ -1339,7 +1344,11 @@ function showCB(c){
     +c.legs.map(function(l){var v=cpVoid(l);return '<div'+(v?' class="cv"':'')+'><i>'+(v?'–':'✓')+'</i><span>'+esc(l.home||"")+' – '+esc(l.away||"")+'</span><em>'+(v?'<span>Postponed</span>':l.locked?'VIP':esc(BZC_SEL[l.sel]||l.sel))+'</em></div>';}).join("")+'</div><small>Cash it in!</small>'
     +('<div class="cbshare"><span><span>Share it with your friends and win</span> <b class="mono">'+cr+'</b> <span>credits</span></span><button type="button" class="btn" data-sh="1">📤 <span>Share</span></button></div><button type="button" class="cbx" data-x="1" aria-label="Close">×</button>')+'</div>';
   document.body.appendChild(o);
-  o.style.pointerEvents="auto";o.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;if(b.dataset.sh)shareBz(c);if(b.dataset.x)done();});
+  /* απόφαση Owner 03/11: μένει τουλάχιστον 5΄΄· μετά κλείνει με πάτημα έξω από την κάρτα (όχι μόνο με το ×) */
+  var t0=Date.now();
+  o.style.pointerEvents="auto";o.addEventListener("click",function(e){var b=e.target.closest("button");
+    if(!b){if(!e.target.closest(".cbig-in")&&Date.now()-t0>=5000)done();return;}
+    if(b.dataset.sh)shareBz(c);if(b.dataset.x)done();});
   var W=window.innerWidth,H=window.innerHeight;
   [[W*.5,H*.35],[W*.15,H*.7],[W*.85,H*.7],[W*.3,H*.2],[W*.7,H*.2]].forEach(function(p,i){setTimeout(function(){confetti(p[0],p[1],true);},i*220);});
   setTimeout(function(){confetti(W*.5,H*.5,true);},1300);
@@ -1374,12 +1383,13 @@ function renderClose(){var box=$("closeBox");if(!box)return;var it=[],now=Date.n
     setTimeout(function(){row.classList.remove("justwon");Array.prototype.forEach.call(row.querySelectorAll(".conf"),function(c){c.remove();});},1600);});
 }
 setInterval(function(){if(!document.hidden)renderClose();},15000);
+function athHour(){try{return +new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Athens",hour:"2-digit",hourCycle:"h23"}).format(new Date());}catch(e){return new Date().getUTCHours()+2;}}
 function renderWins(){var box=$("winsSide");if(!box)return;
   var wins=[];MATCHES.forEach(function(m){if(!m.done||m.type==="cancelled")return;m.tips.forEach(function(t){if(t.r===1)wins.push({m:m,t:t});});});
   wins.sort(function(a,b){return (b.t.odds||0)-(a.t.odds||0);});
   /* απόφαση Owner 02/11: παρολί που κλείνει κερδισμένο μπαίνει από πάνω, μόλις κλείσει (και πριν το ενημερώσει ο server) */
   var L=(typeof BZC!=="undefined"&&BZC)||[],cw=L.filter(cpWon).sort(function(a,b){return cpX(b)-cpX(a);});
-  var h,YW=(typeof YREC!=="undefined"&&YREC&&YREC.yw)||null,useY=!cw.length&&!wins.length&&YW&&(YW.cps.length||YW.tips.length);
+  var h,YW=(typeof YREC!=="undefined"&&YREC&&YREC.yw)||null,useY=!cw.length&&YW&&(YW.cps.length||YW.tips.length)&&(!wins.length||athHour()<14)&&(!window.DAYNAV||DAYNAV.date===DAYNAV.today);
   var wh=$("winsH"),wt=useY?"Our biggest wins yesterday":"Our biggest wins today";if(wh&&wh._t!==wt){wh._t=wt;wh.textContent=(window.__I18N&&__I18N[wt])||wt;}
   if(useY){
     /* απόφαση Owner 03/11: το πρωί, μέχρι να έρθουν νίκες σήμερα, δείχνουμε τις χθεσινές (πρώτα τα παρολί) */
