@@ -1095,6 +1095,7 @@ var toastT;
 function toast(msg,ms){var t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true},ms||1800);}
 function toggleSel(k){
   if(!SEL[k])return;
+  if(SEL[k].m.type==="postponed"||SEL[k].m.type==="cancelled"){toast("This match was postponed");return;}
   if(!SEL[k].m.open||(SEL[k].m.ts&&Date.now()/1000>=SEL[k].m.ts)){toast("This match has already started");return;}
   var i=slip.indexOf(k);
   if(i>=0){slip.splice(i,1);toast("Removed from your slip");}
@@ -1493,6 +1494,7 @@ function pickBtn(m){
   if(!m.tips.length) return '<span class="r-pick none"><span>No tip</span></span>';
   var t=m.tips[0], locked=t.tier==="vip"&&!vipMember&&!t.sel;
   if(locked) return '<button type="button" class="r-pick vip locked" data-unlock="1" aria-label="VIP tip, sign up free to see"><span>VIP · free</span><b aria-hidden="true">•.••</b></button>';
+  if(m.type==="postponed"||m.type==="cancelled") return '<span class="r-pick none"><span>'+esc(t.sel)+'</span> · <span>Void</span></span>'; /* 03/11: αναβολή/ακύρωση = άκυρο, χωρίς κουμπί */
   var st=m._hold?null:tipState(t,m);
   if(st==="won") return '<span class="r-pick paid'+(m._justPaid?' pop':'')+'" role="status" aria-label="'+esc(t.sel)+' landed"><span>✓ '+esc(t.sel)+'</span><b class="mono">'+(t.odds?(+t.odds).toFixed(2):'')+'</b></span>';
   if(st==="lost") return '<span class="r-pick lost"><span>✗ '+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></span>';
