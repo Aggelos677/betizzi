@@ -4,7 +4,7 @@
 import { makeStrong, apiStrong, strongKeys } from "./strong.js";
 import { aiStrong } from "./ai.js";
 import { makeCoupons, apiCoupons } from "./coupons.js";
-import { authStart, authVerify, authMe, authLogout, authVip } from "./auth.js";
+import { authStart, authVerify, authMe, authLogout, authVip, authApp } from "./auth.js";
 import { hit, isAdmin, aToday, aUsers, aUserAct, aExport, aPartners, aPartnerSave, aHealth, aAudit, aLeagues, aLeagueSave, aMkt } from "./admin.js";
 import LEAGUES from "../data/leagues.json";
 import LEAGUES_ALL from "../data/leagues_all.json";
@@ -415,6 +415,7 @@ export default {
         if (u.pathname === "/auth/verify" && req.method === "POST") return json(await authVerify(env, body));
         if (u.pathname === "/auth/me") return json(await authMe(env, tok));
         if (u.pathname === "/auth/logout" && req.method === "POST") return json(await authLogout(env, tok));
+        if (u.pathname === "/auth/app" && req.method === "POST") return json(await authApp(env, tok));
         if (u.pathname === "/auth/vip") {
           const date = u.searchParams.get("date") || ymd(now()); // ίδιο εύρος με το /api/day
           if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return json({ error: "date" }, 400);

@@ -245,6 +245,9 @@ body{padding-top:env(safe-area-inset-top,0px)}
 .seg.c5{grid-template-columns:repeat(5,1fr)}
 .cnt-line{font-size:.8rem;color:var(--muted)}
 
+/* εφαρμογή (PWA) 03/11 */
+.appbar{display:flex;align-items:center;gap:10px;margin:8px 0;padding:10px 12px;border:1px solid var(--lime);border-radius:14px;background:rgba(182,242,58,.08);font-size:.9rem}
+.appbar .ab-t{flex:1}.appbar .btn{min-height:40px;padding:0 14px}.appbar .ab-x{background:none;border:0;color:var(--muted);font-size:1rem;min-width:36px;min-height:36px;cursor:pointer}
 /* betizzi logo */
 .logoa{display:flex;align-items:flex-end;gap:2px;color:inherit;text-decoration:none}
 .logo{display:flex;align-items:flex-end;gap:2px;font:800 clamp(2.6rem,11vw,3.4rem)/.9 var(--f-display);text-transform:none;letter-spacing:-.01em}
@@ -814,6 +817,7 @@ header{position:relative}
       <label class="authc"><input type="checkbox" id="sndAll"> <span>Soft sound: every other goal</span></label>
     </div>
   </header>
+  <div class="appbar" id="appBar" hidden><span class="ab-t">📲 <span id="abTxt">Put betizzi on your phone</span> · <b class="mono">+1000</b> <span>credits</span></span><button type="button" class="btn" id="abGo">Install</button><button type="button" class="ab-x" id="abX" aria-label="Close">✕</button></div>
 
   <nav class="tabs" role="tablist" aria-label="Sections">
     <button type="button" class="tab" role="tab" id="tab-tips" aria-controls="view-tips" aria-selected="false">Our picks</button>
@@ -2157,6 +2161,31 @@ function loadVip(){var d=(window.DAYNAV&&DAYNAV.date)||"";fetch("/vip.json"+(d?"
   try{applyBook();}catch(e){}setVip(true);}).catch(function(){});}
 function loadMe(){if(location.protocol==="file:")return;fetch("/me.json",{credentials:"same-origin"}).then(function(r){return r.json();}).then(function(j){ACC=j.user||null;accRender();if(ACC)loadVip();if(ACC&&MYL){renderFilters();renderMatches();}}).catch(function(){});}
 loadMe();
+/* ---------- Εφαρμογή στο κινητό (PWA) · απόφαση Owner 03/11: +1000 credits μία φορά ---------- */
+(function(){
+  if(location.protocol==="file:")return;
+  if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(function(){});
+  var std=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true;
+  var ios=/iphone|ipad|ipod/i.test(navigator.userAgent),dp=null,bar=$("appBar");
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();dp=e;show();});
+  function dismissed(){try{return Date.now()-(+localStorage.getItem("bz-ab-x")||0)<7*864e5;}catch(e){return false;}}
+  function show(){if(std||dismissed()||window.innerWidth>=900)return;bar.hidden=false;}
+  if(ios)show();
+  $("abX").addEventListener("click",function(){bar.hidden=true;try{localStorage.setItem("bz-ab-x",String(Date.now()));}catch(e){}});
+  $("abGo").addEventListener("click",function(){
+    if(std){openAuth();return;}
+    if(dp){dp.prompt();dp.userChoice.then(function(){dp=null;bar.hidden=true;});return;}
+    toast(ios?"On iPhone: tap Share, then Add to Home Screen":"Open your browser menu and tap Install app or Add to Home screen");});
+  window.addEventListener("appinstalled",function(){bar.hidden=true;toast("Open betizzi from your home screen to collect your 1000 credits");});
+  if(!std)return;
+  var tries=0;
+  function claim(){if(tries++>20)return;try{if(localStorage.getItem("bz-app-cr")==="1")return;}catch(e){}
+    if(!ACC){$("abTxt").textContent="Sign up free to collect your credits";$("abGo").textContent=(window.__I18N&&__I18N["Sign up free"])||"Sign up free";bar.hidden=false;setTimeout(claim,5000);return;}
+    fetch("/auth/app",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:"{}"}).then(function(r){return r.json();}).then(function(j){
+      if(!j||!j.ok)return;try{localStorage.setItem("bz-app-cr","1");}catch(e){}bar.hidden=true;
+      if(j.got){toast("+1000 credits · thanks for installing betizzi!");try{ACC.credits=j.credits;accRender();}catch(e){}}});}
+  setTimeout(claim,2500);
+})();
 /* λογότυπο = αρχική (απόφαση Owner 02/11): στην ίδια σελίδα πάει στις Προτάσεις και πάνω-πάνω, χωρίς φόρτωμα */
 document.querySelector(".logoa").addEventListener("click",function(e){if(location.search)return;e.preventDefault();try{showTab("tips");}catch(x){}window.scrollTo({top:0,behavior:"smooth"});});
 /* ---------- init ---------- */

@@ -78,6 +78,14 @@ export default {
       return new Response(await r.text(), { headers: { "content-type": "application/json", "cache-control": "public, max-age=20" } });
     }
     // Εγγραφή / σύνδεση (απόφαση Owner 02/11): η σελίδα μιλάει με το engine· το session ζει σε cookie HttpOnly.
+    // Εφαρμογή (PWA, απόφαση Owner 03/11): manifest ανά γλώσσα
+    const mf = p.match(/^\/([a-z]{2})\/manifest\.webmanifest$/);
+    if (mf && LANGS.includes(mf[1])) return new Response(JSON.stringify({
+      name: "betizzi", short_name: "betizzi", description: T[mf[1]].desc, lang: mf[1], start_url: `/${mf[1]}/?src=app`, scope: "/", id: `/${mf[1]}/`,
+      display: "standalone", background_color: "#0c0f0d", theme_color: "#0c0f0d", orientation: "portrait",
+      icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }, { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+        { src: "/icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }],
+    }), { headers: { "content-type": "application/manifest+json", "cache-control": "public, max-age=3600" } });
     if (p.startsWith("/auth/") || p === "/me.json" || p === "/vip.json") return authRoute(req, env, url);
     const m = p.match(/^\/([a-z]{2})\/$/);
     if (m && LANGS.includes(m[1])) {
@@ -161,6 +169,7 @@ async function authRoute(req, env, url) {
     await eng("/auth/logout", { method: "POST", body: "{}" });
     return J({ ok: true }, { "set-cookie": `${AUTH_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` });
   }
+  if (p === "/auth/app" && req.method === "POST") return J(await (await eng("/auth/app", { method: "POST", body: "{}" })).json());
   if (p === "/me.json") return J(tok ? await (await eng("/auth/me")).json() : { user: null });
   if (p === "/vip.json") {
     if (!tok) return J({ error: "login" });
@@ -207,6 +216,10 @@ document.querySelectorAll("footer").forEach(function(f){var a=document.createEle
 
 function html(body, status = 200, a21 = false) {
   if (a21) body = body.replace(/18\+/g, "21+");
+  if (body.includes("</head>") && !body.includes('rel="manifest"')) {
+    const lg = (body.match(/<html[^>]*\slang="([a-z]{2})/) || [])[1] || "en";
+    body = body.replace("</head>", `<link rel="manifest" href="/${LANGS.includes(lg) ? lg : "en"}/manifest.webmanifest"><meta name="theme-color" content="#0c0f0d"><link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="betizzi"></head>`);
+  }
   if (body.includes("</head>") && !body.includes("googletagmanager")) body = body.replace("</head>", GA_HEAD + "</head>");
   if (body.includes("</body>")) body = body.replace(/<\/body>(?![\s\S]*<\/body>)/, GA_BODY + "</body>");
   body = locReason(body);
