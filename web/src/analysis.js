@@ -221,6 +221,44 @@ const A = {
   },
 };
 
+
+// Συμπέρασμα ανά αγορά, ΧΩΡΙΣ ποσοστό (απόφαση Owner 03/11: φυσικός λόγος, «περιμένουμε / πιστεύουμε», όχι αριθμοί που προκαλούν).
+const CM = {
+  en: { GG: ["We expect a lively game with chances at both ends, and we believe both teams will score: GG at {O}.", "Both sides look set to find the net here: GG at {O}."],
+        O: ["We expect an open game with plenty of goals: {SEL} at {O}.", "Everything points to a game with goals: {SEL} at {O}."],
+        U: ["We expect a tight game with few goals: {SEL} at {O}.", "This looks like a cagey, low-scoring game: {SEL} at {O}."],
+        NG: ["We believe at least one side will fail to score: NG at {O}."],
+        W: ["We believe {T} will take the win: {SEL} at {O}.", "We back {T} to win this one: {SEL} at {O}."],
+        X: ["We expect a balanced game with no winner: X at {O}."], DC: ["We believe {T} will avoid defeat: {SEL} at {O}."] },
+  el: { GG: ["Περιμένουμε ένα παιχνίδι πλούσιο σε φάσεις και γκολ, και πιστεύουμε ότι θα σκοράρουν και οι δύο ομάδες: GG στο {O}.", "Και οι δύο ομάδες δείχνουν έτοιμες να βρουν δίχτυα: GG στο {O}."],
+        O: ["Περιμένουμε ένα ανοιχτό παιχνίδι με αρκετά γκολ: {SEL} στο {O}.", "Όλα δείχνουν παιχνίδι με γκολ: {SEL} στο {O}."],
+        U: ["Περιμένουμε ένα κλειστό παιχνίδι με λίγα γκολ: {SEL} στο {O}.", "Μοιάζει με σφιχτό παιχνίδι, φτωχό σε γκολ: {SEL} στο {O}."],
+        NG: ["Πιστεύουμε ότι τουλάχιστον μία ομάδα θα μείνει χωρίς γκολ: NG στο {O}."],
+        W: ["Πιστεύουμε ότι η {T} θα πάρει τη νίκη: {SEL} στο {O}.", "Ποντάρουμε στη νίκη της {T}: {SEL} στο {O}."],
+        X: ["Περιμένουμε ένα ισορροπημένο παιχνίδι χωρίς νικητή: X στο {O}."], DC: ["Πιστεύουμε ότι η {T} δεν θα χάσει: {SEL} στο {O}."] },
+  es: { GG: ["Esperamos un partido con ocasiones y goles, y creemos que marcarán los dos equipos: GG a {O}."], O: ["Esperamos un partido abierto y con goles: {SEL} a {O}."],
+        U: ["Esperamos un partido cerrado y con pocos goles: {SEL} a {O}."], NG: ["Creemos que al menos un equipo se quedará sin marcar: NG a {O}."],
+        W: ["Creemos que {T} se llevará la victoria: {SEL} a {O}."], X: ["Esperamos un partido igualado y sin ganador: X a {O}."], DC: ["Creemos que {T} no perderá: {SEL} a {O}."] },
+  pt: { GG: ["Esperamos um jogo com chances e gols, e acreditamos que os dois times vão marcar: GG a {O}."], O: ["Esperamos um jogo aberto e com gols: {SEL} a {O}."],
+        U: ["Esperamos um jogo fechado e com poucos gols: {SEL} a {O}."], NG: ["Acreditamos que pelo menos um time vai passar em branco: NG a {O}."],
+        W: ["Acreditamos que o {T} vai vencer: {SEL} a {O}."], X: ["Esperamos um jogo equilibrado e sem vencedor: X a {O}."], DC: ["Acreditamos que o {T} não vai perder: {SEL} a {O}."] },
+  fr: { GG: ["Nous attendons un match riche en occasions et en buts, et nous pensons que les deux équipes marqueront : GG à {O}."], O: ["Nous attendons un match ouvert avec des buts : {SEL} à {O}."],
+        U: ["Nous attendons un match fermé avec peu de buts : {SEL} à {O}."], NG: ["Nous pensons qu'au moins une équipe ne marquera pas : NG à {O}."],
+        W: ["Nous pensons que {T} va s'imposer : {SEL} à {O}."], X: ["Nous attendons un match équilibré sans vainqueur : X à {O}."], DC: ["Nous pensons que {T} ne perdra pas : {SEL} à {O}."] },
+  de: { GG: ["Wir erwarten ein Spiel mit Chancen und Toren und glauben, dass beide Teams treffen: GG zu {O}."], O: ["Wir erwarten ein offenes Spiel mit Toren: {SEL} zu {O}."],
+        U: ["Wir erwarten ein enges Spiel mit wenigen Toren: {SEL} zu {O}."], NG: ["Wir glauben, dass mindestens ein Team ohne Tor bleibt: NG zu {O}."],
+        W: ["Wir glauben, dass {T} gewinnt: {SEL} zu {O}."], X: ["Wir erwarten ein ausgeglichenes Spiel ohne Sieger: X zu {O}."], DC: ["Wir glauben, dass {T} nicht verliert: {SEL} zu {O}."] },
+  ro: { GG: ["Ne așteptăm la un meci cu ocazii și goluri și credem că ambele echipe vor marca: GG la {O}."], O: ["Ne așteptăm la un meci deschis, cu goluri: {SEL} la {O}."],
+        U: ["Ne așteptăm la un meci închis, cu puține goluri: {SEL} la {O}."], NG: ["Credem că cel puțin o echipă nu va marca: NG la {O}."],
+        W: ["Credem că {T} va câștiga: {SEL} la {O}."], X: ["Ne așteptăm la un meci echilibrat, fără învingător: X la {O}."], DC: ["Credem că {T} nu va pierde: {SEL} la {O}."] },
+  sr: { GG: ["Očekujemo utakmicu sa šansama i golovima i verujemo da će oba tima postići gol: GG po kvoti {O}."], O: ["Očekujemo otvorenu utakmicu sa golovima: {SEL} po kvoti {O}."],
+        U: ["Očekujemo zatvorenu utakmicu sa malo golova: {SEL} po kvoti {O}."], NG: ["Verujemo da bar jedan tim neće postići gol: NG po kvoti {O}."],
+        W: ["Verujemo da će {T} pobediti: {SEL} po kvoti {O}."], X: ["Očekujemo izjednačenu utakmicu bez pobednika: X po kvoti {O}."], DC: ["Verujemo da {T} neće izgubiti: {SEL} po kvoti {O}."] },
+  bg: { GG: ["Очакваме мач с много положения и голове и вярваме, че двата отбора ще вкарат: GG при {O}."], O: ["Очакваме открит мач с голове: {SEL} при {O}."],
+        U: ["Очакваме затворен мач с малко голове: {SEL} при {O}."], NG: ["Вярваме, че поне един отбор няма да вкара: NG при {O}."],
+        W: ["Вярваме, че {T} ще победи: {SEL} при {O}."], X: ["Очакваме равностоен мач без победител: X при {O}."], DC: ["Вярваме, че {T} няма да загуби: {SEL} при {O}."] },
+};
+
 // Φόρμα σε ενιαία μορφή: [{res, gf, ga}], πιο πρόσφατος πρώτος.
 // Ημέρα: [["W","2-1",1], ...]· σελίδα αγώνα: [{res, gf, ga}, ...].
 function norm(form) {
@@ -283,8 +321,11 @@ function tipWhyParts(lang, x, tip, SEL) {
     else if (s === "1X" || s === "X2") { const tm = s === "1X" ? H : Aw; ev = fill(T.evDC, { T: tm }); }
     else if (s === "X") { if (h.length && a.length) st = fill(T.draw, { P: pts(h), Q: pts(a) }); ev = T.evX; }
     if (st) out.push(st);
-    const PC = tip.prob ? Math.round(tip.prob * 100) : null;
-    out.push(ev && PC ? fill(T.concl[(x.id >> 1) % T.concl.length], { EV: ev, PC, SEL: sel, O }) : fill(T.gen, { SEL: sel, O }));
+    const C = CM[lang] || CM.en;
+    const kind = s === "GG" ? "GG" : s === "NG" ? "NG" : /^O\d/.test(s) ? "O" : /^U\d/.test(s) ? "U" : (s === "1" || s === "2") ? "W" : s === "X" ? "X" : (s === "1X" || s === "X2") ? "DC" : null;
+    const tm = s === "1" || s === "1X" ? H : Aw;
+    const arr = kind && C[kind];
+    out.push(arr ? fill(arr[(x.id >> 1) % arr.length], { T: tm, SEL: sel, O }) : fill(T.gen, { SEL: sel, O }));
   return out;
 }
 export function tipWhy(lang, x, tip, SEL) { return tipWhyParts(lang, x, tip, SEL).join(" "); }

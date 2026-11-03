@@ -41,7 +41,7 @@ Rules:
 - 2 to 3 sentences, max 70 words. Plain text, no headings, no emojis, no lists.
 - Use ONLY the facts in the JSON. Talk ONLY about what our tip is based on: the last games, form and goals of both teams (and the table if given).
 - Never mention injuries/absences, players, news, market money/odds movement, history, motivation, coaches or weather: they were not part of our decision (Owner 03/11).
-- Mention the form of both teams with numbers from the data, and end with why that data leads to OUR TIP (pick, odds, our probability %).
+- Mention the form of both teams with numbers from the data, and end with a natural conclusion that leads to OUR TIP (pick and odds), e.g. "We expect a lively game with chances at both ends, and we believe both teams will score: GG at 1.53." Do NOT state our probability or any percentage in the conclusion (Owner 03/11: natural, not provocative).
 - Never promise a win. Never use the words sure, locked, guaranteed, fixed (or σίγουρο, κλειδωμένο, εγγυημένο). No "1 in X".
 - Betting terms (Over/Under, GG/NG, 1X2, VIP, Tip) stay as they are.
 Return only the text.`;
@@ -50,7 +50,7 @@ const C_SYS = `You are a strict fact-checker for a football tips website. You ge
 Approve only if ALL are true:
 1) Every number, score, count, position, odds and percentage in TEXT matches DATA exactly (recount wins/draws/losses yourself).
 2) TEXT states nothing that is not in DATA, and does NOT mention injuries/absences, players, market money or odds movement (not part of the decision).
-3) TEXT's conclusion supports the exact tip in DATA (same pick, same odds, same probability).
+3) TEXT's conclusion supports the exact tip in DATA (same pick, same odds) and states no percentage/probability.
 4) No promises of winning, no words like sure/locked/guaranteed/fixed (or Greek σίγουρο/κλειδωμένο/εγγυημένο), no "1 in X".
 5) Language is correct and natural for the requested language; team names as in DATA.
 Reply with JSON only: {"ok": true} or {"ok": false, "problems": ["..."]}`;
