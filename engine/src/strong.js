@@ -39,7 +39,17 @@ export async function makeStrong(env, date = ymd(now()), force = false) {
   const goals = pick((x) => (x.sel === "O25" || x.sel === "GG") && x.price >= 1.6 && x.price <= 1.85);
   const treble = [];
   // απόφαση Owner 03/11: κάθε επιλογή της τριάδας 1.50–1.80
-  for (const pool of [vip, free]) for (const x of pool) if (treble.length < 3 && !used.has(x.f) && x.price >= 1.5 && x.price <= 1.8) { used.add(x.f); treble.push(x); }
+  // ... και μπορεί να πάρει το πολύ ΕΝΑ από τα δύο «μονά» (Νίκη/Γκολ) της ημέρας
+  const singles = new Set([win, goals].filter(Boolean).map((x) => x.f + ":" + x.sel)), inT = new Set();
+  let fromSingles = 0;
+  for (const pool of [vip, free]) for (const x of pool) {
+    if (treble.length >= 3 || inT.has(x.f) || x.price < 1.5 || x.price > 1.8) continue;
+    const isSingle = singles.has(x.f + ":" + x.sel);
+    if (used.has(x.f) && !isSingle) continue;
+    if (isSingle && fromSingles >= 1) continue;
+    if (isSingle) fromSingles++;
+    inT.add(x.f); treble.push(x);
+  }
   // όχι πριν τις 10:00 ώρα Ελλάδας (εκτός αν το ζητήσει ο Owner με force)
   if (!force && athH() < 10) return { ok: false, wait: true };
   if (!win && !goals && treble.length < 3) return { ok: false, empty: true };
