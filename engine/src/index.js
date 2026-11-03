@@ -272,15 +272,18 @@ async function apiDay(env, date) {
 
 // Ένας αγώνας: στοιχεία, tips (VIP κρυφό ως τη σέντρα), αποδόσεις, φόρμα 10 αγώνων, πιθανότητες και πιθανό σκορ.
 // Record: όλα τα tips που κρίθηκαν (κερδισμένα και χαμένα) + όσα αποσύρθηκαν πριν τη σέντρα. Τίποτα δεν σβήνεται.
+export const RECORD_START = 1793656800; // 2026-11-03 00:00 ώρα Ελλάδας/Κύπρου
 async function apiRecord(env) {
   const q = `SELECT t.fixture_id, t.market, t.sel, t.tier, t.price, t.result, t.status, t.created_at, t.withdrawn_at, t.model_version, t.hash,
       f.ts, f.gh, f.ga, f.league_id, l.name league, l.country, h.name home, a.name away
     FROM tips t JOIN fixtures f ON f.id=t.fixture_id JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id`;
-  const settled = (await env.DB.prepare(q + " WHERE t.status='active' AND t.result IN (0,1) ORDER BY f.ts DESC").all()).results; // void (2) δεν μετρά
-  const withdrawn = (await env.DB.prepare(q + " WHERE t.status='withdrawn' AND f.ts < ? ORDER BY f.ts DESC LIMIT 200").bind(now() + 86400).all()).results;
-  const pending = (await env.DB.prepare("SELECT COUNT(*) n FROM tips WHERE status='active' AND result IS NULL").first()).n;
-  const first = (await env.DB.prepare("SELECT MIN(created_at) t FROM tips").first()).t;
-  return { since: first, pending, settled, withdrawn, updated: now() };
+  // απόφαση Owner 03/11: το ΕΠΙΣΗΜΟ record ξεκινάει 3/11/2026 (αγώνες από 00:00 ώρα Ελλάδας), μετά τους οριστικούς κανόνες.
+  // Οι μέρες δοκιμών (1–2/11) δεν φαίνονται καθόλου: ούτε νίκες, ούτε ήττες, ούτε αποσυρμένα.
+  const S = RECORD_START;
+  const settled = (await env.DB.prepare(q + " WHERE t.status='active' AND t.result IN (0,1) AND f.ts >= ? ORDER BY f.ts DESC").bind(S).all()).results; // void (2) δεν μετρά
+  const withdrawn = (await env.DB.prepare(q + " WHERE t.status='withdrawn' AND f.ts >= ? AND f.ts < ? ORDER BY f.ts DESC LIMIT 200").bind(S, now() + 86400).all()).results;
+  const pending = (await env.DB.prepare("SELECT COUNT(*) n FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE t.status='active' AND t.result IS NULL AND f.ts >= ?").bind(S).first()).n;
+  return { since: S, pending, settled, withdrawn, updated: now() };
 }
 
 async function apiMatch(env, id) {

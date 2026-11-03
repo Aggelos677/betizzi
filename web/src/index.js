@@ -202,7 +202,8 @@ async function stripData(env, lang, tz) {
   try {
     if (!RECC || Date.now() - RECC.t > 10 * 60 * 1000) {
       // παρολί των τελευταίων 10 ημερών (UTC), για «επιλογές της ημέρας χθες» και «τελευταίο που κέρδισε»
-      const days = [...Array(10)].map((_, i) => new Date(Date.now() - (i + 1) * 86400000).toISOString().slice(0, 10));
+      // απόφαση Owner 03/11: επίσημο record από 3/11/2026· παρολί των ημερών δοκιμών δεν μετράνε
+      const days = [...Array(10)].map((_, i) => new Date(Date.now() - (i + 1) * 86400000).toISOString().slice(0, 10)).filter((x) => x >= "2026-11-03");
       const [d, ...cps] = await Promise.all([getRecord(env), ...days.map((x) => getCoupons(env, x).catch(() => []))]);
       RECC = { t: Date.now(), d, cps: days.map((x, i) => ({ date: x, list: cps[i] || [] })) };
     }
@@ -579,7 +580,7 @@ function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) 
   const prevK = mo && mo !== "all" ? months[months.indexOf(mo) + 1] : null;
   const ms = recStats(S), ps = prevK ? recStats(ALL.filter((x) => inM(x, prevK) && tierOk(x))) : null;
   const answer = ALL.length
-    ? r.ans.replace("{since}", dLong(d.since)).replace("{n}", all.n).replace("{w}", all.w).replace("{l}", all.l).replace("{hit}", all.hit)
+    ? (d.withdrawn.length ? r.ans : r.ans.replace(/\s*[^.]*\{wd\}[^.]*\.\s*/, " ").trim()).replace("{since}", dLong(d.since)).replace("{n}", all.n).replace("{w}", all.w).replace("{l}", all.l).replace("{hit}", all.hit)
         .replace("{u}", sgn(all.u)).replace("{roi}", sgn(all.roi, 1)).replace("{avg}", all.avg.toFixed(2)).replace("{wd}", d.withdrawn.length).replace("{upd}", dLong(d.updated))
     : r.empty;
   const base = `/${lang}/${r.slug}`;
