@@ -1404,7 +1404,7 @@ function renderClose(){var box=$("closeBox");if(!box)return;var it=[],now=Date.n
 setInterval(function(){if(!document.hidden)renderClose();},15000);
 function athHour(){try{return +new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Athens",hour:"2-digit",hourCycle:"h23"}).format(new Date());}catch(e){return new Date().getUTCHours()+2;}}
 function renderWins(){var box=$("winsSide");if(!box)return;
-  var wins=[];MATCHES.forEach(function(m){if(!m.done||(m.type==="cancelled"||m.type==="postponed"))return;m.tips.forEach(function(t){if(t.r===1)wins.push({m:m,t:t});});});
+  var wins=[];MATCHES.forEach(function(m){if(!m.done||(m.type==="cancelled"||m.type==="postponed"))return;m.tips.forEach(function(t){if(t.r===1||(t.sel&&tipState(t,m)==="won"))wins.push({m:m,t:t});});}); /* 03/11: και νίκες που μόλις έκλεισαν (χωρίς reload) */
   wins.sort(function(a,b){return (b.t.odds||0)-(a.t.odds||0);});
   /* απόφαση Owner 02/11: παρολί που κλείνει κερδισμένο μπαίνει από πάνω, μόλις κλείσει (και πριν το ενημερώσει ο server) */
   var L=(typeof BZC!=="undefined"&&BZC)||[],cw=L.filter(cpWon).sort(function(a,b){return cpX(b)-cpX(a);});
