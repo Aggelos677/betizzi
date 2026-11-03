@@ -33,6 +33,7 @@
 - Μυστικά (API keys) μόνο ως Cloudflare Secrets, ποτέ στον κώδικα.
 
 ## Ιστορικό
+- 03/11: Εγγραφή λειτουργεί. Email μέσω Cloudflare Email Sending (betizzi.com onboarded, binding EMAIL). Brevo betizzi: domain πιστοποιημένο αλλά χωρίς API key (θέλει κινητό) → δεν χρησιμοποιείται. Πιθανό σκορ κλειδωμένο (πίνακας pred).
 - 03/11: έλεγχος μεταφράσεων από 9 AI ελεγκτές (εργαλεία στο /home/claude/tr: extract.mjs, BRIEF.md, apply.mjs). Διπλό κλειδί UI «Close» (κοντά/κλείσιμο) → «Almost» για το «κοντά». Άλλαξαν slugs affiliate es/fr (301 από τα παλιά). 63% έφυγε από τη γραμμή «Γιατί», πίνακας «Πιθανότητες αγοράς». Δεξιά στήλη ίδια παντού (SIDE_CFG). Χθεσινές μεγάλες νίκες το πρωί ως τις 14:00.
 
 ### 03/11/2026
