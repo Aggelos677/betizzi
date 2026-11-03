@@ -653,3 +653,17 @@ export const REC = {
     latest: "Всички резултати", withdrawn: "Оттеглени преди началото", pending: "{n} прогнози чакат своя мач.",
     how: "Как броим", howText: "Всяка прогноза се отчита по резултата след 90 минути. Публикувана прогноза никога не се променя и не се изтрива; може само да бъде оттеглена преди началото, а оттеглените също са тук. Всяка прогноза пази версията на модела и SHA-256 отпечатък." },
 };
+
+// Μπάνερ συγκατάθεσης για Google Analytics (03/11/2026). «Προς έλεγχο» από ντόπιους όπως όλα.
+export const CONSENT = {
+  en: { msg: "We use Google Analytics cookies to see how the site is used, only if you accept.", yes: "Accept", no: "Reject", more: "More", set: "Cookie settings" },
+  el: { msg: "Χρησιμοποιούμε cookies του Google Analytics για να βλέπουμε πώς χρησιμοποιείται το site, μόνο αν συμφωνήσεις.", yes: "Αποδοχή", no: "Απόρριψη", more: "Περισσότερα", set: "Ρυθμίσεις cookies" },
+  es: { msg: "Usamos cookies de Google Analytics para ver cómo se usa la web, solo si las aceptas.", yes: "Aceptar", no: "Rechazar", more: "Más", set: "Configurar cookies" },
+  pt: { msg: "Usamos cookies do Google Analytics para ver como o site é usado, só se você aceitar.", yes: "Aceitar", no: "Recusar", more: "Mais", set: "Configurar cookies" },
+  fr: { msg: "Nous utilisons les cookies Google Analytics pour voir comment le site est utilisé, seulement si tu acceptes.", yes: "Accepter", no: "Refuser", more: "En savoir plus", set: "Paramètres des cookies" },
+  de: { msg: "Wir nutzen Google-Analytics-Cookies, um zu sehen, wie die Seite genutzt wird – nur wenn du zustimmst.", yes: "Akzeptieren", no: "Ablehnen", more: "Mehr", set: "Cookie-Einstellungen" },
+  ro: { msg: "Folosim cookie-uri Google Analytics ca să vedem cum este folosit site-ul, doar dacă accepți.", yes: "Accept", no: "Refuz", more: "Mai mult", set: "Setări cookie-uri" },
+  sr: { msg: "Koristimo Google Analytics kolačiće da vidimo kako se sajt koristi, samo ako prihvatiš.", yes: "Prihvati", no: "Odbij", more: "Više", set: "Podešavanja kolačića" },
+  bg: { msg: "Използваме бисквитки на Google Analytics, за да виждаме как се използва сайтът, само ако приемеш.", yes: "Приемам", no: "Отказвам", more: "Още", set: "Настройки за бисквитки" },
+};
+export const GA_ID = "G-WW02BKK8TV";

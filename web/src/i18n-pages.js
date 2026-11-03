@@ -677,10 +677,13 @@ The data controller is the sole proprietorship of ${OP.name}, ${OP.city}, which 
 - **Emails we send:** only the sign-in code and one welcome email. No advertising from these emails.
 - **How long:** for as long as you keep your account. You can ask us to delete it at any time by writing to [${OP.privacy}](mailto:${OP.privacy}).
 
-We do not use advertising cookies, we do not sell personal data, and we do not use third-party analytics.
+## Google Analytics (only if you accept)
+If you click "Accept" in our cookie banner, we use Google Analytics (Google Ireland Ltd) to see how the site is used: pages viewed, device type, approximate location (country/city) and how you arrived. Legal basis: your consent. Google keeps this data for 14 months. If you click "Reject", no analytics cookies are set; Google receives only basic signals without cookies, which cannot identify you. You can change your choice at any time with "Cookie settings" at the bottom of every page.
+
+We do not use advertising cookies and we do not sell personal data.
 
 ## Who processes data for us
-Cloudflare, Inc. (hosting, database, security and sending our emails). Data may be processed outside the EU under the European Commission's standard contractual clauses or an adequacy decision.
+Cloudflare, Inc. (hosting, database, security and sending our emails) and, only if you accept analytics cookies, Google Ireland Ltd (Google Analytics). Data may be processed outside the EU under the European Commission's standard contractual clauses or an adequacy decision.
 
 ## Your rights
 You can ask for access, correction, deletion, restriction or portability of your data, or object to processing, by writing to [${OP.privacy}](mailto:${OP.privacy}). We reply within one month. You can also complain to the Cyprus Commissioner for Personal Data Protection ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) or the authority where you live.
@@ -706,10 +709,13 @@ betizzi is not for anyone under 18 (21 in Greece). We do not knowingly process d
 - **Email που στέλνουμε:** μόνο τον κωδικό σύνδεσης και ένα email καλωσορίσματος. Καμία διαφήμιση μέσα σε αυτά.
 - **Για πόσο:** όσο έχεις λογαριασμό. Μπορείς να ζητήσεις τη διαγραφή του όποτε θέλεις, γράφοντας στο [${OP.privacy}](mailto:${OP.privacy}).
 
-Δεν χρησιμοποιούμε διαφημιστικά cookies, δεν πουλάμε προσωπικά δεδομένα και δεν χρησιμοποιούμε εργαλεία μετρήσεων τρίτων.
+## Google Analytics (μόνο αν συμφωνήσεις)
+Αν πατήσεις «Αποδοχή» στο μπάνερ cookies, χρησιμοποιούμε το Google Analytics (Google Ireland Ltd) για να βλέπουμε πώς χρησιμοποιείται το site: σελίδες που είδες, είδος συσκευής, κατά προσέγγιση τοποθεσία (χώρα/πόλη) και από πού ήρθες. Νομική βάση: η συγκατάθεσή σου. Η Google κρατά τα στοιχεία 14 μήνες. Αν πατήσεις «Απόρριψη», δεν μπαίνουν cookies μετρήσεων· η Google παίρνει μόνο βασικά σήματα χωρίς cookies, που δεν σε αναγνωρίζουν. Μπορείς να αλλάξεις την επιλογή σου όποτε θέλεις από τις «Ρυθμίσεις cookies» στο κάτω μέρος κάθε σελίδας.
+
+Δεν χρησιμοποιούμε διαφημιστικά cookies και δεν πουλάμε προσωπικά δεδομένα.
 
 ## Ποιος επεξεργάζεται δεδομένα για εμάς
-Cloudflare, Inc. (φιλοξενία, βάση δεδομένων, ασφάλεια και αποστολή των email μας). Τα δεδομένα μπορεί να επεξεργάζονται εκτός ΕΕ, με τις τυποποιημένες συμβατικές ρήτρες της Ευρωπαϊκής Επιτροπής ή απόφαση επάρκειας.
+Cloudflare, Inc. (φιλοξενία, βάση δεδομένων, ασφάλεια και αποστολή των email μας) και, μόνο αν δεχτείς τα cookies μετρήσεων, η Google Ireland Ltd (Google Analytics). Τα δεδομένα μπορεί να επεξεργάζονται εκτός ΕΕ, με τις τυποποιημένες συμβατικές ρήτρες της Ευρωπαϊκής Επιτροπής ή απόφαση επάρκειας.
 
 ## Τα δικαιώματά σου
 Μπορείς να ζητήσεις πρόσβαση, διόρθωση, διαγραφή, περιορισμό ή φορητότητα των δεδομένων σου, ή να αντιταχθείς στην επεξεργασία, γράφοντας στο [${OP.privacy}](mailto:${OP.privacy}). Απαντάμε μέσα σε έναν μήνα. Μπορείς επίσης να κάνεις καταγγελία στον Επίτροπο Προστασίας Δεδομένων Προσωπικού Χαρακτήρα της Κύπρου ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) ή στην αρχή της χώρας σου (στην Ελλάδα: Αρχή Προστασίας Δεδομένων, [dpa.gr](https://www.dpa.gr)).
@@ -726,10 +732,13 @@ Cloudflare, Inc. (φιλοξενία, βάση δεδομένων, ασφάλε�
     body: {
       en: `Effective date: 3 November 2026.
 
-betizzi does not set advertising or analytics cookies.
+betizzi does not set advertising cookies. Analytics cookies are set only if you click "Accept" in our cookie banner.
 
-## The one cookie we set
-- **bz_s** — the sign-in cookie. Set only when you sign in to your free account, so you stay signed in. HttpOnly and secure, it lasts up to 90 days and is deleted when you sign out. It is strictly necessary for the account to work, so no consent banner is required.
+## Cookies we set
+- **bz_s** — the sign-in cookie. Set only when you sign in to your free account, so you stay signed in. HttpOnly and secure, it lasts up to 90 days and is deleted when you sign out. It is strictly necessary for the account to work, so it does not need your consent.
+- **_ga, _ga_WW02BKK8TV** — Google Analytics, only if you accept. They tell visits apart so we can count how the site is used. They last up to 2 years. If you reject, they are not set.
+
+You can change your choice at any time with "Cookie settings" at the bottom of every page.
 
 ## What we store in your browser
 We also use your browser's own storage to remember choices you make, so the site works the way you left it. This data stays on your device and is not sent to us.
@@ -741,13 +750,16 @@ We also use your browser's own storage to remember choices you make, so the site
 
 These are needed for features you use. You can delete them at any time in your browser settings; the site will simply forget your choices (and sign you out).
 
-If we ever add analytics or advertising cookies, we will update this page and ask for your consent first.`,
+If we ever add advertising cookies, we will update this page and ask for your consent first.`,
       el: `Ισχύει από: 3 Νοεμβρίου 2026.
 
-Το betizzi δεν βάζει διαφημιστικά cookies ούτε cookies μετρήσεων.
+Το betizzi δεν βάζει διαφημιστικά cookies. Cookies μετρήσεων μπαίνουν μόνο αν πατήσεις «Αποδοχή» στο μπάνερ cookies.
 
-## Το μόνο cookie που βάζουμε
-- **bz_s** — cookie σύνδεσης. Μπαίνει μόνο όταν συνδέεσαι στον δωρεάν λογαριασμό σου, για να μένεις συνδεδεμένος. Είναι HttpOnly και ασφαλές, διαρκεί έως 90 μέρες και σβήνει όταν αποσυνδέεσαι. Είναι απολύτως απαραίτητο για να λειτουργεί ο λογαριασμός, γι' αυτό δεν χρειάζεται μπάνερ συγκατάθεσης.
+## Τα cookies που βάζουμε
+- **bz_s** — cookie σύνδεσης. Μπαίνει μόνο όταν συνδέεσαι στον δωρεάν λογαριασμό σου, για να μένεις συνδεδεμένος. Είναι HttpOnly και ασφαλές, διαρκεί έως 90 μέρες και σβήνει όταν αποσυνδέεσαι. Είναι απολύτως απαραίτητο για να λειτουργεί ο λογαριασμός, γι' αυτό δεν χρειάζεται συγκατάθεση.
+- **_ga, _ga_WW02BKK8TV** — Google Analytics, μόνο αν συμφωνήσεις. Ξεχωρίζουν τις επισκέψεις για να μετράμε πώς χρησιμοποιείται το site. Διαρκούν έως 2 χρόνια. Αν πατήσεις «Απόρριψη», δεν μπαίνουν.
+
+Μπορείς να αλλάξεις την επιλογή σου όποτε θέλεις από τις «Ρυθμίσεις cookies» στο κάτω μέρος κάθε σελίδας.
 
 ## Τι κρατάμε στον browser σου
 Χρησιμοποιούμε και τον αποθηκευτικό χώρο του browser σου για να θυμάται τις επιλογές σου, ώστε το site να είναι όπως το άφησες. Αυτά μένουν στη συσκευή σου και δεν μας στέλνονται.
@@ -759,7 +771,7 @@ If we ever add analytics or advertising cookies, we will update this page and as
 
 Χρειάζονται για λειτουργίες που χρησιμοποιείς. Μπορείς να τα σβήσεις όποτε θέλεις από τις ρυθμίσεις του browser· το site απλώς θα ξεχάσει τις επιλογές σου (και θα σε αποσυνδέσει).
 
-Αν ποτέ προσθέσουμε cookies μετρήσεων ή διαφήμισης, θα ενημερώσουμε αυτή τη σελίδα και θα ζητήσουμε πρώτα τη συγκατάθεσή σου.`,
+Αν ποτέ προσθέσουμε διαφημιστικά cookies, θα ενημερώσουμε αυτή τη σελίδα και θα ζητήσουμε πρώτα τη συγκατάθεσή σου.`,
     },
   },
 };

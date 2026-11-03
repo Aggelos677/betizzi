@@ -1,7 +1,7 @@
 // betizzi-web: σελίδες έτοιμες από τον server (SSR), μία ανά γλώσσα.
 // Μέχρι το άνοιγμα: noindex παντού (X-Robots-Tag) και robots.txt κλειστό.
 import { analysis, tipWhy } from "./analysis.js";
-import { LANGS, HREFLANG, TZ, LOCALE, T, SEL, UI, UI_ORDER, REC } from "./i18n.js";
+import { LANGS, HREFLANG, TZ, LOCALE, T, SEL, UI, UI_ORDER, REC, CONSENT, GA_ID } from "./i18n.js";
 import { TRANSLATOR } from "./translator.js";
 import { getDay, getMatch, getRecord, getCoupons } from "./data.js";
 import { PG, PG_ORDER, OP } from "./i18n-pages.js";
@@ -183,8 +183,26 @@ function locReason(body) {
   return body.replace(/(\d+\/10) games/g, `$1 ${L[0]}`).replace(/form (\d+-\d+) pts/g, `${L[1]} $1 ${L[2]}`).replace(/"best price"/g, JSON.stringify(L[3]));
 }
 
+// Google Analytics με Consent Mode v2 (03/11/2026): χωρίς cookies μέχρι να πατήσει «Αποδοχή». Οι δοκιμαστές (?src=bzqa) δεν μετράνε.
+const GA_HEAD = `<script async src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+(function(){var c=null,q=/[?&]src=bzqa/.test(location.search);try{c=localStorage.getItem("bz-consent");if(q)sessionStorage.setItem("bzqa","1");q=q||sessionStorage.getItem("bzqa")==="1";}catch(e){}
+if(q)window["ga-disable-${GA_ID}"]=true;
+gtag("consent","default",{analytics_storage:c==="y"?"granted":"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied"});
+gtag("js",new Date());gtag("config","${GA_ID}");})();</script>`;
+const GA_BODY = `<style>#bzck{position:fixed;left:12px;right:12px;bottom:84px;z-index:9999;max-width:560px;margin:0 auto;background:#141a16;color:#eef3ee;border:1px solid #2a352e;border-radius:14px;padding:14px;font:14px/1.45 Manrope,Arial,sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.5)}#bzck p{margin:0 0 10px}#bzck a{color:#b6f23a}#bzck .r{display:flex;gap:10px}#bzck button{flex:1;min-height:44px;border-radius:10px;border:1px solid #b6f23a;font:800 14px Manrope,Arial,sans-serif;cursor:pointer;background:transparent;color:#eef3ee}@media(min-width:900px){#bzck{bottom:16px}}</style>
+<script>(function(){var C=${JSON.stringify(CONSENT).replace(/</g, "\\u003c")},L=(document.documentElement.lang||"en").slice(0,2),T=C[L]||C.en;
+function show(){if(document.getElementById("bzck"))return;var d=document.createElement("div");d.id="bzck";d.setAttribute("role","dialog");d.setAttribute("aria-label",T.set);
+d.innerHTML="<p>"+T.msg+" <a href=\\"/"+(L==="el"?"el":"en")+"/cookies\\">"+T.more+"</a></p><div class=r><button type=button data-c=n>"+T.no+"</button><button type=button data-c=y>"+T.yes+"</button></div>";
+d.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var y=b.dataset.c==="y";try{localStorage.setItem("bz-consent",y?"y":"n");}catch(x){}
+gtag("consent","update",{analytics_storage:y?"granted":"denied"});d.remove();});document.body.appendChild(d);}
+var c=null;try{c=localStorage.getItem("bz-consent");}catch(e){}
+if(!c||location.hash==="#cookies")show();
+document.querySelectorAll("footer").forEach(function(f){var a=document.createElement("a");a.href="#cookies";a.textContent=T.set;a.style.cssText="display:block;margin-top:6px;color:inherit;text-decoration:underline";a.addEventListener("click",function(e){e.preventDefault();show();});f.appendChild(a);});})();</script>`;
+
 function html(body, status = 200, a21 = false) {
   if (a21) body = body.replace(/18\+/g, "21+");
+  if (body.includes("</head>") && !body.includes("googletagmanager")) body = body.replace("</head>", GA_HEAD + "</head>");
+  if (body.includes("</body>")) body = body.replace(/<\/body>(?![\s\S]*<\/body>)/, GA_BODY + "</body>");
   body = locReason(body);
   return new Response(body, {
     status,
