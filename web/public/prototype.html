@@ -746,7 +746,7 @@ header{position:relative}
 .opalt[aria-pressed="true"]{border-color:var(--lime)}
 .pc-tr{font-family:var(--f-mono);color:var(--fg);opacity:.85}
 .opalt b{display:block;font-size:.92rem}.opalt small{display:block;font-size:.7rem;color:var(--muted)}.opalt em{display:block;font-style:normal;font:700 1.1rem var(--f-mono);color:var(--lime);margin-top:6px}
-.pend{border:1px solid var(--line);border-radius:12px;padding:10px 12px;opacity:.85}.pend>summary{cursor:pointer;font-weight:700;color:var(--mut,#9aa59e);min-height:28px}.opempty{background:var(--panel);border:1px dashed var(--line);border-radius:18px;padding:24px;text-align:center;color:var(--muted)}
+.pend{border:1px solid var(--line);border-radius:12px;padding:10px 12px;opacity:.85}.pend>summary{cursor:pointer;font-weight:700;color:var(--mut,#9aa59e);min-height:28px}.pc-new{font-size:.62em;color:var(--lime,#b6f23a);letter-spacing:0;vertical-align:middle}.opempty{background:var(--panel);border:1px dashed var(--line);border-radius:18px;padding:24px;text-align:center;color:var(--muted)}
 .opempty b{display:block;font:800 1.4rem var(--f-display);text-transform:uppercase;color:var(--fg);margin-bottom:4px}
 .sglist{display:flex;flex-direction:column;gap:12px}
 .sg{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px;transition:border-color .2s}
@@ -1820,7 +1820,7 @@ function parlayHTML(c,feat){
     return '<li'+(lv?' class="lv"':'')+'><span class="pc-tm">'+tm+'</span><span class="pc-m"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+legPick(l)+(l.vip?'<span class="vipt">VIP</span>':'')+'</small></span>'+r+'<span class="pc-o">'+(l.result===2?'<s>'+fx2(l.price)+'</s> 1.00':l.price?fx2(l.price):"")+'</span></li>';}).join("");
   var keys=c.legs.map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});
   /* απόφαση Owner 02/11: το είδος μεγάλο με δικό του χρώμα (Γκολ πορτοκαλοκίτρινο, 1X2 γαλάζιο), το στυλ μικρό */
-  var name='<span class="pv pv-'+esc(c.variant)+'">'+esc(BZC_VAR[c.variant]||c.variant)+'</span>'+(c.style?' <small class="pc-sty">· <span>'+esc(STY[c.style]||c.style)+'</span></small>':'');
+  var name='<span class="pv pv-'+esc(c.variant)+'">'+esc(BZC_VAR[c.variant]||c.variant)+'</span>'+(/\|extra/.test(c.slot||"")?' <small class="pc-new">🆕 <span>New</span></small>':'')+(c.style?' <small class="pc-sty">· <span>'+esc(STY[c.style]||c.style)+'</span></small>':'');
   var tl=c.legs.filter(function(l){return l.time;}).slice().sort(function(a,b){return (a.ts||0)-(b.ts||0);}),first=tl.length?tl[0].time:"",last=tl.length?tl[tl.length-1].time:"";
   var btns=st==="won"?'<span class="pc-res w">✓ <span>Won</span> · x'+fx2(c.odds_now||c.odds)+'</span>':st==="lost"?'<span class="pc-res l">✗ <span>Lost</span></span>':st==="live"?'<span class="pc-res lv"><i class="ldot2"></i> LIVE</span>'
     :(keys.length?'<button type="button" class="pc-take" data-take="'+c.n+'">🎟️ <span>Take it</span> → <span>My slip</span></button>':'');

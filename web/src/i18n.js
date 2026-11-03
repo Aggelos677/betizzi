@@ -456,6 +456,7 @@ export const UI = {
   "Won": ["Κέρδισε", "Ganado", "Ganhou", "Gagné", "Gewonnen", "Câștigat", "Dobitan", "Спечелен"],
   "Void": ["Άκυρο", "Nulo", "Anulado", "Annulé", "Ungültig", "Anulat", "Poništen", "Анулиран"],
   "Our tips for this match are void.": ["Τα tips μας για αυτόν τον αγώνα είναι άκυρα.", "Nuestros tips para este partido son nulos.", "Nossas dicas para este jogo foram anuladas.", "Nos tips pour ce match sont annulés.", "Unsere Tipps für dieses Spiel sind ungültig.", "Ponturile noastre pentru acest meci sunt anulate.", "Naši tipovi za ovu utakmicu su poništeni.", "Нашите прогнози за този мач са анулирани."],
+  "New": ["Νέο", "Nuevo", "Novo", "Nouveau", "Neu", "Nou", "Novo", "Ново"],
   "Ended": ["Έληξαν", "Terminados", "Encerrados", "Terminés", "Beendet", "Încheiate", "Završeni", "Приключили"],
   "Today's parlays are settled": ["Τα σημερινά παρολί κρίθηκαν", "Las combinadas de hoy ya están resueltas", "As múltiplas de hoje já foram decididas", "Les combinés du jour sont réglés", "Die heutigen Kombis sind entschieden", "Biletele de azi s-au decis", "Današnji tiketi su odlučeni", "Днешните комбинации са решени"],
   "See them below. New ones every morning.": ["Δες τα πιο κάτω. Νέα κάθε πρωί.", "Míralos abajo. Nuevos cada mañana.", "Veja abaixo. Novas todas as manhãs.", "Voir plus bas. Nouveaux chaque matin.", "Unten ansehen. Jeden Morgen neue.", "Vezi mai jos. Bilete noi în fiecare dimineață.", "Pogledaj ispod. Novi svakog jutra.", "Виж ги по-долу. Нови всяка сутрин."],

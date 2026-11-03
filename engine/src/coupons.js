@@ -107,6 +107,23 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
     }
     if (c) { c.legs.forEach((l) => usedFx.add(l.f)); have.add(slot); out.push({ kind: z, variant: "mix", style: "bal", slot, ...c }); }
   }
+  // Απόφαση Owner 04/11: καθημερινές, αν τα παρολί της ημέρας χάθηκαν νωρίς («ζει» το πολύ 1), ΜΙΑ φορά τη μέρα 2–3 νέα μικρά (x3–5)
+  // από tips που δεν μπήκαν σε άλλο παρολί, με αγώνες που δεν έχουν αρχίσει. Μετράνε στο record κανονικά (slot «…|extraN»).
+  if (!weekend && !prev.some((r) => /\|extra/.test(r.slot || "")) && hAth(now()) < 20) {
+    const cur = (await apiCoupons(env, date)).filter((c) => c.style);
+    const lost = cur.filter((c) => c.result === 0).length, alive = cur.filter((c) => c.result == null).length + out.length;
+    if (lost >= 1 && alive <= 1) {
+      const [z, lo, hi] = ZONES[0], ex = [];
+      for (const v of ["mix", "goals", "wins", "mix", "goals"]) {
+        if (ex.length >= 3) break;
+        const free = tips.filter((t) => !usedFx.has(t.f) && !ex.some((e) => e.legs.some((l) => l.f === t.f)));
+        let c = null, sty = null;
+        for (const s2 of ["bal", "fav"]) { c = build(lo, hi, v, s2, free); if (c) { sty = s2; break; } }
+        if (c) ex.push({ kind: z, variant: v, style: sty, slot: `${z}|${v}|extra${ex.length + 1}`, ...c });
+      }
+      if (ex.length >= 2) for (const c of ex) { c.legs.forEach((l) => usedFx.add(l.f)); have.add(c.slot); out.push(c); }
+    }
+  }
   if (dry) return { date, dry: true, weekend, tips: tips.length, had: [...have].length - out.length, made: out.map((c) => ({ slot: c.slot, style: c.style, odds: c.odds, prob: Math.round(c.prob * 1000) / 10, value: Math.round(c.value * 100) / 100, legs: c.legs.map((l) => l.sel + "@" + l.price + "(" + l.src + ")") })) };
   const t = now(), st = [];
   for (let i = 0; i < out.length; i++) {
