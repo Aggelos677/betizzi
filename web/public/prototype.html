@@ -1825,7 +1825,7 @@ function renderStrong(){var box=$("strongBox");if(!box)return;
   if(!BZS){box.hidden=!isToday||location.protocol==="file:";if(!box.hidden)box.innerHTML='<div class="stb-h"><b>⚡ <span>Today\'s strongest</span></b></div><div class="stb-wait"><span>Our strongest picks come out at 10:00.</span></div>';return;}
   box.hidden=false;
   var res=function(r){return r===1?'<span class="pc-r w">✓</span>':r===0?'<span class="pc-r l">✗</span>':r===2?'<span class="pc-r v">–</span>':'';};
-  var priceNow=function(c){if(c.result!=null)return '';if(c.now&&c.min&&c.now<c.min)return '<div class="stb-warn">⚠ <span>Not worth it at this price anymore</span> ('+c.now.toFixed(2)+')</div>';if(c.now&&c.now<c.price-0.005)return '<div class="stb-now"><span>now</span> '+c.now.toFixed(2)+'</div>';return '';};
+  var priceNow=function(c){if(c.result!=null)return '';if(c.now&&c.min&&c.now<c.min*0.98)return '<div class="stb-warn">⚠ <span>Not worth it at this price anymore</span> ('+c.now.toFixed(2)+')</div>';if(c.now&&c.now<c.price-0.005)return '<div class="stb-now"><span>now</span> '+c.now.toFixed(2)+'</div>';return '';};
   var card=function(c,ic,lab){if(!c)return '';var k=c.id+":"+c.sel;
     return '<article class="stb-c"><div class="stb-t">'+ic+' <b><span>'+lab+'</span></b>'+(c.tier==="vip"?' <span class="vipt">VIP</span>':'')+'<small>'+esc(c.league||"")+' · '+esc(c.time||"")+'</small></div>'
       +'<div class="stb-m">'+esc(c.home)+' – '+esc(c.away)+'</div>'
