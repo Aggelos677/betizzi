@@ -305,6 +305,7 @@ export const UI = {
   "now": ["τώρα", "ahora", "agora", "maintenant", "jetzt", "acum", "sada", "сега"],
   "Treble": ["Τριάδα", "Triple", "Tripla", "Triple", "Dreierkombi", "Bilet de 3", "Trojka", "Тройка"],
   "Add to slip": ["Στο δελτίο", "Al boleto", "Adicionar", "Au ticket", "Auf den Schein", "Pe bilet", "Na tiket", "Във фиша"],
+  "Cancelled": ["Ακυρώθηκε", "Cancelado", "Cancelado", "Annulé", "Abgesagt", "Anulat", "Otkazano", "Отменен"],
   "Postponed": ["Αναβλήθηκε", "Aplazado", "Adiado", "Reporté", "Verschoben", "Amânat", "Odloženo", "Отложен"],
   "My leagues": ["Τα πρωταθλήματά μου", "Mis ligas", "Minhas ligas", "Mes ligues", "Meine Ligen", "Ligile mele", "Moje lige", "Моите лиги"],
   "Select all": ["Όλα", "Todas", "Todas", "Tout cocher", "Alle wählen", "Toate", "Sve", "Всички"],

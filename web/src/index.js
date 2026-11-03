@@ -426,7 +426,7 @@ async function template(env, url) {
 const BOOKS = ["Bet365", "Betano", "Pinnacle", "1xBet", "William Hill"];
 const SELNAME = { "1": "Home", "2": "Away", X: "Draw", O25: "Over 2.5", U25: "Under 2.5", O15: "Over 1.5", O35: "Over 3.5", U35: "Under 3.5", GG: "GG", NG: "NG", "1X": "1X", X2: "X2", "12": "12" };
 function rawRow(x, hm, lang) {
-  const type = LIVE.has(x.status) ? "inprogress" : DONE.has(x.status) ? "finished" : ["PST", "CANC", "ABD", "AWD", "WO"].includes(x.status) ? "cancelled" : "notstarted";
+  const type = LIVE.has(x.status) ? "inprogress" : DONE.has(x.status) ? "finished" : x.status === "PST" ? "postponed" : ["CANC", "ABD", "AWD", "WO"].includes(x.status) ? "cancelled" : "notstarted";
   const o = x.odds, md = x.model;
   const pc = (v) => (v == null ? null : Math.round(v * 100));
   const fs = (f) => f.map((g) => g[0]).join("");
