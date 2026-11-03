@@ -40,7 +40,7 @@ ul{list-style:none;margin:0;padding:0}
 .sc{color:#fff;font-weight:700}.sc.lv{color:var(--lime)}.min{font-size:11px;color:var(--lime)}
 .teams{text-decoration:none;display:flex;flex-direction:column;gap:3px;min-width:0}.tm{display:flex;gap:6px;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm img{flex:none;border-radius:3px}
 .tips{display:flex;gap:4px;align-items:center}.more{font:700 11px "JetBrains Mono",monospace;color:var(--lime);border:1px solid var(--ln);border-radius:6px;padding:3px 5px}
-.tip{font:700 12px "JetBrains Mono",monospace;padding:6px 8px;border-radius:8px;white-space:nowrap}.tip.free{background:var(--lime);color:#0c0f0d}.tip.vip{background:var(--gold);color:#0c0f0d}.tip i{font-style:normal;opacity:.75}
+.tip{display:inline-block;margin-bottom:6px;font:700 12px "JetBrains Mono",monospace;padding:6px 8px;border-radius:8px;white-space:nowrap}.tip.free{background:var(--lime);color:#0c0f0d}.tip.vip{background:var(--gold);color:#0c0f0d}.tip i{font-style:normal;opacity:.75}
 .how{color:var(--mu)}footer{color:var(--mu);font-size:13px;text-align:center;padding:22px 14px 40px;border-top:1px solid var(--ln);margin-top:20px}
 
 .bc{font-size:13px;color:var(--mu);margin:4px 0}.bc a{text-decoration:none}
@@ -168,8 +168,21 @@ async function authRoute(req, env, url) {
   return J({ error: "not found" });
 }
 
+// Η αιτιολογία των tips έρχεται από το engine στα αγγλικά («8/10 games», «form 7-15 pts», «best price»): τη μεταφράζουμε εδώ, ανά γλώσσα σελίδας.
+const REASON_L = {
+  el: ["αγώνες", "φόρμα", "βαθμοί", "καλύτερη τιμή"], es: ["partidos", "forma", "pts", "mejor cuota"], pt: ["jogos", "forma", "pts", "melhor odd"],
+  fr: ["matchs", "forme", "pts", "meilleure cote"], de: ["Spiele", "Form", "Pkt.", "beste Quote"], ro: ["meciuri", "formă", "pct.", "cea mai bună cotă"],
+  sr: ["utakmica", "forma", "bod.", "najbolja kvota"], bg: ["мача", "форма", "т.", "най-добър коефициент"],
+};
+function locReason(body) {
+  const lg = (body.match(/<html[^>]*\slang="([a-z]{2})/) || [])[1], L = REASON_L[lg];
+  if (!L) return body;
+  return body.replace(/(\d+\/10) games/g, `$1 ${L[0]}`).replace(/form (\d+-\d+) pts/g, `${L[1]} $1 ${L[2]}`).replace(/"best price"/g, JSON.stringify(L[3]));
+}
+
 function html(body, status = 200, a21 = false) {
   if (a21) body = body.replace(/18\+/g, "21+");
+  body = locReason(body);
   return new Response(body, {
     status,
     headers: {
