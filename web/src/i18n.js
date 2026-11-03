@@ -575,7 +575,7 @@ export const UI = {
   "🏆 Coupon wins": ["🏆 Το κουπόνι βγήκε", "🏆 Cupón ganador", "🏆 Bilhete vencedor", "🏆 Ticket gagnant", "🏆 Schein gewinnt", "🏆 Bilet câștigător", "🏆 Tiket prolazi", "🏆 Фиш печели"],
   "Share it with your friends and win": ["Μοιράσου το με τους φίλους σου και κέρδισε", "Compártelo con tus amigos y gana", "Compartilhe com seus amigos e ganhe", "Partage-le avec tes amis et gagne", "Teile es mit Freunden und gewinne", "Distribuie-l prietenilor și câștigi", "Podeli sa prijateljima i osvoji", "Сподели с приятели и спечели"],
   "credits": ["credits", "créditos", "créditos", "crédits", "Credits", "credite", "kredita", "кредита"],
-  "Κοινοποίηση": ["Share", "Compartir", "Compartilhar", "Partager", "Teilen", "Distribuie", "Podeli", "Сподели"],
+  "Share": ["Κοινοποίηση", "Compartir", "Compartilhar", "Partager", "Teilen", "Distribuie", "Podeli", "Сподели"],
   "Upcoming": ["Επόμενοι", "Próximos", "Próximos", "À venir", "Demnächst", "Urmează", "Predstojeće", "Предстоящи"],
 };
 

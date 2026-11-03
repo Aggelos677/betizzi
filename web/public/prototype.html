@@ -1712,7 +1712,7 @@ $("demoCalled").addEventListener("click",function(){
           fx.push(function(){big?goalFx(m.id,side):goalFxSmall(m.id,side);if(loud&&SND.mine)goalSound();else softGoal();
             if(big)toast("⚽ "+m.home+" v "+m.away+" "+sc+" · tip landed");else if(mine)toast("⚽ "+m.home+" "+sc+" "+m.away);});
         }
-        if(done&&!m.done&&sc===m.bz)fx.push(function(){calledIt(m);m.hit=true;});
+        if(done&&!m.done&&sc===m.bz){m.hit=true;/* απόφαση 03/11: μεγάλη γιορτή μόνο για δικό μας tip ή δικό του παιχνίδι */if(m.tips.length||FAV.has(String(m.id)))fx.push(function(){calledIt(m);});}
         m.score=sc;m.min=mnx;m.live=live;m.done=done;m.open=!live&&!done&&!OFF[st];m.type=live?"inprogress":done?"finished":(OFF[st]||m.type);
       });
       if(changed){renderFilters();renderMatches();try{renderTips();renderCoupons();renderBar();renderMyLive();renderWins();}catch(e){}fx.forEach(function(f,i){setTimeout(f,250+i*700);});}
