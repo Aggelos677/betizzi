@@ -341,13 +341,14 @@ async function todayPage(env, lang, url) {
   };
   const row = (x) => {
     const live = LIVE.has(x.status), done = DONE.has(x.status);
-    const mid = x.score && (live || done)
+    const off = x.status === "PST" ? "Postponed" : ["CANC", "ABD"].includes(x.status) ? "Cancelled" : ""; // 04/11: αναβολή/ακύρωση και στο HTML του server
+    const mid = off ? `<span class="min">${off}</span>` : x.score && (live || done)
       ? `<span class="sc${live ? " lv" : ""}">${x.score[0]}–${x.score[1]}</span>`
       : `<time datetime="${new Date(x.ts * 1000).toISOString()}">${hm(x.ts)}</time>`;
     const st = live ? `<span class="min">${x.status === "HT" ? "HT" : esc(x.minute) + "'"}</span>` : done ? `<span class="min">${t.ft}</span>` : "";
     // 03/11: χωρίς λογότυπα στη λίστα της αρχικής (δεν φαίνεται στον επισκέπτη, ήταν ~3,8 MB ανά επίσκεψη)
     const team = (s) => `<span class="tm">${esc(s.name)}</span>`;
-    return `<li class="m${x.tips.length ? " has" : ""}"><div class="t">${mid}${st}</div><a class="teams" href="${matchPath(lang, x)}">${team(x.home)}${team(x.away)}</a><div class="tips">${topTip(x.tips)}</div></li>`;
+    return `<li class="m${x.tips.length ? " has" : ""}"><div class="t">${mid}${st}</div><a class="teams" href="${matchPath(lang, x)}">${team(x.home)}${team(x.away)}</a><div class="tips">${topTip(x.tips)}${off && x.tips.length ? ` · <span>Void</span>` : ""}</div></li>`;
   };
 
   const leaguesHtml = order.map((g, i) => {
@@ -489,14 +490,15 @@ function matchPage(lang, x) {
     .replace("{tip}", tipTxt).replace("{p1}", pc(md?.p1)).replace("{px}", pc(md?.px)).replace("{p2}", pc(md?.p2)).replace("{o}", pc(md?.over25)).replace("{s}", score)
     .replace(/\s+/g, " ").trim();
   const live = LIVE.has(x.status), done = DONE.has(x.status);
-  const mid = x.score && (live || done) ? `${x.score[0]}–${x.score[1]}` : hm;
+  const off = x.status === "PST" ? "Postponed" : ["CANC", "ABD"].includes(x.status) ? "Cancelled" : ""; // 04/11
+  const mid = off ? `<span>${off}</span>` : x.score && (live || done) ? `${x.score[0]}–${x.score[1]}` : hm;
 
   const anTxt = analysis(lang, x, SEL);
   const tipsHtml = x.tips.length ? x.tips.map((y) => y.locked
     ? `<div class="tipc"><div><span class="tip vip">VIP 🔒</span><small>${esc(t.vipLock)}</small></div></div>`
-    : `<div class="tipc"><div>${(x.strong || []).includes(y.sel) ? `<span class="strongb">⚡ ${esc(t.strongB)}</span>` : ""}<span class="tip ${y.tier}">${y.tier === "vip" ? "VIP" : "TIP"} <b>${esc(SEL[y.sel] || y.sel)}</b> <i>${y.price.toFixed(2)}</i>${y.result === 1 ? " ✓" : y.result === 0 ? " ✗" : ""}</span>
+    : `<div class="tipc"><div>${(x.strong || []).includes(y.sel) ? `<span class="strongb">⚡ ${esc(t.strongB)}</span>` : ""}<span class="tip ${y.tier}">${y.tier === "vip" ? "VIP" : "TIP"} <b>${esc(SEL[y.sel] || y.sel)}</b> <i>${y.price.toFixed(2)}</i>${y.result === 1 ? " ✓" : y.result === 0 ? " ✗" : ""}</span>${off || y.result === 2 ? ` · <span>Void</span>` : ""}
        <small>${esc(t.why)}: ${esc(y.reason)}</small></div>
-       <button class="add" data-fx="${x.id}" data-sel="${esc(y.sel)}" data-price="${y.price}">${esc(t.add)}</button></div>`).join("")
+       ${off || live || done ? "" : `<button class="add" data-fx="${x.id}" data-sel="${esc(y.sel)}" data-price="${y.price}">${esc(t.add)}</button>`}</div>`).join("")
     : `<p class="how">${esc(t.noTipM)}</p>`;
 
   const formRow = (team) => `<div class="frow"><span class="tm"><img src="${esc(team.logo)}" alt="" width="18" height="18" loading="lazy">${esc(team.name)}</span>
@@ -511,7 +513,7 @@ function matchPage(lang, x) {
   const title = `${x.home.name} – ${x.away.name}: ${t.word} ${dLong}`;
   const ld = [
     { "@context": "https://schema.org", "@type": "SportsEvent", name: `${x.home.name} vs ${x.away.name}`, startDate: new Date(x.ts * 1000).toISOString(), sport: "Football",
-      eventStatus: "https://schema.org/EventScheduled", location: { "@type": "Place", name: x.home.name },
+      eventStatus: "https://schema.org/" + (x.status === "PST" ? "EventPostponed" : off ? "EventCancelled" : "EventScheduled"), location: { "@type": "Place", name: x.home.name },
       homeTeam: { "@type": "SportsTeam", name: x.home.name, logo: x.home.logo }, awayTeam: { "@type": "SportsTeam", name: x.away.name, logo: x.away.logo },
       superEvent: { "@type": "SportsEvent", name: x.league.name }, description: answer, url: canonical },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
@@ -542,7 +544,7 @@ ${alt}
 <main>
 <nav class="bc"><a href="/${lang}/">betizzi</a> › ${esc(x.league.country)} · ${esc(x.league.name)}</nav>
 <h1>${esc(x.home.name)} – ${esc(x.away.name)}: ${esc(t.word)}</h1>
-<p class="ans">${esc(answer)}</p>
+${off ? `<p class="ans"><b>${off}</b> · <span>Our tips for this match are void.</span></p>` : `<p class="ans">${esc(answer)}</p>`}
 <div class="vs"><div><img src="${esc(x.home.logo)}" alt=""><b>${esc(x.home.name)}</b></div><div class="mid">${mid}${live ? `<div class="min">${esc(x.minute)}'</div>` : ""}</div><div><img src="${esc(x.away.logo)}" alt=""><b>${esc(x.away.name)}</b></div></div>
 ${anTxt ? `<h2>${esc(t.anH)}</h2><p class="an">${esc(anTxt)}</p>` : ""}
 <h2>${esc(t.tips)}</h2><div class="card">${tipsHtml}</div>
