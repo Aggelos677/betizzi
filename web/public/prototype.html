@@ -1080,7 +1080,7 @@ var stake = parseFloat(load("ko-stake",10))||10;
 function save(){store("ko-slip",slip);store("ko-stake",stake);}
 function midOf(k){return k.split(":")[0];}
 var toastT;
-function toast(msg){var t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true},1800);}
+function toast(msg,ms){var t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true},ms||1800);}
 function toggleSel(k){
   if(!SEL[k])return;
   if(!SEL[k].m.open||(SEL[k].m.ts&&Date.now()/1000>=SEL[k].m.ts)){toast("This match has already started");return;}
@@ -2175,7 +2175,7 @@ loadMe();
   $("abGo").addEventListener("click",function(){
     if(std){openAuth();return;}
     if(dp){dp.prompt();dp.userChoice.then(function(){dp=null;bar.hidden=true;});return;}
-    toast(ios?"On iPhone: tap Share, then Add to Home Screen":"Open your browser menu and tap Install app or Add to Home screen");});
+    toast(ios?"On iPhone: tap Share, then Add to Home Screen":"Open your browser menu and tap Install app or Add to Home screen",8000);});
   window.addEventListener("appinstalled",function(){bar.hidden=true;toast("Open betizzi from your home screen to collect your 1000 credits");});
   if(!std)return;
   var tries=0;
