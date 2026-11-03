@@ -1770,7 +1770,7 @@ function parlayHTML(c,feat){
     +'<div class="pc-odd">'+(c.odds_now?'<s class="pc-was">x'+fx2(c.odds)+'</s> ':'')+'x'+fx2(c.odds_now||c.odds)+'</div></div><ul class="pc-legs">'+legs+'</ul>'+chanceHTML(c.prob)
     +'<div class="pc-btns">'+btns+'<button type="button" class="pc-sh" data-bzsh="'+c.n+'" aria-label="Share">↗</button></div>'
 
-    +'<p class="pc-foot">€10 → <b>€'+fx2(c.odds*10)+'</b> <span>if all win</span></p></article>';}
+    +'<p class="pc-foot">€10 → <b>€'+fx2(cpX(c)*10)+'</b> <span>if all win</span></p></article>';}
 function tracked(keys){var s=keys.slice().sort().join("|");return coupons.some(function(c){return c.legs.slice().sort().join("|")===s;});}
 function trkBtn(attr,keys){var on=keys.length&&tracked(keys);return '<button type="button" class="trk'+(on?' on':'')+'" '+attr+(on?' disabled':'')+'>'+(on?'✓ <span>In My coupons</span>':'🎟️ <span>To My coupons</span>')+'</button>';}
 var SPONSOR_A='<a class="spb" href="#" role="button" rel="sponsored nofollow" data-spon="1"><span>Bet now</span> →</a>';
@@ -1801,13 +1801,13 @@ function renderStrip(){var box=$("yStrip");if(!box)return;var Y=(typeof YREC!=="
   Array.prototype.forEach.call(box.querySelectorAll("[data-ys]"),function(b){b.addEventListener("click",function(){ysMode=b.dataset.ys;renderStrip();});});
   /* πάτημα στο τελευταίο παρολί που κέρδισε → το πανηγύρι WINNER που έχουμε */
   var lw=box.querySelector("[data-lastwin]");if(lw&&ls){var open=function(){couponBig({kind:ls.kind.replace("-","–"),variant:ls.variant||"mix",odds:ls.odds,
-    legs:(ls.legs||[]).map(function(l){return {home:l.h,away:l.a,sel:l.sel==="1"?l.h:l.sel==="2"?l.a:l.sel};})});};
+    legs:(ls.legs||[]).map(function(l){return {home:l.h,away:l.a,sel:l.sel==="1"?l.h:l.sel==="2"?l.a:l.sel,result:l.v?2:null};})});};
     lw.addEventListener("click",open);lw.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});}
   bindButtons(box);}
 function renderBig10(Y){var box=$("bigWin");if(!box)return;var c=Y&&Y.big10;if(!c){box.hidden=true;return;}box.hidden=false;
   box.innerHTML='<button type="button" class="bw-row"><span class="bw-k">🏆 <span>Yesterday it landed</span></span><b>WINNER x'+fx2(c.odds)+'</b><span class="bw-go" aria-hidden="true">›</span></button>';
   box.querySelector("button").addEventListener("click",function(){couponBig({kind:String(c.kind).replace("-","–"),variant:c.variant||"mix",odds:c.odds,
-    legs:(c.legs||[]).map(function(l){return {home:l.h,away:l.a,sel:l.sel==="1"?l.h:l.sel==="2"?l.a:l.sel};})});});}
+    legs:(c.legs||[]).map(function(l){return {home:l.h,away:l.a,sel:l.sel==="1"?l.h:l.sel==="2"?l.a:l.sel,result:l.v?2:null};})});});}
 function renderPicks(){
   renderStrip();
   Array.prototype.forEach.call(document.querySelectorAll("[data-op]"),function(b){b.setAttribute("aria-pressed",b.dataset.op===opView?"true":"false");});

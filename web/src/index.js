@@ -218,17 +218,18 @@ async function stripData(env, lang, tz) {
     const big = (L) => L.filter((x) => x.result === 1).sort((a, b) => b.price - a.price)[0] || null;
     const pack = (b) => b && { sel: SEL[b.sel] || b.sel, price: b.price, home: b.home, away: b.away, vip: b.tier === "vip" };
     // παρολί: μετράνε μόνο οι «επιλογές της ημέρας» (στα παλιά χωρίs σήμανση: όλα)
-    const cp = (c, date) => ({ kind: c.kind, odds: c.odds, r: c.result, date, variant: c.variant,
-      legs: (c.legs || []).map((l) => ({ h: l.home, a: l.away, sel: SEL[l.sel] || l.sel, p: l.price })) });
+    // αναβολή = void: η απόδοση που πληρώθηκε είναι το odds_now (χωρίς τους αγώνες που αναβλήθηκαν)
+    const cp = (c, date) => ({ kind: c.kind, odds: c.odds_now || c.odds, odds0: c.odds, r: c.result, date, variant: c.variant,
+      legs: (c.legs || []).map((l) => ({ h: l.home, a: l.away, sel: SEL[l.sel] || l.sel, p: l.price, v: l.result === 2 ? 1 : 0 })) });
     const yc = (RECC.cps[0] || { list: [] }), ylist = yc.list.some((c) => c.pick) ? yc.list.filter((c) => c.pick) : yc.list;
     const settled = ylist.filter((c) => c.result === 0 || c.result === 1);
     let last = null;
-    for (const day of RECC.cps) { const w = day.list.filter((c) => c.result === 1).sort((a, b) => b.odds - a.odds)[0]; if (w) { last = cp(w, day.date); break; } }
-    const b10 = yc.list.filter((c) => c.result === 1 && c.odds >= 10).sort((a, b) => b.odds - a.odds)[0];
+    for (const day of RECC.cps) { const w = day.list.filter((c) => c.result === 1).sort((a, b) => (b.odds_now || b.odds) - (a.odds_now || a.odds))[0]; if (w) { last = cp(w, day.date); break; } }
+    const b10 = yc.list.filter((c) => c.result === 1 && (c.odds_now || c.odds) >= 10).sort((a, b) => (b.odds_now || b.odds) - (a.odds_now || a.odds))[0];
     const dlbl = (x) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "long", day: "numeric", month: "numeric" }).format(Date.parse(x + "T12:00:00Z"));
     if (last) last.label = dlbl(last.date);
     return {
-      pk: { won: settled.filter((c) => c.result === 1).length, total: settled.length, rows: settled.map((c) => ({ kind: c.kind, odds: c.odds, r: c.result })) },
+      pk: { won: settled.filter((c) => c.result === 1).length, total: settled.length, rows: settled.map((c) => ({ kind: c.kind, odds: c.odds_now || c.odds, r: c.result })) },
       last, big10: b10 ? cp(b10, yc.date) : null,
       y: { won: Y.filter((x) => x.result === 1).length, total: Y.length, rows: Y.slice(0, 40).map((x) => ({ h: x.home, o: x.price, r: x.result })), big: pack(big(Y)) },
       m: { won: M.filter((x) => x.result === 1).length, total: M.length, label: mLabel, big: pack(big(M)) },
