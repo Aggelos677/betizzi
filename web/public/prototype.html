@@ -1791,22 +1791,22 @@ document.addEventListener("click",function(e){var b=e.target.closest&&e.target.c
   var id=String(b.dataset.fav);if(FAV.has(id)){FAV.delete(id);toast("Removed from My games");}else{FAV.add(id);toast("Added to My games");}
   store("ko-fav",Array.from(FAV));b.classList.toggle("on",FAV.has(id));b.textContent=FAV.has(id)?"★":"☆";try{renderFilters();if(favF)renderMatches();}catch(x){}try{renderMyLive();}catch(x){}},true);
 function renderStrip(){var box=$("yStrip");if(!box)return;var Y=(typeof YREC!=="undefined"&&YREC)||null;
-  if(!Y||!Y.y||(!Y.y.total&&!Y.m.total)){box.hidden=true;return;} box.hidden=false;
-  var r=ysMode==="m"?Y.m:Y.y;if(!r.total&&ysMode==="y"){ysMode="m";r=Y.m;}
+  /* απόφαση Owner 03/11 «τίμιοι αλλά χαμηλόφωνοι»: στην αρχική μόνο ο μήνας (όχι «χθες»)· όλα τα νούμερα στη σελίδα Record */
+  if(!Y||!Y.m||!Y.m.total){box.hidden=true;renderBig10(Y);return;} box.hidden=false;
+  ysMode="m";var r=Y.m;
   var pct=r.total?Math.round(r.won*100/r.total):0,n=Math.min(r.total,30),wn=r.total?Math.round(r.won/r.total*n):0,dots="";
   for(var i=0;i<n;i++)dots+='<i'+(i<wn?'':' class="l"')+'></i>';
   var chips=ysMode==="y"?'<div class="ys-chips">'+(r.rows||[]).map(function(x){return '<span><i'+(x.r===1?'':' class="l"')+'></i>'+esc(x.h)+' <em>'+fx2(x.o)+'</em></span>';}).join("")+'</div>':'';
   var pk=Y.pk,ls=Y.last,pkh="";
   /* μόνο η επιτυχία: το τελευταίο παρολί μας που κέρδισε, σε μία γραμμή (απόφαση Owner 02/11) */
-  if(ysMode==="y"&&ls)pkh='<div class="ys-last" role="button" tabindex="0" data-lastwin="1"><small><span>Last parlay that won</span> · '+esc(ls.label||ls.date)+'</small><div class="ys-lrow"><span class="ys-lg">'
+  if(ls)pkh='<div class="ys-last" role="button" tabindex="0" data-lastwin="1"><small><span>Last parlay that won</span> · '+esc(ls.label||ls.date)+'</small><div class="ys-lrow"><span class="ys-lg">'
     +(ls.legs||[]).map(function(l){return '<i>'+esc(l.h||"")+'–'+esc(l.a||"")+' <b>'+(l.sel==="1"?winLbl(l.h):l.sel==="2"?winLbl(l.a):esc(l.sel))+'</b></i>';}).join("")
     +'</span><span class="ys-win">✓ WIN x'+fx2(ls.odds)+'</span></div></div>';
   var bg=r.big?'<div class="ys-big"><div><small>Biggest win</small><b>'+(r.big.sel==="1"?winLbl(r.big.home):r.big.sel==="2"?winLbl(r.big.away):esc(r.big.sel))+' · '+esc(r.big.home)+'–'+esc(r.big.away)+'</b> <em>@'+fx2(r.big.price)+'</em></div>'+(r.big.vip&&!vipMember?'<button type="button" class="ys-vip" data-unlock="1">VIP · free with sign-up</button>':'')+'</div>':'';
   var yy=Y.y&&Y.y.total?Y.y:null,head='<button type="button" class="ys-head" id="ysToggle" aria-expanded="'+(ysOpen?'true':'false')+'"><span class="ys-ht">Results</span>'
-    +(yy?'<span class="ys-hs"><span>Yesterday</span> <b>'+yy.won+'/'+yy.total+'</b> · '+Math.round(yy.won*100/yy.total)+'%</span>':'')+'<span class="ys-pl" aria-hidden="true">'+(ysOpen?'−':'+')+'</span></button>';
+    +'<span class="ys-hs">'+esc(Y.m.label)+' <b>'+Y.m.won+'/'+Y.m.total+'</b> · '+Math.round(Y.m.won*100/Y.m.total)+'%</span>'+'<span class="ys-pl" aria-hidden="true">'+(ysOpen?'−':'+')+'</span></button>';
   if(!ysOpen){box.innerHTML=head;$("ysToggle").addEventListener("click",function(){ysOpen=true;store("ko-ys",true);renderStrip();});renderBig10(Y);return;}
-  box.innerHTML=head+'<div class="ys-top"><div class="ys-seg"><button type="button" data-ys="y" aria-pressed="'+(ysMode==="y")+'">Yesterday</button><button type="button" data-ys="m" aria-pressed="'+(ysMode==="m")+'">'+esc(Y.m.label)+'</button></div></div>'
-    +'<div class="ys-num"><b>'+r.won+'<i>/'+r.total+'</i></b><span><span>of our tips won</span> · <em>'+pct+'%</em></span></div><div class="ys-dots" aria-hidden="true">'+dots+'</div>'+chips+bg+pkh;
+  box.innerHTML=head+'<div class="ys-num"><b>'+r.won+'<i>/'+r.total+'</i></b><span><span>of our tips won</span> · <em>'+pct+'%</em></span></div><div class="ys-dots" aria-hidden="true">'+dots+'</div>'+chips+bg+pkh;
   renderBig10(Y);
   $("ysToggle").addEventListener("click",function(){ysOpen=false;store("ko-ys",false);renderStrip();});
   Array.prototype.forEach.call(box.querySelectorAll("[data-ys]"),function(b){b.addEventListener("click",function(){ysMode=b.dataset.ys;renderStrip();});});
