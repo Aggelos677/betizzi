@@ -2202,13 +2202,16 @@ loadMe();
   window.addEventListener("beforeinstallprompt",function(e){if(window.innerWidth>=900)return;e.preventDefault();dp=e;show();});
   function dismissed(){try{return Date.now()-(+localStorage.getItem("bz-ab-x")||0)<7*864e5;}catch(e){return false;}}
   function show(){if(std||dismissed()||window.innerWidth>=900)return;bar.hidden=false;}
+  var andr=/android/i.test(ua);
   if(ios)show();
+  /* Android (03/11): ~60% των επισκεπτών· αν ο browser δεν δίνει αυτόματη εγκατάσταση (Firefox, Facebook/Instagram κ.λπ.), δείχνουμε τη μπάρα με οδηγίες */
+  if(andr)setTimeout(show,3000);
   $("abX").addEventListener("click",function(){closed=true;bar.hidden=true;try{localStorage.setItem("bz-ab-x",String(Date.now()));}catch(e){}});
   $("abGo").addEventListener("click",function(){
     if(std){openAuth();return;}
     if(dp){dp.prompt();dp.userChoice.then(function(){dp=null;bar.hidden=true;});return;}
     /* οδηγίες βήμα-βήμα που μένουν μέχρι να τις κλείσει (03/11) */
-    var st=ios?(inapp?["Open this page in Safari first"]:[]).concat(["Tap ⋯ at the bottom right, then Share ⬆️ (on older iPhones Share is in the middle)","Tap «Add to Home Screen»","Tap «Add» and open betizzi from the new icon"]):["Open the browser menu ⋮","Tap «Install app» or «Add to Home screen»","Open betizzi from the new icon"];
+    var st=ios?(inapp?["Open this page in Safari first"]:[]).concat(["Tap ⋯ at the bottom right, then Share ⬆️ (on older iPhones Share is in the middle)","Tap «Add to Home Screen»","Tap «Add» and open betizzi from the new icon"]):(andr&&inapp?["Open this page in Chrome first"]:[]).concat(["Open the browser menu ⋮","Tap «Install app» or «Add to Home screen»","Open betizzi from the new icon"]);
     var I=window.__I18N||{},hw=$("abHow");hw.innerHTML=st.map(function(x){return "<li>"+esc(I[x]||x)+"</li>";}).join("");hw.hidden=false;$("abGo").hidden=true;});
   function ga(n){try{if(window.gtag)gtag("event",n);}catch(e){}}
   window.addEventListener("appinstalled",function(){ga("app_install");bar.hidden=true;toast("Open betizzi from your home screen to collect your 500 credits");});
