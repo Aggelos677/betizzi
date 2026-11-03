@@ -1347,6 +1347,7 @@ function showCB(c){
   document.body.appendChild(o);
   /* απόφαση Owner 03/11: μένει τουλάχιστον 5΄΄· μετά κλείνει με πάτημα έξω από την κάρτα (όχι μόνο με το ×) */
   var t0=Date.now();
+  document.addEventListener("keydown",function kd(e){if(e.key==="Escape"){document.removeEventListener("keydown",kd);done();}});
   o.style.pointerEvents="auto";o.addEventListener("click",function(e){var b=e.target.closest("button");
     if(!b){if(!e.target.closest(".cbig-in")&&Date.now()-t0>=5000)done();return;}
     if(b.dataset.sh)shareBz(c);if(b.dataset.x)done();});
@@ -1355,7 +1356,7 @@ function showCB(c){
   setTimeout(function(){confetti(W*.5,H*.5,true);},1300);
   try{fanfare();}catch(e){}
   document.body.classList.remove("cshake");void document.body.offsetWidth;document.body.classList.add("cshake");
-  setTimeout(done,big?20000:10000);
+  /* απόφαση Owner 03/11: δεν κλείνει μόνο του· κλείνει με × ή πάτημα έξω μετά από 5΄΄ */
 }
 function renderClose(){var box=$("closeBox");if(!box)return;var it=[],now=Date.now(),fresh=[];
   /* όλα τα live tips: κρατάμε την προηγούμενη κατάσταση για να πιάσουμε τη στιγμή που ένα tip «μπαίνει» */
