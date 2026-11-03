@@ -12,7 +12,7 @@ export const PG_FULL = ["terms", "privacy", "cookies"]; // μόνο EN + EL
 export const PG = {
   about: {
     slug: { en: "about", el: "poioi-eimaste", es: "quienes-somos", pt: "quem-somos", fr: "qui-sommes-nous", de: "ueber-uns", ro: "despre-noi", sr: "o-nama", bg: "za-nas" },
-    title: { en: "About betizzi", el: "Ποιοι είμαστε", es: "Quiénes somos", pt: "Quem somos", fr: "Qui sommes-nous", de: "Über uns", ro: "Despre noi", sr: "O nama", bg: "За нас" },
+    title: { en: "About betizzi", el: "Ποιοι είμαστε", es: "Quiénes somos", pt: "Quem somos", fr: "Qui sommes-nous", de: "Über betizzi", ro: "Despre betizzi", sr: "O nama", bg: "За нас" },
     desc: {
       en: "betizzi is a free football tips site: model-based tips, a public record of every tip and ready-made parlays every day. Not a bookmaker.",
       el: "Το betizzi είναι δωρεάν site με tips ποδοσφαίρου: tips από μοντέλο, δημόσιο ιστορικό κάθε tip και έτοιμα παρολί κάθε μέρα. Δεν είναι bookmaker.",
@@ -21,7 +21,7 @@ export const PG = {
       fr: "betizzi est un site gratuit de pronostics foot : tips issus d'un modèle, un historique public de chaque tip et des combinés prêts chaque jour. Pas un bookmaker.",
       de: "betizzi ist eine kostenlose Fußball-Tipps-Seite: modellbasierte Tipps, eine öffentliche Bilanz jedes Tipps und fertige Kombis jeden Tag. Kein Buchmacher.",
       ro: "betizzi este un site gratuit de ponturi la fotbal: ponturi din model, istoric public al fiecărui pont și bilete gata făcute în fiecare zi. Nu este casă de pariuri.",
-      sr: "betizzi je besplatan sajt sa fudbalskim tipovima: tipovi iz modela, javna istorija svakog tipa i gotove kombinacije svaki dan. Nije kladionica.",
+      sr: "betizzi je besplatan sajt sa fudbalskim tipovima: tipovi iz modela, javna istorija svakog tipa i gotovi tiketi svaki dan. Nije kladionica.",
       bg: "betizzi е безплатен сайт с футболни прогнози: прогнози от модел, публична история на всяка прогноза и готови комбинации всеки ден. Не е букмейкър.",
     },
     body: {
@@ -30,11 +30,11 @@ export const PG = {
 ## What you get
 - Free tips and VIP tips, each with a short reason and the price when we published it.
 - A public record of every tip, wins and losses. We never promise a win.
-- Odds from several bookmakers, so you can see where a price is better.
+- Odds from several bookmakers, so you can see where the price is best.
 - Ready-made parlays every day, your own slip and live scores to follow your games.
 
 ## How tips are made
-We look at each team's recent form (last 10 games, home and away), the league table and bookmaker prices. A tip appears only when the numbers agree. Every tip is published before kick-off and is never edited afterwards; results, wins and losses, are shown on our [Record](/en/record) page.
+We look at each team's recent form (last 10 games, home and away), the league table and bookmaker prices. A tip appears only when the numbers agree. Every tip is published before kick-off and is never edited afterwards; results (wins and losses) are shown on our [Record](/en/record) page.
 
 ## Who runs betizzi
 betizzi is operated by the sole proprietorship of ${OP.name}, ${OP.city}. Contact: [${OP.hello}](mailto:${OP.hello}).
@@ -69,10 +69,10 @@ We are not a bookmaker and we do not take bets. We may earn a commission from bo
 Miramos la forma reciente de cada equipo (últimos 10 partidos, en casa y fuera), la clasificación y las cuotas. Solo hay tip cuando los números coinciden. Cada tip se publica antes del partido y nunca se modifica; los resultados, aciertos y fallos, están en nuestro [Historial](/es/historial).
 
 ## Quién está detrás
-betizzi está gestionado por la empresa individual de ${OP.name}, Pafos, Chipre. Contacto: [${OP.hello}](mailto:${OP.hello}).
+betizzi lo gestiona ${OP.name} como empresario individual, en Pafos (Chipre). Contacto: [${OP.hello}](mailto:${OP.hello}).
 
 ## Qué no somos
-No somos una casa de apuestas y no aceptamos apuestas. Podemos recibir una comisión de casas de apuestas: consulta nuestra [Divulgación de afiliados](/es/divulgacion-afiliados).`,
+No somos una casa de apuestas y no aceptamos apuestas. Podemos recibir una comisión de casas de apuestas: consulta nuestra [Aviso sobre afiliados](/es/aviso-afiliados).`,
       pt: `O betizzi é um site gratuito de palpites de futebol para quem aposta por diversão. Olhamos os jogos do dia, filtramos e damos palpite só onde o nosso modelo vê um sinal claro, não em todos os jogos.
 
 ## O que você encontra
@@ -91,30 +91,30 @@ O betizzi é operado pela empresa individual de ${OP.name}, Pafos, Chipre. Conta
 Não somos casa de apostas e não aceitamos apostas. Podemos receber comissão de casas de apostas: veja a nossa [Divulgação de afiliados](/pt/divulgacao-afiliados).`,
       fr: `betizzi est un site gratuit de pronostics foot pour ceux qui parient pour le plaisir. Nous passons en revue les matchs du jour, nous les filtrons et ne donnons un tip que là où notre modèle voit un signal clair, pas sur chaque match.
 
-## Ce que vous trouvez ici
+## Ce que tu trouves ici
 - Des tips gratuits et VIP, chacun avec une courte explication et la cote au moment de la publication.
 - Un historique public de chaque tip, gagnés et perdus. Nous ne promettons jamais de gain.
-- Les cotes de plusieurs bookmakers, pour voir où le prix est meilleur.
-- Des combinés prêts chaque jour, ton propre ticket et des scores en direct.
+- Les cotes de plusieurs bookmakers, pour voir où la cote est meilleure.
+- Des combinés prêts chaque jour, ton propre ticket et des scores en direct pour suivre tes matchs.
 
 ## Comment nous faisons les tips
-Nous regardons la forme récente de chaque équipe (10 derniers matchs, à domicile et à l'extérieur), le classement et les cotes. Un tip n'apparaît que si les chiffres concordent. Chaque tip est publié avant le coup d'envoi et n'est jamais modifié ; les résultats, gains et pertes, figurent dans notre [Historique](/fr/historique).
+Nous regardons la forme récente de chaque équipe (10 derniers matchs, à domicile et à l'extérieur), le classement et les cotes. Un tip n'apparaît que si les chiffres concordent. Chaque tip est publié avant le coup d'envoi et n'est jamais modifié ; les résultats, gagnés et perdus, figurent dans notre [Historique](/fr/historique).
 
 ## Qui est derrière betizzi
 betizzi est exploité par l'entreprise individuelle de ${OP.name}, Paphos, Chypre. Contact : [${OP.hello}](mailto:${OP.hello}).
 
 ## Ce que nous ne sommes pas
-Nous ne sommes pas un bookmaker et nous n'acceptons pas de paris. Nous pouvons percevoir une commission de bookmakers : voir notre [Divulgation d'affiliation](/fr/divulgation-affiliation).`,
+Nous ne sommes pas un bookmaker et nous ne prenons pas de paris. Nous pouvons toucher une commission de bookmakers : voir [Transparence sur l'affiliation](/fr/affiliation).`,
       de: `betizzi ist eine kostenlose Fußball-Tipps-Seite für alle, die aus Spaß wetten. Wir sehen uns die Spiele des Tages an, filtern sie und geben nur dort einen Tipp, wo unser Modell ein klares Signal sieht – nicht bei jedem Spiel.
 
 ## Was du hier findest
-- Free- und VIP-Tipps, jeweils mit kurzer Begründung und der Quote zum Zeitpunkt der Veröffentlichung.
+- Gratis- und VIP-Tipps, jeweils mit kurzer Begründung und der Quote zum Zeitpunkt der Veröffentlichung.
 - Eine öffentliche Bilanz jedes Tipps, mit Treffern und Niederlagen. Wir versprechen nie einen Gewinn.
-- Quoten mehrerer Buchmacher, damit du siehst, wo der Preis besser ist.
+- Quoten mehrerer Buchmacher, damit du siehst, wo die Quote besser ist.
 - Fertige Kombis jeden Tag, dein eigener Wettschein und Live-Ergebnisse.
 
 ## Wie die Tipps entstehen
-Wir betrachten die aktuelle Form jedes Teams (letzte 10 Spiele, heim und auswärts), die Tabelle und die Quoten. Ein Tipp erscheint nur, wenn die Zahlen übereinstimmen. Jeder Tipp wird vor Anpfiff veröffentlicht und danach nie geändert; die Ergebnisse, Treffer und Niederlagen, stehen in unserer [Bilanz](/de/bilanz).
+Wir betrachten die aktuelle Form jedes Teams (letzte 10 Spiele, zu Hause und auswärts), die Tabelle und die Quoten. Ein Tipp erscheint nur, wenn die Zahlen übereinstimmen. Jeder Tipp wird vor Anpfiff veröffentlicht und danach nie geändert; die Ergebnisse, Treffer und Niederlagen, stehen in unserer [Bilanz](/de/bilanz).
 
 ## Wer hinter betizzi steht
 betizzi wird vom Einzelunternehmen ${OP.name}, Paphos, Zypern, betrieben. Kontakt: [${OP.hello}](mailto:${OP.hello}).
@@ -140,10 +140,10 @@ Nu suntem casă de pariuri și nu acceptăm pariuri. Putem primi comision de la 
       sr: `betizzi je besplatan sajt sa fudbalskim tipovima za one koji se klade iz zabave. Gledamo utakmice dana, filtriramo ih i dajemo tip samo tamo gde naš model vidi jasan signal, ne na svakoj utakmici.
 
 ## Šta ovde nalaziš
-- Free i VIP tipove, svaki sa kratkim obrazloženjem i kvotom u trenutku objave.
+- Besplatne i VIP tipove, svaki sa kratkim obrazloženjem i kvotom u trenutku objave.
 - Javnu istoriju svakog tipa, sa pogocima i promašajima. Nikad ne obećavamo dobitak.
 - Kvote više kladionica, da vidiš gde je cena bolja.
-- Gotove kombinacije svaki dan, svoj tiket i rezultate uživo.
+- Gotove tikete svaki dan, svoj tiket i rezultate uživo.
 
 ## Kako nastaju tipovi
 Gledamo skorašnju formu svakog tima (poslednjih 10 utakmica, kod kuće i u gostima), tabelu i kvote. Tip se pojavljuje samo kad se brojke slažu. Svaki tip se objavljuje pre početka i posle se nikad ne menja; rezultati, pogoci i promašaji, su u našoj [Istoriji](/sr/istorija).
@@ -168,7 +168,7 @@ Nismo kladionica i ne primamo opklade. Možemo dobiti proviziju od kladionica: p
 betizzi се управлява от едноличния търговец ${OP.name}, Пафос, Кипър. Контакт: [${OP.hello}](mailto:${OP.hello}).
 
 ## Какво не сме
-Не сме букмейкър и не приемаме залози. Може да получаваме комисиона от букмейкъри: виж нашето [Разкриване на партньорство](/bg/razkrivane-partnyorstva).`,
+Не сме букмейкър и не приемаме залози. Може да получаваме комисионна от букмейкъри: виж нашето [Разкриване на партньорство](/bg/razkrivane-partnyorstva).`,
     },
   },
 
@@ -212,8 +212,8 @@ We are not a bookmaker: we cannot help with bets, accounts or payments at a book
 ## Datos personales
 [${OP.privacy}](mailto:${OP.privacy})
 
-## Responsable
-Empresa individual de ${OP.name}, Pafos, Chipre.
+## Titular
+${OP.name}, empresario individual, Pafos (Chipre).
 
 No somos una casa de apuestas: no podemos ayudar con apuestas, cuentas o pagos en una casa de apuestas. Contacta directamente con ella.`,
       pt: `## Dúvidas e sugestões
@@ -230,7 +230,7 @@ Empresa individual de ${OP.name}, Pafos, Chipre.
 
 Não somos casa de apostas: não podemos ajudar com apostas, contas ou pagamentos numa casa de apostas. Fale diretamente com ela.`,
       fr: `## Questions et remarques
-[${OP.hello}](mailto:${OP.hello}) — nous répondons en général sous 2 jours ouvrés.
+[${OP.hello}](mailto:${OP.hello}) — on répond en général sous 2 jours ouvrés.
 
 ## Partenariats, sponsors et affiliés
 [${OP.partners}](mailto:${OP.partners})
@@ -241,7 +241,7 @@ Não somos casa de apostas: não podemos ajudar com apostas, contas ou pagamento
 ## Éditeur
 Entreprise individuelle de ${OP.name}, Paphos, Chypre.
 
-Nous ne sommes pas un bookmaker : nous ne pouvons pas vous aider pour des paris, comptes ou paiements chez un bookmaker. Contactez-le directement.`,
+Nous ne sommes pas un bookmaker : nous ne pouvons pas t'aider pour des paris, comptes ou paiements chez un bookmaker. Contacte-le directement.`,
       de: `## Fragen und Feedback
 [${OP.hello}](mailto:${OP.hello}) – wir antworten meist innerhalb von 2 Werktagen.
 
@@ -300,9 +300,9 @@ Nismo kladionica: ne možemo da pomognemo oko opklada, naloga ili uplata u kladi
   responsible: {
     slug: { en: "responsible-gambling", el: "ypefthyno-paixnidi", es: "juego-responsable", pt: "jogo-responsavel", fr: "jeu-responsable", de: "verantwortungsvolles-spielen", ro: "joc-responsabil", sr: "odgovorno-kladjenje", bg: "otgovorna-igra" },
     title: { en: "Responsible gambling · 18+", el: "Υπεύθυνο παιχνίδι · 18+", es: "Juego responsable · 18+", pt: "Jogo responsável · 18+", fr: "Jeu responsable · 18+", de: "Verantwortungsvolles Spielen · 18+", ro: "Joc responsabil · 18+", sr: "Odgovorno klađenje · 18+", bg: "Отговорна игра · 18+" },
-    desc: { en: "Betting is for adults and for fun. Set a limit, never chase losses, and get help if betting stops being fun.", el: "Το στοίχημα είναι για ενήλικες και για διασκέδαση. Βάλε όριο, μην κυνηγάς τις χασούρες και ζήτα βοήθεια αν σταματήσει να είναι διασκέδαση.", es: "Apostar es para adultos y para divertirse. Pon un límite, no persigas pérdidas y pide ayuda si deja de ser diversión.", pt: "Apostar é para adultos e por diversão. Defina um limite, não corra atrás de perdas e peça ajuda se deixar de ser diversão.", fr: "Parier, c'est pour les adultes et pour le plaisir. Fixez une limite, ne courez pas après vos pertes et demandez de l'aide si ce n'est plus un plaisir.", de: "Wetten ist für Erwachsene und zum Spaß. Setz dir ein Limit, jag keinen Verlusten hinterher und hol dir Hilfe, wenn es keinen Spaß mehr macht.", ro: "Pariurile sunt pentru adulți și pentru distracție. Pune o limită, nu alerga după pierderi și cere ajutor dacă nu mai e distracție.", sr: "Klađenje je za odrasle i iz zabave. Postavi limit, ne juri gubitke i potraži pomoć ako prestane da bude zabava.", bg: "Залаганията са за възрастни и за забавление. Сложи си лимит, не гони загубите и потърси помощ, ако престане да е забавно." },
+    desc: { en: "Betting is for adults and for fun. Set a limit, never chase losses, and get help if betting stops being fun.", el: "Το στοίχημα είναι για ενήλικες και για διασκέδαση. Βάλε όριο, μην κυνηγάς τις χασούρες και ζήτα βοήθεια αν σταματήσει να είναι διασκέδαση.", es: "Apostar es para adultos y para divertirse. Pon un límite, no persigas pérdidas y pide ayuda si deja de ser divertido.", pt: "Apostar é para adultos e por diversão. Defina um limite, não corra atrás de perdas e peça ajuda se deixar de ser diversão.", fr: "Parier, c'est pour les adultes et pour le plaisir. Fixe-toi une limite, ne cours pas après tes pertes et demande de l'aide si ce n'est plus un plaisir.", de: "Wetten ist für Erwachsene und zum Spaß. Setz dir ein Limit, jag keinen Verlusten hinterher und hol dir Hilfe, wenn es keinen Spaß mehr macht.", ro: "Pariurile sunt pentru adulți și pentru distracție. Pune o limită, nu alerga după pierderi și cere ajutor dacă nu mai e distracție.", sr: "Klađenje je za odrasle i iz zabave. Postavi limit, ne juri gubitke i potraži pomoć ako prestane da bude zabava.", bg: "Залаганията са за възрастни и за забавление. Сложи си лимит, не гони загубите и потърси помощ, ако престане да е забавно." },
     body: {
-      en: `betizzi is for adults only: at least 18 years old, or 21 where the law requires it (for example Greece). Tips are opinions based on statistics, not a guarantee. Every extra pick on a parlay lowers its chance of winning.
+      en: `betizzi is for adults only: at least 18 years old, or 21 where the law requires it (for example Greece). Tips are opinions based on statistics, not a guarantee. Every extra pick on an parlay lowers its chance of winning.
 
 ## Simple rules
 - Bet for fun, never to make money or to fix money problems.
@@ -322,7 +322,7 @@ Spending more than you planned, hiding betting from people close to you, borrowi
 - Greece: [KETHEA](https://www.kethea.gr) · Cyprus: [National Betting Authority](https://nba.gov.cy)
 
 If you think you may be harming yourself or are in danger, call your local emergency number.`,
-      el: `Το betizzi είναι μόνο για ενήλικες: τουλάχιστον 21 ετών στην Ελλάδα (όπου ορίζει ο νόμος), αλλού τουλάχιστον 18. Τα tips είναι γνώμη από στατιστικά, όχι εγγύηση. Κάθε επιπλέον επιλογή σε ένα παρολί μειώνει την πιθανότητα να κερδίσει.
+      el: `Το betizzi είναι μόνο για ενήλικες: τουλάχιστον 21 ετών στην Ελλάδα, όπως ορίζει ο νόμος, και 18 στην Κύπρο και αλλού. Τα tips είναι γνώμη από στατιστικά, όχι εγγύηση. Κάθε επιπλέον επιλογή σε ένα παρολί μειώνει την πιθανότητα να κερδίσει.
 
 ## Απλοί κανόνες
 - Παίξε για διασκέδαση, ποτέ για να βγάλεις χρήματα ή να λύσεις οικονομικά προβλήματα.
@@ -353,7 +353,7 @@ If you think you may be harming yourself or are in danger, call your local emerg
 - Apuesta por diversión, nunca para ganar dinero ni para resolver problemas económicos.
 - Fija un límite de dinero y de tiempo antes de empezar, y para cuando lo alcances.
 - No persigas las pérdidas.
-- No apuestes dinero que necesitas para el alquiler, las facturas o la comida.
+- No apuestes dinero que necesites para el alquiler, las facturas o la comida.
 - No apuestes si estás alterado, cansado o has bebido.
 - Usa los límites de depósito, pausas y autoexclusión de tu casa de apuestas.
 
@@ -365,7 +365,7 @@ Gastar más de lo previsto, ocultar las apuestas a tu entorno, pedir prestado pa
 - [Gambling Therapy](https://www.gamblingtherapy.org) — apoyo gratuito y confidencial en línea.
 - [Find a Helpline](https://findahelpline.com) — líneas de ayuda gratuitas en tu país.
 
-Si crees que estás en peligro, llama al número de emergencias de tu país.`,
+Si crees que puedes hacerte daño o estás en peligro, llama al número de emergencias de tu país.`,
       pt: `O betizzi é só para adultos: pelo menos 18 anos, ou 21 onde a lei exigir. Os palpites são opiniões baseadas em estatísticas, não uma garantia. Cada seleção a mais numa múltipla reduz a chance de ganhar.
 
 ## Regras simples
@@ -388,12 +388,12 @@ Se achar que está em perigo, ligue para o número de emergência do seu país.`
       fr: `betizzi est réservé aux adultes : au moins 18 ans, ou 21 ans là où la loi l'exige. Les tips sont des avis fondés sur des statistiques, pas une garantie. Chaque sélection en plus dans un combiné réduit ses chances de gagner.
 
 ## Règles simples
-- Pariez pour le plaisir, jamais pour gagner de l'argent ou régler des problèmes financiers.
-- Fixez une limite d'argent et de temps avant de commencer, et arrêtez-vous quand vous l'atteignez.
-- Ne courez jamais après vos pertes.
-- Ne pariez pas l'argent du loyer, des factures ou des courses.
-- Ne pariez pas si vous êtes contrarié, fatigué ou si vous avez bu.
-- Utilisez les limites de dépôt, pauses et l'auto-exclusion de votre bookmaker.
+- Parie pour le plaisir, jamais pour gagner de l'argent ou régler des problèmes financiers.
+- Fixe-toi une limite d'argent et de temps avant de commencer, et arrête-toi quand tu l'atteins.
+- Ne cours jamais après tes pertes.
+- Ne parie jamais l'argent du loyer, des factures ou des courses.
+- Ne parie pas si tu es énervé, fatigué ou si tu as bu.
+- Utilise les limites de dépôt, les pauses et l'auto-exclusion de ton bookmaker.
 
 ## Signaux d'alerte
 Dépenser plus que prévu, cacher ses paris à ses proches, emprunter pour parier ou se sentir anxieux quand on ne peut pas parier.
@@ -401,9 +401,9 @@ Dépenser plus que prévu, cacher ses paris à ses proches, emprunter pour parie
 ## Où trouver de l'aide
 - France : [Joueurs Info Service](https://www.joueurs-info-service.fr).
 - [Gambling Therapy](https://www.gamblingtherapy.org) — soutien gratuit et confidentiel en ligne.
-- [Find a Helpline](https://findahelpline.com) — lignes d'aide gratuites dans votre pays.
+- [Find a Helpline](https://findahelpline.com) — lignes d'aide gratuites dans ton pays.
 
-Si vous pensez être en danger, appelez le numéro d'urgence de votre pays.`,
+Si tu penses être en danger, appelle le numéro d'urgence de ton pays.`,
       de: `betizzi ist nur für Erwachsene: mindestens 18 Jahre, oder 21, wo das Gesetz es verlangt. Tipps sind Meinungen auf Basis von Statistik, keine Garantie. Jede zusätzliche Auswahl in einer Kombiwette senkt ihre Gewinnchance.
 
 ## Einfache Regeln
@@ -422,7 +422,7 @@ Mehr ausgeben als geplant, Wetten vor Nahestehenden verheimlichen, Geld leihen, 
 - Österreich: [Spielsuchthilfe](https://www.spielsuchthilfe.at).
 - [Gambling Therapy](https://www.gamblingtherapy.org) — kostenlose, vertrauliche Online-Hilfe.
 
-Wenn du glaubst, in Gefahr zu sein, ruf die Notrufnummer deines Landes an.`,
+Wenn du dir selbst schaden könntest oder in Gefahr bist, ruf den Notruf 112 an.`,
       ro: `betizzi este doar pentru adulți: cel puțin 18 ani, sau 21 acolo unde o cere legea. Ponturile sunt opinii bazate pe statistici, nu o garanție. Fiecare selecție în plus pe un bilet îi scade șansa de câștig.
 
 ## Reguli simple
@@ -448,7 +448,7 @@ Dacă crezi că ești în pericol, sună la numărul de urgență din țara ta.`
 - Kladi se iz zabave, nikad da bi zaradio ili rešio finansijske probleme.
 - Pre početka odredi limit novca i vremena i stani kad ga dostigneš.
 - Ne juri gubitke.
-- Ne ulaži novac za kiriju, račune ili hranu.
+- Ne ulaži novac koji ti treba za kiriju, račune ili hranu.
 - Ne kladi se kad si uznemiren, umoran ili si pio.
 - Koristi limite uplate, pauze i samoisključenje koje nudi tvoja kladionica.
 
@@ -484,8 +484,8 @@ Ako misliš da si u opasnosti, pozovi broj za hitne slučajeve u svojoj zemlji.`
   },
 
   affiliate: {
-    slug: { en: "affiliate-disclosure", el: "dilosi-affiliate", es: "divulgacion-afiliados", pt: "divulgacao-afiliados", fr: "divulgation-affiliation", de: "affiliate-hinweis", ro: "declaratie-afiliere", sr: "izjava-o-partnerstvu", bg: "razkrivane-partnyorstva" },
-    title: { en: "Affiliate disclosure", el: "Δήλωση affiliate", es: "Divulgación de afiliados", pt: "Divulgação de afiliados", fr: "Divulgation d'affiliation", de: "Affiliate-Hinweis", ro: "Declarație de afiliere", sr: "Izjava o partnerstvu", bg: "Разкриване на партньорство" },
+    slug: { en: "affiliate-disclosure", el: "dilosi-affiliate", es: "aviso-afiliados", pt: "divulgacao-afiliados", fr: "affiliation", de: "affiliate-hinweis", ro: "declaratie-afiliere", sr: "izjava-o-partnerstvu", bg: "razkrivane-partnyorstva" },
+    title: { en: "Affiliate disclosure", el: "Δήλωση affiliate", es: "Aviso sobre afiliados", pt: "Divulgação de afiliados", fr: "Transparence sur l'affiliation", de: "Affiliate-Hinweis", ro: "Declarație de afiliere", sr: "Izjava o partnerstvu", bg: "Разкриване на партньорство" },
     desc: { en: "How betizzi earns money and why it does not change our tips.", el: "Πώς βγάζει χρήματα το betizzi και γιατί αυτό δεν αλλάζει τα tips μας.", es: "Cómo gana dinero betizzi y por qué no cambia nuestros tips.", pt: "Como o betizzi ganha dinheiro e por que isso não muda os nossos palpites.", fr: "Comment betizzi gagne de l'argent et pourquoi cela ne change pas nos tips.", de: "Wie betizzi Geld verdient und warum das unsere Tipps nicht beeinflusst.", ro: "Cum câștigă bani betizzi și de ce asta nu ne schimbă ponturile.", sr: "Kako betizzi zarađuje i zašto to ne menja naše tipove.", bg: "Как betizzi печели пари и защо това не променя прогнозите ни." },
     body: {
       en: `betizzi is free for you. To keep it that way, we may earn a commission when you open an account with a bookmaker through a link or button on our site (an "affiliate link"), or a bookmaker may sponsor the site.
@@ -495,7 +495,7 @@ Ako misliš da si u opasnosti, pozovi broj za hitne slučajeve u svojoj zemlji.`
 - Our tips are produced by the same rules for every match, before we look at any partner. A partner cannot buy, change or remove a tip.
 - We show prices from several bookmakers, not only from partners, and we tell you when a price is poor.
 - Sponsored buttons and cards are marked "Ad".
-- We only show bookmaker links where that bookmaker is licensed in your country, and none at all in Italy.
+- We only show bookmaker links where that bookmaker is licensed in your country, and none at all in Italy or Brazil.
 
 Links to bookmakers carry rel="sponsored". Questions: [${OP.partners}](mailto:${OP.partners}).`,
       el: `Το betizzi είναι δωρεάν για σένα. Για να μείνει έτσι, μπορεί να παίρνουμε προμήθεια όταν ανοίγεις λογαριασμό σε bookmaker από link ή κουμπί του site μας (affiliate link), ή ένας bookmaker μπορεί να είναι χορηγός του site.
@@ -524,18 +524,18 @@ Los enlaces a casas de apuestas llevan rel="sponsored". Preguntas: [${OP.partner
 - Não custa nada a mais.
 - Nossos palpites saem pelas mesmas regras em todos os jogos, antes de olharmos qualquer parceiro. Nenhum parceiro pode comprar, mudar ou remover um palpite.
 - Mostramos odds de várias casas, não só de parceiros, e avisamos quando uma odd é ruim.
-- Botões e cartões patrocinados levam a marca «Publicidade».
+- Botões e cartões patrocinados têm o selo "Publicidade".
 - Só mostramos links de casas licenciadas no seu país, e nenhum na Itália.
 
 Os links para casas de apostas têm rel="sponsored". Dúvidas: [${OP.partners}](mailto:${OP.partners}).`,
-      fr: `betizzi est gratuit pour vous. Pour qu'il le reste, nous pouvons percevoir une commission lorsque vous ouvrez un compte chez un bookmaker via un lien ou un bouton de notre site (lien d'affiliation), ou un bookmaker peut sponsoriser le site.
+      fr: `betizzi est gratuit pour toi. Pour qu'il le reste, nous pouvons toucher une commission quand tu ouvres un compte chez un bookmaker via un lien ou un bouton de notre site (lien d'affiliation), ou un bookmaker peut sponsoriser le site.
 
-## Ce que cela signifie pour vous
-- Cela ne vous coûte rien de plus.
+## Ce que ça change pour toi
+- Ça ne te coûte rien de plus.
 - Nos tips sont produits selon les mêmes règles pour chaque match, avant de regarder le moindre partenaire. Aucun partenaire ne peut acheter, modifier ou retirer un tip.
-- Nous affichons les cotes de plusieurs bookmakers, pas seulement des partenaires, et nous vous signalons une mauvaise cote.
+- Nous affichons les cotes de plusieurs bookmakers, pas seulement des partenaires, et on te prévient quand une cote est mauvaise.
 - Les boutons et cartes sponsorisés portent la mention « Publicité ».
-- Nous n'affichons de liens que vers des bookmakers agréés dans votre pays, et aucun en Italie.
+- Nous n'affichons de liens que vers des bookmakers agréés dans ton pays, et aucun en Italie.
 
 Les liens vers les bookmakers portent rel="sponsored". Questions : [${OP.partners}](mailto:${OP.partners}).`,
       de: `betizzi ist für dich kostenlos. Damit das so bleibt, erhalten wir eventuell eine Provision, wenn du über einen Link oder Button auf unserer Seite ein Konto bei einem Buchmacher eröffnest (Affiliate-Link), oder ein Buchmacher sponsert die Seite.
@@ -561,14 +561,14 @@ Linkurile către case de pariuri au rel="sponsored". Întrebări: [${OP.partners
       sr: `betizzi je za tebe besplatan. Da bi tako i ostalo, možemo dobiti proviziju kad otvoriš nalog u kladionici preko linka ili dugmeta na našem sajtu (partnerski link), ili kladionica može biti sponzor sajta.
 
 ## Šta to znači za tebe
-- Ništa te ne košta više.
+- Ništa te ne košta dodatno.
 - Naši tipovi nastaju po istim pravilima za svaku utakmicu, pre nego što pogledamo bilo kog partnera. Nijedan partner ne može da kupi, promeni ili ukloni tip.
 - Prikazujemo kvote više kladionica, ne samo partnera, i kažemo ti kad je kvota loša.
 - Sponzorisana dugmad i kartice imaju oznaku „Reklama“.
 - Linkove prikazujemo samo za kladionice sa licencom u tvojoj zemlji, a u Italiji nijedan.
 
 Linkovi ka kladionicama imaju rel="sponsored". Pitanja: [${OP.partners}](mailto:${OP.partners}).`,
-      bg: `betizzi е безплатен за теб. За да остане така, може да получаваме комисиона, когато си откриеш профил при букмейкър чрез линк или бутон от сайта ни (партньорски линк), или букмейкър може да спонсорира сайта.
+      bg: `betizzi е безплатен за теб. За да остане така, може да получаваме комисионна, когато си откриеш профил при букмейкър чрез линк или бутон от сайта ни (партньорски линк), или букмейкър може да спонсорира сайта.
 
 ## Какво означава това за теб
 - Не ти струва нищо повече.
@@ -640,7 +640,7 @@ We may update these Terms; the date above shows the current version. These Terms
 Αν υπάρχουν λογαριασμοί, πρέπει να δώσεις email που ελέγχεις και να το κρατάς ασφαλές. Μπορούμε να αναστείλουμε ή να διαγράψουμε λογαριασμό για κατάχρηση, παράνομη χρήση ή σοβαρή παραβίαση των Όρων. Μπορείς να ζητήσεις τη διαγραφή του λογαριασμού σου όποτε θέλεις.
 
 ## Σωστή χρήση
-Μην αντιγράφεις μαζικά την Υπηρεσία, μην την «ξύνεις» αυτόματα, μην την παρενοχλείς και μην τη χρησιμοποιείς για παράνομους σκοπούς. Μην παρουσιάζεις τα tips μας ως δική σου πληρωμένη υπηρεσία.
+Μην αντιγράφεις μαζικά την Υπηρεσία, μην αντλείς αυτόματα δεδομένα από αυτήν (scraping), μην παρεμβαίνεις στη λειτουργία της και μην τη χρησιμοποιείς για παράνομους σκοπούς. Μην παρουσιάζεις τα tips μας ως δική σου πληρωμένη υπηρεσία.
 
 ## Links και διαφήμιση
 Η Υπηρεσία έχει links σε τρίτα sites, και σε bookmakers, κάποιοι από τους οποίους μπορεί να μας πληρώνουν (δες τη Δήλωση affiliate). Δεν ευθυνόμαστε για τρίτα sites.
@@ -649,7 +649,7 @@ We may update these Terms; the date above shows the current version. These Terms
 Το site, το όνομα και το λογότυπο betizzi, τα κείμενα και τα σχέδια ανήκουν σε εμάς ή σε όσους μας έδωσαν άδεια. Τα ονόματα και τα σήματα των ομάδων ανήκουν στους κατόχους τους και χρησιμοποιούνται μόνο για αναγνώριση.
 
 ## Αλλαγές και δίκαιο
-Μπορεί να ενημερώνουμε τους Όρους· η ημερομηνία πάνω δείχνει την ισχύουσα έκδοση. Οι Όροι διέπονται από το δίκαιο της Κυπριακής Δημοκρατίας, χωρίς να περιορίζονται τα υποχρεωτικά δικαιώματα καταναλωτή της χώρας σου.`,
+Μπορεί να ενημερώνουμε τους Όρους· η ημερομηνία στην αρχή δείχνει την ισχύουσα έκδοση. Οι Όροι διέπονται από το δίκαιο της Κυπριακής Δημοκρατίας, χωρίς να περιορίζονται τα υποχρεωτικά δικαιώματα καταναλωτή της χώρας σου.`,
     },
   },
 
@@ -677,7 +677,7 @@ When we open free sign-up (for VIP tips, credits and Telegram alerts), we will u
 Cloudflare, Inc. (hosting, security). Data may be processed outside the EU under the European Commission's standard contractual clauses or an adequacy decision.
 
 ## Your rights
-You can ask for access, correction, deletion, restriction, portability or object to processing, by writing to [${OP.privacy}](mailto:${OP.privacy}). We reply within one month. You can also complain to the Cyprus Commissioner for Personal Data Protection ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) or the authority where you live.
+You can ask for access, correction, deletion, restriction or portability of your data, or object to processing, by writing to [${OP.privacy}](mailto:${OP.privacy}). We reply within one month. You can also complain to the Cyprus Commissioner for Personal Data Protection ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) or the authority where you live.
 
 ## Age
 betizzi is not for anyone under 18 (21 in Greece). We do not knowingly process data of minors.`,

@@ -117,7 +117,9 @@ export default {
       const [, lang, slug] = sp;
       const key = PG_ORDER.find((k) => PG[k].slug[lang] === slug);
       if (key) return html(staticPage(lang, key), 200, age21(req, lang));
-      const other = PG_ORDER.find((k) => Object.values(PG[k].slug).includes(slug));
+      // παλιά slugs (αλλαγή 03/11 από τον έλεγχο μεταφράσεων) → 301
+      const OLD_SLUG = { "divulgacion-afiliados": "affiliate", "divulgation-affiliation": "affiliate" };
+      const other = OLD_SLUG[slug] || PG_ORDER.find((k) => Object.values(PG[k].slug).includes(slug));
       if (other) return Response.redirect(url.origin + pgPath(other, lang), 301);
     }
     if (m === null && /^\/[a-z]{2}$/.test(p) && LANGS.includes(p.slice(1))) return Response.redirect(url.origin + p + "/", 301);
