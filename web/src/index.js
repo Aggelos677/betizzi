@@ -588,7 +588,7 @@ function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) 
   const prevK = mo && mo !== "all" ? months[months.indexOf(mo) + 1] : null;
   const ms = recStats(S), ps = prevK ? recStats(ALL.filter((x) => inM(x, prevK) && tierOk(x))) : null;
   const answer = ALL.length
-    ? (d.withdrawn.length ? r.ans : r.ans.replace(/\s*[^.]*\{wd\}[^.]*\.\s*/, " ").trim()).replace("{since}", dLong(d.since)).replace("{n}", all.n).replace("{w}", all.w).replace("{l}", all.l).replace("{hit}", all.hit)
+    ? (d.withdrawn.length ? r.ans : r.ans.replace(/\s*[^.]*\{wd\}[^.]*\.\s*/, " ").trim()).replace("{since}", new Intl.DateTimeFormat(loc, { timeZone: "Europe/Athens", day: "numeric", month: "long", year: "numeric" }).format(d.since * 1000)).replace(/\.\./g, ".").replace("{n}", all.n).replace("{w}", all.w).replace("{l}", all.l).replace("{hit}", all.hit)
         .replace("{u}", sgn(all.u)).replace("{roi}", sgn(all.roi, 1)).replace("{avg}", all.avg.toFixed(2)).replace("{wd}", d.withdrawn.length).replace("{upd}", dLong(d.updated))
     : r.empty;
   const base = `/${lang}/${r.slug}`;

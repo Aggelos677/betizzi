@@ -4,7 +4,7 @@
 // ΠΡΟΣΟΧΗ: μην γράφεις «18+» μέσα σε πρόταση· σε σελίδες 21+ αλλάζει αυτόματα σε «21+».
 // Όροι/Απόρρητο/Cookies: προς το παρόν EN + EL. Οι άλλες γλώσσες δείχνουν στα αγγλικά.
 
-export const OP = { name: "Christos Menelaou", city: "Paphos, Cyprus", hello: "hello@betizzi.com", partners: "marketing@betizzi.com", privacy: "privacy@betizzi.com", updated: "2026-11-01" };
+export const OP = { name: "Christos Menelaou", city: "Paphos, Cyprus", hello: "hello@betizzi.com", partners: "marketing@betizzi.com", privacy: "privacy@betizzi.com", updated: "2026-11-03" };
 
 export const PG_ORDER = ["about", "contact", "responsible", "affiliate", "terms", "privacy", "cookies"];
 export const PG_FULL = ["terms", "privacy", "cookies"]; // μόνο EN + EL
@@ -658,52 +658,64 @@ We may update these Terms; the date above shows the current version. These Terms
     title: { en: "Privacy policy", el: "Πολιτική απορρήτου" },
     desc: { en: "What personal data betizzi uses and why.", el: "Ποια προσωπικά δεδομένα χρησιμοποιεί το betizzi και γιατί." },
     body: {
-      en: `Effective date: 1 November 2026.
+      en: `Effective date: 3 November 2026.
 
 ## Who is responsible
 The data controller is the sole proprietorship of ${OP.name}, ${OP.city}, which operates betizzi.com. Privacy requests: [${OP.privacy}](mailto:${OP.privacy}).
 
-## What we use today
+## What we use
 - **Technical request data** (IP address, browser, time of request, country from our hosting provider). Purpose: deliver the site, show the right age notice for your country, protect against abuse and fix errors. Legal basis: legitimate interests. Kept in short-term logs by our hosting provider (Cloudflare), usually a few days.
-- **Your choices in the site** (your slip, stake, bookmaker, filters, open tab, VIP view). Stored only in your own browser (local storage); they are never sent to us.
+- **Visit counts.** We count page views and button taps by page type, language and country, with no cookie and no identifier, so we cannot tell who you are. Purpose: know which parts of the site are used. Legal basis: legitimate interests.
+- **Your choices in the site** (your slip, stake, bookmaker, filters, open tab, saved coupons). Stored only in your own browser (local storage); they are not sent to us.
 - **Emails you send us.** Purpose: reply to you. Legal basis: legitimate interests. Kept for as long as needed to handle your message.
 
-We do not use advertising cookies, we do not sell personal data, and we do not use analytics at the moment.
+## If you create a free account
+- **What we keep:** your email address, language, country (from your connection), your confirmation that you are of legal age, the date you signed up, your credits history, and your choice about our newsletter.
+- **Sign-in:** we email you a 6-digit code. We store only a scrambled (hashed) form of the code, for 10 minutes. When you sign in we set one sign-in cookie (bz_s) for up to 90 days; we keep a scrambled copy of it to recognise your session.
+- **Security log:** sign-ins and important account actions, to protect your account and the service.
+- **Purpose and legal basis:** to give you the account and its features (VIP tips, credits). Legal basis: our contract with you. Newsletters only if you tick the separate box (consent); you can withdraw it at any time.
+- **Emails we send:** only the sign-in code and one welcome email. No advertising from these emails.
+- **How long:** for as long as you keep your account. You can ask us to delete it at any time by writing to [${OP.privacy}](mailto:${OP.privacy}).
 
-## Coming soon: accounts
-When we open free sign-up (for VIP tips, credits and Telegram alerts), we will update this policy before collecting any email address, and explain what we keep, why and for how long. Newsletters will only be sent if you tick a separate box.
+We do not use advertising cookies, we do not sell personal data, and we do not use third-party analytics.
 
 ## Who processes data for us
-Cloudflare, Inc. (hosting, security). Data may be processed outside the EU under the European Commission's standard contractual clauses or an adequacy decision.
+Cloudflare, Inc. (hosting, database, security and sending our emails). Data may be processed outside the EU under the European Commission's standard contractual clauses or an adequacy decision.
 
 ## Your rights
 You can ask for access, correction, deletion, restriction or portability of your data, or object to processing, by writing to [${OP.privacy}](mailto:${OP.privacy}). We reply within one month. You can also complain to the Cyprus Commissioner for Personal Data Protection ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) or the authority where you live.
 
 ## Age
 betizzi is not for anyone under 18 (21 in Greece). We do not knowingly process data of minors.`,
-      el: `Ισχύει από: 1 Νοεμβρίου 2026.
+      el: `Ισχύει από: 3 Νοεμβρίου 2026.
 
 ## Ποιος είναι υπεύθυνος
-Υπεύθυνος επεξεργασίας είναι η ατομική επιχείρηση ${OP.name}, Πάφος, Κύπρος, που λειτουργεί το betizzi.com. Αιτήματα για προσωπικά δεδομένα: [${OP.privacy}](mailto:${OP.privacy}).
+Υπεύθυνος επεξεργασίας είναι η ατομική επιχείρηση ${OP.name}, Πάφος, Κύπρος, που λειτουργεί το betizzi.com. Αιτήματα για τα δεδομένα σου: [${OP.privacy}](mailto:${OP.privacy}).
 
-## Τι χρησιμοποιούμε σήμερα
-- **Τεχνικά δεδομένα αιτήματος** (διεύθυνση IP, browser, ώρα, χώρα από τον πάροχο φιλοξενίας). Σκοπός: να λειτουργεί το site, να δείχνουμε το σωστό όριο ηλικίας για τη χώρα σου, προστασία από κατάχρηση και διόρθωση λαθών. Νομική βάση: έννομο συμφέρον. Μένουν σε προσωρινά αρχεία του παρόχου φιλοξενίας (Cloudflare), συνήθως λίγες μέρες.
-- **Οι επιλογές σου στο site** (δελτίο, ποντάρισμα, bookmaker, φίλτρα, καρτέλα, προβολή VIP). Αποθηκεύονται μόνο στον δικό σου browser (local storage) και δεν μας στέλνονται ποτέ.
-- **Τα email που μας στέλνεις.** Σκοπός: να σου απαντήσουμε. Νομική βάση: έννομο συμφέρον. Τα κρατάμε όσο χρειάζεται για το αίτημά σου.
+## Τι χρησιμοποιούμε
+- **Τεχνικά στοιχεία επίσκεψης** (διεύθυνση IP, browser, ώρα, χώρα από τον πάροχο φιλοξενίας). Σκοπός: να λειτουργεί το site, να δείχνουμε τη σωστή ηλικία για τη χώρα σου, να προστατεύουμε από κατάχρηση και να διορθώνουμε λάθη. Νομική βάση: έννομο συμφέρον. Μένουν σε προσωρινά αρχεία του παρόχου μας (Cloudflare), συνήθως λίγες μέρες.
+- **Μετρήσεις επισκέψεων.** Μετράμε προβολές σελίδων και πατήματα κουμπιών ανά είδος σελίδας, γλώσσα και χώρα, χωρίς cookie και χωρίς αναγνωριστικό, οπότε δεν ξέρουμε ποιος είσαι. Σκοπός: να ξέρουμε ποια σημεία του site χρησιμοποιούνται. Νομική βάση: έννομο συμφέρον.
+- **Οι επιλογές σου στο site** (δελτίο, ποντάρισμα, bookmaker, φίλτρα, καρτέλα, αποθηκευμένα κουπόνια). Μένουν μόνο στον δικό σου browser (local storage) και δεν μας στέλνονται.
+- **Email που μας στέλνεις.** Σκοπός: να σου απαντήσουμε. Νομική βάση: έννομο συμφέρον. Τα κρατάμε όσο χρειάζεται για το θέμα σου.
 
-Δεν χρησιμοποιούμε cookies διαφήμισης, δεν πουλάμε προσωπικά δεδομένα και προς το παρόν δεν χρησιμοποιούμε εργαλεία στατιστικών (analytics).
+## Αν φτιάξεις δωρεάν λογαριασμό
+- **Τι κρατάμε:** το email σου, τη γλώσσα, τη χώρα (από τη σύνδεσή σου), την επιβεβαίωση ότι είσαι ενήλικας, την ημερομηνία εγγραφής, το ιστορικό των credits σου και την επιλογή σου για το newsletter.
+- **Σύνδεση:** σου στέλνουμε κωδικό 6 ψηφίων στο email. Κρατάμε μόνο κρυπτογραφημένη (hash) μορφή του κωδικού, για 10 λεπτά. Όταν συνδέεσαι, βάζουμε ένα cookie σύνδεσης (bz_s) έως 90 μέρες και κρατάμε κρυπτογραφημένο αντίγραφό του για να αναγνωρίζουμε τη σύνδεση.
+- **Αρχείο ασφαλείας:** συνδέσεις και σημαντικές ενέργειες στον λογαριασμό, για την προστασία του λογαριασμού σου και της υπηρεσίας.
+- **Σκοπός και νομική βάση:** να σου δώσουμε τον λογαριασμό και ό,τι περιλαμβάνει (VIP tips, credits). Νομική βάση: η σύμβασή μας μαζί σου. Newsletter μόνο αν τσεκάρεις το ξεχωριστό κουτάκι (συγκατάθεση)· μπορείς να την ανακαλέσεις όποτε θέλεις.
+- **Email που στέλνουμε:** μόνο τον κωδικό σύνδεσης και ένα email καλωσορίσματος. Καμία διαφήμιση μέσα σε αυτά.
+- **Για πόσο:** όσο έχεις λογαριασμό. Μπορείς να ζητήσεις τη διαγραφή του όποτε θέλεις, γράφοντας στο [${OP.privacy}](mailto:${OP.privacy}).
 
-## Σύντομα: λογαριασμοί
-Όταν ανοίξει η δωρεάν εγγραφή (για VIP tips, credits και ειδοποιήσεις στο Telegram), θα ενημερώσουμε αυτή την πολιτική πριν συλλέξουμε οποιοδήποτε email, και θα εξηγήσουμε τι κρατάμε, γιατί και για πόσο. Newsletter θα στέλνουμε μόνο αν τσεκάρεις ξεχωριστό κουτάκι.
+Δεν χρησιμοποιούμε διαφημιστικά cookies, δεν πουλάμε προσωπικά δεδομένα και δεν χρησιμοποιούμε εργαλεία μετρήσεων τρίτων.
 
 ## Ποιος επεξεργάζεται δεδομένα για εμάς
-Cloudflare, Inc. (φιλοξενία, ασφάλεια). Τα δεδομένα μπορεί να επεξεργάζονται εκτός ΕΕ με τις τυποποιημένες συμβατικές ρήτρες της Ευρωπαϊκής Επιτροπής ή απόφαση επάρκειας.
+Cloudflare, Inc. (φιλοξενία, βάση δεδομένων, ασφάλεια και αποστολή των email μας). Τα δεδομένα μπορεί να επεξεργάζονται εκτός ΕΕ, με τις τυποποιημένες συμβατικές ρήτρες της Ευρωπαϊκής Επιτροπής ή απόφαση επάρκειας.
 
 ## Τα δικαιώματά σου
-Μπορείς να ζητήσεις πρόσβαση, διόρθωση, διαγραφή, περιορισμό, φορητότητα ή να αντιταχθείς στην επεξεργασία, γράφοντας στο [${OP.privacy}](mailto:${OP.privacy}). Απαντάμε μέσα σε έναν μήνα. Μπορείς επίσης να υποβάλεις παράπονο στον Επίτροπο Προστασίας Δεδομένων Προσωπικού Χαρακτήρα της Κύπρου ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) ή στην αρχή της χώρας σου (στην Ελλάδα: [ΑΠΔΠΧ](https://www.dpa.gr)).
+Μπορείς να ζητήσεις πρόσβαση, διόρθωση, διαγραφή, περιορισμό ή φορητότητα των δεδομένων σου, ή να αντιταχθείς στην επεξεργασία, γράφοντας στο [${OP.privacy}](mailto:${OP.privacy}). Απαντάμε μέσα σε έναν μήνα. Μπορείς επίσης να κάνεις καταγγελία στον Επίτροπο Προστασίας Δεδομένων Προσωπικού Χαρακτήρα της Κύπρου ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) ή στην αρχή της χώρας σου (στην Ελλάδα: Αρχή Προστασίας Δεδομένων, [dpa.gr](https://www.dpa.gr)).
 
 ## Ηλικία
-Το betizzi δεν απευθύνεται σε άτομα κάτω των 18 (στην Ελλάδα κάτω των 21). Δεν επεξεργαζόμαστε εν γνώσει μας δεδομένα ανηλίκων.`,
+Το betizzi δεν είναι για άτομα κάτω των 18 (21 στην Ελλάδα). Δεν επεξεργαζόμαστε εν γνώσει μας δεδομένα ανηλίκων.`,
     },
   },
 
@@ -712,34 +724,42 @@ Cloudflare, Inc. (φιλοξενία, ασφάλεια). Τα δεδομένα �
     title: { en: "Cookie policy", el: "Πολιτική cookies" },
     desc: { en: "What betizzi stores in your browser.", el: "Τι αποθηκεύει το betizzi στον browser σου." },
     body: {
-      en: `Effective date: 1 November 2026.
+      en: `Effective date: 3 November 2026.
 
-betizzi does not set advertising or analytics cookies. We only use your browser's own storage to remember choices you make, so the site works the way you left it. This data stays on your device and is never sent to us.
+betizzi does not set advertising or analytics cookies.
 
-## What we store
+## The one cookie we set
+- **bz_s** — the sign-in cookie. Set only when you sign in to your free account, so you stay signed in. HttpOnly and secure, it lasts up to 90 days and is deleted when you sign out. It is strictly necessary for the account to work, so no consent banner is required.
+
+## What we store in your browser
+We also use your browser's own storage to remember choices you make, so the site works the way you left it. This data stays on your device and is not sent to us.
 - **ko-slip, ko-stake, ko-smode** — your slip, stake and slip mode.
 - **ko-book** — the bookmaker you chose for prices.
 - **ko-lfil, ko-tab, ko-vip** — your league filter, open tab and VIP view.
 - **ko-builder, ko-bmode, ko-coupons** — builder settings and coupons you saved.
 - **ko-y** (only for one visit) — your scroll position.
 
-These are needed for features you use, so no consent banner is required. You can delete them at any time in your browser settings; the site will simply forget your choices.
+These are needed for features you use. You can delete them at any time in your browser settings; the site will simply forget your choices (and sign you out).
 
-If we later add analytics or sign-in cookies, we will update this page and ask for your consent where the law requires it.`,
-      el: `Ισχύει από: 1 Νοεμβρίου 2026.
+If we ever add analytics or advertising cookies, we will update this page and ask for your consent first.`,
+      el: `Ισχύει από: 3 Νοεμβρίου 2026.
 
-Το betizzi δεν βάζει cookies διαφήμισης ή στατιστικών. Χρησιμοποιούμε μόνο την αποθήκευση του browser σου για να θυμάται τις επιλογές σου, ώστε το site να είναι όπως το άφησες. Τα στοιχεία μένουν στη συσκευή σου και δεν μας στέλνονται ποτέ.
+Το betizzi δεν βάζει διαφημιστικά cookies ούτε cookies μετρήσεων.
 
-## Τι αποθηκεύουμε
-- **ko-slip, ko-stake, ko-smode** — το δελτίο σου, το ποντάρισμα και τον τρόπο του δελτίου.
-- **ko-book** — τον bookmaker που διάλεξες για τις αποδόσεις.
-- **ko-lfil, ko-tab, ko-vip** — το φίλτρο λιγκών, την ανοιχτή καρτέλα και την προβολή VIP.
-- **ko-builder, ko-bmode, ko-coupons** — τις ρυθμίσεις του «Φτιάξε» και τα κουπόνια που αποθήκευσες.
-- **ko-y** (μόνο για μία επίσκεψη) — πού είχες κατεβεί στη σελίδα.
+## Το μόνο cookie που βάζουμε
+- **bz_s** — cookie σύνδεσης. Μπαίνει μόνο όταν συνδέεσαι στον δωρεάν λογαριασμό σου, για να μένεις συνδεδεμένος. Είναι HttpOnly και ασφαλές, διαρκεί έως 90 μέρες και σβήνει όταν αποσυνδέεσαι. Είναι απολύτως απαραίτητο για να λειτουργεί ο λογαριασμός, γι' αυτό δεν χρειάζεται μπάνερ συγκατάθεσης.
 
-Χρειάζονται για λειτουργίες που χρησιμοποιείς, οπότε δεν απαιτείται μπάνερ συγκατάθεσης. Μπορείς να τα σβήσεις όποτε θέλεις από τις ρυθμίσεις του browser σου· το site απλώς θα ξεχάσει τις επιλογές σου.
+## Τι κρατάμε στον browser σου
+Χρησιμοποιούμε και τον αποθηκευτικό χώρο του browser σου για να θυμάται τις επιλογές σου, ώστε το site να είναι όπως το άφησες. Αυτά μένουν στη συσκευή σου και δεν μας στέλνονται.
+- **ko-slip, ko-stake, ko-smode** — το δελτίο σου, το ποντάρισμα και ο τρόπος δελτίου.
+- **ko-book** — ο bookmaker που διάλεξες για τις αποδόσεις.
+- **ko-lfil, ko-tab, ko-vip** — το φίλτρο λιγκών, η καρτέλα που είχες ανοιχτή και η προβολή VIP.
+- **ko-builder, ko-bmode, ko-coupons** — ρυθμίσεις και κουπόνια που αποθήκευσες.
+- **ko-y** (μόνο για μία επίσκεψη) — το σημείο της σελίδας όπου ήσουν.
 
-Αν αργότερα προσθέσουμε στατιστικά ή cookies σύνδεσης, θα ενημερώσουμε τη σελίδα και θα ζητάμε συγκατάθεση όπου το απαιτεί ο νόμος.`,
+Χρειάζονται για λειτουργίες που χρησιμοποιείς. Μπορείς να τα σβήσεις όποτε θέλεις από τις ρυθμίσεις του browser· το site απλώς θα ξεχάσει τις επιλογές σου (και θα σε αποσυνδέσει).
+
+Αν ποτέ προσθέσουμε cookies μετρήσεων ή διαφήμισης, θα ενημερώσουμε αυτή τη σελίδα και θα ζητήσουμε πρώτα τη συγκατάθεσή σου.`,
     },
   },
 };

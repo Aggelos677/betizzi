@@ -1146,7 +1146,8 @@ function renderMySlip(target){
   if(multi)h+='<div class="sb-p"><span class="sb-pn"><b>Parlay</b> <small>('+slip.length+')</small></span><span class="sb-o mono">'+t.odds.toFixed(2)+'</span><input type="number" inputmode="decimal" min="0" step="1" class="sb-in" id="pStk" value="'+val(stake)+'" placeholder="Stake" aria-label="Parlay stake"></div>'
     ;
   h+='<div class="sb-sum"><span><span>Total stake</span> <b class="mono" id="sbTot"></b></span><span><span>Potential return</span> <b class="mono" id="retOut"></b></span></div>';
-  h+='<a class="ss-sp" href="#" role="button" id="playSlip" rel="sponsored nofollow"><span>Play it at</span> <b>[SPONSOR]</b> →</a>'
+  /* κουμπί χορηγού: μόνο όταν υπάρχει συνεργάτης (SPONSOR = {name, url}). Μέχρι τότε δεν φαίνεται (03/11) */
+  h+=(window.SPONSOR?'<a class="ss-sp" href="'+esc(SPONSOR.url||"#")+'" role="button" id="playSlip" rel="sponsored nofollow" target="_blank"><span>Play it at</span> <b>'+esc(SPONSOR.name)+'</b> →</a>':'')
     +'<button type="button" class="sb-else" id="playElse">🎟️ <span>I played it elsewhere · save to My coupons</span></button>'
     +'<p class="ss-aff">18+ · <span>Bet only what you can afford to lose.</span></p>';
   var bk='<option value="best"'+(myBook==="best"?' selected':'')+'>Best price</option>'+BOOKS.map(function(b){return '<option value="'+esc(b)+'"'+(myBook===b?' selected':'')+'>'+esc(b)+'</option>';}).join("");
@@ -1166,7 +1167,7 @@ function renderMySlip(target){
     else{var k=slip[0];saveCoupon([k],sStk[k]==null?(+stake||10):(+sStk[k]||+stake||10));}
     slip=[];sStk={};store("ko-sstk",sStk);afterSlip();closeSheet();
     toast(viaSponsor?"Saved in My coupons · our partner bookmaker is coming soon":"Saved in My coupons");};
-  $("playSlip").addEventListener("click",function(e){e.preventDefault();e.stopPropagation();place(true);});
+  if($("playSlip"))$("playSlip").addEventListener("click",function(e){e.preventDefault();e.stopPropagation();place(true);});
   $("playElse").addEventListener("click",function(){place(false);});
   $("copySlip").addEventListener("click",function(){
     var txt="betizzi slip\n"+slip.map(function(k){var s=SEL[k];return s.m.home+" v "+s.m.away+" | "+s.label+" @ "+s.odd.toFixed(2);}).join("\n")+"\nTotal: "+totals().odds.toFixed(2);
@@ -1474,7 +1475,7 @@ function pickBtn(m){
   var t=m.tips[0], locked=t.tier==="vip"&&!vipMember&&!t.sel;
   if(locked) return '<button type="button" class="r-pick vip locked" data-unlock="1" aria-label="VIP tip, sign up free to see"><span>VIP · free</span><b aria-hidden="true">•.••</b></button>';
   var st=m._hold?null:tipState(t,m);
-  if(st==="won") return '<span class="r-pick paid'+(m._justPaid?' pop':'')+'" role="status" aria-label="'+esc(t.sel)+' landed"><span>✓ '+esc(t.sel)+'</span><b>Pay me please :)</b></span>';
+  if(st==="won") return '<span class="r-pick paid'+(m._justPaid?' pop':'')+'" role="status" aria-label="'+esc(t.sel)+' landed"><span>✓ '+esc(t.sel)+'</span><b class="mono">'+(t.odds?(+t.odds).toFixed(2):'')+'</b></span>';
   if(st==="lost") return '<span class="r-pick lost"><span>✗ '+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></span>';
   return '<button type="button" class="r-pick'+(t.tier==="vip"?' vip':'')+'" data-key="'+esc(t.key)+'" aria-pressed="false" aria-label="'+esc((t.tier==="vip"?"VIP tip ":"Free tip ")+t.sel+" at "+t.odds)+'"><span>'+(STRONG_IDS[t.key]?'⚡ ':'')+(t.tier==="vip"?"VIP · ":"TIP · ")+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></button>';
 }
