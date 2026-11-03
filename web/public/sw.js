@@ -1,17 +1,28 @@
-// betizzi service worker (03/11/2026): η σελίδα ανοίγει και χωρίς σήμα (τελευταία έκδοση από την cache).
-// Δίκτυο πρώτα για τις σελίδες· δεν αγγίζουμε auth, admin, μετρήσεις και live δεδομένα.
-const C = "bz-v1";
+// betizzi service worker (03/11/2026): η σελίδα ανοίγει και χωρίς σήμα (τελευταία έκδοση της αρχικής από την cache).
+// Δίκτυο πρώτα (με navigation preload για ταχύτητα)· κρατάμε ΜΟΝΟ τις αρχικές /xx/ χωρίς query (το πολύ 9 σελίδες).
+// Δεν αγγίζουμε auth, admin, μετρήσεις και live δεδομένα.
+const C = "bz-v2";
 self.addEventListener("install", () => self.skipWaiting());
-self.addEventListener("activate", (e) => e.waitUntil(
-  caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== C).map((k) => caches.delete(k)))).then(() => self.clients.claim())));
+self.addEventListener("activate", (e) => e.waitUntil((async () => {
+  for (const k of await caches.keys()) if (k !== C) await caches.delete(k);
+  if (self.registration.navigationPreload) await self.registration.navigationPreload.enable();
+  await self.clients.claim();
+})()));
+const home = (u) => /^\/[a-z]{2}\/$/.test(u.pathname);
 self.addEventListener("fetch", (e) => {
   const r = e.request, u = new URL(r.url);
   if (r.method !== "GET" || u.origin !== location.origin) return;
   if (/^\/(auth\/|admin|h$|me\.json|vip\.json|live\.json|goals\.json)/.test(u.pathname)) return;
-  if (r.mode === "navigate") {
-    e.respondWith(fetch(r).then((res) => { if (res.ok) { const cp = res.clone(); caches.open(C).then((c) => c.put(r, cp)); } return res; })
-      .catch(() => caches.match(r).then((m) => m || caches.match("/" + (u.pathname.split("/")[1] || "en") + "/"))));
-    return;
-  }
-  if (u.pathname.startsWith("/icons/")) e.respondWith(caches.match(r).then((m) => m || fetch(r).then((res) => { const cp = res.clone(); caches.open(C).then((c) => c.put(r, cp)); return res; })));
+  if (r.mode !== "navigate") return;
+  const lang = (u.pathname.match(/^\/([a-z]{2})\//) || [])[1] || "en";
+  const key = new Request(u.origin + "/" + lang + "/");
+  e.respondWith((async () => {
+    try {
+      const res = (await e.preloadResponse) || (await fetch(r));
+      if (res.ok && home(u) && !u.searchParams.has("d")) { const cp = res.clone(); e.waitUntil(caches.open(C).then((c) => c.put(key, cp))); }
+      return res;
+    } catch (err) {
+      return (await caches.match(key)) || Response.error();
+    }
+  })());
 });

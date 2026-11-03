@@ -81,7 +81,7 @@ export default {
     // Εφαρμογή (PWA, απόφαση Owner 03/11): manifest ανά γλώσσα
     const mf = p.match(/^\/([a-z]{2})\/manifest\.webmanifest$/);
     if (mf && LANGS.includes(mf[1])) return new Response(JSON.stringify({
-      name: "betizzi", short_name: "betizzi", description: T[mf[1]].desc, lang: mf[1], start_url: `/${mf[1]}/?utm_source=pwa&utm_medium=app`, scope: "/", id: `/${mf[1]}/`,
+      name: "betizzi", short_name: "betizzi", description: mf[1] === "el" ? T.el.desc.replace(/18\+/g, "21+") : T[mf[1]].desc, lang: mf[1], start_url: `/${mf[1]}/?utm_source=pwa&utm_medium=app`, scope: "/", id: `/${mf[1]}/`,
       display: "standalone", background_color: "#0c0f0d", theme_color: "#0c0f0d", orientation: "portrait",
       icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }, { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
         { src: "/icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }],
@@ -169,7 +169,7 @@ async function authRoute(req, env, url) {
     await eng("/auth/logout", { method: "POST", body: "{}" });
     return J({ ok: true }, { "set-cookie": `${AUTH_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` });
   }
-  if (p === "/auth/app" && req.method === "POST") return J(await (await eng("/auth/app", { method: "POST", body: "{}" })).json());
+  if (p === "/auth/app" && req.method === "POST") { try { return J(await (await eng("/auth/app", { method: "POST", body: "{}" })).json()); } catch (e) { return J({ error: "engine" }); } }
   if (p === "/me.json") return J(tok ? await (await eng("/auth/me")).json() : { user: null });
   if (p === "/vip.json") {
     if (!tok) return J({ error: "login" });

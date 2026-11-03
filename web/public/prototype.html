@@ -2159,35 +2159,37 @@ function loadVip(){var d=(window.DAYNAV&&DAYNAV.date)||"";fetch("/vip.json"+(d?"
   if(!j.tips)return;var by={};j.tips.forEach(function(x){(by[x[0]]=by[x[0]]||[]).push(x[1]);});
   MATCHES.forEach(function(m){var q=by[m.id];if(!q)return;var i=0;m.tips.forEach(function(t,k){if(t.tier==="vip"&&!t.sel&&q[i]){var a=q[i++];var nt={sel:a[0],odds:a[1],tier:"vip",why:a[3],r:a[5],book:a[7],min:a[9]||0,at:hmTs(a[10])},c=tipCode(nt);nt.key=addSel(m,c,tipLabel(m,nt),nt.sel,nt.odds,probFor(m,c));m.tips[k]=nt;}});});
   try{applyBook();}catch(e){}setVip(true);}).catch(function(){});}
-function loadMe(){if(location.protocol==="file:")return;fetch("/me.json",{credentials:"same-origin"}).then(function(r){return r.json();}).then(function(j){ACC=j.user||null;accRender();if(ACC)loadVip();if(ACC&&MYL){renderFilters();renderMatches();}}).catch(function(){});}
+function loadMe(){if(location.protocol==="file:")return;fetch("/me.json",{credentials:"same-origin"}).then(function(r){return r.json();}).then(function(j){ACC=j.user||null;accRender();if(ACC)loadVip();if(ACC&&MYL){renderFilters();renderMatches();}if(window.bzClaim)bzClaim();}).catch(function(){});}
 loadMe();
 /* ---------- Εφαρμογή στο κινητό (PWA) · απόφαση Owner 03/11: +1000 credits μία φορά ---------- */
 (function(){
   if(location.protocol==="file:")return;
   if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(function(){});
   var std=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true;
-  var ios=/iphone|ipad|ipod/i.test(navigator.userAgent),dp=null,bar=$("appBar");
-  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();dp=e;show();});
+  var ua=navigator.userAgent,ios=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1),inapp=/FBAN|FBAV|Instagram|TikTok|Line\//i.test(ua),dp=null,bar=$("appBar"),closed=false;
+  window.addEventListener("beforeinstallprompt",function(e){if(window.innerWidth>=900)return;e.preventDefault();dp=e;show();});
   function dismissed(){try{return Date.now()-(+localStorage.getItem("bz-ab-x")||0)<7*864e5;}catch(e){return false;}}
   function show(){if(std||dismissed()||window.innerWidth>=900)return;bar.hidden=false;}
   if(ios)show();
-  $("abX").addEventListener("click",function(){bar.hidden=true;try{localStorage.setItem("bz-ab-x",String(Date.now()));}catch(e){}});
+  $("abX").addEventListener("click",function(){closed=true;bar.hidden=true;try{localStorage.setItem("bz-ab-x",String(Date.now()));}catch(e){}});
   $("abGo").addEventListener("click",function(){
     if(std){openAuth();return;}
     if(dp){dp.prompt();dp.userChoice.then(function(){dp=null;bar.hidden=true;});return;}
     /* οδηγίες βήμα-βήμα που μένουν μέχρι να τις κλείσει (03/11) */
-    var st=ios?["Tap Share ⬆️ (Share)","Tap «Add to Home Screen»","Tap «Add» and open betizzi from the new icon"]:["Open the browser menu ⋮","Tap «Install app» or «Add to Home screen»","Open betizzi from the new icon"];
+    var st=ios?(inapp?["Open this page in Safari first"]:[]).concat(["Tap Share ⬆️ (Share)","Tap «Add to Home Screen»","Tap «Add» and open betizzi from the new icon"]):["Open the browser menu ⋮","Tap «Install app» or «Add to Home screen»","Open betizzi from the new icon"];
     var I=window.__I18N||{},hw=$("abHow");hw.innerHTML=st.map(function(x){return "<li>"+esc(I[x]||x)+"</li>";}).join("");hw.hidden=false;$("abGo").hidden=true;});
   function ga(n){try{if(window.gtag)gtag("event",n);}catch(e){}}
   window.addEventListener("appinstalled",function(){ga("app_install");bar.hidden=true;toast("Open betizzi from your home screen to collect your 1000 credits");});
   if(!std)return;
   ga("app_open"); /* μέτρηση: πόσοι ανοίγουν το betizzi ως εφαρμογή */
-  var tries=0;
-  function claim(){if(tries++>20)return;try{if(localStorage.getItem("bz-app-cr")==="1")return;}catch(e){}
-    if(!ACC){$("abTxt").textContent="Sign up free to collect your credits";$("abGo").textContent=(window.__I18N&&__I18N["Sign up free"])||"Sign up free";bar.hidden=false;setTimeout(claim,5000);return;}
-    fetch("/auth/app",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:"{}"}).then(function(r){return r.json();}).then(function(j){
-      if(!j||!j.ok)return;try{localStorage.setItem("bz-app-cr","1");}catch(e){}bar.hidden=true;
-      if(j.got){toast("+1000 credits · thanks for installing betizzi!");try{ACC.credits=j.credits;accRender();}catch(e){}}});}
+  var tries=0,busy=false;
+  function ck(){return "bz-app-cr:"+((ACC&&ACC.email)||"");}
+  function claim(){if(busy||tries++>40)return;try{if(ACC&&localStorage.getItem(ck())==="1")return;}catch(e){}
+    if(!ACC){if(closed)return;$("abTxt").textContent=(window.__I18N&&__I18N["Sign in or sign up free to collect your credits"])||"Sign in or sign up free to collect your credits";$("abGo").textContent=(window.__I18N&&__I18N["Sign up free"])||"Sign up free";bar.hidden=false;setTimeout(claim,5000);return;}
+    busy=true;fetch("/auth/app",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:"{}"}).then(function(r){return r.json();}).then(function(j){busy=false;
+      if(!j||!j.ok)return;try{localStorage.setItem(ck(),"1");}catch(e){}bar.hidden=true;
+      if(j.got){toast("+1000 credits · thanks for installing betizzi!");try{ACC.credits=j.credits;accRender();}catch(e){}}}).catch(function(){busy=false;});}
+  window.bzClaim=function(){tries=0;claim();};
   setTimeout(claim,2500);
 })();
 /* λογότυπο = αρχική (απόφαση Owner 02/11): στην ίδια σελίδα πάει στις Προτάσεις και πάνω-πάνω, χωρίς φόρτωμα */
