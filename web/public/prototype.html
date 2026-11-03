@@ -834,7 +834,7 @@ header{position:relative}
 
   <!-- TIPS -->
   <aside id="sidePanel" class="side" aria-label="Side panel"><section class="card sideslip" id="sideSlip"><div id="resultSideWrap"></div><div class="secthead"><h2>My slip</h2><span class="tag lime" id="sideSlipN"></span></div><div id="slipSide" style="display:flex;flex-direction:column;gap:12px"></div></section><section class="card closebox" id="closeBox" hidden><div class="secthead"><h2>Cash it in!</h2><span class="livedot" aria-hidden="true"></span></div><div id="closeList"></div></section><section class="card" id="liveSide"><div class="opsub" role="group" aria-label="Show"><button type="button" class="opsb" data-sv="goals" aria-pressed="true">⚽ <span>Latest goals</span></button><button type="button" class="opsb" data-sv="mylive" aria-pressed="false">📺 <span>My games live</span> <span class="mono" id="myLiveN"></span></button></div>
-<div id="goalsSide" class="gl-list"></div><div id="myLiveSide" class="gl-list" hidden></div><div id="bzcSide" class="bzc-list" hidden></div></section><section class="card" data-side="tips" hidden><div class="secthead"><h2>Our biggest wins today</h2></div><div id="winsSide" style="display:flex;flex-direction:column;gap:10px"></div></section></aside>
+<div id="goalsSide" class="gl-list"></div><div id="myLiveSide" class="gl-list" hidden></div><div id="bzcSide" class="bzc-list" hidden></div></section><section class="card" data-side="tips" hidden><div class="secthead"><h2 id="winsH">Our biggest wins today</h2></div><div id="winsSide" style="display:flex;flex-direction:column;gap:10px"></div></section></aside>
   <div id="view-tips" role="tabpanel" aria-labelledby="tab-tips" class="wrap op" hidden>
     <label class="sw" hidden><input type="checkbox" id="vipMember"> Show as registered user (untick to see what a visitor sees)</label>
     <h2 class="op-h">Today's picks</h2>
@@ -1098,7 +1098,7 @@ function syncPressed(){Array.prototype.forEach.call(document.querySelectorAll("b
     var was=b.className;b.className="sg-add"+(on?" in":"")+(arm?" arm":"");if(b.textContent!==txt)b.textContent=txt;var card=b.closest(".sg");if(card)card.classList.toggle("in",on);});}
 function legHTML(s,removable){
   var m=s.m,note=s.low?' <span class="lowtxt">⚠ <span>Low price here</span> · Pinnacle '+s.pin.toFixed(2)+'</span>':s.nobk?' <span class="lowtxt"><span>Not offered by your bookmaker</span></span>':'';
-  return '<div class="leg"><span class="lg">'+esc(m.country)+' · '+esc(m.league)+' · '+m.time+'</span><span class="tm">'+esc(m.home)+' v '+esc(m.away)+'</span><span class="mk">'+esc(s.label)+(s.p!=null?' <span style="color:var(--muted)">· model '+Math.round(s.p*100)+'%</span>':'')+note+'</span>'
+  return '<div class="leg"><span class="lg">'+esc(m.country)+' · '+esc(m.league)+' · '+m.time+'</span><span class="tm">'+esc(m.home)+' v '+esc(m.away)+'</span><span class="mk">'+esc(s.label)+note+'</span>'
     +'<span class="right"><span class="odd mono">'+s.odd.toFixed(2)+'</span>'+(removable?'<button type="button" class="rm" data-rm="'+esc(s.key)+'" aria-label="Remove '+esc(s.label)+'">×</button>':'')+'</span></div>';
 }
 var SSTEPS=[1,2,3,5,10,15,20,25,30,40,50,75,100,150,200,250,300,400,500,600,700,800,900,1000,1500,2000];
@@ -1379,8 +1379,15 @@ function renderWins(){var box=$("winsSide");if(!box)return;
   wins.sort(function(a,b){return (b.t.odds||0)-(a.t.odds||0);});
   /* απόφαση Owner 02/11: παρολί που κλείνει κερδισμένο μπαίνει από πάνω, μόλις κλείσει (και πριν το ενημερώσει ο server) */
   var L=(typeof BZC!=="undefined"&&BZC)||[],cw=L.filter(cpWon).sort(function(a,b){return cpX(b)-cpX(a);});
-  var h;
-  if(!cw.length&&!wins.length)h='<div class="empty">No wins yet today. Matches are still running.</div>';
+  var h,YW=(typeof YREC!=="undefined"&&YREC&&YREC.yw)||null,useY=!cw.length&&!wins.length&&YW&&(YW.cps.length||YW.tips.length);
+  var wh=$("winsH"),wt=useY?"Our biggest wins yesterday":"Our biggest wins today";if(wh&&wh._t!==wt){wh._t=wt;wh.textContent=(window.__I18N&&__I18N[wt])||wt;}
+  if(useY){
+    /* απόφαση Owner 03/11: το πρωί, μέχρι να έρθουν νίκες σήμερα, δείχνουμε τις χθεσινές (πρώτα τα παρολί) */
+    h=YW.cps.map(function(c){var legs=c.legs.map(function(l,j){return '<div class="bwleg'+(l.v?' cv':'')+'" style="--d:'+(350+j*140)+'ms"><b class="bwtick">'+(l.v?'–':'✓')+'</b><span class="bzm"><b>'+esc(l.h||"")+' – '+esc(l.a||"")+'</b>'+(l.v?'<small><span>Postponed</span></small>':'')+'</span>'+(l.v?'<span class="bzp">–</span><span class="mono bzo">1.00</span>':'<span class="bzp">'+esc(l.sel||"")+'</span><span class="mono bzo">'+(l.p?(+l.p).toFixed(2):"")+'</span>')+'</div>';}).join("");
+      return '<div class="bigwin"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv">'+esc(c.kind)+(c.variant?' · '+esc(BZC_VAR[c.variant]||c.variant):'')+'</span><span class="mono bwodd">x'+(+c.odds).toFixed(2)+'</span></div>'+legs+'</div>';}).join("");
+    if(YW.tips.length)h+='<div>'+YW.tips.map(function(x,i){return '<div class="winrow" style="--d:'+(i*90)+'ms"><span class="wm"><b>'+esc(x.h)+' v '+esc(x.a)+'</b><small>'+esc(x.sel)+(x.sc?' · FT '+esc(x.sc):'')+'</small></span><span class="wo">✓ '+(x.p?(+x.p).toFixed(2):'')+'</span></div>';}).join("")+'</div>';
+  }
+  else if(!cw.length&&!wins.length)h='<div class="empty">No wins yet today. Matches are still running.</div>';
   else{
     h=cw.map(function(c){var legs=c.legs.map(function(l,j){var v=cpVoid(l);return '<div class="bwleg'+(v?' cv':'')+'" style="--d:'+(350+j*140)+'ms"><b class="bwtick">'+(v?'–':'✓')+'</b><span class="bzm"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+esc(l.league||"")+(v?' · <span>Postponed</span>':l.gh!=null?' · '+l.gh+'-'+l.ga:'')+'</small></span>'+(v?'<span class="bzp">–</span><span class="mono bzo">1.00</span>':l.locked?'<span class="bzp vip">VIP</span><span></span>':'<span class="bzp">'+esc(BZC_SEL[l.sel]||l.sel)+'</span><span class="mono bzo">'+(l.price?l.price.toFixed(2):"")+'</span>')+'</div>';}).join("");
       return '<div class="bigwin"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv">'+esc(c.kind)+' · '+esc(BZC_VAR[c.variant]||c.variant)+'</span><span class="mono bwodd">x'+cpX(c).toFixed(2)+'</span></div>'+legs+'</div>';}).join("");
@@ -1484,7 +1491,7 @@ function detailHTML(m){
     +'<span class="hint" style="margin-top:-6px">Table position · last 5, older → newer · line under = home game</span>';
   if(m.p.h||m.p.a){
     var tot=(m.p.h+m.p.x+m.p.a)||1;
-    h+='<div class="mgroup"><span class="glabel">Our model</span><div class="pbar" role="img" aria-label="Home '+m.p.h+'%, draw '+m.p.x+'%, away '+m.p.a+'%"><i class="h" style="width:'+(m.p.h/tot*100)+'%"></i><i class="d" style="width:'+(m.p.x/tot*100)+'%"></i><i class="a" style="width:'+(m.p.a/tot*100)+'%"></i></div>'
+    h+='<div class="mgroup"><span class="glabel">Market chances</span><div class="pbar" role="img" aria-label="Home '+m.p.h+'%, draw '+m.p.x+'%, away '+m.p.a+'%"><i class="h" style="width:'+(m.p.h/tot*100)+'%"></i><i class="d" style="width:'+(m.p.x/tot*100)+'%"></i><i class="a" style="width:'+(m.p.a/tot*100)+'%"></i></div>'
       +'<div class="plegend"><span>1 <b>'+m.p.h+'%</b></span><span>X <b>'+m.p.x+'%</b></span><span>2 <b>'+m.p.a+'%</b></span></div>'
       +(m.capped?'<div class="hint" style="font-size:.72rem">Kept within 5 points of the bookmakers\' price · raw model 1 '+m.pRaw.h+'% · X '+m.pRaw.x+'% · 2 '+m.pRaw.a+'% · O2.5 '+m.pRaw.o25+'%</div>':'')+'<div class="dline"><span>Our score <b style="color:var(--lime)">'+esc(m.bz||"–")+'</b></span><span>Over 2.5 <b>'+m.p.o25+'%</b></span></div></div>';
   if(m.badges.length)h+='<div class="bdglist">'+m.badges.map(function(k){return '<span><i>'+BADGE[k][0]+'</i>'+BADGE[k][1]+'</span>';}).join("")+'</div>';

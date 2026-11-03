@@ -229,9 +229,15 @@ async function stripData(env, lang, tz) {
     const b10 = yc.list.filter((c) => c.result === 1 && (c.odds_now || c.odds) >= 10).sort((a, b) => (b.odds_now || b.odds) - (a.odds_now || a.odds))[0];
     const dlbl = (x) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "long", day: "numeric", month: "numeric" }).format(Date.parse(x + "T12:00:00Z"));
     if (last) last.label = dlbl(last.date);
+    // απόφαση Owner 03/11: το πρωί, μέχρι να έρθουν νίκες σήμερα, «οι μεγαλύτερες νίκες μας χθες» (πρώτα τα παρολί)
+    const ycd = RECC.cps.find((x) => x.date === yday) || yc;
+    const xo = (c) => c.odds_now || c.odds;
+    const yw = { cps: ycd.list.filter((c) => c.result === 1).sort((a, b) => xo(b) - xo(a)).slice(0, 3).map((c) => cp(c, ycd.date)),
+      tips: Y.filter((x) => x.result === 1).sort((a, b) => b.price - a.price).slice(0, 8)
+        .map((x) => ({ h: x.home, a: x.away, sel: SEL[x.sel] || x.sel, p: x.price, sc: x.score ? x.score.join("-") : "" })) };
     return {
       pk: { won: settled.filter((c) => c.result === 1).length, total: settled.length, rows: settled.map((c) => ({ kind: c.kind, odds: c.odds_now || c.odds, r: c.result })) },
-      last, big10: b10 ? cp(b10, yc.date) : null,
+      last, yw, big10: b10 ? cp(b10, yc.date) : null,
       y: { won: Y.filter((x) => x.result === 1).length, total: Y.length, rows: Y.slice(0, 40).map((x) => ({ h: x.home, o: x.price, r: x.result })), big: pack(big(Y)) },
       m: { won: M.filter((x) => x.result === 1).length, total: M.length, label: mLabel, big: pack(big(M)) },
     };
@@ -441,7 +447,7 @@ function matchPage(lang, x) {
   const tipsHtml = x.tips.length ? x.tips.map((y) => y.locked
     ? `<div class="tipc"><div><span class="tip vip">VIP 🔒</span><small>${esc(t.vipLock)}</small></div></div>`
     : `<div class="tipc"><div>${(x.strong || []).includes(y.sel) ? `<span class="strongb">⚡ ${esc(t.strongB)}</span>` : ""}<span class="tip ${y.tier}">${y.tier === "vip" ? "VIP" : "TIP"} <b>${esc(SEL[y.sel] || y.sel)}</b> <i>${y.price.toFixed(2)}</i>${y.result === 1 ? " ✓" : y.result === 0 ? " ✗" : ""}</span>
-       <small>${esc(t.why)}: ${esc(y.reason)} · ${pc(y.prob)}% ${esc(t.chance)}</small></div>
+       <small>${esc(t.why)}: ${esc(y.reason)}</small></div>
        <button class="add" data-fx="${x.id}" data-sel="${esc(y.sel)}" data-price="${y.price}">${esc(t.add)}</button></div>`).join("")
     : `<p class="how">${esc(t.noTipM)}</p>`;
 
