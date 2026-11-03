@@ -157,6 +157,7 @@ input:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visib
 .slipbar .cnt{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:999px;background:var(--lime-ink);color:var(--lime);font-family:var(--f-mono);font-size:.9rem;margin-right:8px}
 .slipbar button[data-empty="true"] .cnt{background:var(--line);color:var(--fg)}
 .slipbar .tot{font-family:var(--f-mono);font-size:.98rem}
+.cpl .cv,.bwleg.cv{opacity:.55}.cpl em{max-width:9em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-height:88%;overflow-y:auto;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:14px 16px calc(18px + env(safe-area-inset-bottom,0px))}
 .sheet-in{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
@@ -1304,7 +1305,10 @@ function legWon(l){if(l.result===1||l.result===2)return true;if(l.result===0)ret
   return ({"1":a>b,"2":a<b,"X":a===b,"U25":a+b<3,"NG":a===0||b===0})[s]||false;}
 function cpWon(c){return c.result===1||(c.legs.length>0&&c.legs.every(legWon));}
 /* παρολί x10+: η κάρτα μένει 20΄΄ και καλεί σε share για credits = απόδοση × 10 (απόφαση Owner) */
-function shareBz(c){var txt="🏆 betizzi "+c.kind+" x"+c.odds.toFixed(2)+" WINNER! ",url="https://betizzi.com";
+/* αναβολή = void (1.00): η απόδοση που πληρώνεται είναι το odds_now του server */
+function cpX(c){return c.odds_now||c.odds;}
+function cpVoid(l){return l.result===2;}
+function shareBz(c){var txt="🏆 betizzi "+c.kind+" x"+cpX(c).toFixed(2)+" WINNER! ",url="https://betizzi.com";
   if(navigator.share){navigator.share({text:txt,url:url}).catch(function(){});return;}
   var ov=document.createElement("div");ov.className="sharebox";
   ov.innerHTML='<div class="sharebox-in"><div class="sharebtns"><a class="btn sec" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url)+'&quote='+encodeURIComponent(txt)+'">Facebook</a><a class="btn sec" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(txt+url)+'">WhatsApp</a><a class="btn sec" target="_blank" rel="noopener" href="https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(txt)+'">Telegram</a><button type="button" class="btn quiet" data-x="1">Close</button></div></div>';
@@ -1316,10 +1320,10 @@ function cbNext(){var c=CBQ.shift();if(!c){CBON=false;return;}CBON=true;showCB(c
 function showCB(c){
   var big=c.odds>=10,closed=false;
   function done(){if(closed)return;closed=true;o.remove();document.body.classList.remove("cshake");setTimeout(cbNext,400);}
-  var cr=c.odds>=50?500:200; /* απόφαση Owner: share νικητήριου παρολί μας = 200 credits, x50 = 500 */
+  var cr=cpX(c)>=50?500:200; /* απόφαση Owner: share νικητήριου παρολί μας = 200 credits, x50 = 500 */
   var o=document.createElement("div");o.className="cbig"+(big?" cbig-long":"");o.setAttribute("role","status");
-  o.innerHTML='<div class="cbig-in cpbig"><span class="cbig-t">🏆 WINNER</span><span class="cbig-m">betizzi · <span>Parlay</span> · '+esc(String(c.kind).replace("-","–"))+'</span><b class="mono">x'+c.odds.toFixed(2)+'</b><div class="cpl">'
-    +c.legs.map(function(l){return '<div><i>✓</i><span>'+esc(l.home||"")+' – '+esc(l.away||"")+'</span><em>'+(l.locked?'VIP':esc(BZC_SEL[l.sel]||l.sel))+'</em></div>';}).join("")+'</div><small>Cash it in!</small>'
+  o.innerHTML='<div class="cbig-in cpbig"><span class="cbig-t">🏆 WINNER</span><span class="cbig-m">betizzi · <span>Parlay</span> · '+esc(String(c.kind).replace("-","–"))+'</span><b class="mono">x'+cpX(c).toFixed(2)+'</b><div class="cpl">'
+    +c.legs.map(function(l){var v=cpVoid(l);return '<div'+(v?' class="cv"':'')+'><i>'+(v?'–':'✓')+'</i><span>'+esc(l.home||"")+' – '+esc(l.away||"")+'</span><em>'+(v?'<span>Postponed</span>':l.locked?'VIP':esc(BZC_SEL[l.sel]||l.sel))+'</em></div>';}).join("")+'</div><small>Cash it in!</small>'
     +('<div class="cbshare"><span><span>Share it with your friends and win</span> <b class="mono">'+cr+'</b> <span>credits</span></span><button type="button" class="btn" data-sh="1">📤 <span>Share</span></button></div><button type="button" class="cbx" data-x="1" aria-label="Close">×</button>')+'</div>';
   document.body.appendChild(o);
   o.style.pointerEvents="auto";o.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;if(b.dataset.sh)shareBz(c);if(b.dataset.x)done();});
@@ -1349,7 +1353,7 @@ function renderClose(){var box=$("closeBox");if(!box)return;var it=[],now=Date.n
   if(!it.length){box.hidden=true;return;}
   var rk={won:0,close:1};it.sort(function(a,b){return rk[a.s]-rk[b.s]||(WONAT[b.k]||0)-(WONAT[a.k]||0);});it=it.slice(0,6);
   var h=it.map(function(x){var jw=fresh.indexOf(x.k)>=0;
-    if(x.cp)return '<div class="clrow won cprow'+(jw?' justwon':'')+'" data-k="'+esc(x.k)+'"><span class="clmin"><b>🏆</b>'+esc(x.cp.kind)+'</span><span class="clm"><b>betizzi · '+esc(BZC_VAR[x.cp.variant]||x.cp.variant)+'</b><small>'+x.cp.legs.length+' ✓</small></span><span class="clst"><span class="mono">x'+x.cp.odds.toFixed(2)+'</span><span class="clbdg">WINNER</span></span></div>';
+    if(x.cp)return '<div class="clrow won cprow'+(jw?' justwon':'')+'" data-k="'+esc(x.k)+'"><span class="clmin"><b>🏆</b>'+esc(x.cp.kind)+'</span><span class="clm"><b>betizzi · '+esc(BZC_VAR[x.cp.variant]||x.cp.variant)+'</b><small>'+x.cp.legs.filter(function(l){return !cpVoid(l);}).length+' ✓</small></span><span class="clst"><span class="mono">x'+cpX(x.cp).toFixed(2)+'</span><span class="clbdg">WINNER</span></span></div>';
     return '<div class="clrow '+x.s+(jw?' justwon':'')+'" data-k="'+esc(x.k)+'"><span class="clmin"><b>'+esc(x.m.score||"0-0")+'</b>'+(x.m.done?'FT':(x.m.min||0)+"'")+'</span><span class="clm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+'</small></span><span class="clst"><span class="mono">'+(x.t.odds?x.t.odds.toFixed(2):'')+'</span>'+(x.s==="won"?'<span class="clbdg">✓ <span>Landed</span></span>':'<span class="clbdg"><span>Close</span></span>')+'</span></div>';}).join("");
   var L=$("closeList");if(L._h!==h||fresh.length){L._h=h;L.innerHTML=h;}box.hidden=false;
   fresh.forEach(function(k){var row=L.querySelector('[data-k="'+k.replace(/"/g,'\\"')+'"]');if(!row)return;
@@ -1361,12 +1365,12 @@ function renderWins(){var box=$("winsSide");if(!box)return;
   var wins=[];MATCHES.forEach(function(m){if(!m.done||m.type==="cancelled")return;m.tips.forEach(function(t){if(t.r===1)wins.push({m:m,t:t});});});
   wins.sort(function(a,b){return (b.t.odds||0)-(a.t.odds||0);});
   /* απόφαση Owner 02/11: παρολί που κλείνει κερδισμένο μπαίνει από πάνω, μόλις κλείσει (και πριν το ενημερώσει ο server) */
-  var L=(typeof BZC!=="undefined"&&BZC)||[],cw=L.filter(cpWon).sort(function(a,b){return b.odds-a.odds;});
+  var L=(typeof BZC!=="undefined"&&BZC)||[],cw=L.filter(cpWon).sort(function(a,b){return cpX(b)-cpX(a);});
   var h;
   if(!cw.length&&!wins.length)h='<div class="empty">No wins yet today. Matches are still running.</div>';
   else{
-    h=cw.map(function(c){var legs=c.legs.map(function(l,j){return '<div class="bwleg" style="--d:'+(350+j*140)+'ms"><b class="bwtick">✓</b><span class="bzm"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+esc(l.league||"")+(l.gh!=null?' · '+l.gh+'-'+l.ga:'')+'</small></span>'+(l.locked?'<span class="bzp vip">VIP</span><span></span>':'<span class="bzp">'+esc(BZC_SEL[l.sel]||l.sel)+'</span><span class="mono bzo">'+(l.price?l.price.toFixed(2):"")+'</span>')+'</div>';}).join("");
-      return '<div class="bigwin"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv">'+esc(c.kind)+' · '+esc(BZC_VAR[c.variant]||c.variant)+'</span><span class="mono bwodd">x'+c.odds.toFixed(2)+'</span></div>'+legs+'</div>';}).join("");
+    h=cw.map(function(c){var legs=c.legs.map(function(l,j){var v=cpVoid(l);return '<div class="bwleg'+(v?' cv':'')+'" style="--d:'+(350+j*140)+'ms"><b class="bwtick">'+(v?'–':'✓')+'</b><span class="bzm"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+esc(l.league||"")+(v?' · <span>Postponed</span>':l.gh!=null?' · '+l.gh+'-'+l.ga:'')+'</small></span>'+(v?'<span class="bzp">–</span><span class="mono bzo">1.00</span>':l.locked?'<span class="bzp vip">VIP</span><span></span>':'<span class="bzp">'+esc(BZC_SEL[l.sel]||l.sel)+'</span><span class="mono bzo">'+(l.price?l.price.toFixed(2):"")+'</span>')+'</div>';}).join("");
+      return '<div class="bigwin"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv">'+esc(c.kind)+' · '+esc(BZC_VAR[c.variant]||c.variant)+'</span><span class="mono bwodd">x'+cpX(c).toFixed(2)+'</span></div>'+legs+'</div>';}).join("");
     var top=wins.slice(0,8);
     if(top.length)h+='<div>'+top.map(function(x,i){return '<div class="winrow" style="--d:'+(i*90)+'ms"><span class="wm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+' · FT '+esc(x.m.score)+'</small></span><span class="wo">✓ '+(x.t.odds?x.t.odds.toFixed(2):'')+'</span></div>';}).join("")+'</div>';
   }

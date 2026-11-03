@@ -262,6 +262,7 @@ export const UI = {
   "Back to the 50 main leagues": ["Πίσω στα 50 βασικά πρωταθλήματα", "Volver a las 50 ligas principales", "Voltar às 50 ligas principais", "Revenir aux 50 ligues principales", "Zurück zu den 50 Hauptligen", "Înapoi la cele 50 de ligi principale", "Nazad na 50 glavnih liga", "Обратно към 50-те основни лиги"],
   "Save": ["Αποθήκευση", "Guardar", "Salvar", "Enregistrer", "Speichern", "Salvează", "Sačuvaj", "Запази"],
   "Saved": ["Αποθηκεύτηκε", "Guardado", "Salvo", "Enregistré", "Gespeichert", "Salvat", "Sačuvano", "Запазено"],
+  "Postponed": ["Αναβλήθηκε", "Aplazado", "Adiado", "Reporté", "Verschoben", "Amânat", "Odložen", "Отложен"],
   "My leagues": ["Τα πρωταθλήματά μου", "Mis ligas", "Minhas ligas", "Mes ligues", "Meine Ligen", "Ligile mele", "Moje lige", "Моите лиги"],
   "Select all": ["Όλα", "Todas", "Todas", "Tout cocher", "Alle wählen", "Toate", "Sve", "Всички"],
   "Unselect all": ["Κανένα", "Ninguna", "Nenhuma", "Tout décocher", "Keine", "Niciuna", "Ništa", "Нито една"],

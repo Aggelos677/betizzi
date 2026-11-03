@@ -349,7 +349,8 @@ export default {
     try {
       if (u.pathname === "/" || u.pathname === "/status") return json(await status(env));
       if (u.pathname === "/api/live") {
-        const r = await env.DB.prepare("SELECT id, status, elapsed, gh, ga FROM fixtures WHERE ts BETWEEN ? AND ? AND status NOT IN ('NS','TBD')").bind(now() - 4 * 3600, now() + 600).all();
+        const r = await env.DB.prepare("SELECT id, status, elapsed, gh, ga FROM fixtures WHERE ts BETWEEN ? AND ? AND status NOT IN ('NS','TBD')").bind(now() - 30 * 3600, now() + 600).all();
+        // 30 ώρες (όχι 4): αν η σελίδα έμεινε ανοιχτή/κοιμισμένη, ο αγώνας που τελείωσε πρέπει να έρθει ως FT και να φύγει από το «live»
         return json(r.results.map((f) => [f.id, f.status, f.elapsed, f.gh, f.ga]));
       }
       if (u.pathname === "/api/goals") {
