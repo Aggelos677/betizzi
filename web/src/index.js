@@ -490,13 +490,14 @@ function matchPage(lang, x) {
     .replace("{tip}", tipTxt).replace("{p1}", pc(md?.p1)).replace("{px}", pc(md?.px)).replace("{p2}", pc(md?.p2)).replace("{o}", pc(md?.over25)).replace("{s}", score)
     .replace(/\s+/g, " ").trim();
   const live = LIVE.has(x.status), done = DONE.has(x.status);
-  const off = x.status === "PST" ? "Postponed" : ["CANC", "ABD"].includes(x.status) ? "Cancelled" : ""; // 04/11
-  const mid = off ? `<span>${off}</span>` : x.score && (live || done) ? `${x.score[0]}–${x.score[1]}` : hm;
+  const ui = (k) => (lang === "en" ? k : (UI[k] && UI[k][UI_ORDER.indexOf(lang)]) || k);
+  const off = x.status === "PST" ? ui("Postponed") : ["CANC", "ABD"].includes(x.status) ? ui("Cancelled") : ""; // 04/11
+  const mid = off ? `<span>${esc(off)}</span>` : x.score && (live || done) ? `${x.score[0]}–${x.score[1]}` : hm;
 
   const anTxt = analysis(lang, x, SEL);
   const tipsHtml = x.tips.length ? x.tips.map((y) => y.locked
     ? `<div class="tipc"><div><span class="tip vip">VIP 🔒</span><small>${esc(t.vipLock)}</small></div></div>`
-    : `<div class="tipc"><div>${(x.strong || []).includes(y.sel) ? `<span class="strongb">⚡ ${esc(t.strongB)}</span>` : ""}<span class="tip ${y.tier}">${y.tier === "vip" ? "VIP" : "TIP"} <b>${esc(SEL[y.sel] || y.sel)}</b> <i>${y.price.toFixed(2)}</i>${y.result === 1 ? " ✓" : y.result === 0 ? " ✗" : ""}</span>${off || y.result === 2 ? ` · <span>Void</span>` : ""}
+    : `<div class="tipc"><div>${(x.strong || []).includes(y.sel) ? `<span class="strongb">⚡ ${esc(t.strongB)}</span>` : ""}<span class="tip ${y.tier}">${y.tier === "vip" ? "VIP" : "TIP"} <b>${esc(SEL[y.sel] || y.sel)}</b> <i>${y.price.toFixed(2)}</i>${y.result === 1 ? " ✓" : y.result === 0 ? " ✗" : ""}</span>${off || y.result === 2 ? ` · <span>${esc(ui("Void"))}</span>` : ""}
        <small>${esc(t.why)}: ${esc(y.reason)}</small></div>
        ${off || live || done ? "" : `<button class="add" data-fx="${x.id}" data-sel="${esc(y.sel)}" data-price="${y.price}">${esc(t.add)}</button>`}</div>`).join("")
     : `<p class="how">${esc(t.noTipM)}</p>`;
@@ -544,7 +545,7 @@ ${alt}
 <main>
 <nav class="bc"><a href="/${lang}/">betizzi</a> › ${esc(x.league.country)} · ${esc(x.league.name)}</nav>
 <h1>${esc(x.home.name)} – ${esc(x.away.name)}: ${esc(t.word)}</h1>
-${off ? `<p class="ans"><b>${off}</b> · <span>Our tips for this match are void.</span></p>` : `<p class="ans">${esc(answer)}</p>`}
+${off ? `<p class="ans"><b>${esc(off)}</b> · <span>${esc(ui("Our tips for this match are void."))}</span></p>` : `<p class="ans">${esc(answer)}</p>`}
 <div class="vs"><div><img src="${esc(x.home.logo)}" alt=""><b>${esc(x.home.name)}</b></div><div class="mid">${mid}${live ? `<div class="min">${esc(x.minute)}'</div>` : ""}</div><div><img src="${esc(x.away.logo)}" alt=""><b>${esc(x.away.name)}</b></div></div>
 ${anTxt ? `<h2>${esc(t.anH)}</h2><p class="an">${esc(anTxt)}</p>` : ""}
 <h2>${esc(t.tips)}</h2><div class="card">${tipsHtml}</div>

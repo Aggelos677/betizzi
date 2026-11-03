@@ -1899,7 +1899,7 @@ function renderPicks(){
   L=L.filter(function(c){if(!parlayLost(c))return true;var k=String(c.n);if(PL_LOST[k]==null)PL_LOST[k]=PL_FIRST?0:plNow;
     if(plNow-PL_LOST[k]<120000){plSoon=true;return true;}plEnded.push(c);return false;});
   PL_FIRST=false;if(plSoon&&!PL_TMR)PL_TMR=setTimeout(function(){PL_TMR=null;try{renderPicks();}catch(e){}},20000);
-  var plEndH=plEnded.length?'<details class="pend"><summary><span>Ended</span> · '+plEnded.length+' <small>(<span>Lost</span>)</small></summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">'+plEnded.map(function(c){return parlayHTML(c,false);}).join("")+'</div></details>':'';
+  var plEndH=plEnded.length?'<details class="pend"><summary><span>Ended</span> · '+plEnded.length+'</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">'+plEnded.map(function(c){return parlayHTML(c,false);}).join("")+'</div></details>':'';
   if($("pkN"))$("pkN").textContent=L.length?"· "+L.length:""; /* απόφαση Owner 02/11: πόσα παρολί «ζουν», όπως στα Μονά */
   var zones=ZORDER.filter(function(z){return L.some(function(c){return c.kind===z;});});
   L.forEach(function(c){if(zones.indexOf(c.kind)<0)zones.push(c.kind);});
