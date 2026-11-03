@@ -1050,6 +1050,8 @@ MATCHES.forEach(function(m){
   var pool=(L>=2.9&&(formGoals==null||formGoals>=3)&&wild.length&&R()<.45)?wild:cand.slice(0,3);
   var sum=pool.reduce(function(a,c){return a+c.p;},0),x=R()*sum;m.bz=pool[0]?pool[0].s:"";
   for(var k=0;k<pool.length;k++){x-=pool[k].p;if(x<=0){m.bz=pool[k].s;break;}}
+  /* απόφαση Owner 03/11: ένα σκορ παντού = το πιθανό σκορ του μοντέλου (ίδιο με σελίδα αγώνα και Google)· το παραπάνω μόνο αν λείπει */
+  if(m.p.score&&/^\d+-\d+$/.test(m.p.score))m.bz=m.p.score;
   m.bzTop=best?best.s:"";
   m.hit=m.done&&m.score&&m.score.replace(/\s/g,"")===m.bz;
 });
