@@ -158,6 +158,7 @@ input:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visib
 .slipbar button[data-empty="true"] .cnt{background:var(--line);color:var(--fg)}
 .slipbar .tot{font-family:var(--f-mono);font-size:.98rem}
 .cpl .cv,.bwleg.cv{opacity:.55}.cpl em{max-width:9em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.m-an{margin:2px 0 8px;line-height:1.55;font-size:.86rem;color:#d9e2da}.m-url{display:inline-block;margin:0 0 10px;color:var(--lime);font-weight:700;font-size:.82rem;text-decoration:none}
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-height:88%;overflow-y:auto;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:14px 16px calc(18px + env(safe-area-inset-bottom,0px))}
 .sheet-in{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
@@ -921,7 +922,7 @@ var MATCHES = RAW.map(function(r){
     o:{h:r[13][0],x:r[13][1],a:r[13][2],o25:r[13][3],u25:r[13][4],gg:r[13][5],ng:r[13][6]},
     p:{h:r[14][0],x:r[14][1],a:r[14][2],o25:r[14][3],score:r[14][4]},
     tips:r[15].map(function(t){return {sel:t[0],odds:t[1],tier:t[2],why:t[3],r:t[5],book:t[7],min:t[9]||0,at:t[10]||""};})};
-  m.bk=r[21]||[];
+  m.bk=r[21]||[];m.an=r[22]||"";m.url=r[23]||"";
   if(r[17])m.min=r[17]; m.live=m.type==="inprogress"; m.done=m.type==="finished"; m.open=m.type==="notstarted";
   return m;
 });
@@ -1460,7 +1461,8 @@ function rowHTML(m){
 }
 function obtn(k){var s=SEL[k];if(!s)return '';return '<button type="button" class="ob" data-key="'+esc(k)+'" aria-pressed="false"'+(s.m.open?'':' disabled')+'><span>'+esc(s.short)+'</span><b>'+s.odd.toFixed(2)+'</b></button>';}
 function detailHTML(m){
-  var h='';
+  /* απόφαση Owner 03/11: σύντομη ανάλυση πάνω-πάνω + link στη σελίδα του αγώνα */
+  var h=(m.an?'<p class="m-an">'+esc(m.an)+'</p>':'')+(m.url?'<a class="m-url" href="'+esc(m.url)+'"><span>All about this match</span> →</a>':'');
   m.tips.forEach(function(t){
     var locked=t.tier==="vip"&&!vipMember&&!t.sel;
     h+='<div class="tipbox'+(t.tier==="vip"?' vip':'')+'"><div class="tiprow">'+tierTag(t)+'<span class="label">Our tip</span>'+resTag(t,m)+'</div>'

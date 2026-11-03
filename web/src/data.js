@@ -12,7 +12,7 @@ export async function getDay(env, date) {
     date,
     coupons: d.coupons || [],
     matches: d.fixtures.map((f) => ({
-      id: f.id, ts: f.ts, status: f.status, minute: f.elapsed, score: f.gh == null ? null : [f.gh, f.ga],
+      id: f.id, ts: f.ts, status: f.status, minute: f.elapsed, score: f.gh == null ? null : [f.gh, f.ga], round: f.round || "",
       league: { id: f.league_id, name: f.league, country: f.country },
       home: { name: f.home, logo: f.home_logo, rank: f.home_rank, form: f.home_form || [], gg: f.home_gg },
       away: { name: f.away, logo: f.away_logo, rank: f.away_rank, form: f.away_form || [], gg: f.away_gg },
@@ -33,10 +33,10 @@ export async function getMatch(env, id) {
   const f = d.fixture;
   const form = (list) => list.map((g) => ({ ts: g.ts, home: !!g.is_home, gf: g.gf, ga: g.ga, res: g.gf > g.ga ? "W" : g.gf < g.ga ? "L" : "D" }));
   return {
-    id: f.id, ts: f.ts, status: f.status, minute: f.elapsed, score: f.gh == null ? null : [f.gh, f.ga],
+    id: f.id, ts: f.ts, status: f.status, minute: f.elapsed, score: f.gh == null ? null : [f.gh, f.ga], round: f.round || "",
     league: { id: f.league_id, name: f.league, country: f.country },
-    home: { name: f.home, logo: f.home_logo, form: form(d.form.home) },
-    away: { name: f.away, logo: f.away_logo, form: form(d.form.away) },
+    home: { name: f.home, logo: f.home_logo, rank: f.home_rank, form: form(d.form.home) },
+    away: { name: f.away, logo: f.away_logo, rank: f.away_rank, form: form(d.form.away) },
     tips: d.tips.filter((t) => t.status !== "withdrawn").map((t) => ({ tier: t.tier, locked: !!t.locked, market: t.market, sel: t.sel, price: t.price, prob: t.prob, reason: t.reason, result: t.result })),
     odds: d.odds, model: d.model,
   };

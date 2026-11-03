@@ -1,5 +1,6 @@
 // betizzi-web: σελίδες έτοιμες από τον server (SSR), μία ανά γλώσσα.
 // Μέχρι το άνοιγμα: noindex παντού (X-Robots-Tag) και robots.txt κλειστό.
+import { analysis } from "./analysis.js";
 import { LANGS, HREFLANG, TZ, LOCALE, T, SEL, UI, UI_ORDER, REC } from "./i18n.js";
 import { TRANSLATOR } from "./translator.js";
 import { getDay, getMatch, getRecord, getCoupons } from "./data.js";
@@ -41,7 +42,7 @@ ul{list-style:none;margin:0;padding:0}
 .teams{text-decoration:none;display:flex;flex-direction:column;gap:3px;min-width:0}.tm{display:flex;gap:6px;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm img{flex:none;border-radius:3px}
 .tips{display:flex;gap:4px;align-items:center}.more{font:700 11px "JetBrains Mono",monospace;color:var(--lime);border:1px solid var(--ln);border-radius:6px;padding:3px 5px}
 .tip{display:inline-block;margin-bottom:6px;font:700 12px "JetBrains Mono",monospace;padding:6px 8px;border-radius:8px;white-space:nowrap}.tip.free{background:var(--lime);color:#0c0f0d}.tip.vip{background:var(--gold);color:#0c0f0d}.tip i{font-style:normal;opacity:.75}
-.how{color:var(--mu)}footer{color:var(--mu);font-size:13px;text-align:center;padding:22px 14px 40px;border-top:1px solid var(--ln);margin-top:20px}
+.how{color:var(--mu)}.an{line-height:1.6;margin:0 0 12px}footer{color:var(--mu);font-size:13px;text-align:center;padding:22px 14px 40px;border-top:1px solid var(--ln);margin-top:20px}
 
 .bc{font-size:13px;color:var(--mu);margin:4px 0}.bc a{text-decoration:none}
 .vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;text-align:center;background:var(--c1);border:1px solid var(--ln);border-radius:12px;padding:14px;margin:10px 0}
@@ -337,7 +338,7 @@ ${alt}
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>
 <style>.ssrh{font:800 1.15rem/1.15 "Fira Sans Extra Condensed",sans-serif;margin:4px 0 2px;text-transform:none;letter-spacing:0}.ssra{font-size:.8rem;color:var(--muted);margin:0 0 8px}
 .mlist .lg h3{margin:0;padding:8px 12px;font-size:.9rem}.mlist .lg ul{list-style:none;margin:0;padding:0}.mlist .m{display:flex;gap:8px;padding:6px 12px}</style>`;
-  const raw = matches.map((x) => rawRow(x, hm));
+  const raw = matches.map((x) => rawRow(x, hm, lang));
   const coupons = (day.coupons || []).map((c) => ({ ...c, legs: c.legs.map((l) => ({ ...l, time: l.ts ? hm(l.ts) : "" })) }));
   const top = TOP.map((id) => groups.get(id)).filter(Boolean).map((g) => g.league.country + "|" + g.league.name);
   let tpl = await template(env, url);
@@ -378,7 +379,7 @@ async function template(env, url) {
 // Μία γραμμή στη μορφή που διαβάζει η εφαρμογή (ίδια με το πρωτότυπο).
 const BOOKS = ["Bet365", "Betano", "Pinnacle", "1xBet", "William Hill"];
 const SELNAME = { "1": "Home", "2": "Away", X: "Draw", O25: "Over 2.5", U25: "Under 2.5", O15: "Over 1.5", O35: "Over 3.5", U35: "Under 3.5", GG: "GG", NG: "NG", "1X": "1X", X2: "X2", "12": "12" };
-function rawRow(x, hm) {
+function rawRow(x, hm, lang) {
   const type = LIVE.has(x.status) ? "inprogress" : DONE.has(x.status) ? "finished" : ["PST", "CANC", "ABD", "AWD", "WO"].includes(x.status) ? "cancelled" : "notstarted";
   const o = x.odds, md = x.model;
   const pc = (v) => (v == null ? null : Math.round(v * 100));
@@ -394,6 +395,8 @@ function rawRow(x, hm) {
     x.status, x.minute || 0, x.home.form, x.away.form,
     { cr: null, yc: null, bts: gg.length ? Math.round((gg.reduce((a, b) => a + b, 0) / gg.length) * 100) : null },
     BOOKS.map((b) => (x.books && x.books[b]) || 0), // [1,X,2,O25,U25,GG,NG] ανά bookmaker, σειρά BOOKS
+    lang ? analysis(lang, x, SEL) : "", // [22] σύντομη ανάλυση (απόφαση Owner 03/11)
+    lang ? matchPath(lang, x) : "", // [23] σελίδα του αγώνα
   ];
 }
 
@@ -420,6 +423,7 @@ function matchPage(lang, x) {
   const live = LIVE.has(x.status), done = DONE.has(x.status);
   const mid = x.score && (live || done) ? `${x.score[0]}–${x.score[1]}` : hm;
 
+  const anTxt = analysis(lang, x, SEL);
   const tipsHtml = x.tips.length ? x.tips.map((y) => y.locked
     ? `<div class="tipc"><div><span class="tip vip">VIP 🔒</span><small>${esc(t.vipLock)}</small></div></div>`
     : `<div class="tipc"><div><span class="tip ${y.tier}">${y.tier === "vip" ? "VIP" : "TIP"} <b>${esc(SEL[y.sel] || y.sel)}</b> <i>${y.price.toFixed(2)}</i>${y.result === 1 ? " ✓" : y.result === 0 ? " ✗" : ""}</span>
@@ -472,6 +476,7 @@ ${alt}
 <h1>${esc(x.home.name)} – ${esc(x.away.name)}: ${esc(t.word)}</h1>
 <p class="ans">${esc(answer)}</p>
 <div class="vs"><div><img src="${esc(x.home.logo)}" alt=""><b>${esc(x.home.name)}</b></div><div class="mid">${mid}${live ? `<div class="min">${esc(x.minute)}'</div>` : ""}</div><div><img src="${esc(x.away.logo)}" alt=""><b>${esc(x.away.name)}</b></div></div>
+${anTxt ? `<h2>${esc(t.anH)}</h2><p class="an">${esc(anTxt)}</p>` : ""}
 <h2>${esc(t.tips)}</h2><div class="card">${tipsHtml}</div>
 ${md ? `<h2>${esc(t.model)}</h2><div class="card">${modelHtml}</div>` : ""}
 <h2>${esc(t.form)}</h2><div class="card">${formRow(x.home)}${formRow(x.away)}</div>
