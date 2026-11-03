@@ -825,7 +825,7 @@ header{position:relative}
       <label class="authc"><input type="checkbox" id="sndAll"> <span>Soft sound: every other goal</span></label>
     </div>
   </header>
-  <div class="appbar" id="appBar" hidden><span class="ab-ic" aria-hidden="true">📲</span><span class="ab-t"><b id="abTxt">Put betizzi on your phone</b><span class="ab-gift">🎁 <b class="mono">+1000</b> <span>credits</span></span></span><button type="button" class="btn" id="abGo">Install</button><button type="button" class="ab-x" id="abX" aria-label="Close">✕</button><ol class="ab-how" id="abHow" hidden></ol></div>
+  <div class="appbar" id="appBar" hidden><span class="ab-ic" aria-hidden="true">📲</span><span class="ab-t"><b id="abTxt">Put betizzi on your phone</b><span class="ab-gift">🎁 <b class="mono">+500</b> <span>credits</span></span></span><button type="button" class="btn" id="abGo">Install</button><button type="button" class="ab-x" id="abX" aria-label="Close">✕</button><ol class="ab-how" id="abHow" hidden></ol></div>
 
   <nav class="tabs" role="tablist" aria-label="Sections">
     <button type="button" class="tab" role="tab" id="tab-tips" aria-controls="view-tips" aria-selected="false">Our picks</button>
@@ -2169,7 +2169,7 @@ function loadVip(){var d=(window.DAYNAV&&DAYNAV.date)||"";fetch("/vip.json"+(d?"
   try{applyBook();}catch(e){}setVip(true);}).catch(function(){});}
 function loadMe(){if(location.protocol==="file:")return;fetch("/me.json",{credentials:"same-origin"}).then(function(r){return r.json();}).then(function(j){ACC=j.user||null;accRender();if(ACC)loadVip();if(ACC&&MYL){renderFilters();renderMatches();}if(window.bzClaim)bzClaim();}).catch(function(){});}
 loadMe();
-/* ---------- Εφαρμογή στο κινητό (PWA) · απόφαση Owner 03/11: +1000 credits μία φορά ---------- */
+/* ---------- Εφαρμογή στο κινητό (PWA) · απόφαση Owner 03/11: +500 credits μία φορά ---------- */
 (function(){
   if(location.protocol==="file:")return;
   if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(function(){});
@@ -2187,7 +2187,7 @@ loadMe();
     var st=ios?(inapp?["Open this page in Safari first"]:[]).concat(["Tap ⋯ at the bottom right, then Share ⬆️ (on older iPhones Share is in the middle)","Tap «Add to Home Screen»","Tap «Add» and open betizzi from the new icon"]):["Open the browser menu ⋮","Tap «Install app» or «Add to Home screen»","Open betizzi from the new icon"];
     var I=window.__I18N||{},hw=$("abHow");hw.innerHTML=st.map(function(x){return "<li>"+esc(I[x]||x)+"</li>";}).join("");hw.hidden=false;$("abGo").hidden=true;});
   function ga(n){try{if(window.gtag)gtag("event",n);}catch(e){}}
-  window.addEventListener("appinstalled",function(){ga("app_install");bar.hidden=true;toast("Open betizzi from your home screen to collect your 1000 credits");});
+  window.addEventListener("appinstalled",function(){ga("app_install");bar.hidden=true;toast("Open betizzi from your home screen to collect your 500 credits");});
   if(!std)return;
   ga("app_open"); /* μέτρηση: πόσοι ανοίγουν το betizzi ως εφαρμογή */
   var tries=0,busy=false;
@@ -2196,7 +2196,7 @@ loadMe();
     if(!ACC){if(closed)return;$("abTxt").textContent=(window.__I18N&&__I18N["Sign in or sign up free to collect your credits"])||"Sign in or sign up free to collect your credits";$("abGo").textContent=(window.__I18N&&__I18N["Sign up free"])||"Sign up free";bar.hidden=false;setTimeout(claim,5000);return;}
     busy=true;fetch("/auth/app",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:"{}"}).then(function(r){return r.json();}).then(function(j){busy=false;
       if(!j||!j.ok)return;try{localStorage.setItem(ck(),"1");}catch(e){}bar.hidden=true;
-      if(j.got){toast("+1000 credits · thanks for installing betizzi!");try{ACC.credits=j.credits;accRender();}catch(e){}}}).catch(function(){busy=false;});}
+      if(j.got){toast("+500 credits · thanks for installing betizzi!");try{ACC.credits=j.credits;accRender();}catch(e){}}}).catch(function(){busy=false;});}
   window.bzClaim=function(){tries=0;claim();};
   setTimeout(claim,2500);
 })();

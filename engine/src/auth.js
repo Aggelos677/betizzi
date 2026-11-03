@@ -7,7 +7,7 @@ import { MAIL, WELCOME } from "./auth-texts.js";
 const now = () => Math.floor(Date.now() / 1000);
 const CODE_TTL = 10 * 60, SESSION_TTL = 90 * 86400, MAX_TRIES = 5;
 const LIMIT = { perEmail15m: 3, perIpHour: 10, perDay: 250 }; // Brevo δωρεάν: 300/μέρα
-export const CREDITS = { signup: 100, visit: 10, app: 1000 }; // app: εγκατάσταση της εφαρμογής (PWA), μία φορά (απόφαση Owner 03/11)            // πίνακας credits (απόφαση Owner 01/11)
+export const CREDITS = { signup: 100, visit: 10, app: 500 }; // app: εγκατάσταση της εφαρμογής (PWA), μία φορά (απόφαση Owner 03/11)            // πίνακας credits (απόφαση Owner 01/11)
 const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i;
 
 async function sha(s) {
@@ -156,7 +156,7 @@ export async function authMe(env, token) {
   return { user: { email: u.email, credits: c.s, since: u.created_at, ref: u.ref_code, tg: !!u.tg_id } };
 }
 
-// POST /auth/app → +1000 credits μία φορά, όταν ο χρήστης ανοίγει το betizzi ως εφαρμογή (PWA) συνδεδεμένος
+// POST /auth/app → +500 credits μία φορά, όταν ο χρήστης ανοίγει το betizzi ως εφαρμογή (PWA) συνδεδεμένος
 export async function authApp(env, token) {
   const u = await userFrom(env, token);
   if (!u) return { error: "login" };
