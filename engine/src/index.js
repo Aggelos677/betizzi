@@ -1,6 +1,8 @@
 // betizzi-engine — μηχανή δεδομένων.
 // Τραβάει αγώνες/αποτελέσματα/live από τα «adapters», βγάζει tips με τους κανόνες του betizzi
 // και τα γράφει στη βάση betizzi-db. Η σελίδα διαβάζει ΜΟΝΟ από τη βάση (/api/...).
+import { makeStrong, apiStrong, strongKeys } from "./strong.js";
+import { aiStrong } from "./ai.js";
 import { makeCoupons, apiCoupons } from "./coupons.js";
 import { authStart, authVerify, authMe, authLogout, authVip } from "./auth.js";
 import { hit, isAdmin, aToday, aUsers, aUserAct, aExport, aPartners, aPartnerSave, aHealth, aAudit, aLeagues, aLeagueSave, aMkt } from "./admin.js";
@@ -230,9 +232,10 @@ async function apiDay(env, date) {
   // VIP: η επιλογή/απόδοση/αιτιολόγηση ΔΕΝ φεύγουν δημόσια μέχρι 10΄ μετά τη σέντρα (μετά φαίνονται για το record).
   // Όταν μπει login, ο συνδεδεμένος χρήστης θα παίρνει πλήρη VIP από ξεχωριστό endpoint.
   const t0 = now();
+  const skDay = (await strongKeys(env, date)).concat(await strongKeys(env, new Date(Date.parse(date + "T00:00:00Z") - 86400000).toISOString().slice(0, 10)));
   const out = tips.results.map((t) => {
     const f = fx.results.find((x) => x.id === t.fixture_id);
-    if (t.tier === "vip" && f && f.ts + VIP_OPEN > t0) return { fixture_id: t.fixture_id, tier: "vip", status: t.status, locked: true };
+    if (t.tier === "vip" && f && f.ts + VIP_OPEN > t0 && !skDay.includes(t.fixture_id + ":" + t.sel)) return { fixture_id: t.fixture_id, tier: "vip", status: t.status, locked: true };
     return t;
   });
   // Για τη σελίδα: αποδόσεις, μοντέλο, φόρμα 5 αγώνων και GG στους 10, για κάθε αγώνα.
@@ -264,7 +267,7 @@ async function apiDay(env, date) {
       f[side + "_gg"] = list.length ? list.filter((r) => r.gf > 0 && r.ga > 0).length / list.length : null;
     }
   }
-  return { date, fixtures: fx.results, tips: out, coupons: await apiCoupons(env, date) };
+  return { date, fixtures: fx.results, tips: out, coupons: await apiCoupons(env, date), strong: await apiStrong(env, date).catch(() => null) };
 }
 
 // Ένας αγώνας: στοιχεία, tips (VIP κρυφό ως τη σέντρα), αποδόσεις, φόρμα 10 αγώνων, πιθανότητες και πιθανό σκορ.
@@ -284,13 +287,15 @@ async function apiMatch(env, id) {
   const f = await env.DB.prepare(`SELECT f.*, l.name league, l.country, h.name home, h.logo home_logo, a.name away, a.logo away_logo
     FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id WHERE f.id=?`).bind(id).first();
   if (!f) return { error: "not found" };
+  // «Τα δυνατά της ημέρας»: τα VIP τους είναι ανοιχτά για όλους (απόφαση Owner 03/11)
+  const sk = await strongKeys(env, new Date(f.ts * 1000).toISOString().slice(0, 10));
   const tips = (await env.DB.prepare("SELECT * FROM tips WHERE fixture_id=? AND status='active'").bind(id).all()).results
-    .map((t) => (t.tier === "vip" && f.ts + VIP_OPEN > now() ? { fixture_id: id, tier: "vip", status: t.status, locked: true } : t));
+    .map((t) => (t.tier === "vip" && f.ts + VIP_OPEN > now() && !sk.includes(t.fixture_id + ":" + t.sel) ? { fixture_id: id, tier: "vip", status: t.status, locked: true } : t));
   const odds = {};
   for (const o of (await env.DB.prepare("SELECT market, sel, price FROM odds WHERE fixture_id=?").bind(id).all()).results) odds[o.sel] = o.price;
   const form = async (team) => (await env.DB.prepare("SELECT fixture_id, ts, is_home, gf, ga FROM results WHERE team_id=? AND ts < ? ORDER BY ts DESC LIMIT 10").bind(team, f.ts).all()).results;
   const model = scoreModel(odds, tips.filter((t) => t.sel));
-  return { fixture: f, tips, odds, form: { home: await form(f.home_id), away: await form(f.away_id) }, model };
+  return { fixture: f, tips, odds, form: { home: await form(f.home_id), away: await form(f.away_id) }, model, strong: sk.filter((k) => k.startsWith(f.id + ":")).map((k) => k.split(":")[1]) };
 }
 
 // Μοντέλο: πιθανότητες από τις αποδόσεις (χωρίς το περιθώριο του bookmaker) και Poisson για το σκορ.
@@ -432,7 +437,7 @@ export default {
           return json({ key_tail: String(env.APIF_KEY || "").slice(-4), plan: j.response?.subscription?.plan, account: j.response?.account?.firstname,
             today: j.response?.requests, per_min_limit: r.headers.get("x-ratelimit-limit"), per_min_left: r.headers.get("x-ratelimit-remaining"), errors: j.errors });
         }
-        const jobs = { coupons: makeCoupons, coupons_dry: (e) => makeCoupons(e, undefined, true), cache: cacheDays, seed: seedLeagues, fixtures: syncFixtures, form: syncForm, odds: syncOdds, live: syncLive, tips: runTips };
+        const jobs = { ai_strong: (e) => aiStrong(e, new Date().toISOString().slice(0, 10)), strong: makeStrong, strong_force: (e) => makeStrong(e, undefined, true), coupons: makeCoupons, coupons_dry: (e) => makeCoupons(e, undefined, true), cache: cacheDays, seed: seedLeagues, fixtures: syncFixtures, form: syncForm, odds: syncOdds, live: syncLive, tips: runTips };
         if (!jobs[job]) return json({ error: "unknown job", jobs: Object.keys(jobs) }, 400);
         return json({ job, result: await jobs[job](env) });
       }
@@ -457,6 +462,8 @@ export default {
     if (m % 2 === 0) tasks.push(cacheDays(env));
     if (h === 6 && m === 50) tasks.push(makeCoupons(env)); // μετά τα tips των 06:40 UTC
     if (h >= 7 && h < 21 && m % 10 === 5) tasks.push(makeCoupons(env)); // συμπληρώνει όσα παρολί λείπουν (νέα tips)
+    if (h >= 6 && h < 14 && m % 10 === 0) tasks.push(makeStrong(env)); // «Τα δυνατά της ημέρας»: βγαίνουν στις 10:00 ώρα Ελλάδας (η ίδια η συνάρτηση περιμένει την ώρα· μία φορά τη μέρα)
+    if (h >= 6 && h < 14 && m % 10 === 3 && env.ANTHROPIC_KEY) tasks.push(aiStrong(env, new Date().toISOString().slice(0, 10))); // AI ανάλυση (EL/EN) για τα δυνατά· γράφει μόνο όσα λείπουν
     ctx.waitUntil(Promise.allSettled(tasks).then(async (r) => {
       const bad = r.filter((x) => x.status === "rejected");
       if (bad.length) await log(env, "cron", false, 0, bad.map((b) => String(b.reason)).join(" | "));

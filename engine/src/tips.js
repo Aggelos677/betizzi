@@ -1,7 +1,7 @@
 // Κανόνες tips betizzi (01/11/2026). Όλα τα όρια εδώ, σε ένα σημείο.
 // Ομάδες που δεν παίρνουν ποτέ tip/κουπόνι (κανόνας λιγκών): Β ομάδες, reserves, νέοι, γυναικείες.
 export const NOT_FIRST_TEAM = /(^Jong | II$| III$| B$| C$|\bU-?(1[6-9]|2[0-3])\b|\bReserves?\b|\(W\)| W$|\bWomen\b|\bYouth\b)/i;
-export const MODEL_VERSION = "rules-2026-11-02c";
+export const MODEL_VERSION = "rules-2026-11-03";
 async function sha256(s) {
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
@@ -15,14 +15,15 @@ export const RULES = {
   vipFill: 0.90,            // VIP συμπλήρωση: δυνατό tip (A/B) με τιμή έως 10% κάτω από τον «πάτο» του VIP
   free: { min: 1.40, max: 4.00 },
   freeBelowVip: 0.97,       // απόφαση Owner 01/11: το Free θέλει τιμή έως 3% κάτω από τον «πάτο» του VIP
-  vip: { max: 3.50, floor: 1.50 },
+  // απόφαση Owner 03/11: όρια VIP −0.10 (πάτωμα 1.45) και ανώτατο 2.60 (τα πάνω από 2.60 έχαναν: 3–6, ROI −5%)
+  vip: { max: 2.60, floor: 1.45 },
   vipTarget: {              // ελάχιστη απόδοση VIP ανά ισχύ σήματος (7..10 στα 10)
-    O25: { 7: 2.00, 8: 1.80, 9: 1.60, 10: 1.50 },
-    U25: { 7: 2.10, 8: 1.90, 9: 1.70, 10: 1.55 },
-    GG:  { 7: 1.90, 8: 1.70, 9: 1.50, 10: 1.50 },
-    NG:  { 7: 2.20, 8: 2.00, 9: 1.80, 10: 1.65 },
+    O25: { 7: 1.90, 8: 1.70, 9: 1.50, 10: 1.45 },
+    U25: { 7: 2.00, 8: 1.80, 9: 1.60, 10: 1.50 },
+    GG:  { 7: 1.80, 8: 1.60, 9: 1.45, 10: 1.45 },
+    NG:  { 7: 2.10, 8: 1.90, 9: 1.70, 10: 1.60 },
   },
-  vipTarget12: (side, diff) => diff >= 10 ? (side === "1" ? 1.55 : 1.80) : diff >= 8 ? (side === "1" ? 1.75 : 2.00) : (side === "1" ? 2.00 : 2.25),
+  vipTarget12: (side, diff) => diff >= 10 ? (side === "1" ? 1.45 : 1.70) : diff >= 8 ? (side === "1" ? 1.65 : 1.90) : (side === "1" ? 1.90 : 2.15),
   groupShare: { RES: 0.4, GOALS: 0.4, BTTS: 0.2 },
   maxPerMatch: 2,
   // Free (απόφαση Owner 02/11, ισχύουν όταν υπάρχουν αρκετές επιλογές): λίγα «ψηλά» 2.60–4.00 (έως 5%),
@@ -95,7 +96,7 @@ export async function makeTips(env, now) {
       }
     }
     const px = o["X"];
-    if (px && dr >= 7 && px >= 3.20 && px <= 3.50) cands.push({ f, k: "X", s: dr, p: px, vip: true, fl: 3.20, fmin: 3.10, level: "A", prob: prob["X"], why: `${dr}/10 draws` });
+    if (px && dr >= 7 && px >= 3.20 && px <= 3.50) cands.push({ f, k: "X", s: dr, p: px, vip: px <= RULES.vip.max, /* 03/11: πάνω από 2.60 όχι VIP */ fl: 3.20, fmin: 3.10, level: "A", prob: prob["X"], why: `${dr}/10 draws` });
     else if (px && Math.abs(hp - ap) <= 1 && dr >= 4 && px >= 3.25) cands.push({ f, k: "X", s: dr, p: px, vip: false, fl: 3.25, fmin: 3.25, level: "A", prob: prob["X"], why: `${dr}/10 draws` });
   }
 
