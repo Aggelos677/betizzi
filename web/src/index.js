@@ -325,7 +325,8 @@ async function todayPage(env, lang, url) {
       ? `<span class="sc${live ? " lv" : ""}">${x.score[0]}–${x.score[1]}</span>`
       : `<time datetime="${new Date(x.ts * 1000).toISOString()}">${hm(x.ts)}</time>`;
     const st = live ? `<span class="min">${x.status === "HT" ? "HT" : esc(x.minute) + "'"}</span>` : done ? `<span class="min">${t.ft}</span>` : "";
-    const team = (s) => `<span class="tm"><img src="${esc(s.logo)}" alt="" width="18" height="18" loading="lazy" decoding="async">${esc(s.name)}</span>`;
+    // 03/11: χωρίς λογότυπα στη λίστα της αρχικής (δεν φαίνεται στον επισκέπτη, ήταν ~3,8 MB ανά επίσκεψη)
+    const team = (s) => `<span class="tm">${esc(s.name)}</span>`;
     return `<li class="m${x.tips.length ? " has" : ""}"><div class="t">${mid}${st}</div><a class="teams" href="${matchPath(lang, x)}">${team(x.home)}${team(x.away)}</a><div class="tips">${topTip(x.tips)}</div></li>`;
   };
 
