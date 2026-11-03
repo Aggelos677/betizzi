@@ -85,8 +85,14 @@ export default {
       // Τα live σκορ έρχονται έτσι κι αλλιώς από το /live.json κάθε 30΄΄.
       const dq = url.searchParams.get("d") || "";
       const key = m[1] + (url.searchParams.has("demo") ? "?demo" : "") + (dq ? "|" + dq : "");
-      const hit = PAGES.get(key), age = hit ? Date.now() - hit.t : Infinity;
-      const build = () => todayPage(env, m[1], url).then((b) => { PAGES.set(key, { t: Date.now(), b }); return b; });
+      // 2ο επίπεδο (03/11): κοινή cache του Cloudflare, για να μη χτίζεται η σελίδα από την αρχή σε κάθε νέο «αντίγραφο» του worker (αργή πρώτη φόρτωση)
+      const ck = new Request("https://betizzi.com/__page/" + encodeURIComponent(key));
+      let hit = PAGES.get(key);
+      if (!hit) { try { const r = await caches.default.match(ck); if (r) { hit = { t: +r.headers.get("x-t"), b: await r.text() }; PAGES.set(key, hit); } } catch (e) {} }
+      const age = hit ? Date.now() - hit.t : Infinity;
+      const build = () => todayPage(env, m[1], url).then((b) => { const t = Date.now(); PAGES.set(key, { t, b });
+        try { ctx.waitUntil(caches.default.put(ck, new Response(b, { headers: { "x-t": String(t), "cache-control": "public, max-age=900" } }))); } catch (e) {}
+        return b; });
       const a21 = age21(req, m[1]);
       if (hit && age < 60000) return html(hit.b, 200, a21);
       if (hit && age < 15 * 60000) { ctx.waitUntil(build().catch(() => {})); return html(hit.b, 200, a21); }
