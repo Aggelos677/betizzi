@@ -1454,6 +1454,10 @@ function renderWins(){var box=$("winsSide");if(!box)return;
     var top=wins.slice(0,8);
     if(top.length)h+='<div>'+top.map(function(x,i){return '<div class="winrow" style="--d:'+(i*90)+'ms"><span class="wm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+' · FT '+esc(x.m.score)+'</small></span><span class="wo">✓ '+(x.t.odds?x.t.odds.toFixed(2):'')+'</span></div>';}).join("")+'</div>';
   }
+  /* απόφαση Owner 04/11: στις μεγαλύτερες νίκες πάντα και παρολί· αν δεν κέρδισε κανένα σήμερα/χθες, το τελευταίο που κέρδισε, με ημερομηνία */
+  var LW=(typeof YREC!=="undefined"&&YREC&&YREC.last)||null,hasCp=cw.length||(useY&&YW.cps.length);
+  if(LW&&!hasCp){var LL=LW.legs||[],lg=LL.slice(0,4).map(function(l,j){return '<div class="bwleg'+(l.v?' cv':'')+'" style="--d:'+(350+j*140)+'ms"><b class="bwtick">'+(l.v?'–':'✓')+'</b><span class="bzm"><b>'+esc(l.h||"")+' – '+esc(l.a||"")+'</b>'+(l.v?'<small><span>Postponed</span></small>':'<small>'+esc(l.sel||"")+'</small>')+'</span>'+(l.v?'<span class="bzp"><s>'+(l.p?(+l.p).toFixed(2):'')+'</s> 1.00</span>':'<span class="bzp mono">'+(l.p?(+l.p).toFixed(2):'')+'</span>')+'</div>';}).join("");
+    h='<div class="bigwin bwlast"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv"><span>Last parlay that won</span> · '+esc(LW.label||LW.date||"")+'</span><span class="mono bwodd">x'+(+LW.odds).toFixed(2)+'</span></div>'+lg+(LL.length>4?'<div class="bwleg" style="--d:950ms;display:block;color:var(--muted)">+'+(LL.length-4)+' <span>picks</span></div>':'')+'</div>'+(h||"");}
   if(box._h===h)return;box._h=h;box.innerHTML=h;}
 if(window.matchMedia){var _sm=window.matchMedia("(min-width:1100px)");var _sf=function(){renderSide();try{renderPicks();}catch(e){}};if(_sm.addEventListener)_sm.addEventListener("change",_sf);else if(_sm.addListener)_sm.addListener(_sf);}
 
