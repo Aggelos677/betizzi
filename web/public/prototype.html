@@ -558,6 +558,12 @@ header{position:relative}
 .langs a{color:var(--muted);text-decoration:none;padding:5px 7px;border:1px solid var(--line);border-radius:7px;min-height:30px;display:inline-flex;align-items:center}
 .langs a:hover{color:var(--fg)}
 .langs a[aria-current]{color:var(--lime);border-color:var(--lime)}
+.langdd{position:relative}.langdd>summary{list-style:none;cursor:pointer;min-height:44px;min-width:56px;padding:0 10px;border:1px solid var(--line);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:4px;font:700 .8rem var(--f-mono);color:var(--fg);background:var(--panel)}
+.langdd>summary::-webkit-details-marker{display:none}.langdd[open]>summary{border-color:var(--lime);color:var(--lime)}
+.langdd .langs{position:absolute!important;top:calc(100% + 6px)!important;right:0!important;z-index:45;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);width:max-content}
+.langdd .langs a{min-height:40px;justify-content:center;padding:0 12px}
+@media (max-width:767px){header .vp{display:none}.hdrbtns .langdd{position:absolute;top:-50px;right:0}.langdd>summary{min-height:36px;padding:0 12px}}
+.legend .lg-tap{color:var(--muted)}
 @media (min-width:768px){.langs{position:absolute;top:20px;right:0}}
 /* Κοντά στη νίκη (πάνω δεξιά) */
 .closebox{border-color:rgba(60,207,110,.45)}
@@ -871,7 +877,7 @@ header{position:relative}
 </div>
 <div class="wrap app" lang="en">
   <header>
-    <span class="label">Smart football tips · <span id="today"></span></span>
+    <span class="label"><span id="today"></span></span>
     <h1 class="logo"><a class="logoa" href="./" aria-label="betizzi · Home"><span class="lb" aria-hidden="true">bet</span><span class="li" aria-hidden="true"><span class="i">&#305;<b><svg viewBox="-10 -10 20 20"><circle r="9.2" fill="#fff" stroke="#0c0f0d" stroke-width="1"/><polygon points="0,-3.6 3.4,-1.1 2.1,2.9 -2.1,2.9 -3.4,-1.1" fill="#0c0f0d"/><path d="M0,-3.6V-9M3.4,-1.1L8.6,-2.8M2.1,2.9L5.3,7.3M-2.1,2.9L-5.3,7.3M-3.4,-1.1L-8.6,-2.8" stroke="#0c0f0d" stroke-width="1.1"/></svg></b></span>zz<span class="i">&#305;<b><svg viewBox="-10 -10 20 20"><circle r="9.2" fill="#fff" stroke="#0c0f0d" stroke-width="1"/><polygon points="0,-3.6 3.4,-1.1 2.1,2.9 -2.1,2.9 -3.4,-1.1" fill="#0c0f0d"/><path d="M0,-3.6V-9M3.4,-1.1L8.6,-2.8M2.1,2.9L5.3,7.3M-2.1,2.9L-5.3,7.3M-3.4,-1.1L-8.6,-2.8" stroke="#0c0f0d" stroke-width="1.1"/></svg></b></span></span></a></h1>
     <p class="vp">Free football tips · ready-made coupons · build your own slip</p>
     <!--datanote-->
@@ -895,8 +901,7 @@ header{position:relative}
     <div class="frows"><div class="hscroll" id="mFilter" role="group" aria-label="Day"></div><div class="daystrip" id="dayStrip" hidden></div><div class="hscroll" id="lFilter" role="group" aria-label="Leagues"></div></div>
     <div class="demorow"><button type="button" class="btn sec" id="demoSmall">⚽ Goal</button><button type="button" class="btn sec" id="demoGoal">💰 Goal lands tip</button><button type="button" class="btn sec" id="demoFT">🏁 Win at full time</button><button type="button" class="btn sec" id="demoCp">🏆 Coupon wins</button><button type="button" class="btn sec" id="demoCalled">🎯 Called it</button></div>
     <input class="search" id="q" type="search" placeholder="Search team or league" aria-label="Search team or league">
-    <div class="legend"><span>Last 5, older → newer:</span><span><span class="fb"><i class="fW"></i></span> Win</span><span><span class="fb"><i class="fD"></i></span> Draw</span><span><span class="fb"><i class="fL"></i></span> Loss</span></div>
-    <p class="hint" style="margin:0">Tap a tip to add it to your slip. Tap the row for table position, form, our model, odds, absences and news.</p>
+    <div class="legend"><span><span class="fb"><i class="fW"></i></span> Win</span><span><span class="fb"><i class="fD"></i></span> Draw</span><span><span class="fb"><i class="fL"></i></span> Loss</span><span class="lg-tap">· <span>Tap a tip → your slip</span></span></div>
     <div class="mlist" id="matchList"></div>
   </div>
 
@@ -1007,6 +1012,15 @@ var MATCHES = RAW.map(function(r){
 MATCHES.sort(function(a,b){return topIx(a.key)-topIx(b.key)||a.key.localeCompare(b.key)||((a.ts&&b.ts)?a.ts-b.ts:a.time.localeCompare(b.time));});
 /* keep our numbers close to the market: the model may differ from the bookmakers fair price by at most 5 points */
 var MAXGAP=.05;
+/* απόφαση Owner 04/11: οι ώρες στην ώρα του κινητού/υπολογιστή του επισκέπτη (όχι της χώρας της γλώσσας).
+   Ημέρα μπροστά όταν η τοπική μέρα είναι άλλη από τη μέρα της σελίδας. Ο server (Google) μένει στην ώρα της γλώσσας. */
+var LOCL=document.documentElement.lang||"en";
+function locYmd(t){var d=new Date(t*1000);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function locT(ts,fb){if(!ts)return fb||"";try{var d=new Date(ts*1000),pg=(typeof DAYNAV!=="undefined"&&DAYNAV&&!DAYNAV.all&&DAYNAV.date)||locYmd(Date.now()/1000);
+  var hm=new Intl.DateTimeFormat(LOCL,{hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(d);
+  return (locYmd(ts)!==pg?new Intl.DateTimeFormat(LOCL,{weekday:"short"}).format(d)+" ":"")+hm;}catch(e){return fb||"";}}
+MATCHES.forEach(function(m){if(m.ts)m.time=locT(m.ts,m.time);});
+try{if(typeof BZC!=="undefined"&&BZC)BZC.forEach(function(c){(c.legs||[]).forEach(function(l){if(l.ts)l.time=locT(l.ts,l.time);});});}catch(e){}
 MATCHES.forEach(function(m){
   m.pRaw={h:m.p.h,x:m.p.x,a:m.p.a,o25:m.p.o25};m.capped=false;
   function cl(v,mk){var d=v-mk;if(Math.abs(d)>MAXGAP){m.capped=true;return mk+(d>0?MAXGAP:-MAXGAP);}return v;}
@@ -1894,6 +1908,7 @@ function tipCard(m,t){
 }
 /* έτοιμα κουπόνια του betizzi (βγαίνουν από τον server μία φορά τη μέρα) */
 if(typeof BZS==="undefined")var BZS=null;
+try{if(BZS)[BZS.win,BZS.goals].concat(BZS.treble?BZS.treble.legs:[]).forEach(function(c){if(c&&c.ts)c.time=locT(c.ts,c.time);});}catch(e){}
 var STRONG_IDS=(function(){var s={};if(BZS){[BZS.win,BZS.goals].concat(BZS.treble?BZS.treble.legs:[]).forEach(function(c){if(c)s[c.id+":"+c.sel]=1;});}return s;})();
 var BZC_SEL={"1":"1","2":"2","X":"X","O25":"Over 2.5","U25":"Under 2.5","O15":"Over 1.5","GG":"GG","NG":"NG"};
 var BZC_VAR={wins:"Wins",goals:"Goals",mix:"Parlay",ucl:"Champions League",uel:"Europa League"};
@@ -2012,7 +2027,7 @@ function renderStrong(){var box=$("strongBox");if(!box)return;
     sgBind(box);bindButtons(box);syncPressed();
     /* 10:00 ώρα Ελλάδας → στην ώρα της γλώσσας της σελίδας */
     setTimeout(function(){try{var TZL={en:"Europe/London",el:"Europe/Athens",es:"Europe/Madrid",pt:"America/Sao_Paulo",fr:"Europe/Paris",de:"Europe/Berlin",ro:"Europe/Bucharest",sr:"Europe/Belgrade",bg:"Europe/Sofia"};
-      var lg=(document.documentElement.lang||"en").slice(0,2),tz=TZL[lg]||"Europe/Athens",now=new Date(),off=function(z){var p=new Intl.DateTimeFormat("en-GB",{timeZone:z,hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(now).split(":");return +p[0]*60+ +p[1];};
+      var tz=Intl.DateTimeFormat().resolvedOptions().timeZone||"Europe/Athens",now=new Date(),off=function(z){var p=new Intl.DateTimeFormat("en-GB",{timeZone:z,hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(now).split(":");return +p[0]*60+ +p[1];};
       var d=((off(tz)-off("Europe/Athens"))%1440+1440)%1440;if(d>720)d-=1440;var mn=600+d,hh=(Math.floor(((mn%1440)+1440)%1440/60)+"").padStart(2,"0"),mm=((mn%60+60)%60+"").padStart(2,"0");
       var el=$("stbAt");if(el&&d)el.textContent=el.textContent.replace("10:00",hh+":"+mm);}catch(e){}},50);
     return;}

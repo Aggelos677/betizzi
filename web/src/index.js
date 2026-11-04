@@ -458,7 +458,8 @@ async function todayPage(env, lang, url) {
   ];
   const langNav = LANGS.map((l) => `<a href="/${l}/" hreflang="${HREFLANG[l]}"${l === lang ? ' aria-current="page"' : ""}>${l.toUpperCase()}</a>`).join("");
 
-  const ssr = `<h1 class="ssrh">${esc(title)}</h1><p class="ssra">${esc(answer)}</p>`;
+  // απόφαση Owner 04/11: ένα σύντομο κείμενο (ημερομηνία, αριθμοί, δυνατά) αντί για δύο· το πλήρες «answer» μένει στο schema
+  const ssr = `<h1 class="ssrh">${esc(title)}</h1>`;
   const head = `<title>${esc(title)} — ${esc(dLong)} | betizzi</title>
 <meta name="description" content="${esc(t.desc)}">
 <link rel="canonical" href="${canonical}">
@@ -485,8 +486,8 @@ ${matches.length ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
   const S2 = BZS ? null : (cdays[0] && cdays[0].strong) || null;
   const LS = BZS || (S2 && { win: S2.win, goals: S2.goals, treble: S2.treble });
   const dS = BZS ? dLong : new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(Date.parse(today + "T12:00:00Z"));
-  const sLine = LS && t.strongS ? t.strongS.replace("{d}", dS).replace("{list}", [LS.win, LS.goals].filter(Boolean)
-    .map((c) => `${SEL[c.sel] || c.sel} ${c.home} – ${c.away} (${Number(c.price).toFixed(2)})`).concat(LS.treble ? [`${t.treble} x${Number(LS.treble.odds).toFixed(2)}`] : []).join("; ")) : "";
+  const sLine = LS && t.strongK ? (t.strongK + (BZS ? "" : " (" + dS + ")") + " " + "{list}").replace("{list}", [LS.win, LS.goals].filter(Boolean)
+    .map((c) => `${SEL[c.sel] || c.sel} ${c.home} – ${c.away} (${Number(c.price).toFixed(2)})`).concat(LS.treble ? [`${t.treble} x${Number(LS.treble.odds).toFixed(2)}`] : []).join(" · ")) : "";
   const coupons = (day.coupons || []).map((c) => ({ ...c, legs: c.legs.map((l) => ({ ...l, time: l.ts ? hm(l.ts) : "" })) }));
   // και οι μεγάλες λίγκες των επόμενων ημερών, για να μετράνε σωστά «Top»/«Τα πρωταθλήματά μου» στο «Αύριο»
   const top = TOP.map((id) => (groups.get(id) ? groups.get(id).league.country + "|" + groups.get(id).league.name : cTop.get(id))).filter(Boolean);
@@ -495,14 +496,16 @@ ${matches.length ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
     .replace(/<title>[\s\S]*?<\/title>/, () => head)
     .replace(/var RAW = \[[\s\S]*?\];\n/, () => "var RAW = " + JSON.stringify(raw).replace(/</g, "\\u003c") + ";\n")
     .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav, all: allDays, cnt: dayCnt }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";var BZS = " + JSON.stringify(BZS).replace(/</g, "\\u003c") + ";")
-    .replace('<div class="hscroll" id="mFilter"', () => ssr + (sLine ? `<p class="ssra">${esc(sLine)}</p>` : "") + '<div class="hscroll" id="mFilter"')
+    .replace('<div class="hscroll" id="mFilter"', () => ssr + `<p class="ssra">${esc(t.short(dLong, matches.length, tipsFree, tipsVip) + (sLine ? " " + sLine : ""))}</p>` + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml)
-    .replace("<!--datanote-->", () => `<nav class="langs" aria-label="Language">${langNav}</nav>`)
+    .replace("<!--datanote-->", "")
+    // απόφαση Owner 04/11: γλώσσες σε κουμπί «EN ▾» πάνω δεξιά (οι σύνδεσμοι μένουν στο HTML για τη Google)
+    .replace('<div class="hdrbtns">', () => `<div class="hdrbtns"><details class="langdd"><summary aria-label="Language">${lang.toUpperCase()} ▾</summary><nav class="langs" aria-label="Language">${langNav}</nav></details>`)
     .replace("<!--footlinks-->", () => `<p class="footl" style="margin:0;opacity:.7;font-size:.8rem;line-height:1.9">${footLinks(lang, ' style="color:inherit"')}</p>`);
   // μετάφραση της εφαρμογής + σωστή ημερομηνία στη γλώσσα της σελίδας
-  const dShort = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "long", day: "numeric", month: "long" }).format(noon);
-  tpl = tpl.replace('"today").textContent="Sunday 1 November"', () => '"today").textContent=' + JSON.stringify(dShort + " · " + TZNOTE[lang]));
-  tpl = tpl.replace('<span id="today"></span>', () => '<span id="today">' + esc(dShort + " · " + TZNOTE[lang]) + "</span>");
+  const dShort = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "short", day: "numeric", month: "short" }).format(noon);
+  tpl = tpl.replace('"today").textContent="Sunday 1 November"', () => '"today").textContent=' + JSON.stringify(dShort));
+  tpl = tpl.replace('<span id="today"></span>', () => '<span id="today">' + esc(dShort) + "</span>");
   if (lang !== "en") {
     const i = UI_ORDER.indexOf(lang), dict = {};
     for (const k in UI) dict[k] = UI[k][i];
