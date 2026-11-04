@@ -23,8 +23,26 @@ async function sha(s) {
 
 export async function makeStrong(env, date = ymd(now()), force = false) {
   await env.DB.prepare("CREATE TABLE IF NOT EXISTS strong(date TEXT PRIMARY KEY, data TEXT, created_at INTEGER, model_version TEXT, hash TEXT)").run();
-  if ((await env.DB.prepare("SELECT 1 FROM strong WHERE date=?").bind(date).first()) && !force) return { ok: true, exists: true };
   const to = athEnd(date), from = to - DAY; // μέρα Ελλάδας (04/11: αγώνας 01:30 Ελλάδας δεν είναι «σημερινός»)
+  const ex = await env.DB.prepare("SELECT data, created_at, model_version, hash FROM strong WHERE date=?").bind(date).first();
+  // Απόφαση Owner 04/11: αν μια κάρτα έχει αγώνα ΕΚΤΟΣ μέρας Ελλάδας (βγήκε πριν τον κανόνα), αντικαθίσταται μία φορά
+  // από τα αμέσως επόμενα tips του κανόνα. Οι σωστές κάρτες μένουν ίδιες. Τα παλιά tips μετράνε κανονικά ως tips (όχι ως «δυνατά»).
+  // Το παλιό σετ κρατιέται στον πίνακα strong_log (τίποτα δεν σβήνεται).
+  let keep = null;
+  if (ex && !force) {
+    const d0 = JSON.parse(ex.data);
+    if (d0.fixed) return { ok: true, exists: true };
+    const legs0 = [d0.win, d0.goals, ...(d0.treble ? d0.treble.legs : [])].filter(Boolean), ids0 = [...new Set(legs0.map((x) => x.f))];
+    const ts0 = {};
+    if (ids0.length) for (const f of (await env.DB.prepare(`SELECT id, ts FROM fixtures WHERE id IN (${ids0.map(() => "?").join(",")})`).bind(...ids0).all()).results) ts0[f.id] = f.ts;
+    const out = (x) => x && (ts0[x.f] == null || ts0[x.f] < from || ts0[x.f] >= to);
+    const badT = d0.treble && d0.treble.legs.some(out);
+    if (!out(d0.win) && !out(d0.goals) && !badT) return { ok: true, exists: true };
+    keep = { win: out(d0.win) ? null : d0.win, goals: out(d0.goals) ? null : d0.goals, treble: badT ? null : d0.treble };
+    await env.DB.prepare("CREATE TABLE IF NOT EXISTS strong_log(date TEXT, data TEXT, created_at INTEGER, model_version TEXT, hash TEXT, replaced_at INTEGER, reason TEXT)").run();
+    await env.DB.prepare("INSERT INTO strong_log(date, data, created_at, model_version, hash, replaced_at, reason) VALUES(?,?,?,?,?,?,?)")
+      .bind(date, ex.data, ex.created_at, ex.model_version, ex.hash, now(), "card outside the Athens day (Owner 04/11)").run();
+  }
   const start = Math.max(now() + 45 * 60, from);
   const rows = (await env.DB.prepare(`SELECT t.fixture_id f, t.sel, t.price, t.prob, t.tier, t.level, t.strength s, f.ts, l.tier lt, h.name hn, a.name an
       FROM tips t JOIN fixtures f ON f.id=t.fixture_id JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id
@@ -39,8 +57,11 @@ export async function makeStrong(env, date = ymd(now()), force = false) {
     return null;
   };
   // απόφαση Owner 03/11: οι δύο κάρτες «μονών» (Νίκη, Γκολ) σε απόδοση 1.60–1.85
-  const win = pick((x) => (x.sel === "1" || x.sel === "2") && x.price >= 1.6 && x.price <= 1.85);
-  const goals = pick((x) => (x.sel === "O25" || x.sel === "GG") && x.price >= 1.6 && x.price <= 1.85);
+  const kept = (c) => c && { f: c.f, sel: c.sel, price: c.price, prob: c.prob, tier: c.tier };
+  if (keep) for (const c of [keep.win, keep.goals, ...(keep.treble ? keep.treble.legs : [])].filter(Boolean)) used.add(c.f);
+  const win = keep && keep.win ? kept(keep.win) : pick((x) => (x.sel === "1" || x.sel === "2") && x.price >= 1.6 && x.price <= 1.85);
+  const goals = keep && keep.goals ? kept(keep.goals) : pick((x) => (x.sel === "O25" || x.sel === "GG") && x.price >= 1.6 && x.price <= 1.85);
+  if (keep && keep.treble) for (const c of keep.treble.legs) used.delete(c.f);
   const treble = [];
   // απόφαση Owner 03/11: κάθε επιλογή της τριάδας 1.50–1.80
   // ... και μπορεί να πάρει το πολύ ΕΝΑ από τα δύο «μονά» (Νίκη/Γκολ) της ημέρας
@@ -55,10 +76,11 @@ export async function makeStrong(env, date = ymd(now()), force = false) {
     inT.add(x.f); treble.push(x);
   }
   // όχι πριν τις 10:00 ώρα Ελλάδας (εκτός αν το ζητήσει ο Owner με force)
-  if (!force && athH() < 10) return { ok: false, wait: true };
+  if (!force && !keep && athH() < 10) return { ok: false, wait: true };
   if (!win && !goals && treble.length < 3) return { ok: false, empty: true };
   const leg = (x) => x && { f: x.f, sel: x.sel, price: x.price, prob: x.prob, tier: x.tier };
-  const data = { win: leg(win), goals: leg(goals), treble: treble.length === 3 ? { legs: treble.map(leg), odds: +treble.reduce((q, x) => q * x.price, 1).toFixed(2) } : null };
+  const data = { win: leg(win), goals: leg(goals), treble: keep && keep.treble ? keep.treble : treble.length === 3 ? { legs: treble.map(leg), odds: +treble.reduce((q, x) => q * x.price, 1).toFixed(2) } : null };
+  if (keep) data.fixed = now(); // αντικατάσταση μία φορά (απόφαση Owner 04/11)
   const js = JSON.stringify(data), t = now();
   await env.DB.prepare("INSERT OR REPLACE INTO strong(date, data, created_at, model_version, hash) VALUES(?,?,?,?,?)")
     .bind(date, js, t, MODEL_VERSION, await sha(date + js + t)).run();
