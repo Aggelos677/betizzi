@@ -59,6 +59,10 @@ table{width:100%;border-collapse:collapse;font:500 14px "JetBrains Mono",monospa
 .frow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0}.frow .tm{min-width:0}
 `;
 
+// Απόφαση Owner 04/11 (Α): η «μέρα» αλλάζει για ΟΛΕΣ τις γλώσσες στα μεσάνυχτα ώρας Ελλάδας (ίδιοι αγώνες, ίδιο «χθες», ίδιο Record).
+// Οι ώρες των αγώνων φαίνονται στην ώρα της χώρας της γλώσσας (TZ[lang]), με ένδειξη (TZNOTE).
+const DAYTZ = "Europe/Athens";
+const TZNOTE = { en: "UK time", el: "ώρα Ελλάδας/Κύπρου", es: "hora de España", pt: "horário de Brasília", fr: "heure de Paris", de: "deutsche Zeit", ro: "ora României", sr: "vreme u Srbiji", bg: "българско време" };
 function ymdIn(tz, ts = Date.now()) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(ts);
 }
@@ -133,7 +137,7 @@ export default {
       const fq = ["w", "l"].includes(url.searchParams.get("f")) ? url.searchParams.get("f") : "", pq = Math.max(1, Math.min(999, parseInt(url.searchParams.get("p")) || 1));
       const key = `rec|${rm[1]}|${mq}|${tq}|${fq}|${pq}`, hit = PAGES.get(key);
       if (hit && Date.now() - hit.t < 5 * 60000) return html(hit.b, 200, age21(req, rm[1]));
-      try { const [rd, sd] = await Promise.all([getRecord(env), stripData(env, rm[1], TZ[rm[1]])]);
+      try { const [rd, sd] = await Promise.all([getRecord(env), stripData(env, rm[1], DAYTZ)]);
         const b = recordPage(rm[1], rd, mq, tq, fq, pq, sd && sd.last); PAGES.set(key, { t: Date.now(), b }); return html(b, 200, age21(req, rm[1])); }
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
     }
@@ -298,7 +302,7 @@ async function stripData(env, lang, tz) {
 }
 async function todayPage(env, lang, url) {
   const t = T[lang], tz = TZ[lang];
-  const today = ymdIn(tz);
+  const today = ymdIn(DAYTZ);
   // ?d=ΗΗΗΗ-ΜΜ-ΗΗ: από 7 μέρες πίσω έως 2 μπροστά (ο engine έχει αγώνες για 3 μέρες)
   const shift = (d, n) => { const [y, mo, da] = d.split("-").map(Number); return new Date(Date.UTC(y, mo - 1, da + n)).toISOString().slice(0, 10); };
   const dq = url.searchParams.get("d");
@@ -308,14 +312,14 @@ async function todayPage(env, lang, url) {
   const date = okD ? dq : today, isToday = date === today;
   // ο engine μετράει μέρα σε UTC: παίρνουμε και τη γειτονική μέρα UTC, για να μη χάνονται αγώνες τα ξημερώματα
   const [y0, m0, d0] = date.split("-").map(Number);
-  const nb = ymdIn(tz, Date.UTC(y0, m0 - 1, d0)) === date ? shift(date, -1) : shift(date, 1);
+  const nb = ymdIn(DAYTZ, Date.UTC(y0, m0 - 1, d0)) === date ? shift(date, -1) : shift(date, 1);
   const extra = allDays ? [1, 2, 3].map((n) => getDay(env, shift(date, n)).catch(() => null)) : [];
-  const [day, day2, strip, ...more] = await Promise.all([getDay(env, date), getDay(env, nb).catch(() => null), stripData(env, lang, tz), ...extra]);
+  const [day, day2, strip, ...more] = await Promise.all([getDay(env, date), getDay(env, nb).catch(() => null), stripData(env, lang, DAYTZ), ...extra]);
   const seen = new Set(), all = [];
   for (const x of [...day.matches, ...(day2 ? day2.matches : []), ...more.flatMap((d) => (d ? d.matches : []))]) if (!seen.has(x.id)) { seen.add(x.id); all.push(x); }
   // κρατάμε τους αγώνες που πέφτουν αυτή τη μέρα (ή, στο «Όλες οι μέρες», σήμερα έως μεθαύριο) στην ώρα της χώρας
   const last = shift(date, 2);
-  const matches = all.filter((x) => { const d = ymdIn(tz, x.ts * 1000); return allDays ? d >= date && d <= last : d === date; });
+  const matches = all.filter((x) => { const d = ymdIn(DAYTZ, x.ts * 1000); return allDays ? d >= date && d <= last : d === date; });
   const noon = Date.UTC(y0, m0 - 1, d0, 12);
   const title = isToday ? t.title : t.title.replace(/\s+\S+$/, "");
   const nav = [-1, 0, 1, 2].map((n) => {
@@ -328,7 +332,8 @@ async function todayPage(env, lang, url) {
   const dLong = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(noon);
   const hm0 = (ts) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(ts * 1000);
   const wd = (ts) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, weekday: "short" }).format(ts * 1000);
-  const hm = allDays ? (ts) => (ymdIn(tz, ts * 1000) === date ? "" : wd(ts) + " ") + hm0(ts) : hm0;
+  // ημέρα της εβδομάδας μπροστά όταν η τοπική μέρα διαφέρει (π.χ. Λονδίνο 22:30 της προηγούμενης) ή στο «Όλες οι μέρες»
+  const hm = (ts) => (ymdIn(tz, ts * 1000) === date && (!allDays || ymdIn(DAYTZ, ts * 1000) === date) ? "" : wd(ts) + " ") + hm0(ts);
 
   // ομαδοποίηση ανά λίγκα
   const groups = new Map();
@@ -433,8 +438,8 @@ ${matches.length ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
     .replace("<!--footlinks-->", () => `<p class="footl" style="margin:0;opacity:.7;font-size:.8rem;line-height:1.9">${footLinks(lang, ' style="color:inherit"')}</p>`);
   // μετάφραση της εφαρμογής + σωστή ημερομηνία στη γλώσσα της σελίδας
   const dShort = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "long", day: "numeric", month: "long" }).format(noon);
-  tpl = tpl.replace('"today").textContent="Sunday 1 November"', () => '"today").textContent=' + JSON.stringify(dShort));
-  tpl = tpl.replace('<span id="today"></span>', () => '<span id="today">' + esc(dShort) + "</span>");
+  tpl = tpl.replace('"today").textContent="Sunday 1 November"', () => '"today").textContent=' + JSON.stringify(dShort + " · " + TZNOTE[lang]));
+  tpl = tpl.replace('<span id="today"></span>', () => '<span id="today">' + esc(dShort + " · " + TZNOTE[lang]) + "</span>");
   if (lang !== "en") {
     const i = UI_ORDER.indexOf(lang), dict = {};
     for (const k in UI) dict[k] = UI[k][i];
@@ -678,7 +683,7 @@ function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) 
   const r = REC[lang], t = T[lang], tz = TZ[lang], loc = LOCALE[lang];
   const fD = (ts, o) => new Intl.DateTimeFormat(loc, { timeZone: tz, ...o }).format(ts * 1000);
   const dLong = (ts) => fD(ts, { day: "numeric", month: "long", year: "numeric" });
-  const mKey = (ts) => ymdIn(tz, ts * 1000).slice(0, 7);
+  const mKey = (ts) => ymdIn(DAYTZ, ts * 1000).slice(0, 7);
   const mName = (k) => new Intl.DateTimeFormat(loc, { timeZone: "UTC", month: "long", year: "numeric" }).format(Date.UTC(+k.slice(0, 4), +k.slice(5) - 1, 15));
   const ALL = d.settled, all = recStats(ALL);
   const months = [...new Set(ALL.map((x) => mKey(x.ts)))].sort().reverse();
