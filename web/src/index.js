@@ -86,6 +86,17 @@ export default {
       icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }, { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
         { src: "/icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }],
     }), { headers: { "content-type": "application/manifest+json", "cache-control": "public, max-age=3600" } });
+    // Sitemaps (04/11): ένα ανά γλώσσα + index, με hreflang. Μόνο σελίδες που θέλουμε στο Google (indexable).
+    if (p === "/sitemap.xml" || /^\/sitemap-[a-z]{2}\.xml$/.test(p)) {
+      const sl = p === "/sitemap.xml" ? "" : p.slice(9, 11);
+      if (sl && !LANGS.includes(sl)) return new Response("not found", { status: 404 });
+      const ck = new Request("https://betizzi.com/__sm/" + (sl || "index"));
+      try { const c = await caches.default.match(ck); if (c) return c; } catch (e) {}
+      const body = sl ? await sitemapLang(env, sl) : sitemapIndex();
+      const r = new Response(body, { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
+      try { ctx.waitUntil(caches.default.put(ck, r.clone())); } catch (e) {}
+      return r;
+    }
     if (p.startsWith("/auth/") || p === "/me.json" || p === "/vip.json") return authRoute(req, env, url);
     const m = p.match(/^\/([a-z]{2})\/$/);
     if (m && LANGS.includes(m[1])) {
@@ -389,7 +400,7 @@ async function todayPage(env, lang, url) {
   const head = `<title>${esc(title)} — ${esc(dLong)} | betizzi</title>
 <meta name="description" content="${esc(t.desc)}">
 <link rel="canonical" href="${canonical}">
-${alt}
+${matches.length ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
 <meta property="og:type" content="website"><meta property="og:site_name" content="betizzi">
 <meta property="og:title" content="${esc(title)} — ${esc(dLong)}"><meta property="og:description" content="${esc(answer)}">
 <meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
@@ -473,10 +484,44 @@ function rawRow(x, hm, lang) {
 
 // ---------- Σελίδα αγώνα ----------
 const slugify = (s) => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
-  .replace(/ß/g, "ss").replace(/[øØ]/g, "o").replace(/[łŁ]/g, "l").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  .replace(/ß/g, "ss").replace(/ı/g, "i").replace(/[øØ]/g, "o").replace(/[łŁ]/g, "l").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 export function matchPath(lang, x) {
   const d = new Date(x.ts * 1000).toISOString().slice(0, 10);
   return `/${lang}/${slugify(x.home.name)}-vs-${slugify(x.away.name)}-${T[lang].slug}-${d}-${x.id}`;
+}
+
+// ---- Sitemaps (04/11/2026) ----
+// Indexable αγώνας (κανόνας «indexing σε επίπεδα»): έχει tip ή είναι σε Tier 1 διοργάνωση (TOP). Οι υπόλοιποι: noindex,follow.
+const indexable = (x) => (x.tips && x.tips.length > 0) || TOP.includes(x.league && x.league.id);
+const SM_START = "2026-11-02"; // επίσημο record
+const xmlEsc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const smAlt = (pathOf) => LANGS.map((l) => `<xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${xmlEsc(SITE + pathOf(l))}"/>`).join("")
+  + `<xhtml:link rel="alternate" hreflang="x-default" href="${xmlEsc(SITE + pathOf("en"))}"/>`;
+const smUrl = (loc, alt, lastmod) => `<url><loc>${xmlEsc(SITE + loc)}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ""}${alt}</url>`;
+function sitemapIndex() {
+  const today = new Date().toISOString().slice(0, 10);
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`
+    + LANGS.map((l) => `<sitemap><loc>${SITE}/sitemap-${l}.xml</loc><lastmod>${today}</lastmod></sitemap>`).join("") + `</sitemapindex>`;
+}
+async function sitemapLang(env, lang) {
+  const today = new Date().toISOString().slice(0, 10), out = [];
+  out.push(smUrl(`/${lang}/`, smAlt((l) => `/${l}/`), today));
+  out.push(smUrl(`/${lang}/${REC[lang].slug}`, smAlt((l) => `/${l}/${REC[l].slug}`), today));
+  for (const k of PG_ORDER) if (PG[k].body[lang] && PG[k].slug[lang]) {
+    const langs = LANGS.filter((l) => PG[k].body[l] && PG[k].slug[l]);
+    out.push(`<url><loc>${xmlEsc(SITE + pgPath(k, lang))}</loc>${langs.map((l) => `<xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${xmlEsc(SITE + pgPath(k, l))}"/>`).join("")}<xhtml:link rel="alternate" hreflang="x-default" href="${xmlEsc(SITE + pgPath(k, "en"))}"/></url>`);
+  }
+  // αγώνες: από την αρχή του record (έως 60 μέρες πίσω) μέχρι μεθαύριο
+  const days = [], t0 = Date.parse(today + "T12:00:00Z");
+  for (let i = -60; i <= 2; i++) { const d = new Date(t0 + i * 86400000).toISOString().slice(0, 10); if (d >= SM_START) days.push(d); }
+  const seen = new Set();
+  const lists = await Promise.all(days.map((d) => getDay(env, d).catch(() => null)));
+  for (const day of lists) for (const x of (day && day.matches) || []) {
+    if (seen.has(x.id) || !indexable(x)) continue; seen.add(x.id);
+    const lm = new Date(Math.min(Date.now(), x.ts * 1000 + 3 * 3600000)).toISOString().slice(0, 10);
+    out.push(smUrl(matchPath(lang, x), smAlt((l) => matchPath(l, x)), lm));
+  }
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${out.join("")}</urlset>`;
 }
 
 function matchPage(lang, x) {
@@ -538,7 +583,7 @@ function matchPage(lang, x) {
 <title>${esc(title)} | betizzi</title>
 <meta name="description" content="${esc(answer.slice(0, 160))}">
 <link rel="canonical" href="${canonical}">
-${alt}
+${indexable(x) ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
 <meta property="og:type" content="article"><meta property="og:site_name" content="betizzi"><meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(answer)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
 <meta property="article:modified_time" content="${nowIso}"><meta name="theme-color" content="#0c0f0d">

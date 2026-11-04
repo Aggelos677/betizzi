@@ -1,0 +1,33 @@
+# betizzi
+
+> betizzi (betizzi.com) is a free football (soccer) tips site in 9 languages. It filters each day's matches and publishes tips only where its statistics-based model finds a reason, plus ready-made parlays and a public, unedited track record of every tip since 2 November 2026 (wins and losses). It does not promise profit; tips are not a guarantee. 18+ (21+ in Greece).
+
+## What betizzi offers
+- Daily football tips (Free and VIP) with a short reason based on recent form, goals and league standings, and the odds at the time of publication.
+- Ready parlays in fixed odds zones (about x3–5, x8–12, x20–30 and x100), built only from betizzi's own tips.
+- "Strongest of the day": three picks published every day at 10:00 Athens time.
+- A public Record page: every published tip with result, win rate and ROI by league, odds range and bet type. Published tips are never edited or deleted.
+- Match pages for each match, kept after full time with the result (✓ won / ✗ lost; postponed = void).
+
+## Key pages
+- [Home (English)](https://betizzi.com/en/): today's matches and tips
+- [Record (English)](https://betizzi.com/en/record): full track record, wins and losses
+- [About](https://betizzi.com/en/about)
+- [Responsible gambling](https://betizzi.com/en/responsible-gambling)
+- [Affiliate disclosure](https://betizzi.com/en/affiliate-disclosure)
+- [Contact](https://betizzi.com/en/contact)
+
+## Languages
+- English: https://betizzi.com/en/
+- Ελληνικά (Greek): https://betizzi.com/el/
+- Español: https://betizzi.com/es/
+- Português (Brasil): https://betizzi.com/pt/
+- Français: https://betizzi.com/fr/
+- Deutsch: https://betizzi.com/de/
+- Română: https://betizzi.com/ro/
+- Srpski (latinica): https://betizzi.com/sr/
+- Български: https://betizzi.com/bg/
+
+## Optional
+- [Full description for AI assistants](https://betizzi.com/llms-full.txt)
+- [Sitemap](https://betizzi.com/sitemap.xml)
