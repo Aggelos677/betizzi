@@ -1404,7 +1404,10 @@ var TABS=["matches","tips","build","coupons"];
 function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-selected",t===name?"true":"false");$("view-"+t).hidden=t!==name;});store("ko-tab2",name);if(name==="coupons"&&cpNew){cpNew=0;store("ko-cpnew",0);try{renderCoupons();}catch(e){}}renderSide();
   /* χωρίς πήδημα: αν έχεις κατέβει, η νέα καρτέλα ξεκινά ακριβώς κάτω από το μενού· αλλιώς η σελίδα μένει όπου είναι */
   var hd=document.querySelector(".wrap.app>header"),top=hd?hd.offsetTop+hd.offsetHeight:0;if(window.scrollY>top)window.scrollTo(0,top);}
-TABS.forEach(function(t){$("tab-"+t).addEventListener("click",function(){showTab(t);});});
+/* απόφαση Owner 04/11: «Οι προτάσεις μας» είναι πάντα οι σημερινές. Αν βλέπεις άλλη μέρα (π.χ. Αύριο στους Αγώνες), το tab σε γυρίζει στη σημερινή σελίδα */
+var NOT_TODAY=typeof DAYNAV!=="undefined"&&DAYNAV&&DAYNAV.today&&DAYNAV.date!==DAYNAV.today;
+TABS.forEach(function(t){$("tab-"+t).addEventListener("click",function(){if(t==="tips"&&NOT_TODAY){store("ko-tab2","tips");location.href=location.pathname;return;}showTab(t);});});
+if(NOT_TODAY)setTimeout(function(){try{var l=document.createElement("link");l.rel="prefetch";l.href=location.pathname;l.as="document";document.head.appendChild(l);}catch(e){}},2000);
 /* ---------- πλαϊνό (PC): αλλάζει ανάλογα με την καρτέλα ---------- */
 function sideOn(){return !!(window.matchMedia&&window.matchMedia("(min-width:1100px)").matches);}
 function curTab(){var c="matches";(TABS||[]).forEach(function(t){var e=$("tab-"+t);if(e&&e.getAttribute("aria-selected")==="true")c=t;});return c;}
@@ -2440,7 +2443,7 @@ document.querySelector(".logoa").addEventListener("click",function(e){if(locatio
 $("today").textContent="Sunday 1 November";
 renderFilters(); renderMatches(); renderTips(); renderBuilder(); renderBar(); renderCoupons();
 try{var _ky=sessionStorage.getItem("ko-y");if(_ky!=null){sessionStorage.removeItem("ko-y");if("scrollRestoration" in history)history.scrollRestoration="manual";requestAnimationFrame(function(){window.scrollTo(0,+_ky);});}}catch(x){}
-var startTab=load("ko-tab2","tips"); if(startTab==="build")startTab="tips"; showTab(TABS.indexOf(startTab)>=0?startTab:"tips");
+var startTab=load("ko-tab2","tips"); if(startTab==="build")startTab="tips"; if(startTab==="tips"&&NOT_TODAY)startTab="matches"; showTab(TABS.indexOf(startTab)>=0?startTab:"tips");
 })();
 </script>
 </body>
