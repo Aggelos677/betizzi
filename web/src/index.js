@@ -250,12 +250,14 @@ async function stripData(env, lang, tz) {
     const d = RECC.d, today = ymdIn(tz);
     const [y, m, dd] = today.split("-").map(Number);
     const yday = new Date(Date.UTC(y, m - 1, dd - 1)).toISOString().slice(0, 10);
-    const mm = dd <= 5 ? new Date(Date.UTC(y, m - 2, 15)) : new Date(Date.UTC(y, m - 1, 15));
-    const mKey = mm.toISOString().slice(0, 7);
-    const mLabel = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", month: "long" }).format(mm);
     const day = (x) => ymdIn(tz, x.ts * 1000);
+    // τις πρώτες 5 μέρες ο προηγούμενος μήνας· αν εκείνος δεν έχει record (π.χ. Οκτώβριος, record από 2/11), ο τρέχων (04/11)
+    const mOf = (k) => d.settled.filter((x) => day(x).slice(0, 7) === k && (x.result === 0 || x.result === 1));
+    let mm = dd <= 5 ? new Date(Date.UTC(y, m - 2, 15)) : new Date(Date.UTC(y, m - 1, 15));
+    let M = mOf(mm.toISOString().slice(0, 7));
+    if (!M.length && dd <= 5) { mm = new Date(Date.UTC(y, m - 1, 15)); M = mOf(mm.toISOString().slice(0, 7)); }
+    const mLabel = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", month: "long" }).format(mm);
     const Y = d.settled.filter((x) => day(x) === yday && (x.result === 0 || x.result === 1)).sort((a, b) => a.ts - b.ts);
-    const M = d.settled.filter((x) => day(x).slice(0, 7) === mKey && (x.result === 0 || x.result === 1));
     const big = (L) => L.filter((x) => x.result === 1).sort((a, b) => b.price - a.price)[0] || null;
     const pack = (b) => b && { sel: SEL[b.sel] || b.sel, price: b.price, home: b.home, away: b.away, vip: b.tier === "vip" };
     // παρολί: μετράνε μόνο οι «επιλογές της ημέρας» (στα παλιά χωρίs σήμανση: όλα)
@@ -486,13 +488,18 @@ function matchPage(lang, x) {
   const md = x.model;
   const score = md ? `${md.score[0]}–${md.score[1]}` : "–";
   const tipTxt = open.length ? t.mTip.replace("{sel}", SEL[open[0].sel] || open[0].sel).replace("{pr}", open[0].price.toFixed(2)) : "";
-  const answer = t.mAnswer.replace("{h}", x.home.name).replace("{a}", x.away.name).replace("{lg}", x.league.name).replace("{d}", dLong).replace("{t}", hm)
+  const answer0 = t.mAnswer.replace("{h}", x.home.name).replace("{a}", x.away.name).replace("{lg}", x.league.name).replace("{d}", dLong).replace("{t}", hm)
     .replace("{tip}", tipTxt).replace("{p1}", pc(md?.p1)).replace("{px}", pc(md?.px)).replace("{p2}", pc(md?.p2)).replace("{o}", pc(md?.over25)).replace("{s}", score)
     .replace(/\s+/g, " ").trim();
   const live = LIVE.has(x.status), done = DONE.has(x.status);
   const ui = (k) => (lang === "en" ? k : (UI[k] && UI[k][UI_ORDER.indexOf(lang)]) || k);
   const off = x.status === "PST" ? ui("Postponed") : ["CANC", "ABD"].includes(x.status) ? ui("Cancelled") : ""; // 04/11
   const mid = off ? `<span>${esc(off)}</span>` : x.score && (live || done) ? `${x.score[0]}–${x.score[1]}` : hm;
+  // 04/11: μετά τη λήξη / σε αναβολή η πρώτη πρόταση (και meta/JSON-LD) λέει το αποτέλεσμα, όχι «ξεκινά στις…»
+  const resTxt = (y) => `${SEL[y.sel] || y.sel} ${y.price.toFixed(2)} ${y.result === 1 ? "✓" : y.result === 0 ? "✗" : ""}`.trim();
+  const answer = off ? `${x.home.name} – ${x.away.name} (${x.league.name}, ${dLong}): ${off}. ${ui("Our tips for this match are void.")}`
+    : done && x.score ? `${x.home.name} ${x.score[0]}–${x.score[1]} ${x.away.name} (${ui("Final score")}, ${x.league.name}, ${dLong}).${open.length ? " Tips: " + open.map(resTxt).join(" · ") : ""}`
+    : answer0;
 
   const anTxt = analysis(lang, x, SEL);
   const tipsHtml = x.tips.length ? x.tips.map((y) => y.locked
