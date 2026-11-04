@@ -8,6 +8,10 @@ import { MODEL_VERSION, NOT_FIRST_TEAM } from "./tips.js";
 import { aiTexts } from "./ai.js";
 
 const DAY = 86400;
+// 04/11: η «μέρα» είναι μέρα Ελλάδας (ίδια με τη σελίδα, DAYTZ)· τέλος της = 00:00 ώρα Ελλάδας της επόμενης
+const athEnd = (date) => { const [y, m, d] = date.split("-").map(Number), u = Date.UTC(y, m - 1, d + 1) / 1000;
+  const off = (+new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", hour: "2-digit", hourCycle: "h23" }).format(u * 1000) - new Date(u * 1000).getUTCHours() + 24) % 24;
+  return u - off * 3600; };
 const now = () => Math.floor(Date.now() / 1000);
 const ymd = (t) => new Date(t * 1000).toISOString().slice(0, 10);
 export const athH = () => +new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", hour: "2-digit", hourCycle: "h23" }).format(new Date());
@@ -20,7 +24,7 @@ async function sha(s) {
 export async function makeStrong(env, date = ymd(now()), force = false) {
   await env.DB.prepare("CREATE TABLE IF NOT EXISTS strong(date TEXT PRIMARY KEY, data TEXT, created_at INTEGER, model_version TEXT, hash TEXT)").run();
   if ((await env.DB.prepare("SELECT 1 FROM strong WHERE date=?").bind(date).first()) && !force) return { ok: true, exists: true };
-  const from = Math.floor(Date.parse(date + "T00:00:00Z") / 1000), to = from + DAY;
+  const to = athEnd(date), from = to - DAY; // μέρα Ελλάδας (04/11: αγώνας 01:30 Ελλάδας δεν είναι «σημερινός»)
   const start = Math.max(now() + 45 * 60, from);
   const rows = (await env.DB.prepare(`SELECT t.fixture_id f, t.sel, t.price, t.prob, t.tier, t.level, t.strength s, f.ts, l.tier lt, h.name hn, a.name an
       FROM tips t JOIN fixtures f ON f.id=t.fixture_id JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id

@@ -10,6 +10,10 @@
 import { MODEL_VERSION, NOT_FIRST_TEAM } from "./tips.js";
 
 const DAY = 86400;
+// 04/11: η «μέρα» είναι μέρα Ελλάδας (ίδια με τη σελίδα, DAYTZ)· τέλος της = 00:00 ώρα Ελλάδας της επόμενης
+const athEnd = (date) => { const [y, m, d] = date.split("-").map(Number), u = Date.UTC(y, m - 1, d + 1) / 1000;
+  const off = (+new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", hour: "2-digit", hourCycle: "h23" }).format(u * 1000) - new Date(u * 1000).getUTCHours() + 24) % 24;
+  return u - off * 3600; };
 const now = () => Math.floor(Date.now() / 1000);
 const ymd = (t) => new Date(t * 1000).toISOString().slice(0, 10);
 const WINS = new Set(["1", "2"]), GOALS = new Set(["O25", "GG"]);
@@ -36,7 +40,7 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
     if (r.kind !== CRAZY[0]) for (const l of JSON.parse(r.legs)) usedFx.add(l[0]);
   }
 
-  const from = Math.floor(Date.parse(date + "T00:00:00Z") / 1000), to = from + DAY;
+  const to = athEnd(date), from = to - DAY; // μέρα Ελλάδας (04/11)
   const start = Math.max(now() + 45 * 60, from); // μόνο αγώνες που δεν έχουν αρχίσει (περιθώριο 45΄)
   const fx = (await env.DB.prepare("SELECT f.id, h.name hn, a.name an FROM fixtures f JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id WHERE f.ts BETWEEN ? AND ? AND f.status IN ('NS','TBD')").bind(start, to).all()).results;
   const ok = new Set(fx.filter((f) => !NOT_FIRST_TEAM.test(f.hn) && !NOT_FIRST_TEAM.test(f.an)).map((f) => f.id));
