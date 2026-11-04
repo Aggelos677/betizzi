@@ -160,14 +160,28 @@ input:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visib
 .cpl .cv,.bwleg.cv{opacity:.55}.cpl em{max-width:9em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .m-an{margin:2px 0 8px;line-height:1.55;font-size:.86rem;color:#d9e2da}.m-url{display:inline-block;margin:0 0 10px;color:var(--lime);font-weight:700;font-size:.82rem;text-decoration:none}
 .zsec{margin:10px 0 -2px;font:800 1.05rem 'Fira Sans Extra Condensed',sans-serif;color:var(--lime);scroll-margin-top:12px}.zsec small{color:var(--muted);font-weight:600}
-.stb{margin:0 0 14px}.stb-c .pc-take{flex:none;margin-top:auto;min-height:44px}.stb-h{display:flex;align-items:center;gap:8px;margin:0 0 8px;font:800 1.05rem "Fira Sans Extra Condensed",sans-serif;text-transform:uppercase;letter-spacing:.02em;color:var(--lime)}
+.stb{margin:0 0 14px}.stb-h{display:flex;align-items:center;gap:8px;margin:0 0 8px;font:800 1.05rem "Fira Sans Extra Condensed",sans-serif;text-transform:uppercase;letter-spacing:.02em;color:var(--lime)}
 .stb-g{display:grid;grid-template-columns:1fr;gap:10px}@media(min-width:900px){.stb-g{grid-template-columns:repeat(3,1fr)}}
-.stb-c{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
-.stb-t{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.9rem}.stb-t small{color:var(--muted);margin-left:auto;font-size:.75rem}
-.stb-m{font-weight:700;font-size:.95rem}.stb-p{display:flex;align-items:center;gap:10px}.stb-sel{font-weight:800;color:var(--lime)}.stb-o{font-weight:700}
-.stb-add{margin-left:auto;min-height:44px;min-width:44px;padding:0 12px;font-size:1.2rem}.stb-why{margin:0;font-size:.82rem;line-height:1.5;color:#cfd8d0}
+.stb-c{background:var(--panel);border:1.5px solid rgba(182,242,58,.42);box-shadow:0 0 0 1px rgba(182,242,58,.06),0 6px 18px rgba(0,0,0,.25);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.stb-hd{display:flex;align-items:center;gap:8px;font-size:.9rem}.stb-hd>b{font-weight:800}
+.stb-st{margin-left:auto;font-size:.75rem;color:var(--muted);display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.stb-st.on{color:var(--win);font-weight:700}.stb-st.w{color:var(--win);font-weight:700}.stb-st.l{color:var(--bad);font-weight:700}
+.stb-lgn{font-size:.75rem;color:var(--muted);margin-top:-4px}
+.stb-tms{font-weight:800;font-size:1.02rem;line-height:1.3}
+.stb-scr{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:8px}.stb-scr b{color:var(--fg);font-weight:800}.stb-scr b.on{color:#e9f7ee;background:rgba(60,207,110,.08);border:1px solid rgba(60,207,110,.6);border-radius:6px;padding:0 6px}
+.stb-pk{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;display:flex;flex-direction:column;gap:4px}
+.stb-lb{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stb-pr{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.stb-sel{font:800 18px/1.2 "Fira Sans Extra Condensed",sans-serif;color:var(--lime)}.stb-o{font:800 18px/1 var(--f-mono);color:#fff}
+.stb-v{font-size:.8rem;font-weight:700}.stb-v.w,.stb-l .w{color:var(--win)}.stb-v.l,.stb-l .l{color:var(--bad)}
+.stb-why{margin:0;font-size:.82rem;line-height:1.5;color:#cfd8d0}
 .stb-warn{font-size:.8rem;color:var(--gold)}.stb-now{font-size:.8rem;color:var(--muted)}.stb-wait{color:var(--muted);font-size:.9rem;padding:12px;border:1px dashed var(--line);border-radius:12px}
-.stb-l{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}.stb-l li{display:flex;align-items:center;gap:8px;font-size:.85rem}.stb-l li>span:first-child{flex:1;min-width:0}.stb-l small{color:var(--muted)}
+.stb-ft{margin-top:auto;padding-top:2px}.stb-ft .stb-add,.stb-ft .pc-take,.stb-btn{width:100%;min-height:40px;border-radius:10px;font-weight:800;font-size:.88rem;display:flex;align-items:center;justify-content:center;gap:6px}
+.stb-ft .stb-add{background:rgba(182,242,58,.08);border:1px solid rgba(182,242,58,.5);color:var(--lime)}.stb-ft .stb-add[aria-pressed="true"]{background:var(--lime);color:#0c0f0d}
+.stb-btn.off{border:1px solid var(--line);color:var(--muted);font-weight:600}
+.stb-ft .pc-take{margin:0}.stb-ft .stb-add{text-transform:none;letter-spacing:0}
+.stb-l{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}.stb-l li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}.stb-l li:first-child{padding-top:2px}
+.stb-lg{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.stb-lm{font-weight:700;font-size:.86rem;line-height:1.25}.stb-lg small{font-size:.72rem;color:var(--muted)}.stb-lg small .on{color:var(--win);font-weight:700}
+.stb-tp{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none}.stb-tp b{font-size:.86rem;color:var(--lime);white-space:nowrap}.stb-tp .mono{font-weight:800;font-size:.86rem}
+.stb-tot{display:flex;align-items:baseline;justify-content:space-between;font-size:.8rem;color:var(--muted)}.stb-tot b{font:800 1.5rem/1 var(--f-mono);color:#fff}
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-height:88%;overflow-y:auto;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:14px 16px calc(18px + env(safe-area-inset-bottom,0px))}
 .sheet-in{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
@@ -213,6 +227,14 @@ body{padding-top:env(safe-area-inset-top,0px)}
 .lghead{position:sticky;top:calc(env(safe-area-inset-top,0px) + 61px);z-index:5;background:var(--panel-2);border-bottom:1px solid var(--line);padding:7px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .lghead b{font:800 .95rem var(--f-display);text-transform:uppercase;letter-spacing:.06em}
 .lghead span{font:600 .75rem var(--f-mono);color:var(--muted)}
+.lghead .lgr{display:flex;align-items:center;gap:6px}.lghead .lgfav{position:static;min-width:36px;min-height:36px;margin:-6px -6px -6px 0}
+.chip .lvb{display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:2px 8px;border-radius:999px;background:rgba(60,207,110,.16);border:1px solid var(--win,#3ccf6e);color:var(--win,#3ccf6e);font:700 .72rem var(--f-mono)}
+.chip .lvb.on{background:var(--win,#3ccf6e);color:#06120a}.chip .lvb.on .ldot{background:#06120a}
+.chip.daylv .lvb{display:none}
+@media (max-width:767px){.chip.livechip{display:none}.chip.daylv .lvb{display:inline-flex}.chip.daylv{padding-right:8px}}
+.wins-h{font:800 1rem var(--f-display);text-transform:uppercase;letter-spacing:.04em;margin:4px 0 0}
+.bwlast{cursor:pointer}.bwlast:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.bwmore{display:flex;align-items:center;gap:4px;padding:10px 12px;border-top:1px solid rgba(182,242,58,.25);color:var(--lime);font-weight:700;font-size:.85rem}.bwmore b{font-size:.95rem}
 .tm2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .tbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0}
 .tbox .nm{font:800 .95rem var(--f-display);text-transform:uppercase;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -493,6 +515,14 @@ body.cshake .wrap.app{animation:cshk .5s ease .15s}
 .bktot{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
 .bkt{display:flex;justify-content:space-between;font-size:.86rem;color:var(--muted);padding:3px 8px;border-radius:8px}
 .bkt b{color:var(--fg)}
+.bkl{display:flex;flex-direction:column;gap:6px;margin-top:10px}.bkl-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.bkl-set{min-height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--muted);font:600 .8rem inherit;cursor:pointer}
+.bkl-cfg{border:1px solid var(--line);border-radius:12px;padding:8px 12px;display:flex;flex-direction:column;gap:2px}.bkl-cfg p{margin:0 0 4px;font-size:.78rem;color:var(--muted)}
+.bkr{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px;min-height:44px;padding:0 12px;border-radius:10px;cursor:pointer;text-align:left;
+  border:1px solid hsla(var(--h),70%,55%,.35);background:hsla(var(--h),70%,50%,.08);color:var(--fg);font:600 .9rem inherit}
+.bkr b{color:hsl(var(--h),75%,62%);font-size:1rem}.bkr-d{font-size:.75rem;color:hsl(var(--h),60%,62%)}.bkr-n small{color:var(--muted);font-weight:500}
+.bkr.on{border-color:hsl(var(--h),75%,55%);box-shadow:inset 0 0 0 1px hsl(var(--h),75%,55%);background:hsla(var(--h),70%,50%,.16)}
+.bkl-none{font-size:.8rem;color:var(--muted)}
 .bkt.top{background:var(--lime-soft);color:var(--lime);font-weight:800}.bkt.top b{color:var(--lime)}
 .bkt.mine{box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
 .cpbig b{font-size:clamp(2.6rem,11vw,4rem)}
@@ -871,7 +901,7 @@ header{position:relative}
 
   <!-- TIPS -->
   <aside id="sidePanel" class="side" aria-label="Side panel"><section class="card sideslip" id="sideSlip"><div id="resultSideWrap"></div><div class="secthead"><h2>My slip</h2><span class="tag lime" id="sideSlipN"></span></div><div id="slipSide" style="display:flex;flex-direction:column;gap:12px"></div></section><section class="card closebox" id="closeBox" hidden><div class="secthead"><h2>Cash it in!</h2><span class="livedot" aria-hidden="true"></span></div><div id="closeList"></div></section><section class="card" id="liveSide"><div class="opsub" role="group" aria-label="Show"><button type="button" class="opsb" data-sv="goals" aria-pressed="true">⚽ <span>Latest goals</span></button><button type="button" class="opsb" data-sv="mylive" aria-pressed="false">📺 <span>My games live</span> <span class="mono" id="myLiveN"></span></button></div>
-<div id="goalsSide" class="gl-list"></div><div id="myLiveSide" class="gl-list" hidden></div><div id="bzcSide" class="bzc-list" hidden></div></section><section class="card" data-sk="wins" hidden><div class="secthead"><h2 id="winsH">Our biggest wins today</h2></div><div id="winsSide" style="display:flex;flex-direction:column;gap:10px"></div></section></aside>
+<div id="goalsSide" class="gl-list"></div><div id="myLiveSide" class="gl-list" hidden></div><div id="bzcSide" class="bzc-list" hidden></div></section><section class="card" data-sk="wins" hidden><div id="winsSide" style="display:flex;flex-direction:column;gap:10px"></div></section></aside>
   <div id="view-tips" role="tabpanel" aria-labelledby="tab-tips" class="wrap op" hidden>
     <label class="sw" hidden><input type="checkbox" id="vipMember"> Show as registered user (untick to see what a visitor sees)</label>
     <h2 class="op-h">Today's picks</h2>
@@ -1005,11 +1035,18 @@ MATCHES.forEach(function(m){
 /* ---------- ο bookmaker μου: τιμές ενός bookmaker, σύγκριση με Pinnacle, καλύτερο σύνολο παρολί ---------- */
 var BOOKS=["Bet365","Betano","Pinnacle","1xBet","William Hill"],BKC=["1","X","2","O25","U25","GG","NG"],LOWBK=0.94;
 var myBook=load("ko-book","best");if(myBook!=="best"&&BOOKS.indexOf(myBook)<0)myBook="best";
+/* απόφαση Owner 04/11: ο παίκτης διαλέγει σε ποιους bookmakers παίζει (⚙). Μονό: η καλύτερη τιμή από αυτούς.
+   Παρολί: ο bookmaker με το καλύτερο ΣΥΝΟΛΟ (ένα παρολί παίζεται σε έναν bookmaker), όχι η καλύτερη τιμή από τον καθένα. */
+var ENBK=(load("ko-bks",null)||BOOKS.slice()).filter(function(b){return BOOKS.indexOf(b)>=0;});if(!ENBK.length)ENBK=BOOKS.slice();
+if(myBook!=="best"&&ENBK.indexOf(myBook)<0)myBook="best";
 function bkP(m,code,b){var i=BKC.indexOf(code),bi=BOOKS.indexOf(b);if(i<0||bi<0||!m.bk||!m.bk[bi])return 0;return m.bk[bi][i]||0;}
 function applyBook(){
   Object.keys(SEL).forEach(function(k){var s=SEL[k];if(s.best==null)s.best=s.odd;var c=k.split(":")[1],my=myBook!=="best";
-    var p=my?bkP(s.m,c,myBook):0,pin=bkP(s.m,c,"Pinnacle");
-    s.odd=p||s.best;s.nobk=my&&!p&&BKC.indexOf(c)>=0;s.pin=pin;
+    var p=my?bkP(s.m,c,myBook):0,pin=bkP(s.m,c,"Pinnacle"),anyBk=BOOKS.some(function(b){return bkP(s.m,c,b)>0;});
+    s.bb=my?myBook:"";
+    /* «καλύτερη τιμή» = η καλύτερη από τους bookmakers που έχει ενεργούς (αν δεν έχουμε τιμές ανά bookmaker: η γενική καλύτερη) */
+    if(!my&&anyBk)ENBK.forEach(function(b){var x=bkP(s.m,c,b);if(x>p){p=x;s.bb=b;}});
+    s.odd=p||s.best;s.nobk=(my||anyBk)&&!p&&BKC.indexOf(c)>=0;s.pin=pin;
     /* «δεν αξίζει εδώ»: η τιμή του bookmaker σου είναι πάνω από 6% κάτω από την Pinnacle */
     s.low=!!(my&&myBook!=="Pinnacle"&&p&&pin&&p<pin*LOWBK);});
   MATCHES.forEach(function(m){m.tips.forEach(function(t){if(t.best==null)t.best=t.odds;var s=t.key&&SEL[t.key];if(s&&t.best){t.odds=s.odd;t.nobk=s.nobk;t.low=s.low;t.pin=s.pin;}});});
@@ -1022,15 +1059,35 @@ function priceNote(t){var ip=t.best!=null?t.best:t.odds;if(!ip)return "";
   return h+'</div>';}
 function oddTxt(t){return t.odds?t.odds.toFixed(2)+(t.low?' <i class="lowbk" title="Low price at your bookmaker">⚠</i>':''):"🔒";}
 function bookRowHTML(){return '<div class="bkrow"><span class="label">My bookmaker</span><div class="hscroll bkchips">'
-  +[["best","Best price"]].concat(BOOKS.map(function(b){return [b,b];})).map(function(x){return '<button type="button" class="chip" data-book="'+esc(x[0])+'" aria-pressed="'+(myBook===x[0])+'">'+(x[0]==="best"?'<span>'+esc(x[1])+'</span>':esc(x[1]))+'</button>';}).join("")+'</div></div>';}
+  +[["best","Best price"]].concat(ENBK.map(function(b){return [b,b];})).map(function(x){return '<button type="button" class="chip" data-book="'+esc(x[0])+'" aria-pressed="'+(myBook===x[0])+'">'+(x[0]==="best"?'<span>'+esc(x[1])+'</span>':esc(x[1]))+'</button>';}).join("")+'</div></div>';}
 function bindBookRow(root){Array.prototype.forEach.call(root.querySelectorAll("[data-book]"),function(b){if(b._b)return;b._b=1;b.addEventListener("click",function(){setBook(b.getAttribute("data-book"));});});}
 function setBook(b){if(b===myBook)return;myBook=b;store("ko-book",b);applyBook();
   try{renderMatches();renderTips();renderBuilder();renderBar();if(!$("sheet").hidden)renderMySlip();renderSide();}catch(e){}
   Array.prototype.forEach.call(document.querySelectorAll("[data-book]"),function(x){x.setAttribute("aria-pressed",x.getAttribute("data-book")===myBook?"true":"false");});
   toast(b==="best"?"Showing the best price":"Prices from "+b);}
+/* λίστα στο δελτίο: κάθε ενεργός bookmaker με την τιμή (μονό) ή το σύνολο (παρολί), από τον καλύτερο στον χειρότερο,
+   χρώμα από πράσινο σε κόκκινο. Πάτημα → παίζεις εκεί (ο πρώτος = αυτόματα ο καλύτερος). ⚙ = ποιους bookmakers παίζω */
+var bkSet=false;
+function bkListHTML(){var rows=bkRank(slip),sb=slipBook()||(rows[0]&&rows[0].b),n=rows.length,multi=slip.length>1;
+  var h='<div class="bkl"><div class="bkl-h"><span class="label">'+(multi?'<span>Total per bookmaker</span>':'<span>Price per bookmaker</span>')+'</span><button type="button" class="bkl-set" id="bkSetBtn" aria-expanded="'+(bkSet?'true':'false')+'">⚙ <span>My bookmakers</span></button></div>';
+  if(bkSet)h+='<div class="bkl-cfg"><p><span>Tick the bookmakers you play at. We show prices only from these.</span></p>'+BOOKS.map(function(b){return '<label class="authc"><input type="checkbox" data-enbk="'+esc(b)+'"'+(ENBK.indexOf(b)>=0?' checked':'')+'> <span>'+esc(b)+'</span></label>';}).join("")+'</div>';
+  if(!n)return h+'<div class="bkl-none"><span>No single bookmaker offers all these picks.</span></div></div>';
+  var top=rows[0].t;
+  h+=rows.map(function(r,i){var hue=n>1?Math.round(120-120*i/(n-1)):120,on=r.b===sb,diff=i?Math.round((r.t/top-1)*1000)/10:0;
+    return '<button type="button" class="bkr'+(on?' on':'')+'" data-bkpick="'+esc(r.b)+'" aria-pressed="'+(on?'true':'false')+'" style="--h:'+hue+'"><span class="bkr-n">'+(i===0?'★ ':'')+esc(r.b)+(i===0&&myBook==="best"?' <small>· <span>best</span></small>':'')+'</span>'
+      +'<span class="bkr-d mono">'+(i?diff.toFixed(1)+'%':'')+'</span><b class="mono">'+(multi?'x':'')+r.t.toFixed(2)+'</b></button>';}).join("");
+  return h+'</div>';}
+function bindBkList(root){
+  Array.prototype.forEach.call(root.querySelectorAll("[data-bkpick]"),function(b){b.addEventListener("click",function(){var r=bkRank(slip),v=b.dataset.bkpick;setBook(r.length&&r[0].b===v?"best":v);});});
+  var sb=root.querySelector("#bkSetBtn");if(sb)sb.addEventListener("click",function(){bkSet=!bkSet;renderSlipAny();});
+  Array.prototype.forEach.call(root.querySelectorAll("[data-enbk]"),function(c){c.addEventListener("change",function(){var b=c.dataset.enbk,i=ENBK.indexOf(b);
+    if(c.checked&&i<0)ENBK.push(b);if(!c.checked&&i>=0){if(ENBK.length===1){c.checked=true;toast("Keep at least one bookmaker");return;}ENBK.splice(i,1);}
+    ENBK.sort(function(a,x){return BOOKS.indexOf(a)-BOOKS.indexOf(x);});store("ko-bks",ENBK);if(myBook!=="best"&&ENBK.indexOf(myBook)<0)myBook="best",store("ko-book","best");
+    applyBook();try{renderMatches();renderTips();renderBuilder();}catch(e){}renderBar();renderSlipAny();});});}
+function renderSlipAny(){if(!$("sheet").hidden)renderMySlip();else renderSide();}
 /* σε ποιον bookmaker βγαίνει το καλύτερο σύνολο για όλο το παρολί (ένα παρολί παίζεται σε έναν bookmaker) */
 function bookTotalsHTML(keys){if(keys.length<2)return "";var rows=[];
-  BOOKS.forEach(function(b){var tot=1,ok=true;keys.forEach(function(k){var c=k.split(":")[1],p=bkP(SEL[k].m,c,b);if(!p)ok=false;else tot*=p;});if(ok)rows.push([b,tot]);});
+  ENBK.forEach(function(b){var tot=1,ok=true;keys.forEach(function(k){var c=k.split(":")[1],p=bkP(SEL[k].m,c,b);if(!p)ok=false;else tot*=p;});if(ok)rows.push([b,tot]);});
   if(!rows.length)return "";rows.sort(function(a,c){return c[1]-a[1];});
   return '<div class="bktot"><span class="label">Total per bookmaker</span>'+rows.map(function(r,i){return '<div class="bkt'+(i===0?' top':'')+(r[0]===myBook?' mine':'')+'"><span>'+(i===0?'★ ':'')+esc(r[0])+'</span><b class="mono">x'+r[1].toFixed(2)+'</b></div>';}).join("")+'</div>';}
 applyBook();
@@ -1128,7 +1185,12 @@ function toggleSel(k){
 }
 function addLegs(keys){var mids=keys.map(midOf);slip=slip.filter(function(k){return mids.indexOf(midOf(k))<0;});keys.forEach(function(k){slip.push(k);});afterSlip();toast("Moved to your slip");openSheet();}
 function afterSlip(){save();syncPressed();renderBar();if(!$("sheet").hidden)renderMySlip();else renderSide();}
-function totals(){var o=1,p=1,known=true;slip.forEach(function(k){o*=SEL[k].odd;if(SEL[k].p==null)known=false;else p*=SEL[k].p;});return {odds:o,prob:known?p:null};}
+/* ο bookmaker του δελτίου: ο δικός του αν τον διάλεξε, αλλιώς (παρολί) εκείνος με το καλύτερο σύνολο */
+function bkRank(keys){var rows=[];ENBK.forEach(function(b){var tot=1,ok=keys.length>0;keys.forEach(function(k){var p=bkP(SEL[k].m,k.split(":")[1],b);if(!p)ok=false;else tot*=p;});if(ok)rows.push({b:b,t:tot});});
+  rows.sort(function(a,c){return c.t-a.t;});return rows;}
+function slipBook(){if(myBook!=="best")return myBook;if(slip.length<2)return null;var r=bkRank(slip);return r.length?r[0].b:null;}
+function legOdd(k,sb){var s=SEL[k];if(sb===undefined)sb=slipBook();var p=sb?bkP(s.m,k.split(":")[1],sb):0;return p||s.odd;}
+function totals(){var o=1,p=1,known=true,sb=slipBook();slip.forEach(function(k){o*=legOdd(k,sb);if(SEL[k].p==null)known=false;else p*=SEL[k].p;});return {odds:o,prob:known?p:null};}
 function renderBar(){var b=$("slipBarBtn"),t=totals();$("sbCount").textContent=slip.length;b.dataset.empty=slip.length?"false":"true";
   $("sbTotal").textContent=slip.length?"x"+t.odds.toFixed(2):"—";
   $("sbSub").textContent=slip.length?(stake+" → "+(stake*t.odds).toFixed(2)):"Tap a tip to start";
@@ -1175,14 +1237,14 @@ function mkLbl(c){return c==="1"||c==="X"||c==="2"?"Match result":c==="O25"||c==
 function renderMySlip(target){
   var box=target||$("mySlip"),other=box.id==="mySlip"?$("slipSide"):$("mySlip");if(other)other.innerHTML="";
   if(!slip.length){box.innerHTML='<div class="ss-empty"><span>Your slip is empty. Add a tip from Our picks or Matches.</span></div>';return;}
-  var multi=slip.length>1,t=totals();
+  var multi=slip.length>1,t=totals(),SB=slipBook();
   Object.keys(sStk).forEach(function(k){if(slip.indexOf(k)<0)delete sStk[k];});
   var val=function(v){return v>0?String(v):"";};
   var h='<div class="sb">';
   h+='<ul class="sb-l">'+slip.map(function(k){var s=SEL[k],m=s.m,c=k.split(":")[1],
       pk=c==="1"?m.home:c==="2"?m.away:c==="X"?'<span>Draw</span>':esc(s.short),note=s.low?'<em class="ss-warn">⚠ <span>Low price here</span></em>':s.nobk?'<em class="ss-warn"><span>Not offered by your bookmaker</span></em>':'';
     return '<li><button type="button" class="sb-x" data-rm="'+esc(k)+'" aria-label="Remove">✕</button><span class="sb-m"><b>'+(c==="1"||c==="2"?esc(pk):pk)+'</b><small>'+(mkLbl(c)?'<span>'+mkLbl(c)+'</span>':'')+'</small><small>'+esc(m.home)+' – '+esc(m.away)+' · '+esc(m.time)+'</small>'+note+'</span>'
-      +'<span class="sb-o mono">'+s.odd.toFixed(2)+'</span><input type="number" inputmode="decimal" min="0" step="1" class="sb-in" data-stk="'+esc(k)+'" value="'+val(!multi&&sStk[k]==null?stake:sStk[k])+'" placeholder="Stake" aria-label="Stake"></li>';}).join("")+'</ul>';
+      +'<span class="sb-o mono">'+legOdd(k,SB).toFixed(2)+'</span><input type="number" inputmode="decimal" min="0" step="1" class="sb-in" data-stk="'+esc(k)+'" value="'+val(!multi&&sStk[k]==null?stake:sStk[k])+'" placeholder="Stake" aria-label="Stake"></li>';}).join("")+'</ul>';
   if(multi)h+='<div class="sb-p"><span class="sb-pn"><b>Parlay</b> <small>('+slip.length+')</small></span><span class="sb-o mono">'+t.odds.toFixed(2)+'</span><input type="number" inputmode="decimal" min="0" step="1" class="sb-in" id="pStk" value="'+val(stake)+'" placeholder="Stake" aria-label="Parlay stake"></div>'
     ;
   h+='<div class="sb-sum"><span><span>Total stake</span> <b class="mono" id="sbTot"></b></span><span><span>Potential return</span> <b class="mono" id="retOut"></b></span></div>';
@@ -1190,16 +1252,15 @@ function renderMySlip(target){
   h+=(window.SPONSOR?'<a class="ss-sp" href="'+esc(SPONSOR.url||"#")+'" role="button" id="playSlip" rel="sponsored nofollow" target="_blank"><span>Play it at</span> <b>'+esc(SPONSOR.name)+'</b> →</a>':'')
     +'<button type="button" class="sb-else" id="playElse">🎟️ <span>I played it elsewhere · save to My coupons</span></button>'
     +'<p class="ss-aff">18+ · <span>Bet only what you can afford to lose.</span></p>';
-  var bk='<option value="best"'+(myBook==="best"?' selected':'')+'>Best price</option>'+BOOKS.map(function(b){return '<option value="'+esc(b)+'"'+(myBook===b?' selected':'')+'>'+esc(b)+'</option>';}).join("");
-  h+='<div class="sb-ft"><select id="bkSel" aria-label="My bookmaker">'+bk+'</select><button type="button" id="copySlip" aria-label="Copy">⧉ <span>Copy</span></button><button type="button" id="clearSlip" aria-label="Clear">🗑</button></div></div>';
+  h+=bkListHTML()+'<div class="sb-ft"><button type="button" id="copySlip" aria-label="Copy">⧉ <span>Copy</span></button><button type="button" id="clearSlip" aria-label="Clear">🗑</button></div></div>';
   box.innerHTML=h;
-  var calc=function(){var tot=0,ret=0;slip.forEach(function(k){var v=multi?(+sStk[k]||0):(sStk[k]==null?stake:+sStk[k]||0);tot+=v;ret+=v*SEL[k].odd;});
+  var calc=function(){var tot=0,ret=0;slip.forEach(function(k){var v=multi?(+sStk[k]||0):(sStk[k]==null?stake:+sStk[k]||0);tot+=v;ret+=v*legOdd(k,SB);});
     if(multi){var p=+stake||0;tot+=p;ret+=p*t.odds;}$("sbTot").textContent=tot.toFixed(2)+" €";$("retOut").textContent=ret.toFixed(2)+" €";};
   calc();
   Array.prototype.forEach.call(box.querySelectorAll("[data-rm]"),function(b){b.addEventListener("click",function(){toggleSel(b.dataset.rm);});});
   Array.prototype.forEach.call(box.querySelectorAll("[data-stk]"),function(inp){inp.addEventListener("input",function(){var v=parseFloat(this.value);sStk[inp.dataset.stk]=v>0?v:0;if(!multi&&v>0)stake=v;store("ko-sstk",sStk);save();calc();renderBar();});});
   if($("pStk"))$("pStk").addEventListener("input",function(){var v=parseFloat(this.value);stake=v>0?v:0;save();calc();renderBar();});
-  $("bkSel").addEventListener("change",function(){setBook(this.value);});
+  bindBkList(box);
   $("clearSlip").addEventListener("click",function(){slip=[];sStk={};store("ko-sstk",sStk);afterSlip();toast("Slip cleared");});
   /* απόφαση Owner 02/11: ένας δρόμος, όπως στον bookmaker. Παίξ' το → ανοίγει ο χορηγός ΚΑΙ μπαίνει στα Κουπόνια μου (ανοιχτά) */
   var place=function(viaSponsor){var n=0;
@@ -1440,7 +1501,7 @@ function renderWins(){var box=$("winsSide");if(!box)return;
   /* απόφαση Owner 02/11: παρολί που κλείνει κερδισμένο μπαίνει από πάνω, μόλις κλείσει (και πριν το ενημερώσει ο server) */
   var L=(typeof BZC!=="undefined"&&BZC)||[],cw=L.filter(cpWon).sort(function(a,b){return cpX(b)-cpX(a);});
   var h,YW=(typeof YREC!=="undefined"&&YREC&&YREC.yw)||null,useY=!cw.length&&YW&&(YW.cps.length||YW.tips.length)&&(!wins.length||athHour()<14)&&(typeof DAYNAV==="undefined"||DAYNAV.date===DAYNAV.today);
-  var wh=$("winsH"),wt=useY?"Our biggest wins yesterday":"Our biggest wins today";if(wh&&wh._t!==wt){wh._t=wt;wh.textContent=(window.__I18N&&__I18N[wt])||wt;}
+  var wt=useY?"Our biggest wins yesterday":"Our biggest wins today",wh0='<h3 class="wins-h">'+wt+'</h3>';
   if(useY){
     /* απόφαση Owner 03/11: το πρωί, μέχρι να έρθουν νίκες σήμερα, δείχνουμε τις χθεσινές (πρώτα τα παρολί) */
     h=YW.cps.map(function(c){var legs=c.legs.map(function(l,j){return '<div class="bwleg'+(l.v?' cv':'')+'" style="--d:'+(350+j*140)+'ms"><b class="bwtick">'+(l.v?'–':'✓')+'</b><span class="bzm"><b>'+esc(l.h||"")+' – '+esc(l.a||"")+'</b>'+(l.v?'<small><span>Postponed</span></small>':'')+'</span>'+(l.v?'<span class="bzp">–</span><span class="mono bzo">1.00</span>':'<span class="bzp">'+esc(l.sel||"")+'</span><span class="mono bzo">'+(l.p?(+l.p).toFixed(2):"")+'</span>')+'</div>';}).join("");
@@ -1448,17 +1509,22 @@ function renderWins(){var box=$("winsSide");if(!box)return;
     if(YW.tips.length)h+='<div>'+YW.tips.map(function(x,i){return '<div class="winrow" style="--d:'+(i*90)+'ms"><span class="wm"><b>'+esc(x.h)+' v '+esc(x.a)+'</b><small>'+esc(x.sel)+(x.sc?' · FT '+esc(x.sc):'')+'</small></span><span class="wo">✓ '+(x.p?(+x.p).toFixed(2):'')+'</span></div>';}).join("")+'</div>';
   }
   else if(!cw.length&&!wins.length)h='<div class="empty">No wins yet today. Matches are still running.</div>';
+  if(useY)h=wh0+h;
   else{
     h=cw.map(function(c){var legs=c.legs.map(function(l,j){var v=cpVoid(l);return '<div class="bwleg'+(v?' cv':'')+'" style="--d:'+(350+j*140)+'ms"><b class="bwtick">'+(v?'–':'✓')+'</b><span class="bzm"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+esc(l.league||"")+(v?' · <span>Postponed</span>':l.gh!=null?' · '+l.gh+'-'+l.ga:'')+'</small></span>'+(v?'<span class="bzp">–</span><span class="mono bzo">1.00</span>':l.locked?'<span class="bzp vip">VIP</span><span></span>':'<span class="bzp">'+esc(BZC_SEL[l.sel]||l.sel)+'</span><span class="mono bzo">'+(l.price?l.price.toFixed(2):"")+'</span>')+'</div>';}).join("");
       return '<div class="bigwin"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv">'+esc(c.kind)+' · '+esc(BZC_VAR[c.variant]||c.variant)+'</span><span class="mono bwodd">x'+cpX(c).toFixed(2)+'</span></div>'+legs+'</div>';}).join("");
     var top=wins.slice(0,8);
-    if(top.length)h+='<div>'+top.map(function(x,i){return '<div class="winrow" style="--d:'+(i*90)+'ms"><span class="wm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+' · FT '+esc(x.m.score)+'</small></span><span class="wo">✓ '+(x.t.odds?x.t.odds.toFixed(2):'')+'</span></div>';}).join("")+'</div>';
+    h=wh0+h;if(top.length)h+='<div>'+top.map(function(x,i){return '<div class="winrow" style="--d:'+(i*90)+'ms"><span class="wm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+' · FT '+esc(x.m.score)+'</small></span><span class="wo">✓ '+(x.t.odds?x.t.odds.toFixed(2):'')+'</span></div>';}).join("")+'</div>';
   }
   /* απόφαση Owner 04/11: στις μεγαλύτερες νίκες πάντα και παρολί· αν δεν κέρδισε κανένα σήμερα/χθες, το τελευταίο που κέρδισε, με ημερομηνία */
   var LW=(typeof YREC!=="undefined"&&YREC&&YREC.last)||null,hasCp=cw.length||(useY&&YW.cps.length);
   if(LW&&!hasCp){var LL=LW.legs||[],lg=LL.slice(0,4).map(function(l,j){return '<div class="bwleg'+(l.v?' cv':'')+'" style="--d:'+(350+j*140)+'ms"><b class="bwtick">'+(l.v?'–':'✓')+'</b><span class="bzm"><b>'+esc(l.h||"")+' – '+esc(l.a||"")+'</b>'+(l.v?'<small><span>Postponed</span></small>':'<small>'+esc(l.sel||"")+'</small>')+'</span>'+(l.v?'<span class="bzp"><s>'+(l.p?(+l.p).toFixed(2):'')+'</s> 1.00</span>':'<span class="bzp mono">'+(l.p?(+l.p).toFixed(2):'')+'</span>')+'</div>';}).join("");
-    h='<div class="bigwin bwlast"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv"><span>Last parlay that won</span> · '+esc(LW.label||LW.date||"")+'</span><span class="mono bwodd">x'+(+LW.odds).toFixed(2)+'</span></div>'+lg+(LL.length>4?'<div class="bwleg" style="--d:950ms;display:block;color:var(--muted)">+'+(LL.length-4)+' <span>picks</span></div>':'')+'</div>'+(h||"");}
-  if(box._h===h)return;box._h=h;box.innerHTML=h;}
+    h='<div class="bigwin bwlast" role="button" tabindex="0" data-lastwin2="1" aria-label="Last parlay that won"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv"><span>Last parlay that won</span> · '+esc(LW.label||LW.date||"")+'</span><span class="mono bwodd">x'+(+LW.odds).toFixed(2)+'</span></div>'+lg
+      +'<div class="bwmore">'+(LL.length>4?'<b class="mono">+'+(LL.length-4)+'</b> <span>more picks</span> · ':'')+'<span>See the whole parlay</span> <span aria-hidden="true">›</span></div></div>'+(h||"");}
+  if(box._h===h)return;box._h=h;box.innerHTML=h;
+  var lw=box.querySelector("[data-lastwin2]");if(lw&&LW){var open=function(){couponBig({kind:String(LW.kind||"").replace("-","–"),variant:LW.variant||"mix",odds:LW.odds,
+    legs:(LW.legs||[]).map(function(l){return {home:l.h,away:l.a,sel:l.sel==="1"?l.h:l.sel==="2"?l.a:l.sel,result:l.v?2:null};})});};
+    lw.addEventListener("click",open);lw.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});}}
 if(window.matchMedia){var _sm=window.matchMedia("(min-width:1100px)");var _sf=function(){renderSide();try{renderPicks();}catch(e){}};if(_sm.addEventListener)_sm.addEventListener("change",_sf);else if(_sm.addListener)_sm.addListener(_sf);}
 
 /* ---------- helpers ---------- */
@@ -1473,7 +1539,7 @@ var mFilter="all", q="";
 var DN=(typeof DAYNAV!=="undefined"&&DAYNAV)||{date:"",today:"",nav:[]},IS_TODAY=!DN.date||DN.date===DN.today;
 /* απόφαση Owner 02/11: δύο κουμπιά, «⭐ Τα πρωταθλήματά μου» (ξεκινάει με τα 50 σημαντικά) και «Όλα».
    Αλλαγή της λίστας μόνο με λογαριασμό (αλλιώς → εγγραφή). */
-var lFil=load("ko-lfil2","mine");if(["all","mine"].indexOf(lFil)<0)lFil="mine";
+var lFil=load("ko-lfil2","mine");if(["all","mine"].indexOf(lFil)<0)lFil="mine"; /* απόφαση Owner 02/11: προεπιλογή «Τα πρωταθλήματά μου» (50 λίγκες) */
 var MYL=load("ko-myl",null); /* null = τα 50 σημαντικά */
 function inMyL(k){return MYL&&ACC?MYL.indexOf(k)>=0:topIx(k)<999;}
 var tipF=false,calF=false,favF=false,stripOpen=false,FAV=new Set(load("ko-fav",[])||[]);
@@ -1486,30 +1552,41 @@ function passAll(m,o){o=o||{};var tf=o.t!=null?o.t:mFilter,lf=o.l!=null?o.l:lFil
 function countFilter(f){return MATCHES.filter(function(m){return passF(m,f);}).length;}
 function cnt(o){return MATCHES.filter(function(m){return passAll(m,o);}).length;}
 function chipEl(html,on,fn,cls,href){var b=document.createElement(href?"a":"button");if(href)b.href=href;else b.type="button";b.className="chip"+(cls?" "+cls:"");b.setAttribute("aria-pressed",on?"true":"false");b.innerHTML=html;if(fn)b.addEventListener("click",fn);return b;}
+/* αγώνες άλλης μέρας (από τον server, ανά λίγκα) με το φίλτρο λιγκών */
+function dayN(map){var n=0;if(!map)return null;for(var k in map)if(lFil!=="mine"||passL({key:k},"mine"))n+=map[k];return n;}
 function renderFilters(){
   var nl=MATCHES.filter(function(m){return m.live;}).length,lb=$("liveBdg");lb.hidden=!nl;lb.textContent=nl+" live";
-  var _sl1=$("mFilter").scrollLeft,_sl2=$("lFilter").scrollLeft;
+  var _sl1=$("mFilter").scrollLeft,_sl2=$("lFilter").scrollLeft,DC=DN.cnt||{};
   var box=$("mFilter");box.innerHTML="";
-  if(IS_TODAY&&nl)box.appendChild(chipEl('<span class="ldot"></span>Live <span class="c">'+cnt({t:"live"})+'</span>',mFilter==="live",function(){mFilter=mFilter==="live"?"all":"live";renderFilters();renderMatches();},"livechip"));
-  DN.nav.forEach(function(d){if(d.n!==0&&d.n!==1)return;var cur=!DN.all&&d.d===DN.date,on=cur&&mFilter!=="live";
+  var liveOn=mFilter==="live",goLive=function(){mFilter=liveOn?"all":"live";renderFilters();renderMatches();},nLive=cnt({t:"live",f:false});
+  /* PC: ξεχωριστό κουμπί Live. Κινητό (απόφαση Owner 04/11): πράσινο σηματάκι πάνω στο «Σήμερα», για να κερδίσουμε χώρο */
+  if(IS_TODAY&&nl)box.appendChild(chipEl('<span class="ldot"></span>Live <span class="c">'+nLive+'</span>',liveOn,goLive,"livechip"));
+  DN.nav.forEach(function(d){if(d.n!==0&&d.n!==1)return;var cur=!DN.all&&d.d===DN.date,on=cur&&!liveOn;
+    var n=cur?cnt({t:"all",f:false}):dayN(d.n===0?DC.d:DC.t),lv=cur&&IS_TODAY&&nl?'<span class="lvb'+(liveOn?' on':'')+'" role="button" tabindex="0" aria-pressed="'+(liveOn?'true':'false')+'" aria-label="Live"><span class="ldot"></span>'+nLive+'</span>':'';
     /* η μέρα της σελίδας είναι κουμπί (χωρίς ξαναφόρτωμα) και από το Live· οι άλλες μέρες είναι σύνδεσμοι */
-    box.appendChild(chipEl('<span>'+esc(d.lbl)+'</span>'+(cur?' <span class="c">'+cnt({t:"all"})+'</span>':''),on,cur?function(e){e.preventDefault();if(mFilter==="all")return;mFilter="all";renderFilters();renderMatches();}:null,"",cur?null:d.href));});
+    var el=chipEl('<span>'+esc(d.lbl)+'</span>'+(n!=null?' <span class="c">'+n+'</span>':'')+lv,on,cur?function(e){e.preventDefault();if(e.target.closest&&e.target.closest(".lvb")){goLive();return;}if(mFilter==="all")return;mFilter="all";renderFilters();renderMatches();}:null,lv?"daylv":"",cur?null:d.href);
+    var lvEl=el.querySelector(".lvb");if(lvEl)lvEl.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();e.stopPropagation();goLive();}});
+    box.appendChild(el);});
   /* απόφαση Owner 03/11: «Όλες οι μέρες» = σήμερα έως μεθαύριο σε μία λίστα */
-  box.appendChild(chipEl('<span>All days</span>'+(DN.all?' <span class="c">'+cnt({t:"all"})+'</span>':''),!!DN.all&&mFilter!=="live",DN.all?function(e){e.preventDefault();mFilter="all";renderFilters();renderMatches();}:null,"",DN.all?null:"?d=all"));
+  var na=DN.all?cnt({t:"all",f:false}):dayN(DC.a);
+  box.appendChild(chipEl('<span>All days</span>'+(na!=null?' <span class="c">'+na+'</span>':''),!!DN.all&&!liveOn,DN.all?function(e){e.preventDefault();mFilter="all";renderFilters();renderMatches();}:null,"",DN.all?null:"?d=all"));
   var other=DN.all?null:DN.nav.filter(function(d){return d.d===DN.date&&d.n!==0&&d.n!==1;})[0];
-  if(other)box.appendChild(chipEl('<span>'+esc(other.lbl)+'</span> <span class="c">'+cnt({t:"all"})+'</span>',true,null,""));
+  if(other)box.appendChild(chipEl('<span>'+esc(other.lbl)+'</span> <span class="c">'+cnt({t:"all",f:false})+'</span>',true,null,""));
   box.appendChild(chipEl("📅",stripOpen,function(){stripOpen=!stripOpen;renderFilters();},"calchip"));
   var st=$("dayStrip");st.hidden=!stripOpen;
   st.innerHTML=DN.nav.map(function(d){return '<a class="dayb'+(d.d===DN.date?' on':'')+'" href="'+(d.d===DN.date?'#':esc(d.href))+'"'+(d.d===DN.date?' data-cur="1"':'')+'><span>'+esc(d.lbl)+'</span><small class="mono">'+esc(d.d.slice(8,10)+"/"+d.d.slice(5,7))+'</small></a>';}).join("");
   var cur=st.querySelector("[data-cur]");if(cur)cur.addEventListener("click",function(e){e.preventDefault();stripOpen=false;renderFilters();});
   var lb2=$("lFilter");lb2.innerHTML="";
+  /* απόφαση Owner 02/11: πρώτα «Τα πρωταθλήματά μου» (προεπιλογή), μετά «Όλα» */
   [["mine","My leagues"],["all","All"]].forEach(function(f){
-    lb2.appendChild(chipEl((f[0]==="mine"?"⭐ ":"")+'<span>'+esc(f[1])+'</span> <span class="c">'+cnt({l:f[0]})+'</span>',lFil===f[0],function(){
-      lFil=f[0];store("ko-lfil2",lFil);renderFilters();renderMatches();}));});
+    lb2.appendChild(chipEl((f[0]==="mine"?"⭐ ":"")+'<span>'+esc(f[1])+'</span> <span class="c">'+cnt({l:f[0],f:false})+'</span>',lFil===f[0]&&!favF,function(){
+      lFil=f[0];favF=false;store("ko-lfil2",lFil);renderFilters();renderMatches();}));});
   lb2.appendChild(chipEl('✎',false,function(){openMyL();},"tog"));
   var sep=document.createElement("span");sep.className="fsep";sep.setAttribute("aria-hidden","true");lb2.appendChild(sep);
   lb2.appendChild(chipEl('<span>With tip</span> <span class="c">'+cnt({tip:true})+'</span>',tipF,function(){tipF=!tipF;renderFilters();renderMatches();},"tog"));
-  lb2.appendChild(chipEl('<span>⭐ My games</span> <span class="c">'+FAV.size+'</span>',favF,function(){if(!FAV.size&&!favF){toast("Tap ☆ on a match to follow it");return;}favF=!favF;renderFilters();renderMatches();},"tog"));
+  /* 04/11: ο αριθμός = αγώνες με ★ σε ΑΥΤΗ τη μέρα (όχι όλοι όσοι έχουν αποθηκευτεί, π.χ. χθεσινοί/αυριανοί) */
+  var nf=MATCHES.filter(function(m){return FAV.has(String(m.id));}).length;
+  lb2.appendChild(chipEl('<span>⭐ My games</span> <span class="c">'+nf+'</span>',favF,function(){if(!nf&&!favF){toast(FAV.size?"None of your followed games is on this day":"Tap ☆ on a match to follow it");return;}favF=!favF;renderFilters();renderMatches();},"tog"));
   var nc=cnt({c:true});if(nc)lb2.appendChild(chipEl('<span>🎯 Called</span> <span class="c">'+nc+'</span>',calF,function(){calF=!calF;renderFilters();renderMatches();},"tog calledchip"));
   box.scrollLeft=_sl1;lb2.scrollLeft=_sl2;
 }
@@ -1573,6 +1650,15 @@ function detailHTML(m){
 }
 document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest('#mFilter a[href],#dayStrip a[href]');if(a&&a.getAttribute("href")!=="#"){try{sessionStorage.setItem("ko-y",String(window.scrollY));}catch(x){}}},true);
 function renderMatches(){var _y=window.scrollY;renderMatches2();if(Math.abs(window.scrollY-_y)>2)window.scrollTo(0,_y);}
+/* απόφαση Owner 04/11: ☆ στην κεφαλίδα κάθε λίγκας → μπαίνει/βγαίνει από «Τα πρωταθλήματά μου» (όπως το ☆ στους αγώνες) */
+function lgStar(k){var on=!!ACC&&inMyL(k);return '<button type="button" class="fav lgfav'+(on?' on':'')+'" data-lgfav="'+esc(k)+'" aria-pressed="'+(on?'true':'false')+'" aria-label="Follow this league">'+(on?'★':'☆')+'</button>';}
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-lgfav]");if(!b)return;e.preventDefault();e.stopPropagation();
+  if(!ACC){toast("Sign up free to pick your own leagues");openAuth();return;}
+  var k=b.dataset.lgfav;if(!MYL){MYL=[];MATCHES.forEach(function(m){if(topIx(m.key)<999&&MYL.indexOf(m.key)<0)MYL.push(m.key);});}
+  var i=MYL.indexOf(k),on=i<0;if(on)MYL.push(k);else MYL.splice(i,1);store("ko-myl",MYL);toast(on?"Added to My leagues":"Removed from My leagues");
+  if(lFil==="mine"&&!favF){renderFilters();renderMatches();return;}
+  Array.prototype.forEach.call(document.querySelectorAll("[data-lgfav]"),function(x){if(x.dataset.lgfav!==k)return;x.classList.toggle("on",on);x.setAttribute("aria-pressed",on?"true":"false");x.textContent=on?"★":"☆";});
+  renderFilters();});
 /* γρήγορη λίστα: οι πρώτοι ~60 αγώνες αμέσως, οι υπόλοιποι σε κομμάτια στο παρασκήνιο (δεν «κολλάει» η σελίδα στο κινητό) */
 var RJOB=0;
 function renderMatches2(){
@@ -1582,7 +1668,7 @@ function renderMatches2(){
   if(!list.length){box.innerHTML='<div class="empty" style="border:0">No matches for this filter.</div>';return;}
   var cnt={};list.forEach(function(m){cnt[m.key]=(cnt[m.key]||0)+1;});
   var blocks=[],cur=null;
-  list.forEach(function(m){if(!cur||cur.key!==m.key){cur={key:m.key,h:'<div class="lghead"><b>'+esc(m.country)+' · '+esc(m.league)+'</b><span>'+cnt[m.key]+'</span></div>',n:0};blocks.push(cur);}cur.h+=rowHTML(m);cur.n++;});
+  list.forEach(function(m){if(!cur||cur.key!==m.key){cur={key:m.key,h:'<div class="lghead"><b>'+esc(m.country)+' · '+esc(m.league)+'</b><span class="lgr"><span>'+cnt[m.key]+'</span>'+lgStar(m.key)+'</span></div>',n:0};blocks.push(cur);}cur.h+=rowHTML(m);cur.n++;});
   var i=0;
   function chunk(limit){var h="",n=0;while(i<blocks.length&&(n<limit||!n)){h+='<div class="lgb">'+blocks[i].h+'</div>';n+=blocks[i].n;i++;}return h;}
   box.innerHTML=chunk(60);bindMatchList();
@@ -1772,7 +1858,7 @@ $("demoCalled").addEventListener("click",function(){
         if(done&&!m.done&&sc===m.bz){m.hit=true;/* απόφαση 03/11: μεγάλη γιορτή μόνο για δικό μας tip ή δικό του παιχνίδι */if(m.tips.length||FAV.has(String(m.id)))fx.push(function(){calledIt(m);});}
         m.score=sc;m.min=mnx;m.live=live;m.done=done;m.open=!live&&!done&&!OFF[st];m.type=live?"inprogress":done?"finished":(OFF[st]||m.type);
       });
-      if(changed){renderFilters();renderMatches();try{renderTips();renderCoupons();renderBar();renderMyLive();renderWins();}catch(e){}fx.forEach(function(f,i){setTimeout(f,250+i*700);});}
+      if(changed){renderFilters();renderMatches();try{renderTips();renderCoupons();renderBar();renderMyLive();renderWins();}catch(e){}try{renderStrong();}catch(e){}fx.forEach(function(f,i){setTimeout(f,250+i*700);});}
     }).catch(function(){});
   }
   tick();setInterval(function(){if(!document.hidden)tick();},30000);
@@ -1871,7 +1957,7 @@ function tracked(keys){var s=keys.slice().sort().join("|");return coupons.some(f
 function trkBtn(attr,keys){var on=keys.length&&tracked(keys);return '<button type="button" class="trk'+(on?' on':'')+'" '+attr+(on?' disabled':'')+'>'+(on?'✓ <span>In My coupons</span>':'🎟️ <span>To My coupons</span>')+'</button>';}
 var SPONSOR_A='<a class="spb" href="#" role="button" rel="sponsored nofollow" data-spon="1"><span>Bet now</span> →</a>';
 /* μέχρι να υπάρξει χορηγός: μήνυμα αντί για κενό κλικ */
-document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("[data-spon],.ss-sp,.sponsor");if(!a)return;e.preventDefault();toast("Our partner bookmaker is coming soon");});
+document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("[data-spon],.ss-sp,.sponsor");if(!a)return;bzHit("bk",a.dataset.bk||"sponsor");e.preventDefault();toast("Our partner bookmaker is coming soon");});
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-fav]");if(!b)return;e.preventDefault();e.stopPropagation();
   var id=String(b.dataset.fav);if(FAV.has(id)){FAV.delete(id);toast("Removed from My games");}else{FAV.add(id);toast("Added to My games");}
   store("ko-fav",Array.from(FAV));b.classList.toggle("on",FAV.has(id));b.textContent=FAV.has(id)?"★":"☆";try{renderFilters();if(favF)renderMatches();}catch(x){}try{renderMyLive();}catch(x){}},true);
@@ -1925,18 +2011,41 @@ function renderStrong(){var box=$("strongBox");if(!box)return;
     return;}
   box.hidden=false;
   var res=function(r){return r===1?'<span class="pc-r w">✓</span>':r===0?'<span class="pc-r l">✗</span>':r===2?'<span class="pc-r v">–</span>':'';};
-  var priceNow=function(c){if(c.result!=null)return '';if(c.now&&c.min&&c.now<c.min*0.98)return '<div class="stb-warn">⚠ <span>Not worth it at this price anymore</span> ('+c.now.toFixed(2)+')</div>';if(c.now&&c.now<c.price-0.005)return '<div class="stb-now"><span>now</span> '+c.now.toFixed(2)+'</div>';return '';};
-  var card=function(c,ic,lab){if(!c)return '';var k=c.id+":"+c.sel;
-    return '<article class="stb-c"><div class="stb-t">'+ic+' <b><span>'+lab+'</span></b>'+(c.tier==="vip"?' <span class="vipt">VIP</span>':'')+'<small>'+esc(c.league||"")+' · '+esc(c.time||"")+'</small></div>'
-      +'<div class="stb-m">'+esc(c.home)+' – '+esc(c.away)+'</div>'
-      +'<div class="stb-p"><span class="stb-sel">'+esc(BZC_SEL[c.sel]||c.sel)+'</span><span class="mono stb-o">'+Number(c.price).toFixed(2)+'</span>'+res(c.result)
-      +(c.result==null&&SEL[k]?'<button type="button" class="btn sec stb-add" data-key="'+esc(k)+'" aria-pressed="false" aria-label="Add to slip">+</button>':'')+'</div>'
-      +priceNow(c)+(c.why?'<p class="stb-why">'+esc(c.why)+'</p>':'')+(c.url?'<a class="m-url" href="'+esc(c.url)+'"><span>All about this match</span> →</a>':'')+'</article>';};
-  var tr=BZS.treble,h='<div class="stb-h"><b>⚡ <span>Today\'s strongest</span></b></div><div class="stb-g">'+card(BZS.win,'🏆','Win')+card(BZS.goals,'⚽','Goals');
+  var priceNow=function(c){if(c.result!=null||lvOf(c).lv||lvOf(c).dn)return '';if(c.now&&c.min&&c.now<c.min*0.98)return '<div class="stb-warn">⚠ <span>Not worth it at this price anymore</span> ('+c.now.toFixed(2)+')</div>';if(c.now&&c.now<c.price-0.005)return '<div class="stb-now"><span>now</span> '+c.now.toFixed(2)+'</div>';return '';};
+  /* live στα μονά (απόφαση Owner 03/11): λεπτό πράσινο + σκορ σε πράσινο κουτί, από τους αγώνες της σελίδας (ανά 30΄΄). Η τριάδα μένει ως έχει (δεν χωράει) */
+  var lvOf=function(c){var mm=null;for(var q=0;q<MATCHES.length;q++)if(String(MATCHES[q].id)===String(c.id)){mm=MATCHES[q];break;}
+    var LVS=["1H","2H","HT","ET","BT","P","LIVE","INT"],lv=mm?mm.live:LVS.indexOf(c.status)>=0,dn=mm?mm.done:["FT","AET","PEN"].indexOf(c.status)>=0;
+    var sc=mm&&mm.score?mm.score:(c.gh!=null?c.gh+"-"+c.ga:""),mn=mm&&mm.min?(mm.min==="HT"?"HT":mm.min+"'"):"";return {lv:lv,dn:dn,sc:sc,mn:mn};};
+  /* αποτέλεσμα: από τον server, αλλιώς από το live (Over/GG που μπήκε → ✓) */
+  var stOf=function(c,L){if(c.result!=null)return c.result;if((L.lv||L.dn)&&L.sc){var es=tipState({sel:({"1":"home","2":"away","X":"x","O25":"over 2.5","O15":"over 1.5","U25":"under 2.5","GG":"gg","NG":"ng"})[c.sel]||""},{live:L.lv,done:L.dn,score:L.sc});if(es==="won")return 1;if(es==="lost")return 0;}return null;};
+  var verdict=function(r){return r===1?'<div class="stb-v w">✓ <span>Won</span></div>':r===0?'<div class="stb-v l">✗ <span>Lost</span></div>':r===2?'<div class="stb-v">– void</div>':'';};
+  var pickTxt=function(c){var b=esc(BZC_SEL[c.sel]||c.sel);return c.sel==="1"?b+' · '+esc(c.home):c.sel==="2"?b+' · '+esc(c.away):b;};
+  var sc2=function(x){return esc(String(x||"").replace("-"," – "));};
+  /* απόφαση Owner 03/11: ίδια γεωμετρία στις 3 κάρτες — κεφαλίδα (τύπος · κατάσταση), λίγκα, ομάδες, σκορ, «Η πρότασή μας», ανάλυση, κουμπί κάτω */
+  var card=function(c,lab){if(!c)return '';var k=c.id+":"+c.sel,L=lvOf(c),r=stOf(c,L);
+    var st=L.lv?'<span class="stb-st on"><i class="ldot2"></i>LIVE '+esc(L.mn)+'</span>':L.dn?'<span class="stb-st"><span>Finished</span></span>':'';
+    var btn=c.result==null&&!L.lv&&!L.dn&&SEL[k]?'<button type="button" class="btn sec stb-add" data-key="'+esc(k)+'" aria-pressed="false">+ <span>Add to my slip</span></button>'
+      :'<div class="stb-btn off">'+(L.dn||c.result!=null?'<span>Match over</span>':'<span>In progress</span>')+'</div>';
+    return '<article class="stb-c'+(L.lv?' lv':'')+'"><div class="stb-hd"><b><span>'+lab+'</span></b>'+(c.tier==="vip"?'<span class="vipt">VIP</span>':'')+st+'</div>'
+      +'<div class="stb-lgn">'+esc(c.league||"")+'</div>'
+      +'<div class="stb-tms"><div>'+esc(c.home)+'</div><div>'+esc(c.away)+'</div></div>'
+      +'<div class="stb-scr">'+(L.lv||L.dn?'<span>Score</span> <b class="mono'+(L.lv?' on':'')+'">'+sc2(L.sc||"0-0")+'</b>':'<span>Kick-off</span> <b class="mono">'+esc(c.time||"")+'</b>')+'</div>'
+      +'<div class="stb-pk"><div class="stb-lb"><span>Our pick</span></div><div class="stb-pr"><span class="stb-sel">'+pickTxt(c)+'</span><span class="mono stb-o">'+Number(c.price).toFixed(2)+'</span></div>'+verdict(r)+priceNow(c)+'</div>'
+      +(c.why?'<p class="stb-why">'+esc(c.why)+'</p>':'')+(c.url?'<a class="m-url" href="'+esc(c.url)+'"><span>All about this match</span> →</a>':'')
+      +'<div class="stb-ft">'+btn+'</div></article>';};
+  var tr=BZS.treble,h='<div class="stb-h"><b>⚡ <span>Today\'s strongest</span></b></div><div class="stb-g">'+card(BZS.win,'Win')+card(BZS.goals,'Goals');
   if(tr){var keys=tr.legs.map(function(c){return c.id+":"+c.sel;}).filter(function(k){return SEL[k];});
-    h+='<article class="stb-c"><div class="stb-t">🎯 <b><span>Treble</span></b> <span class="mono stb-o">x'+Number(tr.odds).toFixed(2)+'</span>'+res(tr.result)+'</div><ul class="stb-l">'
-      +tr.legs.map(function(c){return '<li><span>'+esc(c.home)+' – '+esc(c.away)+' <small>'+esc(c.time||"")+'</small></span><b>'+esc(BZC_SEL[c.sel]||c.sel)+'</b>'+(c.tier==="vip"?'<span class="vipt">VIP</span>':'')+'<span class="mono">'+Number(c.price).toFixed(2)+'</span>'+res(c.result)+'</li>';}).join("")+'</ul>'
-      +(tr.result==null&&keys.length===3?'<button type="button" class="pc-take" id="stbTake">🎟️ <span>Take it</span> → <span>My slip</span></button>':'')+'</article>';}
+    var Ls=tr.legs.map(lvOf),anyLv=Ls.some(function(L){return L.lv;}),allDn=Ls.every(function(L){return L.dn;});
+    var rs=tr.legs.map(function(c,i){return stOf(c,Ls[i]);}),tres=tr.result!=null?tr.result:rs.some(function(x){return x===0;})?0:rs.every(function(x){return x===1||x===2;})?1:null;
+    var tst=tres===1?'<span class="stb-st w">✓ <span>Won</span></span>':tres===0?'<span class="stb-st l">✗ <span>Lost</span></span>':anyLv?'<span class="stb-st on"><i class="ldot2"></i><span>In progress</span></span>':allDn?'<span class="stb-st"><span>Finished</span></span>':'';
+    h+='<article class="stb-c stb-tr"><div class="stb-hd"><b><span>Treble</span></b>'+tst+'</div><div class="stb-lgn"><span>3 picks in one slip</span></div><ul class="stb-l">'
+      +tr.legs.map(function(c,i){var L=Ls[i],r=rs[i];
+        /* γραμμή 2: λίγκα · ώρα (ή λεπτό · σκορ, ή ✓/✗ · τελικό) */
+        var sub=r===1?'<span class="w">✓ <span>Won</span></span> · <span>Full time</span> '+sc2(L.sc):r===0?'<span class="l">✗ <span>Lost</span></span> · '+sc2(L.sc)
+          :L.lv?esc(c.league||"")+' · <span class="on">'+esc(L.mn||"LIVE")+'</span> · <b class="mono on">'+sc2(L.sc||"0-0")+'</b>':L.dn?esc(c.league||"")+' · FT '+sc2(L.sc):esc(c.league||"")+' · '+esc(c.time||"");
+        return '<li><div class="stb-lg"><span class="stb-lm">'+esc(c.home)+' – '+esc(c.away)+'</span><small>'+sub+'</small></div><div class="stb-tp"><b>'+esc(BZC_SEL[c.sel]||c.sel)+(c.tier==="vip"?' <span class="vipt">VIP</span>':'')+'</b><span class="mono">'+Number(c.price).toFixed(2)+'</span></div></li>';}).join("")+'</ul>'
+      +'<div class="stb-tot"><span>Total odds</span><b class="mono">'+Number(tr.odds).toFixed(2)+'</b></div>'
+      +'<div class="stb-ft">'+(tr.result==null&&tres==null&&!Ls.some(function(L){return L.lv||L.dn;})&&keys.length===3?'<button type="button" class="pc-take" id="stbTake">+ <span>Treble to my slip</span></button>':'<div class="stb-btn off">'+(allDn||tres!=null?'<span>Match over</span>':'<span>In progress</span>')+'</div>')+'</div></article>';}
   h+='</div>';box.innerHTML=h;bindButtons(box);syncPressed();
   var tk=$("stbTake");if(tk)tk.addEventListener("click",function(){var keys=tr.legs.map(function(c){return c.id+":"+c.sel;}).filter(function(k){return SEL[k];});slip=keys.slice();sStk={};store("ko-sstk",sStk);afterSlip();toast("In your slip");if(!sideOn())openSheet();});}
 function renderPicks(){
@@ -2213,7 +2322,7 @@ function openMyL(){if(!ACC){toast("Sign up free to pick your own leagues");openA
 var ACC=null,authMail="";
 function authStep(n){[1,2,3].forEach(function(i){$("authS"+i).hidden=i!==n;});if($("mylS"))$("mylS").hidden=true;$("authErr").hidden=true;}
 function authErr(m){var e=$("authErr");e.textContent=m;e.hidden=false;}
-function openAuth(){authStep(ACC?3:1);if(ACC){$("accMail").textContent=ACC.email;$("accCr").textContent=ACC.credits;tgRender();}
+function openAuth(){if(!ACC)bzHit("su");authStep(ACC?3:1);if(ACC){$("accMail").textContent=ACC.email;$("accCr").textContent=ACC.credits;tgRender();}
   $("authBg").hidden=false;$("authBox").hidden=false;setTimeout(function(){var i=ACC?null:$("authEmail");if(i)i.focus();},50);}
 function closeAuth(){$("authBg").hidden=true;$("authBox").hidden=true;}
 var AERR={email:"Please check your email address.",wait:"Too many tries. Wait a few minutes and try again.",busy:"Too many sign-ups right now. Try again later.",
@@ -2297,6 +2406,12 @@ loadMe();
   window.bzClaim=function(){tries=0;claim();};
   setTimeout(claim,2500);
 })();
+/* μετρητής (απόφαση Owner 02/11): συγκεντρωτικά νούμερα, χωρίς cookies και χωρίς προσωπικά στοιχεία */
+/* δοκιμαστές (?src=bzqa): δεν μετράνε στα νούμερα, σε καμία σελίδα μετά */
+var BZQA=(function(){try{if(/[?&]src=bzqa\b/.test(location.search))localStorage.setItem("bz-qa","1");return localStorage.getItem("bz-qa")==="1";}catch(e){return false;}})();
+function bzHit(k,s){if(BZQA||location.protocol==="file:"||!navigator.sendBeacon)return;try{navigator.sendBeacon("/h",JSON.stringify({k:k,l:langCode(),s:s||""}));}catch(e){}}
+(function(){try{var q=new URLSearchParams(location.search),s=q.get("src")||q.get("utm_source")||"";
+  if(!s&&document.referrer){var h=new URL(document.referrer).hostname;if(h&&h!==location.hostname)s=h.replace(/^www\./,"").split(".")[0];}bzHit("pv",s);}catch(e){}})();
 /* λογότυπο = αρχική (απόφαση Owner 02/11): στην ίδια σελίδα πάει στις Προτάσεις και πάνω-πάνω, χωρίς φόρτωμα */
 document.querySelector(".logoa").addEventListener("click",function(e){if(location.search)return;e.preventDefault();try{showTab("tips");}catch(x){}window.scrollTo({top:0,behavior:"smooth"});});
 /* ---------- init ---------- */

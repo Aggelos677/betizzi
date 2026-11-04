@@ -3,6 +3,7 @@
 import { analysis, tipWhy } from "./analysis.js";
 import { LANGS, HREFLANG, TZ, LOCALE, T, SEL, UI, UI_ORDER, REC, CONSENT, GA_ID } from "./i18n.js";
 import { TRANSLATOR } from "./translator.js";
+import { ADMIN_HTML } from "./admin-page.js";
 import { getDay, getMatch, getRecord, getCoupons } from "./data.js";
 import { PG, PG_ORDER, OP } from "./i18n-pages.js";
 
@@ -105,6 +106,7 @@ export default {
       return r;
     }
     if (p.startsWith("/auth/") || p === "/me.json" || p === "/vip.json") return authRoute(req, env, url);
+    if (p === "/admin" || p.startsWith("/admin/") || p === "/h") return adminRoute(req, env, url);
     const m = p.match(/^\/([a-z]{2})\/$/);
     if (m && LANGS.includes(m[1])) {
       // Γρήγορη φόρτωση: έτοιμη σελίδα από τη μνήμη (έως 60΄΄), ανανέωση στο παρασκήνιο.
@@ -205,6 +207,34 @@ async function authRoute(req, env, url) {
   return J({ error: "not found" });
 }
 
+// Backoffice + μετρητής (απόφαση Owner 02/11). /admin?k=<ADMIN_TOKEN> = προσωρινό μυστικό link (cookie 30 μέρες, μόνο για /admin).
+async function adminRoute(req, env, url) {
+  const p = url.pathname;
+  const eng = (path, init = {}) => {
+    const ck = req.headers.get("cookie") || "";
+    const h = { "content-type": "application/json", "x-bz-session": cookieTok(req), "x-bz-admin": (() => { try { return decodeURIComponent((ck.match(/(?:^|;\s*)bz_adm=([^;]+)/) || [])[1] || ""); } catch (e) { return ""; } })(),
+      "x-bz-country": req.headers.get("cf-ipcountry") || "" };
+    return env.ENGINE ? env.ENGINE.fetch("https://engine" + path, { ...init, headers: h }) : fetch("https://betizzi-engine.bettipsters79.workers.dev" + path, { ...init, headers: h });
+  };
+  const NS = { "cache-control": "private, no-store", "x-robots-tag": "noindex, nofollow" };
+  if (p === "/h") { // μετρητής: συγκεντρωτικά, χωρίς cookies/προσωπικά στοιχεία
+    if (req.method !== "POST") return new Response(null, { status: 204 });
+    const b = await req.text(); eng("/hit", { method: "POST", body: b.slice(0, 300) }).catch(() => {});
+    return new Response(null, { status: 204, headers: NS });
+  }
+  if (p === "/admin") {
+    const k = url.searchParams.get("k");
+    if (k) return new Response(null, { status: 302, headers: { ...NS, location: "/admin", "set-cookie": `bz_adm=${encodeURIComponent(k)}; Path=/admin; Max-Age=${30 * 86400}; HttpOnly; Secure; SameSite=Strict` } });
+    return new Response(ADMIN_HTML, { headers: { ...NS, "content-type": "text/html; charset=utf-8" } });
+  }
+  if (p.startsWith("/admin/api/")) {
+    if (req.method === "POST" && (req.headers.get("origin") || url.origin) !== url.origin) return new Response("{}", { status: 403 });
+    const r = await eng("/admin/" + p.slice(11) + url.search, req.method === "POST" ? { method: "POST", body: await req.text() } : {});
+    return new Response(r.body, { status: r.status, headers: { ...NS, "content-type": r.headers.get("content-type") || "application/json", ...(r.headers.get("content-disposition") ? { "content-disposition": r.headers.get("content-disposition") } : {}) } });
+  }
+  return new Response("not found", { status: 404 });
+}
+
 // Η αιτιολογία των tips έρχεται από το engine στα αγγλικά («8/10 games», «form 7-15 pts», «best price»): τη μεταφράζουμε εδώ, ανά γλώσσα σελίδας.
 const REASON_L = {
   el: ["αγώνες", "φόρμα", "βαθμοί", "καλύτερη τιμή"], es: ["partidos", "forma", "pts", "mejor cuota"], pt: ["jogos", "forma", "pts", "melhor odd"],
@@ -260,7 +290,7 @@ async function stripData(env, lang, tz) {
   try {
     if (!RECC || Date.now() - RECC.t > 10 * 60 * 1000) {
       // παρολί των τελευταίων 10 ημερών (UTC), για «επιλογές της ημέρας χθες» και «τελευταίο που κέρδισε»
-      // απόφαση Owner 03/11: επίσημο record από 3/11/2026· παρολί των ημερών δοκιμών δεν μετράνε
+      // απόφαση Owner 03/11: επίσημο record από 2/11/2026 (η 1/11 ήταν μέρα δοκιμών)
       const days = [...Array(10)].map((_, i) => new Date(Date.now() - (i + 1) * 86400000).toISOString().slice(0, 10)).filter((x) => x >= "2026-11-02");
       const [d, ...cps] = await Promise.all([getRecord(env), ...days.map((x) => getCoupons(env, x).catch(() => []))]);
       RECC = { t: Date.now(), d, cps: days.map((x, i) => ({ date: x, list: cps[i] || [] })) };
@@ -316,8 +346,12 @@ async function todayPage(env, lang, url) {
   // ο engine μετράει μέρα σε UTC: παίρνουμε και τη γειτονική μέρα UTC, για να μη χάνονται αγώνες τα ξημερώματα
   const [y0, m0, d0] = date.split("-").map(Number);
   const nb = ymdIn(DAYTZ, Date.UTC(y0, m0 - 1, d0)) === date ? shift(date, -1) : shift(date, 1);
-  const extra = allDays ? [1, 2, 3].map((n) => getDay(env, shift(date, n)).catch(() => null)) : [];
-  const [day, day2, strip, ...more] = await Promise.all([getDay(env, date), getDay(env, nb).catch(() => null), stripData(env, lang, DAYTZ), ...extra]);
+  // μία κλήση ανά μέρα UTC (ίδια μέρα δεν ζητιέται δύο φορές)
+  const DP = new Map(), gd = (d) => { if (!DP.has(d)) DP.set(d, getDay(env, d)); return DP.get(d); };
+  const extra = allDays ? [1, 2, 3].map((n) => gd(shift(date, n)).catch(() => null)) : [];
+  // απόφαση Owner 04/11: αριθμός αγώνων και στο «Αύριο» και στο «Όλες οι μέρες» (μέρες UTC σήμερα έως +3)
+  const cntP = Promise.all([0, 1, 2, 3].map((n) => gd(shift(today, n)).catch(() => null)));
+  const [day, day2, strip, cdays, ...more] = await Promise.all([gd(date), gd(nb).catch(() => null), stripData(env, lang, DAYTZ), cntP, ...extra]);
   const seen = new Set(), all = [];
   for (const x of [...day.matches, ...(day2 ? day2.matches : []), ...more.flatMap((d) => (d ? d.matches : []))]) if (!seen.has(x.id)) { seen.add(x.id); all.push(x); }
   // κρατάμε τους αγώνες που πέφτουν αυτή τη μέρα (ή, στο «Όλες οι μέρες», σήμερα έως μεθαύριο) στην ώρα της χώρας
@@ -330,6 +364,16 @@ async function todayPage(env, lang, url) {
     const lbl = n === -1 ? "Yesterday" : n === 0 ? "Today" : n === 1 ? "Tomorrow" : new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "short", day: "numeric", month: "numeric" }).format(ts);
     return { d, n, lbl, href: n === 0 ? `/${lang}/` : `/${lang}/?d=${d}` };
   });
+  // αγώνες ανά λίγκα (κλειδί «χώρα|λίγκα») για σήμερα (d), αύριο (t) και για σήμερα–μεθαύριο (a), ώστε η σελίδα να μετράει με το φίλτρο λιγκών
+  const cSeen = new Set(), cAll = [], cTop = new Map();
+  for (const d of cdays) for (const x of d ? d.matches : []) if (!cSeen.has(x.id)) { cSeen.add(x.id); cAll.push(x); }
+  const dayCnt = { d: {}, t: {}, a: {} }, tmr = shift(today, 1), aEnd = shift(today, 2);
+  for (const x of cAll) {
+    const d = ymdIn(DAYTZ, x.ts * 1000), k = x.league.country + "|" + x.league.name;
+    if (d === today) dayCnt.d[k] = (dayCnt.d[k] || 0) + 1;
+    if (d === tmr) dayCnt.t[k] = (dayCnt.t[k] || 0) + 1;
+    if (d >= today && d <= aEnd) { dayCnt.a[k] = (dayCnt.a[k] || 0) + 1; if (!cTop.has(x.league.id)) cTop.set(x.league.id, k); }
+  }
   const tipsFree = matches.reduce((a, x) => a + x.tips.filter((y) => y.tier === "free").length, 0);
   const tipsVip = matches.reduce((a, x) => a + x.tips.filter((y) => y.tier === "vip").length, 0);
   const dLong = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(noon);
@@ -429,12 +473,13 @@ ${matches.length ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
   const sLine = BZS && t.strongS ? t.strongS.replace("{d}", dLong).replace("{list}", [BZS.win, BZS.goals].filter(Boolean)
     .map((c) => `${SEL[c.sel] || c.sel} ${c.home} – ${c.away} (${Number(c.price).toFixed(2)})`).concat(BZS.treble ? [`${t.treble} x${BZS.treble.odds.toFixed(2)}`] : []).join("; ")) : "";
   const coupons = (day.coupons || []).map((c) => ({ ...c, legs: c.legs.map((l) => ({ ...l, time: l.ts ? hm(l.ts) : "" })) }));
-  const top = TOP.map((id) => groups.get(id)).filter(Boolean).map((g) => g.league.country + "|" + g.league.name);
+  // και οι μεγάλες λίγκες των επόμενων ημερών, για να μετράνε σωστά «Top»/«Τα πρωταθλήματά μου» στο «Αύριο»
+  const top = TOP.map((id) => (groups.get(id) ? groups.get(id).league.country + "|" + groups.get(id).league.name : cTop.get(id))).filter(Boolean);
   let tpl = await template(env, url);
   tpl = tpl.replace('<html lang="en">', `<html lang="${HREFLANG[lang]}">`)
     .replace(/<title>[\s\S]*?<\/title>/, () => head)
     .replace(/var RAW = \[[\s\S]*?\];\n/, () => "var RAW = " + JSON.stringify(raw).replace(/</g, "\\u003c") + ";\n")
-    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav, all: allDays }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";var BZS = " + JSON.stringify(BZS).replace(/</g, "\\u003c") + ";")
+    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav, all: allDays, cnt: dayCnt }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";var BZS = " + JSON.stringify(BZS).replace(/</g, "\\u003c") + ";")
     .replace('<div class="hscroll" id="mFilter"', () => ssr + (sLine ? `<p class="ssra">${esc(sLine)}</p>` : "") + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml)
     .replace("<!--datanote-->", () => `<nav class="langs" aria-label="Language">${langNav}</nav>`)
