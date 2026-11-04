@@ -323,6 +323,9 @@ async function stripData(env, lang, tz) {
       const w = day.list.filter((c) => c.result === 1 && c.odds >= 8).sort((a, b) => (b.odds_now || b.odds) - (a.odds_now || a.odds))[0];
       if (w) { last = cp(w, day.date); break; }
     }
+    // απόφαση Owner 04/11: δύο παρολί (πάνω + χθεσινό) μόνο όταν το χθεσινό μεγαλύτερο είναι ΜΙΚΡΟΤΕΡΟ από αυτό των 3 ημερών· αλλιώς μόνο τα χθεσινά
+    const ydw = (RECC.cps.find((x) => x.date === yday) || { list: [] }).list.filter((c) => c.result === 1).reduce((q, c) => Math.max(q, c.odds_now || c.odds), 0);
+    if (last && ydw >= last.odds) last = null;
     const b10 = yc.list.filter((c) => c.result === 1 && (c.odds_now || c.odds) >= 10).sort((a, b) => (b.odds_now || b.odds) - (a.odds_now || a.odds))[0];
     const dlbl = (x) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "long", day: "numeric", month: "numeric" }).format(Date.parse(x + "T12:00:00Z"));
     if (last) last.label = dlbl(last.date);
