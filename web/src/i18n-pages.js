@@ -6,7 +6,7 @@
 
 export const OP = { name: "Christos Menelaou", city: "Paphos, Cyprus", hello: "hello@betizzi.com", partners: "marketing@betizzi.com", privacy: "privacy@betizzi.com", updated: "2026-11-03" };
 
-export const PG_ORDER = ["about", "contact", "responsible", "affiliate", "terms", "privacy", "cookies"];
+export const PG_ORDER = ["about", "contact", "responsible", "affiliate", "partners", "terms", "privacy", "cookies"];
 export const PG_FULL = ["terms", "privacy", "cookies"]; // μόνο EN + EL
 
 export const PG = {
@@ -581,6 +581,41 @@ Linkovi ka kladionicama imaju rel="sponsored". Pitanja: [${OP.partners}](mailto:
     },
   },
 
+  // Απόφαση Owner 04/11: σελίδα για bookmakers (μόνο αγγλικά). Μόνο πραγματικά νούμερα· κανένα ποσοστό επιτυχίας (link στο Record).
+  partners: {
+    slug: { en: "partners" },
+    title: { en: "Partners · for bookmakers" },
+    desc: { en: "Partner with betizzi: per-country placement inside every slip, odds display, exclusivity and main sponsor. Licensed operators only." },
+    body: {
+      en: `betizzi is a free football tips site with ready-made parlays, made for people who bet for fun. Every tip comes from the same model-based rules and is published before kick-off, with a public record of every win and loss. We go live on **10 November 2026**.
+
+## Where we are
+- 9 languages: English, Greek, Spanish, Portuguese, French, German, Romanian, Serbian, Bulgarian.
+- First markets: Cyprus, Greece, Romania, Serbia, Bulgaria, Spain, Portugal, France, Germany, and English-speaking Africa.
+- The site shows a different partner per country, based on the visitor's country.
+
+## What we offer a partner
+- A "Play it at [your brand]" button inside every slip and every ready-made parlay.
+- Your prices shown next to our tips.
+- **Exclusivity per country:** your brand as the only bookmaker shown in that country.
+- Main sponsor: your brand on our parlays and on the images players share.
+- A bet-slip deep link, so the player's slip opens at your site already filled in (if you offer one).
+
+## How we work
+- We only promote operators licensed in the visitor's country. No bookmaker links in Italy or Brazil.
+- Age notices per country (18+, or 21+ where the law asks for it, e.g. Greece), "bet only what you can afford to lose" on every slip, and no "sure win" language.
+- For Greece we register with the HGC affiliate registry before any agreement.
+- A partner cannot buy, change or remove a tip. Our full results are public: [Record](/en/record).
+
+## Numbers
+We launch on 10 November 2026. We will share real traffic and click numbers (from our analytics) on request. We do not publish estimates.
+
+## Contact
+Write to [${OP.partners}](mailto:${OP.partners}) with your brand, the countries you are licensed in and the type of deal you have in mind (CPA, RevShare, hybrid or sponsorship).
+
+${OP.name}, founder · ${OP.city}`,
+    },
+  },
   terms: {
     slug: { en: "terms", el: "oroi-xrisis" },
     title: { en: "Terms of use", el: "Όροι χρήσης" },

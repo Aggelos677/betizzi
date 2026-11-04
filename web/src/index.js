@@ -107,6 +107,7 @@ export default {
     }
     if (p.startsWith("/auth/") || p === "/me.json" || p === "/vip.json") return authRoute(req, env, url);
     if (p === "/admin" || p.startsWith("/admin/") || p === "/h") return adminRoute(req, env, url);
+    if (p === "/partners") return Response.redirect(SITE + "/en/partners", 301); // σύντομο link για τα email
     const m = p.match(/^\/([a-z]{2})\/$/);
     if (m && LANGS.includes(m[1])) {
       // Γρήγορη φόρτωση: έτοιμη σελίδα από τη μνήμη (έως 60΄΄), ανανέωση στο παρασκήνιο.
@@ -888,7 +889,7 @@ function pgPath(key, lang) {
   const sl = PG[key].slug[lang];
   return sl ? `/${lang}/${sl}` : `/en/${PG[key].slug.en}`; // Όροι/Απόρρητο/Cookies: όπου δεν υπάρχει μετάφραση, τα αγγλικά
 }
-const pgLabel = (key, lang) => (PG[key].title[lang] || PG[key].title.en).replace(/\s*·\s*18\+$/, "");
+const pgLabel = (key, lang) => (PG[key].title[lang] || PG[key].title.en).replace(/\s*·\s*(18\+|for bookmakers)$/, "");
 function footLinks(lang, attr = "") {
   const a = [`<a href="/${lang}/${REC[lang].slug}"${attr}>${esc(REC[lang].nav)}</a>`];
   for (const k of PG_ORDER) a.push(`<a href="${pgPath(k, lang)}"${attr}${PG[k].slug[lang] ? "" : ' hreflang="en"'}>${esc(pgLabel(k, lang))}</a>`);
