@@ -232,6 +232,7 @@ body{padding-top:env(safe-area-inset-top,0px)}
 .chip .lvb.on{background:var(--win,#3ccf6e);color:#06120a}.chip .lvb.on .ldot{background:#06120a}
 .chip.daylv .lvb{display:none}
 @media (max-width:767px){.chip.livechip{display:none}.chip.daylv .lvb{display:inline-flex}.chip.daylv{padding-right:8px}}
+.myl-hint{display:block;width:100%;text-align:left;margin:0 0 8px;padding:10px 12px;min-height:44px;border-radius:12px;border:1px dashed rgba(182,242,58,.45);background:rgba(182,242,58,.05);color:var(--muted);font:500 .84rem inherit;cursor:pointer}.myl-hint b{color:var(--lime);font-weight:700}
 .wins-h{font:800 1rem var(--f-display);text-transform:uppercase;letter-spacing:.04em;margin:4px 0 0}
 .bwlast{cursor:pointer}.bwlast:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
 .bwmore{display:flex;align-items:center;gap:4px;padding:10px 12px;border-top:1px solid rgba(182,242,58,.25);color:var(--lime);font-weight:700;font-size:.85rem}.bwmore b{font-size:.95rem}
@@ -1591,6 +1592,9 @@ function renderFilters(){
   var nc=cnt({c:true});if(nc)lb2.appendChild(chipEl('<span>🎯 Called</span> <span class="c">'+nc+'</span>',calF,function(){calF=!calF;renderFilters();renderMatches();},"tog calledchip"));
   box.scrollLeft=_sl1;lb2.scrollLeft=_sl2;
 }
+/* 04/11: λίγο μετά το άνοιγμα, προφορτώνουμε «Αύριο» και «Όλες οι μέρες» (ο browser τις έχει έτοιμες όταν πατηθούν) */
+setTimeout(function(){try{if(!DN.nav||!DN.nav.length)return;var hs=[];DN.nav.forEach(function(d){if(d.n===1&&d.d!==DN.date)hs.push(d.href);});if(!DN.all)hs.push("?d=all");
+  hs.forEach(function(h){var l=document.createElement("link");l.rel="prefetch";l.href=h;l.as="document";document.head.appendChild(l);});}catch(e){}},2500);
 /* live: is a tip already settled? Over/GG can land before full time; Under/NG can be lost early */
 function tipState(t,m){
   if(!(m.live||m.done)||!m.score||m.score.indexOf("-")<0)return null;
@@ -1666,13 +1670,15 @@ function renderMatches2(){
   var job=++RJOB,box=$("matchList");
   var list=MATCHES.filter(function(m){return passAll(m);});
   if(q){var s=q.toLowerCase();list=list.filter(function(m){return (m.home+" "+m.away+" "+m.league+" "+m.country).toLowerCase().indexOf(s)>=0;});}
-  if(!list.length){box.innerHTML='<div class="empty" style="border:0">No matches for this filter.</div>';return;}
+  if(!list.length){box.innerHTML=(lFil==="mine"&&!favF&&!ACC?'<button type="button" class="myl-hint" id="mylHint">⭐ <span>These are the 50 main leagues.</span> <b><span>Sign up free to build your own</span> →</b></button>':'')+'<div class="empty" style="border:0">No matches for this filter.</div>';var mh0=$("mylHint");if(mh0)mh0.addEventListener("click",function(){toast("Sign up free to pick your own leagues");openAuth();});return;}
   var cnt={};list.forEach(function(m){cnt[m.key]=(cnt[m.key]||0)+1;});
   var blocks=[],cur=null;
   list.forEach(function(m){if(!cur||cur.key!==m.key){cur={key:m.key,h:'<div class="lghead"><b>'+esc(m.country)+' · '+esc(m.league)+'</b><span class="lgr"><span>'+cnt[m.key]+'</span>'+lgStar(m.key)+'</span></div>',n:0};blocks.push(cur);}cur.h+=rowHTML(m);cur.n++;});
   var i=0;
   function chunk(limit){var h="",n=0;while(i<blocks.length&&(n<limit||!n)){h+='<div class="lgb">'+blocks[i].h+'</div>';n+=blocks[i].n;i++;}return h;}
-  box.innerHTML=chunk(60);bindMatchList();
+  /* απόφαση Owner 02/11 + 04/11: ο επισκέπτης βλέπει έτοιμες τις 50 βασικές λίγκες· για δικές του → εγγραφή */
+  var myh=lFil==="mine"&&!favF&&!ACC?'<button type="button" class="myl-hint" id="mylHint">⭐ <span>These are the 50 main leagues.</span> <b><span>Sign up free to build your own</span> →</b></button>':'';
+  box.innerHTML=myh+chunk(60);bindMatchList();var mh=$("mylHint");if(mh)mh.addEventListener("click",function(){toast("Sign up free to pick your own leagues");openAuth();});
   (function more(){if(job!==RJOB||i>=blocks.length)return;setTimeout(function(){if(job!==RJOB)return;box.insertAdjacentHTML("beforeend",chunk(120));bindMatchList();more();},16);})();
 }
 function bindMatchList(){
