@@ -1450,7 +1450,7 @@ function showCB(c){
   function done(){if(closed)return;closed=true;o.remove();document.body.classList.remove("cshake");setTimeout(cbNext,400);}
   var cr=cpX(c)>=50?500:200; /* απόφαση Owner: share νικητήριου παρολί μας = 200 credits, x50 = 500 */
   var o=document.createElement("div");o.className="cbig cbig-long"; /* 03/11: όλα τα κερδισμένα παρολί μένουν μέχρι να τα κλείσει (όχι αόρατο στρώμα που μπλοκάρει πατήματα) */o.setAttribute("role","status");
-  o.innerHTML='<div class="cbig-in cpbig"><span class="cbig-t">🏆 WINNER</span><span class="cbig-m">betizzi · <span>Parlay</span> · '+esc(String(c.kind).replace("-","–"))+'</span><b class="mono">x'+cpX(c).toFixed(2)+'</b><div class="cpl">'
+  o.innerHTML='<div class="cbig-in cpbig"><span class="cbig-t">🏆 WINNER</span><span class="cbig-m">betizzi · <span>Parlay</span></span><b class="mono">x'+cpX(c).toFixed(2)+'</b><div class="cpl">'
     +c.legs.map(function(l){var v=cpVoid(l);return '<div'+(v?' class="cv"':'')+'><i>'+(v?'–':'✓')+'</i><span>'+esc(l.home||"")+' – '+esc(l.away||"")+'</span><em>'+(v?'<span>Postponed</span>':l.locked?'VIP':esc(BZC_SEL[l.sel]||l.sel))+'</em></div>';}).join("")+'</div><small>Cash it in!</small>'
     +('<div class="cbshare"><span><span>Share it with your friends and win</span> <b class="mono">'+cr+'</b> <span>credits</span></span><button type="button" class="btn" data-sh="1">📤 <span>Share</span></button></div><button type="button" class="cbx" data-x="1" aria-label="Close">×</button>')+'</div>';
   document.body.appendChild(o);
@@ -1517,8 +1517,9 @@ function renderWins(){var box=$("winsSide");if(!box)return;
     h=wh0+h;if(top.length)h+='<div>'+top.map(function(x,i){return '<div class="winrow" style="--d:'+(i*90)+'ms"><span class="wm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+' · FT '+esc(x.m.score)+'</small></span><span class="wo">✓ '+(x.t.odds?x.t.odds.toFixed(2):'')+'</span></div>';}).join("")+'</div>';
   }
   /* απόφαση Owner 04/11: στις μεγαλύτερες νίκες πάντα και παρολί· αν δεν κέρδισε κανένα σήμερα/χθες, το τελευταίο που κέρδισε, με ημερομηνία */
-  var LW=(typeof YREC!=="undefined"&&YREC&&YREC.last)||null,hasCp=cw.length||(useY&&YW.cps.length);
-  if(LW&&!hasCp){var LL=LW.legs||[],lg=LL.slice(0,4).map(function(l,j){return '<div class="bwleg'+(l.v?' cv':'')+'" style="--d:'+(350+j*140)+'ms"><b class="bwtick">'+(l.v?'–':'✓')+'</b><span class="bzm"><b>'+esc(l.h||"")+' – '+esc(l.a||"")+'</b>'+(l.v?'<small><span>Postponed</span></small>':'<small>'+esc(l.sel||"")+'</small>')+'</span>'+(l.v?'<span class="bzp"><s>'+(l.p?(+l.p).toFixed(2):'')+'</s> 1.00</span>':'<span class="bzp mono">'+(l.p?(+l.p).toFixed(2):'')+'</span>')+'</div>';}).join("");
+  /* απόφαση Owner 04/11: πάνω πάντα (αν υπάρχει) το τελευταίο x8+ των 3 ημερών· ο server δεν δίνει το χθεσινό, άρα δεν φαίνεται δύο φορές */
+  var LW=(typeof YREC!=="undefined"&&YREC&&YREC.last)||null;
+  if(LW){var LL=LW.legs||[],lg=LL.slice(0,4).map(function(l,j){return '<div class="bwleg'+(l.v?' cv':'')+'" style="--d:'+(350+j*140)+'ms"><b class="bwtick">'+(l.v?'–':'✓')+'</b><span class="bzm"><b>'+esc(l.h||"")+' – '+esc(l.a||"")+'</b>'+(l.v?'<small><span>Postponed</span></small>':'<small>'+esc(l.sel||"")+'</small>')+'</span>'+(l.v?'<span class="bzp"><s>'+(l.p?(+l.p).toFixed(2):'')+'</s> 1.00</span>':'<span class="bzp mono">'+(l.p?(+l.p).toFixed(2):'')+'</span>')+'</div>';}).join("");
     h='<div class="bigwin bwlast" role="button" tabindex="0" data-lastwin2="1" aria-label="Last parlay that won"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv"><span>Last parlay that won</span> · '+esc(LW.label||LW.date||"")+'</span><span class="mono bwodd">x'+(+LW.odds).toFixed(2)+'</span></div>'+lg
       +'<div class="bwmore">'+(LL.length>4?'<b class="mono">+'+(LL.length-4)+'</b> <span>more picks</span> · ':'')+'<span>See the whole parlay</span> <span aria-hidden="true">›</span></div></div>'+(h||"");}
   if(box._h===h)return;box._h=h;box.innerHTML=h;
@@ -1560,9 +1561,9 @@ function renderFilters(){
   var box=$("mFilter");box.innerHTML="";
   var liveOn=mFilter==="live",goLive=function(){mFilter=liveOn?"all":"live";renderFilters();renderMatches();},nLive=cnt({t:"live",f:false});
   /* PC: ξεχωριστό κουμπί Live. Κινητό (απόφαση Owner 04/11): πράσινο σηματάκι πάνω στο «Σήμερα», για να κερδίσουμε χώρο */
-  if(IS_TODAY&&nl)box.appendChild(chipEl('<span class="ldot"></span>Live <span class="c">'+nLive+'</span>',liveOn,goLive,"livechip"));
+  if(IS_TODAY&&nLive)box.appendChild(chipEl('<span class="ldot"></span>Live <span class="c">'+nLive+'</span>',liveOn,goLive,"livechip"));
   DN.nav.forEach(function(d){if(d.n!==0&&d.n!==1)return;var cur=!DN.all&&d.d===DN.date,on=cur&&!liveOn;
-    var n=cur?cnt({t:"all",f:false}):dayN(d.n===0?DC.d:DC.t),lv=cur&&IS_TODAY&&nl?'<span class="lvb'+(liveOn?' on':'')+'" role="button" tabindex="0" aria-pressed="'+(liveOn?'true':'false')+'" aria-label="Live"><span class="ldot"></span>'+nLive+'</span>':'';
+    var n=cur?cnt({t:"all",f:false}):dayN(d.n===0?DC.d:DC.t),lv=cur&&IS_TODAY&&nLive?'<span class="lvb'+(liveOn?' on':'')+'" role="button" tabindex="0" aria-pressed="'+(liveOn?'true':'false')+'" aria-label="Live"><span class="ldot"></span>'+nLive+'</span>':'';
     /* η μέρα της σελίδας είναι κουμπί (χωρίς ξαναφόρτωμα) και από το Live· οι άλλες μέρες είναι σύνδεσμοι */
     var el=chipEl('<span>'+esc(d.lbl)+'</span>'+(n!=null?' <span class="c">'+n+'</span>':'')+lv,on,cur?function(e){e.preventDefault();if(e.target.closest&&e.target.closest(".lvb")){goLive();return;}if(mFilter==="all")return;mFilter="all";renderFilters();renderMatches();}:null,lv?"daylv":"",cur?null:d.href);
     var lvEl=el.querySelector(".lvb");if(lvEl)lvEl.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();e.stopPropagation();goLive();}});

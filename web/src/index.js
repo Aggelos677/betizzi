@@ -314,8 +314,15 @@ async function stripData(env, lang, tz) {
       legs: (c.legs || []).map((l) => ({ h: l.home, a: l.away, sel: SEL[l.sel] || l.sel, p: l.price, v: l.result === 2 ? 1 : 0 })) });
     const yc = (RECC.cps[0] || { list: [] }), ylist = yc.list.some((c) => c.pick) ? yc.list.filter((c) => c.pick) : yc.list;
     const settled = ylist.filter((c) => c.result === 0 || c.result === 1);
+    // απόφαση Owner 04/11: πάνω μένει μέχρι 3 μέρες το τελευταίο κερδισμένο παρολί ζώνης x8–12 ή μεγαλύτερης.
+    // Το χθεσινό ΔΕΝ μπαίνει πάνω (είναι ήδη κάτω, στις «μεγαλύτερες νίκες χθες»)· από αύριο ανεβαίνει πάνω.
+    const d3 = new Date(Date.UTC(y, m - 1, dd - 3)).toISOString().slice(0, 10);
     let last = null;
-    for (const day of RECC.cps) { const w = day.list.filter((c) => c.result === 1).sort((a, b) => (b.odds_now || b.odds) - (a.odds_now || a.odds))[0]; if (w) { last = cp(w, day.date); break; } }
+    for (const day of RECC.cps) {
+      if (day.date >= yday || day.date < d3) continue;
+      const w = day.list.filter((c) => c.result === 1 && c.odds >= 8).sort((a, b) => (b.odds_now || b.odds) - (a.odds_now || a.odds))[0];
+      if (w) { last = cp(w, day.date); break; }
+    }
     const b10 = yc.list.filter((c) => c.result === 1 && (c.odds_now || c.odds) >= 10).sort((a, b) => (b.odds_now || b.odds) - (a.odds_now || a.odds))[0];
     const dlbl = (x) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "long", day: "numeric", month: "numeric" }).format(Date.parse(x + "T12:00:00Z"));
     if (last) last.label = dlbl(last.date);
