@@ -670,7 +670,7 @@ ${indexable(x) ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
 <nav class="bc"><a href="/${lang}/">betizzi</a> › ${esc(x.league.country)} · ${esc(x.league.name)}</nav>
 <h1>${esc(x.home.name)} – ${esc(x.away.name)}: ${esc(t.word)}</h1>
 ${off ? `<p class="ans"><b>${esc(off)}</b> · <span>${esc(ui("Our tips for this match are void."))}</span></p>` : `<p class="ans">${esc(answer)}</p>`}
-<div class="vs"><div><b>${esc(x.home.name)}</b></div><div class="mid">${mid}${live ? `<div class="min">${esc(x.minute)}'</div>` : ""}</div><div><b>${esc(x.away.name)}</b></div></div>
+<div class="vs"><div><b>${esc(x.home.name)}</b></div><div class="mid"${!off && !(x.score && (live || done)) ? ` data-ts="${x.ts}" data-d="${ymdIn(DAYTZ, x.ts * 1000)}"` : ""}>${mid}${live ? `<div class="min">${esc(x.minute)}'</div>` : ""}</div><div><b>${esc(x.away.name)}</b></div></div>
 ${anTxt ? `<h2>${esc(t.anH)}</h2><p class="an">${esc(anTxt)}</p>` : ""}
 <h2>${esc(t.tips)}</h2><div class="card">${tipsHtml}</div>
 ${md ? `<h2>${esc(t.model)}</h2><div class="card">${modelHtml}</div>` : ""}
@@ -679,6 +679,8 @@ ${oddsHtml ? `<h2>${esc(t.odds)}</h2><div class="card">${oddsHtml}</div>` : ""}
 <p><a href="/${lang}/">← ${esc(t.back)}</a></p>
 </main>
 <footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi · <time datetime="${nowIso}">${esc(dLong)}</time></p></footer>
+<script>/* απόφαση Owner 04/11: η ώρα σέντρας στην ώρα της συσκευής του επισκέπτη */(function(){try{var e=document.querySelector(".mid[data-ts]");if(!e)return;var d=new Date(e.dataset.ts*1000),L=document.documentElement.lang||"en",y=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+e.firstChild.nodeValue=(y!==e.dataset.d?new Intl.DateTimeFormat(L,{weekday:"short"}).format(d)+" ":"")+new Intl.DateTimeFormat(L,{hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(d);}catch(x){}})();</script>
 </body>
 </html>`;
 }
