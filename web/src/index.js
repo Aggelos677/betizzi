@@ -480,8 +480,13 @@ ${matches.length ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
       why: (c.ai && c.ai[lang]) || (x ? tipWhy(lang, x, { sel: c.sel, price: c.price, prob: c.prob }, SEL) : ""), url: x ? matchPath(lang, x) : "" }; // why: AI (εγκεκριμένο από τον ελεγκτή) ή «καλούπι»
   };
   const BZS = S ? { win: sCard(S.win), goals: sCard(S.goals), treble: S.treble ? { odds: S.treble.odds, result: S.treble.result, legs: S.treble.legs.map(sCard) } : null } : null;
-  const sLine = BZS && t.strongS ? t.strongS.replace("{d}", dLong).replace("{list}", [BZS.win, BZS.goals].filter(Boolean)
-    .map((c) => `${SEL[c.sel] || c.sel} ${c.home} – ${c.away} (${Number(c.price).toFixed(2)})`).concat(BZS.treble ? [`${t.treble} x${BZS.treble.odds.toFixed(2)}`] : []).join("; ")) : "";
+  // απόφαση Owner 04/11: η γραμμή «τα δυνατά μας» φαίνεται σε ΚΑΘΕ μέρα (αύριο, όλες οι μέρες…) με τα δυνατά της ημέρας,
+  // ώστε να μην «πετάγεται» η σελίδα όταν αλλάζει μέρα· αν η μέρα της σελίδας δεν έχει δικά της, τα σημερινά (με την ημερομηνία τους)
+  const S2 = BZS ? null : (cdays[0] && cdays[0].strong) || null;
+  const LS = BZS || (S2 && { win: S2.win, goals: S2.goals, treble: S2.treble });
+  const dS = BZS ? dLong : new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(Date.parse(today + "T12:00:00Z"));
+  const sLine = LS && t.strongS ? t.strongS.replace("{d}", dS).replace("{list}", [LS.win, LS.goals].filter(Boolean)
+    .map((c) => `${SEL[c.sel] || c.sel} ${c.home} – ${c.away} (${Number(c.price).toFixed(2)})`).concat(LS.treble ? [`${t.treble} x${Number(LS.treble.odds).toFixed(2)}`] : []).join("; ")) : "";
   const coupons = (day.coupons || []).map((c) => ({ ...c, legs: c.legs.map((l) => ({ ...l, time: l.ts ? hm(l.ts) : "" })) }));
   // και οι μεγάλες λίγκες των επόμενων ημερών, για να μετράνε σωστά «Top»/«Τα πρωταθλήματά μου» στο «Αύριο»
   const top = TOP.map((id) => (groups.get(id) ? groups.get(id).league.country + "|" + groups.get(id).league.name : cTop.get(id))).filter(Boolean);
