@@ -202,7 +202,7 @@ body{padding-top:env(safe-area-inset-top,0px)}
 .rk{font:600 .7rem var(--f-mono);color:var(--muted);flex:none}
 .r-score.live{color:#e9f7ee;font-weight:600;background:rgba(60,207,110,.08);border-color:rgba(60,207,110,.6);animation:livepulse 2.4s ease-in-out infinite}
 @keyframes livepulse{0%,100%{box-shadow:0 0 0 0 rgba(60,207,110,0)}50%{box-shadow:0 0 0 2px rgba(60,207,110,.15)}}
-.r-score.empty{border-color:transparent;color:var(--muted);font-size:.8rem}
+.r-score.empty{border-color:transparent;color:var(--muted);font-size:.8rem}.r-score.pst{font-size:1rem;opacity:.7}
 .r-pick.vip{border-color:rgba(164,124,255,.6);background:var(--vip-soft)}
 .r-pick.vip span{color:var(--vip)}
 .r-pick.vip[aria-pressed="true"]{background:#8b5cf6;border-color:#8b5cf6;color:#fff}
@@ -436,6 +436,7 @@ details.mrow.calledrow>summary{background:radial-gradient(circle at 78% 50%,rgba
 :root{--muted:#b3c0b7}
 .vp{margin:2px 0 6px;color:var(--muted);font-size:.9rem}
 @media (max-width:767px){
+.lghead,.dayhead{top:env(safe-area-inset-top,0px)} /* 04/11: στο κινητό τα tabs είναι κάτω· η κεφαλίδα λίγκας κολλάει τέρμα πάνω, χωρίς κενό */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;top:auto;margin:0;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);border-bottom:0;z-index:31;background:var(--bg)}
 .tab{min-height:48px;font-size:.8rem;letter-spacing:.02em;padding:8px 2px;line-height:1.1}
 .slipbar{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
@@ -1521,17 +1522,18 @@ function tipState(t,m){
   return null;
 }
 function pickBtn(m){
-  if(!m.tips.length) return '<span class="r-pick none"><span>No tip</span></span>';
+  var offT=m.type==="postponed"?"Postponed":m.type==="cancelled"?"Cancelled":""; /* 04/11: η λέξη στη στήλη του tip (χωράει), όχι στο στενό κουτί του σκορ */
+  if(!m.tips.length) return '<span class="r-pick none">'+(offT?'<span>'+offT+'</span>':'<span>No tip</span>')+'</span>';
   var t=m.tips[0], locked=t.tier==="vip"&&!vipMember&&!t.sel;
   if(locked) return '<button type="button" class="r-pick vip locked" data-unlock="1" aria-label="VIP tip, sign up free to see"><span>VIP · free</span><b aria-hidden="true">•.••</b></button>';
-  if(m.type==="postponed"||m.type==="cancelled") return '<span class="r-pick none"><span>'+esc(t.sel)+'</span> · <span>Void</span></span>'; /* 03/11: αναβολή/ακύρωση = άκυρο, χωρίς κουμπί */
+  if(m.type==="postponed"||m.type==="cancelled") return '<span class="r-pick none"><span>'+offT+'</span><small style="white-space:nowrap">'+esc(t.sel)+' · <span>Void</span></small></span>'; /* 03/11: αναβολή/ακύρωση = άκυρο, χωρίς κουμπί */
   var st=m._hold?null:tipState(t,m);
   if(st==="won") return '<span class="r-pick paid'+(m._justPaid?' pop':'')+'" role="status" aria-label="'+esc(t.sel)+' landed"><span>✓ '+esc(t.sel)+'</span><b class="mono">'+(t.odds?(+t.odds).toFixed(2):'')+'</b></span>';
   if(st==="lost") return '<span class="r-pick lost"><span>✗ '+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></span>';
   return '<button type="button" class="r-pick'+(t.tier==="vip"?' vip':'')+'" data-key="'+esc(t.key)+'" aria-pressed="false" aria-label="'+esc((t.tier==="vip"?"VIP tip ":"Free tip ")+t.sel+" at "+t.odds)+'"><span>'+(STRONG_IDS[t.key]?'⚡ ':'')+(t.tier==="vip"?"VIP · ":"TIP · ")+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></button>';
 }
 function rowHTML(m){
-  var sc = (m.live||m.done) ? '<span class="r-score'+(m.live?' live':'')+(m.hit?' hit':'')+'"'+(m.hit?' title="We called this score"':'')+'>'+esc(m.score||"–")+(m.hit?'<em>🎯</em>':'')+'</span>' : (m.type==="postponed"?'<span class="r-score empty"><span>Postponed</span></span>':m.type==="cancelled"?'<span class="r-score empty"><span>Cancelled</span></span>':(m.bz?'<span class="r-score pred" title="Our score"><small>likely</small>'+m.bz+'</span>':'<span class="r-score empty">v</span>'));
+  var sc = (m.live||m.done) ? '<span class="r-score'+(m.live?' live':'')+(m.hit?' hit':'')+'"'+(m.hit?' title="We called this score"':'')+'>'+esc(m.score||"–")+(m.hit?'<em>🎯</em>':'')+'</span>' : (m.type==="postponed"||m.type==="cancelled"?'<span class="r-score empty pst" aria-hidden="true">⏸</span>':(m.bz?'<span class="r-score pred" title="Our score"><small>likely</small>'+m.bz+'</span>':'<span class="r-score empty">v</span>'));
   var mn=m.min||"";var time = m.live?'<b style="color:var(--win)">LIVE</b><span class="lmin">'+(mn==="HT"?"HT":mn+'<i>\'</i>')+'</span>':m.done?'<b>FT</b><span>'+m.time+'</span>':'<b>'+m.time+'</b>';
   return '<details class="mrow'+(m.hit?' hitrow':'')+'" data-mid="'+m.id+'"><summary><span class="r-time">'+time+'<button type="button" class="fav'+(FAV.has(String(m.id))?' on':'')+'" data-fav="'+m.id+'" aria-label="Follow this match">'+(FAV.has(String(m.id))?'★':'☆')+'</button></span>'
     +'<span class="r-teams"><span class="tl"><span class="nm">'+esc(m.home)+'</span>'+(m.hr?'<span class="rk">'+m.hr+'</span>':'')+fbars(m.hf,m.home)+'</span>'
