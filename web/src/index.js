@@ -51,12 +51,15 @@ ul{list-style:none;margin:0;padding:0}
 .tipc{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--ln)}.tipc:first-child{border-top:0}
 .tipc small{color:var(--mu);display:block}.add{font:700 13px Manrope,sans-serif;background:var(--c2);color:var(--lime);border:1px solid var(--lime);border-radius:10px;padding:10px 12px;min-height:44px}
 table{width:100%;border-collapse:collapse;font:500 14px "JetBrains Mono",monospace}td,th{padding:7px 4px;text-align:center;border-top:1px solid var(--ln)}th{color:var(--mu);font:600 12px Manrope,sans-serif}
-.fm{display:flex;gap:3px}.fm span{width:16px;height:20px;border-radius:5px;display:grid;place-items:center;font:700 11px "JetBrains Mono",monospace;color:#0c0f0d}
+.fm{display:flex;gap:3px;flex-wrap:wrap}.fm span{min-width:30px;height:22px;padding:0 3px;border-radius:5px;display:grid;place-items:center;font:700 11px "JetBrains Mono",monospace;color:#0c0f0d}
+.fm span i{font-style:normal}.fm span u{display:none;text-decoration:none}.fm{padding-bottom:4px}.fm span.h{box-shadow:0 3px 0 #e9f2ec}
+@media (max-width:480px){.fm span{min-width:18px}.fm span i{display:none}.fm span u{display:inline}}
+.fleg{font-size:12px;color:var(--mut,#9aa59e);margin:6px 0 0}
 .fm .W{background:#3ccf6e}.fm .D{background:#ffb547}.fm .L{background:#ff6b6b}
 .fl a{margin:0 6px;white-space:nowrap}
 .doc h2{margin-top:22px}.doc p,.doc li{color:#cfd8d1;line-height:1.6}.doc ul{list-style:disc;padding-left:20px}.doc li{margin:4px 0}.doc a{color:var(--lime)}
 .recl{text-align:center;margin:10px 0}.recl a{color:var(--lime);font-weight:700;text-decoration:none}
-.frow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0}.frow .tm{min-width:0}
+.frow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;flex-wrap:wrap}.frow .tm{min-width:0;font-weight:600}
 `;
 
 // Απόφαση Owner 04/11 (Α): η «μέρα» αλλάζει για ΟΛΕΣ τις γλώσσες στα μεσάνυχτα ώρας Ελλάδας (ίδιοι αγώνες, ίδιο «χθες», ίδιο Record).
@@ -559,8 +562,9 @@ function matchPage(lang, x) {
        ${off || live || done ? "" : `<button class="add" data-fx="${x.id}" data-sel="${esc(y.sel)}" data-price="${y.price}">${esc(t.add)}</button>`}</div>`).join("")
     : `<p class="how">${esc(t.noTipM)}</p>`;
 
-  const formRow = (team) => `<div class="frow"><span class="tm"><img src="${esc(team.logo)}" alt="" width="18" height="18" loading="lazy">${esc(team.name)}</span>
-    <span class="fm">${team.form.slice(0, 10).reverse().map((g) => `<span class="${g.res}" title="${g.gf}-${g.ga}">${t[g.res]}</span>`).join("")}</span></div>`;
+  // 04/11 (Owner): χωρίς λογότυπα· σκορ σε χρωματιστό κουτί (W/D/L στο στενό κινητό), γραμμή από κάτω = εντός έδρας
+  const formRow = (team) => `<div class="frow"><span class="tm">${esc(team.name)}</span>
+    <span class="fm">${team.form.slice(0, 10).reverse().map((g) => `<span class="${g.res}${g.home ? " h" : ""}" title="${g.gf}-${g.ga}"><i>${g.gf}-${g.ga}</i><u>${t[g.res]}</u></span>`).join("")}</span></div>`;
   const oddsRow = ["1", "X", "2", "O25", "U25", "GG", "NG"].filter((k) => x.odds[k]);
   const oddsHtml = oddsRow.length ? `<table><tr>${oddsRow.map((k) => `<th>${SEL[k]}</th>`).join("")}</tr><tr>${oddsRow.map((k) => `<td>${x.odds[k].toFixed(2)}</td>`).join("")}</tr></table>` : "";
   const modelHtml = md ? `<table><tr><th>1</th><th>X</th><th>2</th><th>Over 2.5</th><th>${esc(t.score)}</th></tr>
@@ -603,11 +607,11 @@ ${indexable(x) ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
 <nav class="bc"><a href="/${lang}/">betizzi</a> › ${esc(x.league.country)} · ${esc(x.league.name)}</nav>
 <h1>${esc(x.home.name)} – ${esc(x.away.name)}: ${esc(t.word)}</h1>
 ${off ? `<p class="ans"><b>${esc(off)}</b> · <span>${esc(ui("Our tips for this match are void."))}</span></p>` : `<p class="ans">${esc(answer)}</p>`}
-<div class="vs"><div><img src="${esc(x.home.logo)}" alt=""><b>${esc(x.home.name)}</b></div><div class="mid">${mid}${live ? `<div class="min">${esc(x.minute)}'</div>` : ""}</div><div><img src="${esc(x.away.logo)}" alt=""><b>${esc(x.away.name)}</b></div></div>
+<div class="vs"><div><b>${esc(x.home.name)}</b></div><div class="mid">${mid}${live ? `<div class="min">${esc(x.minute)}'</div>` : ""}</div><div><b>${esc(x.away.name)}</b></div></div>
 ${anTxt ? `<h2>${esc(t.anH)}</h2><p class="an">${esc(anTxt)}</p>` : ""}
 <h2>${esc(t.tips)}</h2><div class="card">${tipsHtml}</div>
 ${md ? `<h2>${esc(t.model)}</h2><div class="card">${modelHtml}</div>` : ""}
-<h2>${esc(t.form)}</h2><div class="card">${formRow(x.home)}${formRow(x.away)}</div>
+<h2>${esc(t.form)}</h2><div class="card">${formRow(x.home)}${formRow(x.away)}<p class="fleg">${esc(ui("Underlined = home game"))}</p></div>
 ${oddsHtml ? `<h2>${esc(t.odds)}</h2><div class="card">${oddsHtml}</div>` : ""}
 <p><a href="/${lang}/">← ${esc(t.back)}</a></p>
 </main>
