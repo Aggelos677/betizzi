@@ -1903,8 +1903,11 @@ function renderStrong(){var box=$("strongBox");if(!box)return;
   var isToday=typeof DAYNAV==="undefined"||DAYNAV.date===DAYNAV.today;
   if(!BZS){box.hidden=!isToday||location.protocol==="file:";if(box.hidden)return;
     /* απόφαση Owner 04/11: μέχρι τις 10:00 όχι άδειο κουτί· τα 3 επόμενα (χρονικά) tips, ένα ανά αγώνα, και από κάτω η σημείωση */
-    var nx=[],seenM={};MATCHES.filter(function(m){return m.open;}).sort(function(a,b){return (a.ts||0)-(b.ts||0);}).forEach(function(m){
-      if(nx.length>=3||seenM[m.id])return;var t=m.tips.filter(function(x){return !(x.tier==="vip"&&!vipMember&&!x.sel);})[0];if(t){seenM[m.id]=1;nx.push({m:m,t:t});}});
+    /* απόφαση Owner 04/11: 2 Free + 1 VIP (κλειδωμένο αν δεν έχει λογαριασμό, για να φαίνεται ότι υπάρχουν), με σειρά ώρας */
+    var nx=[],nf=0,nv=0,seenM={};MATCHES.filter(function(m){return m.open;}).sort(function(a,b){return (a.ts||0)-(b.ts||0);}).forEach(function(m){
+      if(seenM[m.id])return;m.tips.forEach(function(t){if(seenM[m.id])return;
+        if(t.tier==="vip"&&nv<1){nv++;seenM[m.id]=1;nx.push({m:m,t:t});}else if(t.tier!=="vip"&&nf<2){nf++;seenM[m.id]=1;nx.push({m:m,t:t});}});});
+    nx.sort(function(a,b){return (a.m.ts||0)-(b.m.ts||0);});
     box.innerHTML='<div class="stb-h"><b>⏱ <span>Our next tips</span></b></div>'+(nx.length?'<div class="stb-next">'+nx.map(function(x){return singleHTML(x.m,x.t);}).join("")+'</div>':'')
       +'<div class="stb-wait">⚡ <span id="stbAt">Our strongest picks come out at 10:00.</span></div>';
     sgBind(box);bindButtons(box);syncPressed();
