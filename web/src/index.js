@@ -5,7 +5,7 @@ import { LANGS, HREFLANG, TZ, LOCALE, T, SEL, UI, UI_ORDER, REC, CONSENT, GA_ID 
 import { TRANSLATOR } from "./translator.js";
 import { ADMIN_HTML } from "./admin-page.js";
 import { getDay, getMatch, getRecord, getCoupons } from "./data.js";
-import { PG, PG_ORDER, OP } from "./i18n-pages.js";
+import { PG, PG_ORDER, OP, PAR } from "./i18n-pages.js";
 
 const SITE = "https://betizzi.com";
 // Σειρά λιγκών: πρώτα οι μεγάλες (Top 30), μετά οι υπόλοιπες ανά χώρα.
@@ -145,6 +145,18 @@ export default {
       if (hit && Date.now() - hit.t < 5 * 60000) return html(hit.b, 200, age21(req, rm[1]));
       try { const [rd, sd] = await Promise.all([getRecord(env), stripData(env, rm[1], DAYTZ)]);
         const b = recordPage(rm[1], rd, mq, tq, fq, pq, sd && sd.last); PAGES.set(key, { t: Date.now(), b }); return html(b, 200, age21(req, rm[1])); }
+      catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
+    }
+    // «Παρολί σήμερα» (απόφαση Owner 05/11): ένα σταθερό URL ανά γλώσσα, ανανέωση από τη μνήμη ανά 1΄ (όπως η αρχική)
+    const pr = p.match(/^\/([a-z]{2})\/([a-z-]+)$/);
+    if (pr && LANGS.includes(pr[1]) && LANGS.some((l) => PAR[l].slug === pr[2])) {
+      const lang = pr[1];
+      if (PAR[lang].slug !== pr[2]) return Response.redirect(url.origin + parPath(lang), 301);
+      const key = "par|" + lang, hit = PAGES.get(key), age = hit ? Date.now() - hit.t : Infinity;
+      const build = () => paroliPage(env, lang).then((b) => { PAGES.set(key, { t: Date.now(), b }); return b; });
+      if (hit && age < 60000) return html(hit.b, 200, age21(req, lang));
+      if (hit && age < 15 * 60000) { ctx.waitUntil(build().catch(() => {})); return html(hit.b, 200, age21(req, lang)); }
+      try { return html(await build(), 200, age21(req, lang)); }
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
     }
     const sp = p.match(/^\/([a-z]{2})\/([a-z0-9-]+)$/);
@@ -579,6 +591,7 @@ async function sitemapLang(env, lang) {
   const today = new Date().toISOString().slice(0, 10), out = [];
   out.push(smUrl(`/${lang}/`, smAlt((l) => `/${l}/`), today));
   out.push(smUrl(`/${lang}/${REC[lang].slug}`, smAlt((l) => `/${l}/${REC[l].slug}`), today));
+  out.push(smUrl(parPath(lang), smAlt((l) => parPath(l)), today));
   for (const k of PG_ORDER) if (PG[k].body[lang] && PG[k].slug[lang]) {
     const langs = LANGS.filter((l) => PG[k].body[l] && PG[k].slug[l]);
     out.push(`<url><loc>${xmlEsc(SITE + pgPath(k, lang))}</loc>${langs.map((l) => `<xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${xmlEsc(SITE + pgPath(k, l))}"/>`).join("")}<xhtml:link rel="alternate" hreflang="x-default" href="${xmlEsc(SITE + pgPath(k, "en"))}"/></url>`);
@@ -891,7 +904,7 @@ function pgPath(key, lang) {
 }
 const pgLabel = (key, lang) => (PG[key].title[lang] || PG[key].title.en).replace(/\s*·\s*(18\+|for bookmakers)$/, "");
 function footLinks(lang, attr = "") {
-  const a = [`<a href="/${lang}/${REC[lang].slug}"${attr}>${esc(REC[lang].nav)}</a>`];
+  const a = [`<a href="${parPath(lang)}"${attr}>${esc(PAR[lang].h1)}</a>`, `<a href="/${lang}/${REC[lang].slug}"${attr}>${esc(REC[lang].nav)}</a>`];
   for (const k of PG_ORDER) a.push(`<a href="${pgPath(k, lang)}"${attr}${PG[k].slug[lang] ? "" : ' hreflang="en"'}>${esc(pgLabel(k, lang))}</a>`);
   return a.join(" · ");
 }
@@ -946,6 +959,103 @@ ${own ? alt : '<meta name="robots" content="noindex,follow">'}
 ${md(pg.body[L])}
 <p class="how" style="font-size:13px;margin-top:24px"><time datetime="${upd}">${esc(dUpd)}</time></p>
 <p><a href="/${lang}/">← ${esc(t.back)}</a></p>
+</main>
+<footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi · ${esc(OP.name)}, ${esc(OP.city)}</p></footer>
+</body>
+</html>`;
+}
+
+// ---------- «Παρολί σήμερα» (απόφαση Owner 05/11) ----------
+// Ελαφριά σελίδα από τον server: χωρίς εικόνες και χωρίς την εφαρμογή. Μόνο τα σημερινά παρολί (μέρα Ελλάδας),
+// πώς τα φτιάχνουμε, το τελευταίο που κέρδισε (κανόνας Record: από τα παρολί μόνο αυτό), FAQ.
+const PZ = ["x3-5", "x8-12", "x20-30", "x100"];
+const PZL = { "x3-5": "3–5", "x8-12": "8–12", "x20-30": "20–30", x100: "~100" };
+function parPath(lang) { return `/${lang}/${PAR[lang].slug}`; }
+const PCSS = `
+.doc ul.lgl{list-style:none;padding:0;margin:0}.doc ul.lgl li{margin:0;color:inherit}.pz{margin:18px 0 6px}.cp{background:var(--c1);border:1px solid var(--ln);border-radius:12px;margin:0 0 10px;overflow:hidden}
+.cph{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--c2);flex-wrap:wrap}.cph b{font:700 15px "Fira Sans Extra Condensed",sans-serif}
+.cph .od{margin-left:auto;font:700 16px "JetBrains Mono",monospace;color:var(--lime)}.cph small{color:var(--mu);font-size:12px}
+.pill{font:700 11px Manrope,sans-serif;border-radius:999px;padding:3px 8px;border:1px solid var(--ln);color:var(--mu)}.pill.w{background:#3ccf6e;color:#06120a;border-color:#3ccf6e}.pill.l{color:#ff6b6b;border-color:#ff6b6b}.pill.lv{color:var(--lime);border-color:var(--lime)}
+.lgl li{display:grid;grid-template-columns:48px 1fr auto 22px;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid var(--ln);min-height:48px}
+.lgl .tm0{font:500 12px "JetBrains Mono",monospace;color:var(--mu)}.lgl a{text-decoration:none;min-width:0}.lgl a b{display:block;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lgl a small{color:var(--mu);font-size:12px}
+.lgl .pr{font:700 14px "JetBrains Mono",monospace}.lgl .r{text-align:center;font-weight:800}.lgl .r.w{color:#3ccf6e}.lgl .r.l{color:#ff6b6b}
+.cta{display:inline-block;margin:6px 0 4px;color:var(--lime);font-weight:700;text-decoration:none}
+.faq dt{font-weight:700;margin:12px 0 4px}.faq dd{margin:0;color:#cfd8d1;line-height:1.55}
+`;
+async function paroliPage(env, lang) {
+  const P = PAR[lang], t = T[lang], tz = TZ[lang], today = ymdIn(DAYTZ);
+  const [list, sd] = await Promise.all([getCoupons(env, today).catch(() => []), stripData(env, lang, DAYTZ).catch(() => null)]);
+  const cps = (list || []).filter((c) => PZ.includes(c.kind)).sort((a, b) => a.odds - b.odds);
+  const [y0, m0, d0] = today.split("-").map(Number), noon = Date.UTC(y0, m0 - 1, d0, 12);
+  const dLong = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(noon);
+  const dShort = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "numeric" }).format(noon);
+  const hm = (ts) => (ymdIn(tz, ts * 1000) === today ? "" : new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, weekday: "short" }).format(ts * 1000) + " ")
+    + new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(ts * 1000);
+  const xo = (c) => c.odds_now || c.odds;
+  // το τελευταίο παρολί που κέρδισε (μέχρι 10 μέρες πίσω), το μεγαλύτερο εκείνης της μέρας
+  let last = null;
+  for (const day of (RECC && RECC.cps) || []) {
+    const w = day.list.filter((c) => c.result === 1).sort((a, b) => xo(b) - xo(a))[0];
+    if (w) { last = { o: xo(w).toFixed(2), d: new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long" }).format(Date.parse(day.date + "T12:00:00Z")) }; break; }
+  }
+  const selTxt = (l) => (l.sel === "1" ? `1 · ${l.home}` : l.sel === "2" ? `2 · ${l.away}` : SEL[l.sel] || l.sel);
+  const leg = (l) => {
+    const href = l.home && l.away && l.ts ? matchPath(lang, { home: { name: l.home }, away: { name: l.away }, ts: l.ts, id: l.fixture_id }) : "";
+    const r = l.result === 1 ? '<span class="r w" aria-label="✓">✓</span>' : l.result === 0 ? '<span class="r l" aria-label="✗">✗</span>' : l.result === 2 ? '<span class="r">–</span>' : '<span class="r"></span>';
+    const nm = `<b>${esc(l.home || "")} – ${esc(l.away || "")}</b><small>${esc(selTxt(l))}</small>`;
+    return `<li><span class="tm0">${l.ts ? esc(hm(l.ts)) : ""}</span>${href ? `<a href="${href}">${nm}</a>` : `<span>${nm}</span>`}<span class="pr">${l.price ? Number(l.price).toFixed(2) : ""}</span>${r}</li>`;
+  };
+  const st = (c) => c.result === 1 ? ["w", P.st.w] : c.result === 0 ? ["l", P.st.l] : (c.legs || []).some((l) => LIVE.has(l.status) || l.result != null) ? ["lv", P.st.lv] : ["o", P.st.o];
+  const card = (c) => { const [k, lbl] = st(c);
+    return `<article class="cp"><div class="cph"><b>${esc(P.v[c.variant] || P.v.mix)}</b><span class="pill ${k}">${esc(lbl)}</span><span class="od" title="${esc(P.total)}">x${xo(c).toFixed(2)}</span></div><ul class="lgl">${(c.legs || []).map(leg).join("")}</ul></article>`; };
+  let body = "";
+  for (const z of PZ) { const L = cps.filter((c) => c.kind === z); if (L.length) body += `<h2 class="pz">${esc(P.zone)} ${PZL[z]}</h2>${L.map(card).join("")}`; }
+  const lo = cps.length ? Math.round(Math.min(...cps.map((c) => c.odds))) : 0, hi = cps.length ? Math.round(Math.max(...cps.map((c) => c.odds))) : 0;
+  const ans = cps.length ? P.ans(dLong, cps.length, lo, hi) : P.none;
+  const modTs = Math.max(0, ...cps.map((c) => c.created_at || 0));
+  const mod = new Date(modTs ? modTs * 1000 : noon).toISOString();
+  const canonical = SITE + parPath(lang);
+  const title = P.title.replace("{d}", dShort);
+  const alt = LANGS.map((l) => `<link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE}${parPath(l)}">`).join("") + `<link rel="alternate" hreflang="x-default" href="${SITE}${parPath("en")}">`;
+  const langNav = LANGS.map((l) => `<a href="${parPath(l)}" hreflang="${HREFLANG[l]}"${l === lang ? ' aria-current="page"' : ""}>${l.toUpperCase()}</a>`).join("");
+  const ld = [
+    { "@context": "https://schema.org", "@type": "WebPage", name: title, description: P.desc, url: canonical, inLanguage: HREFLANG[lang], dateModified: mod },
+    { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
+      { "@type": "ListItem", position: 1, name: "betizzi", item: `${SITE}/${lang}/` }, { "@type": "ListItem", position: 2, name: P.h1, item: canonical }] },
+    { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: P.faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) },
+  ];
+  return `<!doctype html>
+<html lang="${HREFLANG[lang]}">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)} | betizzi</title>
+<meta name="description" content="${esc(P.desc)}">
+<link rel="canonical" href="${canonical}">
+${alt}
+${cps.length ? "" : '<meta name="robots" content="noindex,follow">'}
+<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(ans)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
+<meta property="article:modified_time" content="${mod}"><meta name="theme-color" content="#0c0f0d">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>
+<style>${CSS}${PCSS}</style>
+</head>
+<body>
+<header><a class="logo" href="/${lang}/"><b>bet</b><i>izzi</i></a><nav class="l" aria-label="Language">${langNav}</nav></header>
+<main class="doc">
+<nav class="bc"><a href="/${lang}/">betizzi</a> › ${esc(P.h1)}</nav>
+<h1>${esc(P.h1)} · ${esc(dShort)}</h1>
+<p class="ans">${esc(ans)}</p>
+<a class="cta" href="/${lang}/">${esc(P.app)}</a>
+${body}
+<p class="how">${esc(P.big)}</p>
+${last ? `<p>${esc(P.last(last.o, last.d))} <a href="/${lang}/${REC[lang].slug}">${esc(REC[lang].nav)} →</a></p>` : ""}
+<h2>${esc(P.howH)}</h2>
+<ul>${P.how.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+<h2>${esc(P.faqH)}</h2>
+<dl class="faq">${P.faq.map(([q, a]) => `<dt>${esc(q)}</dt><dd>${esc(a)}</dd>`).join("")}</dl>
+<p class="how" style="font-size:13px;margin-top:24px">${esc(P.upd)}: <time datetime="${mod}">${esc(new Intl.DateTimeFormat(LOCALE[lang], { timeZone: DAYTZ, day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(Date.parse(mod)))}</time></p>
 </main>
 <footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi · ${esc(OP.name)}, ${esc(OP.city)}</p></footer>
 </body>
