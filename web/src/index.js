@@ -485,21 +485,34 @@ ${matches.length ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
 .mlist .lg h3{margin:0;padding:8px 12px;font-size:.9rem}.mlist .lg ul{list-style:none;margin:0;padding:0}.mlist .m{display:flex;gap:8px;padding:6px 12px}</style>`;
   const raw = matches.map((x) => rawRow(x, hm, lang));
   // «Τα δυνατά της ημέρας» (απόφαση Owner 03/11): 3 κάρτες, VIP ανοιχτά, με το «γιατί» στη γλώσσα της σελίδας
-  const S = day.strong;
+  // απόφαση Owner 05/11: μέχρι να βγουν τα νέα, μένουν τα χθεσινά δυνατά όταν κέρδισε η τριάδα ή 2+ κάρτες,
+  // ή όσο παίζεται ακόμα κάποιος χθεσινός αγώνας. Όταν χάθηκαν (ή κέρδισε μόνο ένα μονό) και τελείωσαν όλα, φεύγουν.
+  let S = day.strong, SY = false;
+  if (!S && isToday) {
+    const Y = await gd(shift(today, -1)).then((d) => d && d.strong).catch(() => null);
+    if (Y) {
+      const rs = [Y.win && Y.win.result, Y.goals && Y.goals.result, Y.treble && Y.treble.result];
+      const w = rs.filter((r) => r === 1).length, tw = !!(Y.treble && Y.treble.result === 1);
+      const legs = [Y.win, Y.goals, ...(Y.treble ? Y.treble.legs : [])].filter(Boolean);
+      const open = legs.some((c) => c.result == null);
+      if (w >= 2 || tw || open) { S = Y; SY = true; }
+    }
+  }
   const sCard = (c) => {
     if (!c) return null;
-    const x = matches.find((m) => m.id === c.fixture_id);
+    const x = matches.find((m) => m.id === c.fixture_id) || (c.home && c.ts ? { id: c.fixture_id, ts: c.ts, home: { name: c.home }, away: { name: c.away }, noWhy: 1 } : null);
     return { id: c.fixture_id, home: c.home, away: c.away, league: c.league, country: c.country, time: c.ts ? hm(c.ts) : "", ts: c.ts,
       sel: c.sel, price: c.price, now: c.now, min: c.min, tier: c.tier, result: c.result, status: c.status, gh: c.gh, ga: c.ga,
-      why: (c.ai && c.ai[lang]) || (x ? tipWhy(lang, x, { sel: c.sel, price: c.price, prob: c.prob }, SEL) : ""), url: x ? matchPath(lang, x) : "" }; // why: AI (εγκεκριμένο από τον ελεγκτή) ή «καλούπι»
+      why: (c.ai && c.ai[lang]) || (x && !x.noWhy ? tipWhy(lang, x, { sel: c.sel, price: c.price, prob: c.prob }, SEL) : ""), url: x ? matchPath(lang, x) : "" }; // why: AI (εγκεκριμένο από τον ελεγκτή) ή «καλούπι»
   };
-  const BZS = S ? { win: sCard(S.win), goals: sCard(S.goals), treble: S.treble ? { odds: S.treble.odds, result: S.treble.result, legs: S.treble.legs.map(sCard) } : null } : null;
+  const BZS = S ? { yday: SY, win: sCard(S.win), goals: sCard(S.goals), treble: S.treble ? { odds: S.treble.odds, result: S.treble.result, legs: S.treble.legs.map(sCard) } : null } : null;
+  const BZT = SY ? null : BZS; // για τη γραμμή της Google: μόνο τα σημερινά
   // απόφαση Owner 04/11: η γραμμή «τα δυνατά μας» φαίνεται σε ΚΑΘΕ μέρα (αύριο, όλες οι μέρες…) με τα δυνατά της ημέρας,
   // ώστε να μην «πετάγεται» η σελίδα όταν αλλάζει μέρα· αν η μέρα της σελίδας δεν έχει δικά της, τα σημερινά (με την ημερομηνία τους)
-  const S2 = BZS ? null : (cdays[0] && cdays[0].strong) || null;
-  const LS = BZS || (S2 && { win: S2.win, goals: S2.goals, treble: S2.treble });
-  const dS = BZS ? dLong : new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(Date.parse(today + "T12:00:00Z"));
-  const sLine = LS && t.strongK ? (t.strongK + (BZS ? "" : " (" + dS + ")") + " " + "{list}").replace("{list}", [LS.win, LS.goals].filter(Boolean)
+  const S2 = BZT ? null : (cdays[0] && cdays[0].strong) || null;
+  const LS = BZT || (S2 && { win: S2.win, goals: S2.goals, treble: S2.treble });
+  const dS = BZT ? dLong : new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(Date.parse(today + "T12:00:00Z"));
+  const sLine = LS && t.strongK ? (t.strongK + (BZT ? "" : " (" + dS + ")") + " " + "{list}").replace("{list}", [LS.win, LS.goals].filter(Boolean)
     .map((c) => `${SEL[c.sel] || c.sel} ${c.home} – ${c.away} (${Number(c.price).toFixed(2)})`).concat(LS.treble ? [`${t.treble} x${Number(LS.treble.odds).toFixed(2)}`] : []).join(" · ")) : "";
   const coupons = (day.coupons || []).map((c) => ({ ...c, legs: c.legs.map((l) => ({ ...l, time: l.ts ? hm(l.ts) : "" })) }));
   // και οι μεγάλες λίγκες των επόμενων ημερών, για να μετράνε σωστά «Top»/«Τα πρωταθλήματά μου» στο «Αύριο»

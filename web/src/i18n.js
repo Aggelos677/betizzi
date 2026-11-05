@@ -270,6 +270,9 @@ export const SEL = { "1": "1", X: "X", "2": "2", "1X": "1X", X2: "X2", "12": "12
 export const UI_ORDER = ["el", "es", "pt", "fr", "de", "ro", "sr", "bg"];
 export const UI = {
   // 05/11: dropdown αγώνα = μία ανάλυση
+  "Our strongest picks come out in the morning.": ["Τα δυνατά της ημέρας βγαίνουν το πρωί.", "Lo más fuerte del día sale por la mañana.", "Os mais fortes do dia saem de manhã.", "Nos meilleurs choix du jour sortent le matin.", "Unsere stärksten Tipps kommen am Morgen.", "Cele mai tari ponturi ale zilei apar dimineața.", "Najjači tipovi dana izlaze ujutru.", "Най-силните прогнози за деня излизат сутрин."],
+  "Yesterday's strongest": ["Τα δυνατά της χθες", "Lo más fuerte de ayer", "Os mais fortes de ontem", "Les meilleurs choix d'hier", "Die stärksten Tipps von gestern", "Cele mai tari de ieri", "Najjači tipovi od juče", "Най-силните от вчера"],
+  "New picks come out in the morning.": ["Τα νέα βγαίνουν το πρωί.", "Los nuevos salen por la mañana.", "Os novos saem de manhã.", "Les nouveaux sortent le matin.", "Die neuen kommen am Morgen.", "Cele noi apar dimineața.", "Novi izlaze ujutru.", "Новите излизат сутрин."],
   "Form": ["Φόρμα", "Forma", "Forma", "Forme", "Form", "Formă", "Forma", "Форма"],
   "What our analysis shows": ["Τι λέει η ανάλυση", "Lo que muestra nuestro análisis", "O que a nossa análise mostra", "Ce que montre notre analyse", "Was unsere Analyse zeigt", "Ce arată analiza noastră", "Šta pokazuje naša analiza", "Какво показва анализът ни"],
   "Last 5": ["Τελευταίοι 5", "Últimos 5", "Últimos 5", "5 derniers", "Letzte 5", "Ultimele 5", "Poslednjih 5", "Последни 5"],
@@ -337,7 +340,6 @@ export const UI = {
   "Saved": ["Αποθηκεύτηκε", "Guardado", "Salvo", "Enregistré", "Gespeichert", "Salvat", "Sačuvano", "Запазено"],
   "All about this match": ["Όλα για τον αγώνα", "Todo sobre el partido", "Tudo sobre o jogo", "Tout sur le match", "Alles zum Spiel", "Totul despre meci", "Sve o utakmici", "Всичко за мача"],
   "Today's strongest": ["Τα δυνατά της ημέρας", "Lo más fuerte del día", "Os fortes do dia", "Top pronos du jour", "Die Stärksten des Tages", "Cele mai tari ale zilei", "Najjači dana", "Най-силните за деня"],
-  "Our strongest picks come out at 10:00.": ["Τα δυνατά της ημέρας βγαίνουν στις 10:00.", "Lo más fuerte del día sale a las 10:00.", "Os fortes do dia saem às 10:00.", "Nos top pronos sortent à 10h.", "Die Stärksten des Tages erscheinen um 10:00 Uhr.", "Ponturile tari ale zilei apar la 10:00.", "Najjači dana izlaze u 10:00.", "Най-силните за деня излизат в 10:00."],
   "Not worth it at this price anymore": ["Δεν αξίζει πια σε αυτή την τιμή", "Ya no vale la pena a esta cuota", "Já não vale a pena nesta odd", "Ne vaut plus le coup à cette cote", "Lohnt sich zu dieser Quote nicht mehr", "Nu mai merită la această cotă", "Ne isplati se više po ovoj kvoti", "Вече не си струва при този коефициент"],
   "now": ["τώρα", "ahora", "agora", "maintenant", "jetzt", "acum", "sada", "сега"],
   "Treble": ["Τριάδα", "Triple", "Tripla", "Triple", "Dreierkombi", "Bilet de 3", "Trojka", "Тройка"],
