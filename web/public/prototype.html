@@ -237,26 +237,23 @@ body{padding-top:env(safe-area-inset-top,0px)}
 .bwlast{cursor:pointer}.bwlast:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
 .bwmore{display:flex;align-items:center;gap:4px;padding:10px 12px;border-top:1px solid rgba(182,242,58,.25);color:var(--lime);font-weight:700;font-size:.85rem}.bwmore b{font-size:.95rem}
 .tm2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-details.more{border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02)}
-details.more>summary{list-style:none;cursor:pointer;min-height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-weight:700;color:var(--lime)}
-details.more>summary::-webkit-details-marker{display:none}details.more>summary::after{content:"▾"}details.more[open]>summary::after{content:"▴"}
-.mo-b{padding:0 12px 12px;display:flex;flex-direction:column;gap:8px}
 .mo-h{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--lime);font-weight:800}
-.mo-h2{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:6px}
 .mo-sig{display:flex;flex-direction:column;gap:6px}
 .mo-sig .sg{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;border:1.5px solid var(--win);background:rgba(60,207,110,.12);font-size:.95rem;line-height:1.3}
-.mo-sig .sg.dn{border-color:var(--bad);background:rgba(255,107,107,.12)}.mo-sig .sg.gl{border-color:var(--lime);background:var(--lime-soft)}
+.mo-sig .sg.mo-dn{border-color:var(--bad);background:rgba(255,107,107,.12)}.mo-sig .sg.mo-gl{border-color:var(--lime);background:var(--lime-soft)}.mo-sig .sg.mo-mt{border-color:var(--line);background:var(--panel)}
 .mo-sig .sg i{flex:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:800;background:var(--win);color:#06120a}
-.mo-sig .sg.dn i{background:var(--bad)}.mo-sig .sg.gl i{background:var(--lime)}
+.mo-sig .sg.mo-dn i{background:var(--bad)}.mo-sig .sg.mo-gl i{background:var(--lime)}.mo-sig .sg.mo-mt i{background:transparent}
 .mo-sig .sg b{font-weight:800}
-.mo-tw{overflow-x:auto}.mo-t{width:100%;border-collapse:collapse;font-size:.82rem}
-.mo-t th{color:var(--muted);font-weight:600;padding:6px 4px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
-.mo-t td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:center;font-family:var(--f-mono);white-space:nowrap}
-.mo-t th:first-child,.mo-t td:first-child{text-align:left;font-family:inherit;font-weight:600;white-space:normal}
-.mo-t td.hi{background:rgba(60,207,110,.22);font-weight:700}.mo-t td.lo{background:rgba(255,107,107,.2);font-weight:700}.mo-t td.gl{background:var(--lime-soft);font-weight:700}
-.mo-t td.best{color:var(--lime);font-weight:700}
-.mo-leg{display:flex;flex-wrap:wrap;gap:12px;font-size:.72rem;color:var(--muted)}.mo-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
-.mo-leg i.hi{background:rgba(60,207,110,.6)}.mo-leg i.lo{background:rgba(255,107,107,.6)}.mo-leg i.gl{background:rgba(182,242,58,.5)}
+.mo-tw{overflow-x:auto}.mo-t{width:100%;border-collapse:collapse;font-size:.82rem;table-layout:auto}
+.mo-t th{color:var(--muted);font-weight:600;padding:6px 3px;border-bottom:1px solid var(--line);text-align:center;font-size:.72rem;line-height:1.2}
+.mo-t td{padding:7px 3px;border-bottom:1px solid var(--line);text-align:center;font-family:var(--f-mono);white-space:nowrap;vertical-align:middle}
+.mo-t th:first-child,.mo-t td:first-child{text-align:left;font-family:inherit;font-weight:700;white-space:normal}
+.mo-t td:first-child small{display:block;font-weight:500;font-size:.7rem;color:var(--muted)}
+.mo-t tr.mo-r1 td{border-bottom:0;padding-bottom:2px}.mo-t tr.mo-r2 td{padding-top:0}.mo-t tr.mo-r2 .sqs{margin-top:2px;max-width:240px}
+.mo-t td.mo-hi{background:rgba(60,207,110,.22);font-weight:700}.mo-t td.mo-lo{background:rgba(255,107,107,.2);font-weight:700}.mo-t td.mo-gl{background:var(--lime-soft);font-weight:700}
+.mo-t td.mo-best{color:var(--lime);font-weight:700}
+.mo-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.72rem;color:var(--muted);align-items:center}.mo-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.mo-leg i.mo-hi{background:rgba(60,207,110,.6)}.mo-leg i.mo-lo{background:rgba(255,107,107,.6)}.mo-leg i.mo-gl{background:rgba(182,242,58,.5)}
 
 .tbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0}
 .tbox .nm{font:800 .95rem var(--f-display);text-transform:uppercase;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1666,61 +1663,65 @@ function rowHTML(m){
 }
 function obtn(k){var s=SEL[k];if(!s)return '';return '<button type="button" class="ob" data-key="'+esc(k)+'" aria-pressed="false"'+(s.m.open?'':' disabled')+'><span>'+esc(s.short)+'</span><b>'+s.odd.toFixed(2)+'</b></button>';}
 function detailHTML(m){
-  /* απόφαση Owner 03/11: σύντομη ανάλυση πάνω-πάνω + link στη σελίδα του αγώνα */
-  var h=(m.an?'<p class="m-an">'+esc(m.an)+'</p>':'')+(m.url?'<a class="m-url" href="'+esc(m.url)+'"><span>All about this match</span> →</a>':'');
+  /* απόφαση Owner 05/11: ΕΝΑ dropdown = μία ολοκληρωμένη ανάλυση, χωρίς επαναλήψεις:
+     εικόνα → tip → τι λέει η ανάλυση (σήματα) → οι δύο ομάδες (θέση, φόρμα, 5 τελευταίοι σε έναν πίνακα) → αγορά → αποδόσεις → τιμή ανά bookmaker → σελίδα αγώνα */
+  var h=(m.an?'<p class="m-an">'+esc(m.an)+'</p>':'');
   m.tips.forEach(function(t){
     var locked=t.tier==="vip"&&!vipMember&&!t.sel;
     h+='<div class="tipbox'+(t.tier==="vip"?' vip':'')+'"><div class="tiprow">'+tierTag(t)+'<span class="label">Our tip</span>'+resTag(t,m)+'</div>'
       +(locked?'<div class="tiprow"><span class="hint">This is a VIP tip.</span><button type="button" class="btn vipb" data-unlock="1">Sign up free</button></div>'
       :'<div class="tiprow"><span class="sel">'+esc(t.sel)+'</span><span class="oddpill">'+oddTxt(t)+'</span><span class="hint">'+esc(t.book)+'</span></div><div class="why">'+esc(t.why)+'</div>'+priceNote(t))+'</div>';
   });
-  h+='<div class="tm2"><div class="tbox"><div class="nm">'+esc(m.home)+'</div><div class="pos">'+(m.hr||"–")+'<small>'+(m.nt?'of '+m.nt:'')+'</small></div>'+squares(m.hfd)+'</div>'
-    +'<div class="tbox"><div class="nm">'+esc(m.away)+'</div><div class="pos">'+(m.ar||"–")+'<small>'+(m.nt?'of '+m.nt:'')+'</small></div>'+squares(m.afd)+'</div></div>'
-    +'<span class="hint" style="margin-top:-6px">Table position · last 5, older → newer · line under = home game</span>';
+  var H=f5(m.hfd),A=f5(m.afd);
+  /* σήματα: φόρμα (έως 2 ανά ομάδα) + σήματα αγώνα του μοντέλου, χωρίς διπλά θέματα */
+  var ss=sigs(m,H,A);
+  if(ss.length)h+='<div class="mgroup"><span class="mo-h">What our analysis shows</span><div class="mo-sig">'+ss.map(function(x){return '<div class="sg mo-'+x[0]+'"><i aria-hidden="true">'+x[1]+'</i><span>'+(x[2]?'<b>'+esc(x[2])+'</b> ':'')+'<span>'+x[3]+'</span></span></div>';}).join("")+'</div></div>';
+  if(H||A||m.hr||m.ar){
+    var cl=function(c){return c?' class="mo-'+c+'"':'';};
+    var row=function(nm,rk,o,f){var d=o?o.gf-o.ga:0,pos=rk?'<small>'+rk+(m.nt?'/'+m.nt:'')+'</small>':'';
+      return '<tr class="mo-r1"><td>'+esc(nm)+pos+'</td>'+(o?'<td'+cl(o.pts>=12?"hi":o.pts<=3?"lo":"")+'>'+o.pts+'</td><td'+cl(d>=6?"hi":d<=-6?"lo":"")+'>'+o.gf+'-'+o.ga+'</td><td'+cl(o.o25>=4||o.o25<=1?"gl":"")+'>'+o.o25+'/'+o.n+'</td><td'+cl(o.gg>=4||o.gg<=1?"gl":"")+'>'+o.gg+'/'+o.n+'</td><td'+cl(o.cs>=3?"hi":o.cs===0?"lo":"")+'>'+o.cs+'/'+o.n+'</td>':'<td colspan="5"></td>')+'</tr>'
+        +'<tr class="mo-r2"><td colspan="6">'+squares(f)+'</td></tr>';};
+    h+='<div class="mgroup"><span class="glabel">Last 5</span><div class="mo-tw"><table class="mo-t"><thead><tr><th></th><th>Pts</th><th>Goals</th><th>O2.5</th><th>GG</th><th>Clean sheets</th></tr></thead><tbody>'
+      +row(m.home,m.hr,H,m.hfd)+row(m.away,m.ar,A,m.afd)+'</tbody></table></div>'
+      +'<div class="mo-leg"><span><i class="mo-hi"></i><span>strong point</span></span><span><i class="mo-lo"></i><span>weak point</span></span><span><i class="mo-gl"></i><span>goals trend</span></span><span><span>older → newer · line under = home game</span></span></div></div>';
+  }
   if(m.p.h||m.p.a){
     var tot=(m.p.h+m.p.x+m.p.a)||1;
     h+='<div class="mgroup"><span class="glabel">Market chances</span><div class="pbar" role="img" aria-label="Home '+m.p.h+'%, draw '+m.p.x+'%, away '+m.p.a+'%"><i class="h" style="width:'+(m.p.h/tot*100)+'%"></i><i class="d" style="width:'+(m.p.x/tot*100)+'%"></i><i class="a" style="width:'+(m.p.a/tot*100)+'%"></i></div>'
       +'<div class="plegend"><span>1 <b>'+m.p.h+'%</b></span><span>X <b>'+m.p.x+'%</b></span><span>2 <b>'+m.p.a+'%</b></span></div>'
       +(m.capped?'<div class="hint" style="font-size:.72rem">Kept within 5 points of the bookmakers\' price · raw model 1 '+m.pRaw.h+'% · X '+m.pRaw.x+'% · 2 '+m.pRaw.a+'% · O2.5 '+m.pRaw.o25+'%</div>':'')+'<div class="dline"><span>Our score <b style="color:var(--lime)">'+esc(m.bz||"–")+'</b></span><span>Over 2.5 <b>'+m.p.o25+'%</b></span></div></div>';
-  if(m.badges.length)h+='<div class="bdglist">'+m.badges.map(function(k){return '<span><i>'+BADGE[k][0]+'</i>'+BADGE[k][1]+'</span>';}).join("")+'</div>';
   }
   if(m.o.h){
     h+='<div class="mgroup"><span class="glabel">Result</span><div class="odds c3">'+obtn(m.id+":1")+obtn(m.id+":X")+obtn(m.id+":2")+'</div></div>'
       +'<div class="mgroup"><span class="glabel">Goals</span><div class="odds c2">'+obtn(m.id+":O25")+obtn(m.id+":U25")+obtn(m.id+":GG")+obtn(m.id+":NG")+'</div></div>';
   }
-  h+=moreHTML(m);
+  h+=bkTable(m);
+  if(m.url)h+='<a class="m-url" href="'+esc(m.url)+'"><span>All about this match</span> →</a>';
   /* απουσίες & νέα: κρυφά μέχρι να υπάρχουν δεδομένα */
   return h;
 }
-/* απόφαση Owner 05/11: «Περισσότερα στοιχεία» κλειστό μέσα στο dropdown — σήματα (έντονα), πίνακας 5 τελευταίων με φόντο στα σημαντικά, τιμές ανά bookmaker. Μόνο κείμενο, χτίζεται όταν ανοίξει ο αγώνας. */
 function f5(f){if(!f||!f.length)return null;var o={n:f.length,pts:0,gf:0,ga:0,o25:0,gg:0,cs:0,fts:0,w:0,l:0};
   f.forEach(function(g){var a=String(g[1]).split("-"),x=+a[0]||0,y=+a[1]||0;o.gf+=x;o.ga+=y;if(g[0]==="W"){o.pts+=3;o.w++;}else if(g[0]==="D")o.pts+=1;else o.l++;
     if(x+y>=3)o.o25++;if(x>0&&y>0)o.gg++;if(y===0)o.cs++;if(x===0)o.fts++;});return o;}
-function sigs(nm,o){var r=[];if(!o||o.n<5)return r;
+function tsig(nm,o){var r=[];if(!o||o.n<5)return r;
   if(o.w===5)r.push(["up","won all of the last 5"]);else if(o.l===0)r.push(["up","unbeaten in the last 5"]);
   if(o.w===0)r.push(["dn","no win in the last 5"]);
   if(o.fts===0)r.push(["up","scored in every one of the last 5"]);else if(o.fts>=3)r.push(["dn","failed to score in 3 or more of the last 5"]);
   if(o.cs>=3)r.push(["up","kept a clean sheet in 3 or more of the last 5"]);else if(o.cs===0)r.push(["dn","conceded in every one of the last 5"]);
   if(o.o25>=4)r.push(["gl","3+ goals in at least 4 of the last 5"]);else if(o.o25<=1)r.push(["gl","2 or fewer goals in at least 4 of the last 5"]);
   if(o.gg>=4)r.push(["gl","Both teams scored in at least 4 of the last 5"]);
-  return r.map(function(x){return [x[0],nm,x[1]];});}
-function moreHTML(m){
-  var H=f5(m.hfd),A=f5(m.afd),pr={up:0,dn:1,gl:2};function srt(a){return a.sort(function(x,y){return pr[x[0]]-pr[y[0]];});}
-  /* το πολύ 2 σήματα ανά ομάδα, τα πιο δυνατά πρώτα */
-  var ss=srt(srt(sigs(m.home,H)).slice(0,2).concat(srt(sigs(m.away,A)).slice(0,2)));
-  var b="";
-  if(ss.length)b+='<span class="mo-h">What our analysis shows</span><div class="mo-sig">'+ss.map(function(x){return '<div class="sg '+x[0]+'"><i aria-hidden="true">'+(x[0]==="up"?"↑":x[0]==="dn"?"↓":"⚽")+'</i><span><b>'+esc(x[1])+'</b> <span>'+x[2]+'</span></span></div>';}).join("")+'</div>';
-  function cl(v,hi,lo){return v===null?"":v?' class="'+v+'"':"";}
-  function row(nm,o){if(!o)return "";var d=o.gf-o.ga;
-    return '<tr><td>'+esc(nm)+'</td><td'+cl(o.pts>=12?"hi":o.pts<=3?"lo":"")+'>'+o.pts+'</td><td'+cl(d>=6?"hi":d<=-6?"lo":"")+'>'+o.gf+'-'+o.ga+'</td><td'+cl(o.o25>=4||o.o25<=1?"gl":"")+'>'+o.o25+'/'+o.n+'</td><td'+cl(o.gg>=4||o.gg<=1?"gl":"")+'>'+o.gg+'/'+o.n+'</td><td'+cl(o.cs>=3?"hi":o.cs===0?"lo":"")+'>'+o.cs+'/'+o.n+'</td></tr>';}
-  if(H||A)b+='<span class="mo-h2">Last 5</span><div class="mo-tw"><table class="mo-t"><thead><tr><th></th><th>Pts</th><th>Goals</th><th>O2.5</th><th>GG</th><th>Clean sheets</th></tr></thead><tbody>'+row(m.home,H)+row(m.away,A)+'</tbody></table></div>'
-    +'<div class="mo-leg"><span><i class="hi"></i><span>strong point</span></span><span><i class="lo"></i><span>weak point</span></span><span><i class="gl"></i><span>goals trend</span></span></div>';
-  if(m.bk&&m.bk.length){var cols=["1","X","2","O25","GG"],lab={"1":"1",X:"X","2":"2",O25:"O2.5",GG:"GG"},best={};
-    cols.forEach(function(c){BOOKS.forEach(function(bn){var v=bkP(m,c,bn);if(v>(best[c]||0))best[c]=v;});});
-    var rows=BOOKS.map(function(bn){var any=0,t='<tr><td>'+esc(bn)+'</td>'+cols.map(function(c){var v=bkP(m,c,bn);if(v)any=1;return '<td'+(v&&v===best[c]?' class="best"':'')+'>'+(v?v.toFixed(2):'–')+'</td>';}).join("")+'</tr>';return any?t:"";}).join("");
-    if(rows)b+='<span class="mo-h2">Price per bookmaker</span><div class="mo-tw"><table class="mo-t"><thead><tr><th></th>'+cols.map(function(c){return '<th>'+lab[c]+'</th>';}).join("")+'</tr></thead><tbody>'+rows+'</tbody></table></div>';}
-  return b?'<details class="more"><summary>More stats</summary><div class="mo-b">'+b+'</div></details>':'';
-}
+  var pr={up:0,dn:1,gl:2};r.sort(function(a,b){return pr[a[0]]-pr[b[0]];});
+  return r.slice(0,2).map(function(x){return [x[0],x[0]==="up"?"↑":x[0]==="dn"?"↓":"⚽",nm,x[1]];});}
+function sigs(m,H,A){var r=tsig(m.home,H).concat(tsig(m.away,A)),pr={up:0,dn:1,gl:2},gl=r.some(function(x){return x[0]==="gl";});
+  r.sort(function(a,b){return pr[a[0]]-pr[b[0]];});
+  /* σήματα αγώνα (μοντέλο/αγορά): τα γκολ μόνο αν δεν το λέει ήδη η φόρμα */
+  (m.badges||[]).forEach(function(k){if(!BADGE[k])return;if(gl&&(k==="goals"||k==="btts"||k==="tight"))return;if(k==="form"&&r.length)return;r.push(["mt",BADGE[k][0],"",BADGE[k][1]]);});
+  return r.slice(0,5);}
+function bkTable(m){if(!m.bk||!m.bk.length)return "";var cols=["1","X","2","O25","GG"],lab={"1":"1",X:"X","2":"2",O25:"O2.5",GG:"GG"},best={};
+  cols.forEach(function(c){BOOKS.forEach(function(bn){var v=bkP(m,c,bn);if(v>(best[c]||0))best[c]=v;});});
+  var rows=BOOKS.map(function(bn){var any=0,t='<tr><td>'+esc(bn)+'</td>'+cols.map(function(c){var v=bkP(m,c,bn);if(v)any=1;return '<td'+(v&&v===best[c]?' class="mo-best"':'')+'>'+(v?v.toFixed(2):'–')+'</td>';}).join("")+'</tr>';return any?t:"";}).join("");
+  return rows?'<div class="mgroup"><span class="glabel">Price per bookmaker</span><div class="mo-tw"><table class="mo-t mo-bk"><thead><tr><th></th>'+cols.map(function(c){return '<th>'+lab[c]+'</th>';}).join("")+'</tr></thead><tbody>'+rows+'</tbody></table></div></div>':"";}
+
 document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest('#mFilter a[href],#dayStrip a[href]');if(a&&a.getAttribute("href")!=="#"){try{sessionStorage.setItem("ko-y",String(window.scrollY));}catch(x){}}},true);
 function renderMatches(){var _y=window.scrollY;renderMatches2();if(Math.abs(window.scrollY-_y)>2)window.scrollTo(0,_y);}
 /* απόφαση Owner 04/11: ☆ στην κεφαλίδα κάθε λίγκας → μπαίνει/βγαίνει από «Τα πρωταθλήματά μου» (όπως το ☆ στους αγώνες) */
