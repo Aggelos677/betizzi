@@ -14,8 +14,8 @@ People who bet on football for fun and want an honest, data-based second opinion
 - New tips are added during the day; a published tip is never edited or withdrawn. If the price falls below betizzi's limit, the tip stays with a warning.
 
 ## Ready parlays
-- Built only from betizzi's own tips, in fixed odds zones: about x3–5, x8–12, x20–30 and one about x100 per day (two on weekends).
-- Styles: balanced (picks 1.50–2.10) or favourites. Each tip is used in only one parlay (the x100 may reuse up to half of its picks).
+- Built only from betizzi's own tips, in fixed odds zones: about x3–5, x8–12, x20–30 and one "mega parlay of the day" at x30–50 (two on weekends).
+- Styles: balanced (picks 1.50–2.10) or favourites. Each tip is used in only one parlay (the mega parlay may reuse up to half of its picks).
 - Postponed or cancelled matches count as void (odds 1.00).
 - On weekdays, if the day's parlays are lost early, betizzi may publish once that day 2–3 new small parlays (about x3–5) from unused tips; they are marked "New" and are part of the record.
 

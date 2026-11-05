@@ -1,11 +1,11 @@
 // Τα έτοιμα κουπόνια (παρολί) του betizzi. Ό,τι δημοσιεύτηκε δεν αλλάζει (record)· μέσα στη μέρα μόνο ΠΡΟΣΤΙΘΕΝΤΑΙ όσα λείπουν.
 // Κανόνες (απόφαση Owner 02/11/2026, βλ. project «Tips και παρολί — κανόνες»):
-//  Ζώνες x3–5, x8–12, x20–30: Νίκες (1X2) · Γκολ (Over 2.5 + GG) · Μικτό. Και ~x100.
+//  Ζώνες x3–5, x8–12, x20–30: Νίκες (1X2) · Γκολ (Over 2.5 + GG) · Μικτό. Και «Μεγάλο παρολί της ημέρας» x30–50 (05/11, πριν ~x100).
 //  Καθημερινές: 9 + 1 x100 = 10 (κυρίως αγώνες μετά τις 17:00).
 //  Σάβ–Κυρ: διπλά, ένα σετ έως τις 17:00 και ένα μετά = 18 + 2 x100 (ένα για κάθε ζώνη ώρας) = 20.
 //  Μόνο από τα tips μας (Free + VIP· τα VIP μέσα στα παρολί είναι ανοιχτά), με σειρά ποιότητας.
 //  Στυλ: Ισορροπημένο (1.50–2.10)· αν δεν βγαίνει, Φαβορί (1X2 1.40–1.65, γκολ 1.50–1.75). Ποτέ 1.40 με 3.80 μαζί.
-//  Κάθε tip σε ΕΝΑ παρολί· το x100 μπορεί να ξαναπάρει έως τις ΜΙΣΕΣ επιλογές του από άλλα παρολί.
+//  Κάθε tip σε ΕΝΑ παρολί· το Μεγάλο (πριν x100) μπορεί να ξαναπάρει έως τις ΜΙΣΕΣ επιλογές του από άλλα παρολί.
 //  Ό,τι δεν βγαίνει, δεν βγαίνει· ξαναδοκιμάζεται όταν μπουν νέα tips.
 import { MODEL_VERSION, NOT_FIRST_TEAM } from "./tips.js";
 
@@ -18,7 +18,8 @@ const now = () => Math.floor(Date.now() / 1000);
 const ymd = (t) => new Date(t * 1000).toISOString().slice(0, 10);
 const WINS = new Set(["1", "2"]), GOALS = new Set(["O25", "GG"]);
 const ZONES = [["x3-5", 3, 5], ["x8-12", 8, 12], ["x20-30", 20, 30]];
-const CRAZY = ["x100", 80, 130];
+// Απόφαση Owner 05/11: το ~x100 έγινε «Μεγάλο παρολί της ημέρας», απόδοση 30–50 (τις καθημερινές το x100 δεν έβγαινε: λίγα tips)
+const CRAZY = ["mega", 30, 50];
 const STYLE = {
   bal: { wins: [1.50, 2.10], goals: [1.50, 2.10], other: [1.50, 2.10] },
   fav: { wins: [1.40, 1.65], goals: [1.50, 1.75], other: [1.45, 1.75] },
@@ -37,7 +38,7 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
   const have = new Set(), usedFx = new Set();
   for (const r of prev.filter((r) => r.style)) {
     have.add(r.slot || `${r.kind}|${r.variant}|day`);
-    if (r.kind !== CRAZY[0]) for (const l of JSON.parse(r.legs)) usedFx.add(l[0]);
+    if (r.kind !== CRAZY[0] && r.kind !== "x100") for (const l of JSON.parse(r.legs)) usedFx.add(l[0]);
   }
 
   const to = athEnd(date), from = to - DAY; // μέρα Ελλάδας (04/11)
@@ -96,7 +97,7 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
   const wins = weekend ? ["early", "late"] : ["day"];
   for (const w of wins) for (const [z, lo, hi] of ZONES) make(z, lo, hi, "mix", w);
   for (const w of wins) for (const [z, lo, hi] of ZONES) for (const v of ["wins", "goals"]) make(z, lo, hi, v, w);
-  // ~x100: ένα τη μέρα (κυρίως βραδινοί)· Σάβ–Κυρ ένα έως τις 17:00 και ένα μετά.
+  // Μεγάλο παρολί (30–50, πριν ~x100): ένα τη μέρα (κυρίως βραδινοί)· Σάβ–Κυρ ένα έως τις 17:00 και ένα μετά.
   // Ό,τι περισσεύει + έως τις ΜΙΣΕΣ επιλογές από τα πιο δυνατά tips που μπήκαν ήδη σε άλλα παρολί.
   for (const w of wins) {
     const [z, lo, hi] = CRAZY, slot = `${z}|mix|${w}`; if (have.has(slot)) continue;

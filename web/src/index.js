@@ -982,8 +982,8 @@ ${md(pg.body[L])}
 // ---------- «Παρολί σήμερα» (απόφαση Owner 05/11) ----------
 // Ελαφριά σελίδα από τον server: χωρίς εικόνες και χωρίς την εφαρμογή. Μόνο τα σημερινά παρολί (μέρα Ελλάδας),
 // πώς τα φτιάχνουμε, το τελευταίο που κέρδισε (κανόνας Record: από τα παρολί μόνο αυτό), FAQ.
-const PZ = ["x3-5", "x8-12", "x20-30", "x100"];
-const PZL = { "x3-5": "3–5", "x8-12": "8–12", "x20-30": "20–30", x100: "~100" };
+const PZ = ["x3-5", "x8-12", "x20-30", "mega", "x100"]; // x100: παλιά (πριν 05/11)
+const PZL = { "x3-5": "3–5", "x8-12": "8–12", "x20-30": "20–30", mega: "30–50", x100: "~100" };
 function parPath(lang) { return `/${lang}/${PAR[lang].slug}`; }
 const PCSS = `
 .doc ul.lgl{list-style:none;padding:0;margin:0}.doc ul.lgl li{margin:0;color:inherit}.pz{margin:18px 0 6px}.cp{background:var(--c1);border:1px solid var(--ln);border-radius:12px;margin:0 0 10px;overflow:hidden}
@@ -1023,7 +1023,7 @@ async function paroliPage(env, lang) {
   const card = (c) => { const [k, lbl] = st(c);
     return `<article class="cp"><div class="cph"><b>${esc(P.v[c.variant] || P.v.mix)}</b><span class="pill ${k}">${esc(lbl)}</span><span class="od" title="${esc(P.total)}">x${xo(c).toFixed(2)}</span></div><ul class="lgl">${(c.legs || []).map(leg).join("")}</ul></article>`; };
   let body = "";
-  for (const z of PZ) { const L = cps.filter((c) => c.kind === z); if (L.length) body += `<h2 class="pz">${esc(P.zone)} ${PZL[z]}</h2>${L.map(card).join("")}`; }
+  for (const z of PZ) { const L = cps.filter((c) => c.kind === z); if (L.length) body += `<h2 class="pz">${z === "mega" ? `⭐ ${esc(P.megaH)} · ${PZL[z]}` : `${esc(P.zone)} ${PZL[z]}`}</h2>${L.map(card).join("")}`; }
   const lo = cps.length ? Math.round(Math.min(...cps.map((c) => c.odds))) : 0, hi = cps.length ? Math.round(Math.max(...cps.map((c) => c.odds))) : 0;
   const ans = cps.length ? P.ans(dLong, cps.length, lo, hi) : P.none;
   const modTs = Math.max(0, ...cps.map((c) => c.created_at || 0));
@@ -1081,5 +1081,5 @@ function parZones(lang, P) {
   if (!P) return "";
   const r = REC[lang], rows = PZ.filter((z) => P[z] && P[z].w + P[z].l > 0);
   if (!rows.length) return "";
-  return `<h2>${esc(r.parH)}</h2><p class="note">${esc(r.parNote)}</p><table><thead><tr><th style="text-align:left">${esc(PAR[lang].zone)}</th><th>${esc(r.won)}</th><th>${esc(r.lost)}</th></tr></thead><tbody>${rows.map((z) => `<tr><td style="text-align:left">${PZL[z]}</td><td class="pos">${P[z].w} ✓</td><td>${P[z].l} ✗</td></tr>`).join("")}</tbody></table>`;
+  return `<h2>${esc(r.parH)}</h2><p class="note">${esc(r.parNote)}</p><table><thead><tr><th style="text-align:left">${esc(PAR[lang].zone)}</th><th>${esc(r.won)}</th><th>${esc(r.lost)}</th></tr></thead><tbody>${rows.map((z) => `<tr><td style="text-align:left">${z === "mega" ? esc(PAR[lang].megaH) + " · " : ""}${PZL[z]}</td><td class="pos">${P[z].w} ✓</td><td>${P[z].l} ✗</td></tr>`).join("")}</tbody></table>`;
 }

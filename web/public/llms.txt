@@ -4,7 +4,7 @@
 
 ## What betizzi offers
 - Daily football tips (Free and VIP) with a short reason based on recent form, goals and league standings, and the odds at the time of publication.
-- Ready parlays in fixed odds zones (about x3–5, x8–12, x20–30 and x100), built only from betizzi's own tips.
+- Ready parlays in fixed odds zones (about x3–5, x8–12, x20–30 and the mega parlay of the day, x30–50), built only from betizzi's own tips.
 - "Strongest of the day": three picks published every morning (Athens time, between 08:00 and 14:00).
 - A public Record page: every published tip with result, win rate and ROI by league, odds range and bet type. Published tips are never edited or deleted.
 - Match pages for each match, kept after full time with the result (✓ won / ✗ lost; postponed = void).

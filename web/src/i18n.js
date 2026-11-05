@@ -270,6 +270,7 @@ export const SEL = { "1": "1", X: "X", "2": "2", "1X": "1X", X2: "X2", "12": "12
 export const UI_ORDER = ["el", "es", "pt", "fr", "de", "ro", "sr", "bg"];
 export const UI = {
   // 05/11: dropdown αγώνα = μία ανάλυση
+  "Mega": ["Μεγάλο", "Mega", "Mega", "Méga", "Mega", "Mare", "Veliki", "Голям"],
   "Our strongest picks come out in the morning.": ["Τα δυνατά της ημέρας βγαίνουν το πρωί.", "Lo más fuerte del día sale por la mañana.", "Os mais fortes do dia saem de manhã.", "Nos meilleurs choix du jour sortent le matin.", "Unsere stärksten Tipps kommen am Morgen.", "Cele mai tari ponturi ale zilei apar dimineața.", "Najjači tipovi dana izlaze ujutru.", "Най-силните прогнози за деня излизат сутрин."],
   "Yesterday's strongest": ["Τα δυνατά της χθες", "Lo más fuerte de ayer", "Os mais fortes de ontem", "Les meilleurs choix d'hier", "Die stärksten Tipps von gestern", "Cele mai tari de ieri", "Najjači tipovi od juče", "Най-силните от вчера"],
   "New picks come out in the morning.": ["Τα νέα βγαίνουν το πρωί.", "Los nuevos salen por la mañana.", "Os novos saem de manhã.", "Les nouveaux sortent le matin.", "Die neuen kommen am Morgen.", "Cele noi apar dimineața.", "Novi izlaze ujutru.", "Новите излизат сутрин."],
