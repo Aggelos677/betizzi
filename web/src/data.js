@@ -55,7 +55,7 @@ export async function getRecord(env) {
     league: t.league, country: t.country, home: t.home, away: t.away, score: t.gh == null ? null : [t.gh, t.ga],
     at: t.created_at, wdAt: t.withdrawn_at, model: t.model_version, hash: t.hash,
   });
-  return { since: d.since, pending: d.pending, updated: d.updated, settled: d.settled.map(row), withdrawn: d.withdrawn.map(row) };
+  return { since: d.since, pending: d.pending, updated: d.updated, settled: d.settled.map(row), withdrawn: d.withdrawn.map(row), parlays: d.parlays || null };
 }
 
 // Έτοιμα παρολί μιας μέρας (UTC) με αποτέλεσμα, για τη λωρίδα «Χθες» και το «τελευταίο που κέρδισε».

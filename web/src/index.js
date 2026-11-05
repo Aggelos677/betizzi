@@ -885,6 +885,7 @@ ${d.pending ? `<p class="note">${esc(r.pending.replace("{n}", d.pending))}</p>` 
 ${lgHtml}
 ${rangesHtml}
 ${parHtml}
+${parZones(lang, d.parlays)}
 ${bigHtml}
 ${monthsTable}
 ${listHtml}
@@ -1060,4 +1061,12 @@ ${last ? `<p>${esc(P.last(last.o, last.d))} <a href="/${lang}/${REC[lang].slug}"
 <footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi · ${esc(OP.name)}, ${esc(OP.city)}</p></footer>
 </body>
 </html>`;
+}
+
+// Record: παρολί ανά ζώνη, ΜΟΝΟ κέρδισαν / χάθηκαν (απόφαση Owner 05/11), χωρίς ROI και χωρίς ποσοστό. Link μόνο από το footer.
+function parZones(lang, P) {
+  if (!P) return "";
+  const r = REC[lang], rows = PZ.filter((z) => P[z] && P[z].w + P[z].l > 0);
+  if (!rows.length) return "";
+  return `<h2>${esc(r.parH)}</h2><p class="note">${esc(r.parNote)}</p><table><thead><tr><th style="text-align:left">${esc(PAR[lang].zone)}</th><th>${esc(r.won)}</th><th>${esc(r.lost)}</th></tr></thead><tbody>${rows.map((z) => `<tr><td style="text-align:left">${PZL[z]}</td><td class="pos">${P[z].w} ✓</td><td>${P[z].l} ✗</td></tr>`).join("")}</tbody></table>`;
 }
