@@ -501,13 +501,13 @@ export default {
     if (m % 2 === 0) tasks.push(cacheDays(env));
     if (h === 6 && m === 50) tasks.push(makeCoupons(env)); // μετά τα tips των 06:40 UTC
     if (h >= 7 && h < 21 && m % 10 === 5) tasks.push(makeCoupons(env)); // συμπληρώνει όσα παρολί λείπουν (νέα tips)
-    if (h >= 6 && h < 14 && m % 10 === 0) tasks.push(makeStrong(env));
+    if (h >= 5 && h < 14 && m % 5 === 0) tasks.push(makeStrong(env)); // 05/11: η ίδια περιμένει την ώρα του (releaseMin)
     if (env.TG_BOT_TOKEN) {
       tasks.push(tgPoll(env)); // Telegram: νέα μέλη / κανάλια (1 κλήση/λεπτό στο Telegram, όχι στο API-Football)
       if (m === 30) tasks.push(tgExpire(env)); // κάθε ώρα: όσοι έληξαν βγαίνουν
-      if (h >= 7 && h < 14 && m % 10 === 2) tasks.push(tgPostStrong(env)); // 10:00 Ελλάδας: τα δυνατά στο ιδιωτικό κανάλι (μία φορά)
-    } // «Τα δυνατά της ημέρας»: βγαίνουν στις 10:00 ώρα Ελλάδας (η ίδια η συνάρτηση περιμένει την ώρα· μία φορά τη μέρα)
-    if (h >= 6 && h < 14 && m % 10 === 3 && env.ANTHROPIC_KEY) tasks.push(aiStrong(env, new Date().toISOString().slice(0, 10))); // AI ανάλυση (EL/EN) για τα δυνατά· γράφει μόνο όσα λείπουν
+      if (h >= 5 && h < 14 && m % 5 === 2) tasks.push(tgPostStrong(env)); // μόλις βγουν τα δυνατά: στο ιδιωτικό κανάλι (μία φορά)
+    } // «Τα δυνατά της ημέρας»: βγαίνουν το πρωί, ώρα ανάλογα με τα χθεσινά (releaseMin, 05/11· η ίδια η συνάρτηση περιμένει την ώρα· μία φορά τη μέρα)
+    if (h >= 5 && h < 14 && m % 5 === 3 && env.ANTHROPIC_KEY) tasks.push(aiStrong(env, new Date().toISOString().slice(0, 10))); // AI ανάλυση (EL/EN) για τα δυνατά· γράφει μόνο όσα λείπουν
     ctx.waitUntil(Promise.allSettled(tasks).then(async (r) => {
       const bad = r.filter((x) => x.status === "rejected");
       if (bad.length) await log(env, "cron", false, 0, bad.map((b) => String(b.reason)).join(" | "));

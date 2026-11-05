@@ -1,4 +1,4 @@
-// «Τα δυνατά της ημέρας» (απόφαση Owner 03/11/2026): 3 κάρτες, κάθε μέρα στις 10:00 ώρα Ελλάδας/Κύπρου.
+// «Τα δυνατά της ημέρας» (απόφαση Owner 03/11/2026): 3 κάρτες κάθε πρωί (ώρα: releaseMin, απόφαση Owner 05/11).
 //  1) Νίκη (1 ή 2) σε απόδοση 1.60–1.85: VIP αν υπάρχει, αλλιώς Free
 //  2) Γκολ: Over 2.5 ή GG σε απόδοση 1.60–1.85: VIP αν υπάρχει, αλλιώς Free
 //  3) Τριάδα: τα 3 πιο δυνατά VIP που μένουν, κάθε επιλογή 1.50–1.80 (διαφορετικοί αγώνες)· αν λείπουν, από Free
@@ -15,6 +15,19 @@ const athEnd = (date) => { const [y, m, d] = date.split("-").map(Number), u = Da
 const now = () => Math.floor(Date.now() / 1000);
 const ymd = (t) => new Date(t * 1000).toISOString().slice(0, 10);
 export const athH = () => +new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", hour: "2-digit", hourCycle: "h23" }).format(new Date());
+
+// Απόφαση Owner 05/11: η ώρα που βγαίνουν τα νέα δυνατά εξαρτάται από τα χθεσινά (όσο κέρδισαν, τόσο μένουν περισσότερο):
+//  0 νίκες ή 1 νίκη μονού → 08:00–09:00 · κέρδισε η τριάδα (μόνη της) → 10:00–11:00 · 2 νίκες → 12:00–12:20 · 3 νίκες → 13:00–14:00
+// Το λεπτό μέσα στο παράθυρο είναι «τυχαίο» αλλά σταθερό για τη μέρα (από το hash της ημερομηνίας). Ώρα Ελλάδας.
+export const athMin = () => { const [h, m] = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date()).split(":").map(Number); return h * 60 + m; };
+export async function releaseMin(env, date) {
+  const [y, m, d] = date.split("-").map(Number), yd = new Date(Date.UTC(y, m - 1, d - 1)).toISOString().slice(0, 10);
+  const s = await apiStrong(env, yd).catch(() => null);
+  const w = s ? [s.win && s.win.result, s.goals && s.goals.result, s.treble && s.treble.result].filter((r) => r === 1).length : 0;
+  const tw = !!(s && s.treble && s.treble.result === 1);
+  const [start, len] = w >= 3 ? [13 * 60, 60] : w === 2 ? [12 * 60, 20] : tw ? [10 * 60, 60] : [8 * 60, 60];
+  return start + (parseInt((await sha("release" + date)).slice(0, 6), 16) % len);
+}
 
 async function sha(s) {
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
@@ -75,8 +88,8 @@ export async function makeStrong(env, date = ymd(now()), force = false) {
     if (isSingle) fromSingles++;
     inT.add(x.f); treble.push(x);
   }
-  // όχι πριν τις 10:00 ώρα Ελλάδας (εκτός αν το ζητήσει ο Owner με force)
-  if (!force && !keep && athH() < 10) return { ok: false, wait: true };
+  // όχι πριν την ώρα της ημέρας (releaseMin, απόφαση Owner 05/11· εκτός αν το ζητήσει ο Owner με force)
+  if (!force && !keep && athMin() < await releaseMin(env, date)) return { ok: false, wait: true };
   if (!win && !goals && treble.length < 3) return { ok: false, empty: true };
   const leg = (x) => x && { f: x.f, sel: x.sel, price: x.price, prob: x.prob, tier: x.tier };
   const data = { win: leg(win), goals: leg(goals), treble: keep && keep.treble ? keep.treble : treble.length === 3 ? { legs: treble.map(leg), odds: +treble.reduce((q, x) => q * x.price, 1).toFixed(2) } : null };

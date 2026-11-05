@@ -1,6 +1,6 @@
 // Telegram (απόφαση Owner 03/11/2026)
 //  - Δημόσιο κανάλι φίλων: @betizzi_tips (νέα, νίκες παρολί, μηνιαίο report).
-//  - Ιδιωτικό κανάλι «betizzi ⚡ Strongest»: κάθε μέρα 10:00 ώρα Ελλάδας τα δυνατά της ημέρας.
+//  - Ιδιωτικό κανάλι «betizzi ⚡ Strongest»: κάθε πρωί τα δυνατά της ημέρας, μόλις βγουν (ώρα: releaseMin, απόφαση Owner 05/11).
 //    Μπαίνει όποιος εξαργυρώσει 1000 credits = 30 μέρες. Ο bot δίνει προσωπικό link μίας χρήσης
 //    και βγάζει όποιον λήξει. Τα αποτελέσματα ΔΕΝ ποστάρονται καθημερινά (μόνο μηνιαία αναφορά).
 // Bot: @betizzi_tips_bot · token στο secret TG_BOT_TOKEN (ποτέ στον κώδικα).
@@ -67,7 +67,7 @@ export async function tgPoll(env) {
       const msg = u.message;
       if (msg && msg.chat?.type === "private" && /^\/start/.test(msg.text || "")) {
         await tg(env, "sendMessage", { chat_id: msg.chat.id, disable_web_page_preview: true,
-          text: "👋 Welcome to betizzi!\n\nFree football tips, ready-made parlays and live scores: https://betizzi.com\n\n⚡ Our strongest picks every day at 10:00 (Athens time) are in a members-only channel: collect 1000 credits on betizzi.com and tap «Join ⚡ Strongest» in your account.\n\n18+ · Play responsibly." });
+          text: "👋 Welcome to betizzi!\n\nFree football tips, ready-made parlays and live scores: https://betizzi.com\n\n⚡ Our strongest picks every morning are in a members-only channel: collect 1000 credits on betizzi.com and tap «Join ⚡ Strongest» in your account.\n\n18+ · Play responsibly." });
       }
     } catch (e) { /* ένα κακό γεγονός δεν σταματά τα υπόλοιπα */ }
   }
@@ -123,9 +123,9 @@ export async function tgExpire(env) {
   return { kicked: n };
 }
 
-// 10:00 ώρα Ελλάδας: τα δυνατά της ημέρας στο ιδιωτικό κανάλι (μία φορά τη μέρα).
+// Μόλις βγουν τα δυνατά της ημέρας: στο ιδιωτικό κανάλι (μία φορά τη μέρα).
 export async function tgPostStrong(env, date = new Date().toISOString().slice(0, 10)) {
-  if (!env.TG_BOT_TOKEN || athH() < 10) return { skip: true };
+  if (!env.TG_BOT_TOKEN || athH() < 8) return { skip: true }; // 05/11: όταν βγουν τα δυνατά (ώρα ανάλογα με τα χθεσινά)
   await kvInit(env);
   const chat = await kvGet(env, "tg_chan_vip");
   if (!chat || (await kvGet(env, "tg_post_" + date))) return { skip: true };
