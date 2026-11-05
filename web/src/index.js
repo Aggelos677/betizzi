@@ -71,30 +71,8 @@ function ymdIn(tz, ts = Date.now()) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(ts);
 }
 
-// Launch (SEO): indexable ΜΟΝΟ στο betizzi.com. Test/preview (*.workers.dev) μένουν noindex.
-// Ιδιωτικά (admin, auth, me/vip.json, ?demo) πάντα noindex.
-// /pt/: ΠΡΟΣΩΡΙΝΑ noindex (απόφαση Owner 05/11, προληπτικά): τα πορτογαλικά στοχεύουν τώρα Βραζιλία.
-// Δεν είναι επιβεβαιωμένη νομική υποχρέωση· φεύγει όταν τα /pt/ γίνουν Πορτογαλίας (ή μετά από νομικό έλεγχο).
-const PROD_HOST = "betizzi.com";
-const NOINDEX_LANGS = ["pt"];
-function isPrivate(url) {
-  const p = url.pathname;
-  return p === "/admin" || p.startsWith("/admin/") || p.startsWith("/auth/") || p === "/me.json" || p === "/vip.json" || p === "/h" || url.searchParams.has("demo")
-    || NOINDEX_LANGS.some((l) => p === "/" + l || p.startsWith("/" + l + "/") || p === "/sitemap-" + l + ".xml");
-}
 export default {
   async fetch(req, env, ctx) {
-    const res = await handle(req, env, ctx);
-    const url = new URL(req.url);
-    if (url.hostname === PROD_HOST && !isPrivate(url)) return res;
-    const r = new Response(res.body, res);
-    r.headers.set("x-robots-tag", "noindex, nofollow");
-    return r;
-  },
-};
-
-const handle = async (req, env, ctx) => {
-  {
     const url = new URL(req.url);
     const p = url.pathname;
     if (url.hostname === "www.betizzi.com") return Response.redirect("https://betizzi.com" + p + url.search, 301);
@@ -193,7 +171,7 @@ const handle = async (req, env, ctx) => {
     }
     if (m === null && /^\/[a-z]{2}$/.test(p) && LANGS.includes(p.slice(1))) return Response.redirect(url.origin + p + "/", 301);
     return env.ASSETS.fetch(req);
-  }
+  },
 };
 
 const AUTH_COOKIE = "bz_s";
@@ -312,6 +290,7 @@ function html(body, status = 200, a21 = false) {
     headers: {
       "content-type": "text/html; charset=utf-8",
       "cache-control": "public, max-age=60",
+      "x-robots-tag": "noindex, nofollow", // αφαιρείται την ημέρα που ανοίγει το site
     },
   });
 }
@@ -619,7 +598,7 @@ const smUrl = (loc, alt, lastmod) => `<url><loc>${xmlEsc(SITE + loc)}</loc>${las
 function sitemapIndex() {
   const today = new Date().toISOString().slice(0, 10);
   return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`
-    + LANGS.filter((l) => !NOINDEX_LANGS.includes(l)).map((l) => `<sitemap><loc>${SITE}/sitemap-${l}.xml</loc><lastmod>${today}</lastmod></sitemap>`).join("") + `</sitemapindex>`;
+    + LANGS.map((l) => `<sitemap><loc>${SITE}/sitemap-${l}.xml</loc><lastmod>${today}</lastmod></sitemap>`).join("") + `</sitemapindex>`;
 }
 async function sitemapLang(env, lang) {
   const today = new Date().toISOString().slice(0, 10), out = [];
