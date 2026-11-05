@@ -1,4 +1,7 @@
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /auth/
+Disallow: /me.json
+Disallow: /vip.json
 
 Sitemap: https://betizzi.com/sitemap.xml
