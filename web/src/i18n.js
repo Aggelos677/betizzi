@@ -270,7 +270,7 @@ export const SEL = { "1": "1", X: "X", "2": "2", "1X": "1X", X2: "X2", "12": "12
 export const UI_ORDER = ["el", "es", "pt", "fr", "de", "ro", "sr", "bg"];
 export const UI = {
   // 05/11: dropdown αγώνα = μία ανάλυση
-  "older → newer · line under = home game": ["παλιό → νέο · γραμμή από κάτω = εντός έδρας", "antiguo → reciente · línea debajo = en casa", "antigo → recente · linha embaixo = em casa", "ancien → récent · trait dessous = à domicile", "alt → neu · Strich = Heimspiel", "vechi → recente · linie dedesubt = acasă", "staro → novo · linija ispod = kod kuće", "старо → ново · линия отдолу = у дома"],
+  "Form": ["Φόρμα", "Forma", "Forma", "Forme", "Form", "Formă", "Forma", "Форма"],
   "What our analysis shows": ["Τι λέει η ανάλυση", "Lo que muestra nuestro análisis", "O que a nossa análise mostra", "Ce que montre notre analyse", "Was unsere Analyse zeigt", "Ce arată analiza noastră", "Šta pokazuje naša analiza", "Какво показва анализът ни"],
   "Last 5": ["Τελευταίοι 5", "Últimos 5", "Últimos 5", "5 derniers", "Letzte 5", "Ultimele 5", "Poslednjih 5", "Последни 5"],
   "Pts": ["Β.", "Pts", "Pts", "Pts", "Pkt.", "Pct.", "Bod.", "Т."],

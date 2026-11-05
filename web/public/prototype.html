@@ -249,7 +249,6 @@ body{padding-top:env(safe-area-inset-top,0px)}
 .mo-t td{padding:7px 3px;border-bottom:1px solid var(--line);text-align:center;font-family:var(--f-mono);white-space:nowrap;vertical-align:middle}
 .mo-t th:first-child,.mo-t td:first-child{text-align:left;font-family:inherit;font-weight:700;white-space:normal}
 .mo-t td:first-child small{display:block;font-weight:500;font-size:.7rem;color:var(--muted)}
-.mo-t tr.mo-r1 td{border-bottom:0;padding-bottom:2px}.mo-t tr.mo-r2 td{padding-top:0}.mo-t tr.mo-r2 .sqs{margin-top:2px;max-width:240px}
 .mo-t td.mo-hi{background:rgba(60,207,110,.22);font-weight:700}.mo-t td.mo-lo{background:rgba(255,107,107,.2);font-weight:700}.mo-t td.mo-gl{background:var(--lime-soft);font-weight:700}
 .mo-t td.mo-best{color:var(--lime);font-weight:700}
 .mo-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.72rem;color:var(--muted);align-items:center}.mo-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
@@ -1676,14 +1675,17 @@ function detailHTML(m){
   /* σήματα: φόρμα (έως 2 ανά ομάδα) + σήματα αγώνα του μοντέλου, χωρίς διπλά θέματα */
   var ss=sigs(m,H,A);
   if(ss.length)h+='<div class="mgroup"><span class="mo-h">What our analysis shows</span><div class="mo-sig">'+ss.map(function(x){return '<div class="sg mo-'+x[0]+'"><i aria-hidden="true">'+x[1]+'</i><span>'+(x[2]?'<b>'+esc(x[2])+'</b> ':'')+'<span>'+x[3]+'</span></span></div>';}).join("")+'</div></div>';
-  if(H||A||m.hr||m.ar){
+  /* απόφαση Owner 05/11: φόρμα (σκορ) και στατιστικά σε ΞΕΧΩΡΙΣΤΟΥΣ πίνακες */
+  h+='<div class="mgroup"><span class="glabel">Form</span><div class="tm2"><div class="tbox"><div class="nm">'+esc(m.home)+'</div><div class="pos">'+(m.hr||"–")+'<small>'+(m.nt?'of '+m.nt:'')+'</small></div>'+squares(m.hfd)+'</div>'
+    +'<div class="tbox"><div class="nm">'+esc(m.away)+'</div><div class="pos">'+(m.ar||"–")+'<small>'+(m.nt?'of '+m.nt:'')+'</small></div>'+squares(m.afd)+'</div></div>'
+    +'<span class="hint">Table position · last 5, older → newer · line under = home game</span></div>';
+  if(H||A){
     var cl=function(c){return c?' class="mo-'+c+'"':'';};
-    var row=function(nm,rk,o,f){var d=o?o.gf-o.ga:0,pos=rk?'<small>'+rk+(m.nt?'/'+m.nt:'')+'</small>':'';
-      return '<tr class="mo-r1"><td>'+esc(nm)+pos+'</td>'+(o?'<td'+cl(o.pts>=12?"hi":o.pts<=3?"lo":"")+'>'+o.pts+'</td><td'+cl(d>=6?"hi":d<=-6?"lo":"")+'>'+o.gf+'-'+o.ga+'</td><td'+cl(o.o25>=4||o.o25<=1?"gl":"")+'>'+o.o25+'/'+o.n+'</td><td'+cl(o.gg>=4||o.gg<=1?"gl":"")+'>'+o.gg+'/'+o.n+'</td><td'+cl(o.cs>=3?"hi":o.cs===0?"lo":"")+'>'+o.cs+'/'+o.n+'</td>':'<td colspan="5"></td>')+'</tr>'
-        +'<tr class="mo-r2"><td colspan="6">'+squares(f)+'</td></tr>';};
+    var row=function(nm,o){if(!o)return "";var d=o.gf-o.ga;
+      return '<tr><td>'+esc(nm)+'</td><td'+cl(o.pts>=12?"hi":o.pts<=3?"lo":"")+'>'+o.pts+'</td><td'+cl(d>=6?"hi":d<=-6?"lo":"")+'>'+o.gf+'-'+o.ga+'</td><td'+cl(o.o25>=4||o.o25<=1?"gl":"")+'>'+o.o25+'/'+o.n+'</td><td'+cl(o.gg>=4||o.gg<=1?"gl":"")+'>'+o.gg+'/'+o.n+'</td><td'+cl(o.cs>=3?"hi":o.cs===0?"lo":"")+'>'+o.cs+'/'+o.n+'</td></tr>';};
     h+='<div class="mgroup"><span class="glabel">Last 5</span><div class="mo-tw"><table class="mo-t"><thead><tr><th></th><th>Pts</th><th>Goals</th><th>O2.5</th><th>GG</th><th>Clean sheets</th></tr></thead><tbody>'
-      +row(m.home,m.hr,H,m.hfd)+row(m.away,m.ar,A,m.afd)+'</tbody></table></div>'
-      +'<div class="mo-leg"><span><i class="mo-hi"></i><span>strong point</span></span><span><i class="mo-lo"></i><span>weak point</span></span><span><i class="mo-gl"></i><span>goals trend</span></span><span><span>older → newer · line under = home game</span></span></div></div>';
+      +row(m.home,H)+row(m.away,A)+'</tbody></table></div>'
+      +'<div class="mo-leg"><span><i class="mo-hi"></i><span>strong point</span></span><span><i class="mo-lo"></i><span>weak point</span></span><span><i class="mo-gl"></i><span>goals trend</span></span></div></div>';
   }
   if(m.p.h||m.p.a){
     var tot=(m.p.h+m.p.x+m.p.a)||1;
