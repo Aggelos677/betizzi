@@ -174,3 +174,28 @@ export async function apiCoupons(env, date) {
     return { n: r.n, kind: r.kind, variant: r.variant, style: r.style || null, slot: r.slot || null, pick: false, odds: r.odds, odds_now: legs.some((l) => l.result === 2) ? oddsNow : null, prob: r.prob, created_at: r.created_at, hash: r.hash, result, legs };
   });
 }
+
+// Record παρολί ανά ζώνη (απόφαση Owner 05/11): μόνο κέρδισαν / χάθηκαν, από 2/11/2026. Ανοιχτά και void δεν μετράνε.
+export async function parlayRecord(env, from = "2026-11-02") {
+  const rows = (await env.DB.prepare("SELECT date, kind, legs FROM coupons WHERE date >= ? AND style IS NOT NULL").bind(from).all()).results;
+  const ids = [...new Set(rows.flatMap((r) => JSON.parse(r.legs).map((l) => l[0])))], fx = {};
+  for (let i = 0; i < ids.length; i += 90) {
+    const part = ids.slice(i, i + 90);
+    for (const f of (await env.DB.prepare(`SELECT id, ts, status, gh, ga, fth, fta FROM fixtures WHERE id IN (${part.map(() => "?").join(",")})`).bind(...part).all()).results) fx[f.id] = f;
+  }
+  const won = (s, i, j) => ({ "1": i > j, X: i === j, "2": i < j, O15: i + j > 1, O25: i + j > 2, U25: i + j < 3, GG: i > 0 && j > 0, NG: i === 0 || j === 0 })[s];
+  const out = {};
+  for (const r of rows) {
+    const res = JSON.parse(r.legs).map(([f, sel]) => {
+      const m = fx[f] || {};
+      const s90 = m.status === "FT" ? [m.gh, m.ga] : (m.status === "AET" || m.status === "PEN") && m.fth != null ? [m.fth, m.fta] : null;
+      if (["PST", "CANC", "ABD", "AWD", "WO"].includes(m.status) && m.ts < now() - 3600) return 2;
+      return s90 ? (won(sel, s90[0], s90[1]) ? 1 : 0) : null;
+    });
+    const r0 = res.some((x) => x === 0) ? 0 : res.every((x) => x === 1 || x === 2) && res.some((x) => x === 1) ? 1 : null;
+    if (r0 === null) continue;
+    const z = (out[r.kind] = out[r.kind] || { w: 0, l: 0 });
+    if (r0 === 1) z.w++; else z.l++;
+  }
+  return out;
+}

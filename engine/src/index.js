@@ -3,7 +3,7 @@
 // και τα γράφει στη βάση betizzi-db. Η σελίδα διαβάζει ΜΟΝΟ από τη βάση (/api/...).
 import { makeStrong, apiStrong, strongKeys } from "./strong.js";
 import { aiStrong } from "./ai.js";
-import { makeCoupons, apiCoupons } from "./coupons.js";
+import { makeCoupons, apiCoupons, parlayRecord } from "./coupons.js";
 import { authStart, authVerify, authMe, authLogout, authVip, authApp, userFrom } from "./auth.js";
 import { tgPoll, tgJoin, tgExpire, tgPostStrong, tgStatus } from "./tg.js";
 import { hit, isAdmin, aToday, aUsers, aUserAct, aExport, aPartners, aPartnerSave, aHealth, aAudit, aLeagues, aLeagueSave, aMkt } from "./admin.js";
@@ -287,7 +287,8 @@ async function apiRecord(env) {
   const settled = (await env.DB.prepare(q + " WHERE t.status='active' AND t.result IN (0,1) AND f.ts >= ? ORDER BY f.ts DESC").bind(S).all()).results; // void (2) δεν μετρά
   const withdrawn = (await env.DB.prepare(q + " WHERE t.status='withdrawn' AND f.ts >= ? AND t.withdrawn_at >= ? AND f.ts < ? ORDER BY f.ts DESC LIMIT 200").bind(S, S, now() + 86400).all()).results;
   const pending = (await env.DB.prepare("SELECT COUNT(*) n FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE t.status='active' AND t.result IS NULL AND f.ts >= ?").bind(S).first()).n;
-  return { since: S, pending, settled, withdrawn, updated: now() };
+  const parlays = await parlayRecord(env).catch(() => null); // 05/11: παρολί ανά ζώνη, μόνο W/L
+  return { since: S, pending, settled, withdrawn, parlays, updated: now() };
 }
 
 async function apiMatch(env, id) {
