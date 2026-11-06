@@ -142,13 +142,19 @@ export default {
       const ck = new Request("https://betizzi.com/__page/" + encodeURIComponent(key) + "?v=" + (await template(env, url)).length);
       let hit = PAGES.get(key);
       if (!hit) { try { const r = await caches.default.match(ck); if (r) { hit = { t: +r.headers.get("x-t"), b: await r.text() }; PAGES.set(key, hit); } } catch (e) {} }
+      // 06/11: 3ο επίπεδο, το KV (παγκόσμιο, γεμίζει από το cron κάθε 10΄)· μπορεί να είναι λίγο παλιότερο ή προηγούμενης έκδοσης,
+      // αλλά δίνεται αμέσως και η καινούργια φτιάχνεται στο παρασκήνιο
+      const kvk = url.hostname + "|" + key, ver = (await template(env, url)).length;
+      if (!hit && env.PAGESKV) { try { const v = await env.PAGESKV.get(kvk, { type: "json", cacheTtl: 60 }); if (v && v.b) hit = { t: v.t, b: v.b, kv: 1, old: v.v !== ver }; } catch (e) {} }
+      // σελίδα «σήμερα» φτιαγμένη χθες (ώρα Ελλάδας) δεν δίνεται ποτέ
+      if (hit && !dq && ymdIn(DAYTZ, hit.t || 0) !== ymdIn(DAYTZ)) hit = null;
       const age = hit ? Date.now() - hit.t : Infinity;
       const build = () => todayPage(env, m[1], url).then((b) => { const t = Date.now(); PAGES.set(key, { t, b });
-        try { ctx.waitUntil(caches.default.put(ck, new Response(b, { headers: { "x-t": String(t), "cache-control": "public, max-age=900" } }))); } catch (e) {}
+        try { ctx.waitUntil(caches.default.put(ck, new Response(b, { headers: { "x-t": String(t), "cache-control": "public, max-age=21600" } }))); } catch (e) {}
         return b; });
       const a21 = age21(req, m[1]);
-      if (hit && age < 60000) return html(hit.b, 200, a21);
-      if (hit && age < 15 * 60000) { ctx.waitUntil(build().catch(() => {})); return html(hit.b, 200, a21); }
+      if (hit && !hit.old && age < 60000) return html(hit.b, 200, a21);
+      if (hit && age < 6 * 3600000) { ctx.waitUntil(build().catch(() => {})); return html(hit.b, 200, a21); } // 06/11: ποτέ αναμονή όσο υπάρχει έτοιμη σελίδα (έως 6 ώρες)
       try { return html(await build(), 200, a21); }
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
     }
@@ -213,6 +219,22 @@ export default {
     }
     if (m === null && /^\/[a-z]{2}$/.test(p) && LANGS.includes(p.slice(1))) return Response.redirect(url.origin + p + "/", 301);
     return env.ASSETS.fetch(req);
+  },
+  // 06/11 (απόφαση Owner: «όταν μπαίνεις και αργεί, νομίζεις ότι κάτι πάει λάθος»): κάθε 10΄ φτιάχνουμε από πριν
+  // τις σελίδες σήμερα + αύριο + όλες τις μέρες σε 9 γλώσσες στο KV (betizzi-pages, παγκόσμιο).
+  async scheduled(ev, env, ctx) {
+    if (!env.PAGESKV) return;
+    const host = "betizzi.com", url0 = new URL("https://" + host + "/"), today = ymdIn(DAYTZ);
+    const tmr = new Date(Date.parse(today + "T12:00:00Z") + 864e5).toISOString().slice(0, 10);
+    const ver = (await template(env, url0)).length;
+    for (const lang of LANGS) for (const d of ["", tmr, "all"]) {
+      try {
+        const u = new URL(`https://${host}/${lang}/${d ? "?d=" + d : ""}`);
+        const b = await todayPage(env, lang, u), key = lang + (d ? "|" + d : "");
+        PAGES.set(key, { t: Date.now(), b });
+        await env.PAGESKV.put(host + "|" + key, JSON.stringify({ t: Date.now(), v: ver, b }), { expirationTtl: 2 * 86400 });
+      } catch (e) {}
+    }
   },
 };
 
