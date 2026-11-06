@@ -3,7 +3,9 @@
 import { authTables, userFrom } from "./auth.js";
 
 const now = () => Math.floor(Date.now() / 1000);
-const day = (t = now()) => new Date(t * 1000).toISOString().slice(0, 10);
+// 06/11 (QA): η «μέρα» του διαχειριστικού σε ώρα Ελλάδας (όπως το site), όχι UTC
+const day = (t = now()) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens" }).format(t * 1000);
+const athMid = (d) => { const u = Date.parse(d + "T00:00:00Z") / 1000; const h = +new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", hour: "2-digit", hourCycle: "h23" }).format(u * 1000); return u - h * 3600; };
 const OWNER = "menelaou.chr70@gmail.com"; // admin από την αρχή (μπορεί να αλλάξει από τη βάση)
 export const PARTNER_STATUS = ["todo", "sent", "replied", "talks", "signed", "live", "no"];
 
@@ -62,7 +64,7 @@ const audit = (env, who, action, target, detail) =>
 
 // ---------- 1. Σήμερα ----------
 export async function aToday(env) {
-  const d = day(), y = day(now() - 86400), from = Math.floor(Date.parse(d + "T00:00:00Z") / 1000);
+  const d = day(), y = day(now() - 86400), from = athMid(d);
   const q = (s, ...b) => env.DB.prepare(s).bind(...b);
   const [hitsT, hitsY, su, logins, users, news, tips, coupons, yres, bk] = await Promise.all([
     q("SELECT kind, lang, country, src, n FROM hits WHERE day=?", d).all(),
@@ -143,7 +145,7 @@ export async function aPartnerSave(env, who, b) {
 export async function aHealth(env) {
   const since = now() - 86400, q = (s, ...b) => env.DB.prepare(s).bind(...b);
   const [byJob, errs, last, pending, stuck, mailFail] = await Promise.all([
-    q("SELECT job, COUNT(*) runs, SUM(calls) calls FROM runs WHERE ts>=? AND job!='cron' GROUP BY job", Math.floor(Date.parse(day() + "T00:00:00Z") / 1000)).all(),
+    q("SELECT job, COUNT(*) runs, SUM(calls) calls FROM runs WHERE ts>=? AND job!='cron' GROUP BY job", athMid(day())).all(),
     q("SELECT datetime(ts,'unixepoch') at, substr(note,1,160) note, COUNT(*) n FROM runs WHERE ts>=? AND (ok=0 OR note LIKE 'Error%') GROUP BY substr(note,1,60) ORDER BY ts DESC LIMIT 12", since).all(),
     q("SELECT datetime(ts,'unixepoch') at, job, ok, calls, substr(note,1,120) note FROM runs WHERE job!='cron' ORDER BY id DESC LIMIT 15").all(),
     q("SELECT COUNT(*) c FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE t.status='active' AND t.result IS NULL AND f.ts < ?", now() - 3 * 3600).first(),
@@ -152,10 +154,10 @@ export async function aHealth(env) {
   ]);
   let api = null;
   try {
-    const r = await fetch("https://v3.football.api-sports.io/status", { headers: { "x-apisports-key": env.APIF_KEY } });
+    const r = await fetch("https://v3.football.api-sports.io/status", { headers: { "x-apisports-key": env.APIF_KEY }, signal: AbortSignal.timeout(5000) });
     const j = await r.json(); api = { current: j.response?.requests?.current, limit: j.response?.requests?.limit_day, plan: j.response?.subscription?.plan };
   } catch (e) { api = { error: String(e.message) }; }
-  return { api, byJob: byJob.results, errors: errs.results, last: last.results, pendingOld: pending.c, stuck: stuck.c, mailFail: mailFail.results, brevo: !!env.BREVO_KEY };
+  return { api, byJob: byJob.results, errors: errs.results, last: last.results, pendingOld: pending.c, stuck: stuck.c, mailFail: mailFail.results, brevo: !!env.BREVO_KEY, email: !!env.EMAIL || !!env.BREVO_KEY }; // 06/11: τα email φεύγουν από Cloudflare (EMAIL)· το Brevo είναι μόνο εφεδρεία
 }
 
 // ---------- 7. Ιστορικό ----------

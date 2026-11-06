@@ -36,7 +36,7 @@ var T=[["today","Σήμερα"],["users","Πελάτες"],["mkt","Marketing"],[
 var ST={todo:"να σταλεί",sent:"στάλθηκε",replied:"απάντησε",talks:"συζήτηση",signed:"υπογραφή",live:"live",no:"όχι"};
 function $(i){return document.getElementById(i);}
 function e(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
-function api(p,o){return fetch("/admin/api/"+p,o?{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(o)}:{}).then(function(r){if(r.status===403)throw new Error("Δεν έχεις πρόσβαση. Μπες με τον λογαριασμό σου ή με το μυστικό link.");return r.json();});}
+function api(p,o){return fetch("/admin/api/"+p,o?{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(o)}:{}).then(function(r){if(r.status===403)throw new Error("Δεν έχεις πρόσβαση. Μπες με τον λογαριασμό σου ή με το μυστικό link.");if(!r.ok)throw new Error("Ο server δεν απάντησε σωστά ("+r.status+"). Δοκίμασε ξανά σε λίγο.");return r.json().then(function(j){if(j&&j.error)throw new Error("Σφάλμα: "+j.error);return j;});});}
 function dt(t){if(!t)return"—";var d=new Date(t*1000);return d.toLocaleDateString("el-GR",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("el-GR",{hour:"2-digit",minute:"2-digit"});}
 function nav(){$("nav").innerHTML=T.map(function(x){return '<button data-t="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'">'+x[1]+'</button>';}).join("");
   Array.prototype.forEach.call(document.querySelectorAll("[data-t]"),function(b){b.onclick=function(){cur=b.dataset.t;location.hash=cur;go();};});}
@@ -116,7 +116,7 @@ function leagues(m){return api("leagues").then(function(d){LD=d;
 function health(m){return api("health").then(function(d){var a=d.api||{},pct=a.limit?Math.round(a.current*100/a.limit):0;
   m.innerHTML='<h2>Υγεία</h2><div class="grid"><div class="card kpi"><small>API-Football σήμερα (κοινό κλειδί)</small><b class="'+(pct>85?"neg":"")+'">'+(a.current!=null?a.current+" / "+a.limit:"—")+'</b><div class="bar"><i style="width:'+pct+'%"></i></div><small>'+e(a.plan||a.error||"")+'</small></div>'
    +'<div class="card kpi"><small>Tips χωρίς αποτέλεσμα (3+ ώρες μετά)</small><b class="'+(d.pendingOld?"neg":"pos")+'">'+d.pendingOld+'</b></div><div class="card kpi"><small>Αγώνες «κολλημένοι» (4+ ώρες)</small><b>'+d.stuck+'</b></div>'
-   +'<div class="card kpi"><small>Email (Brevo)</small><b class="'+(d.brevo?"pos":"neg")+'">'+(d.brevo?"OK":"λείπει το κλειδί")+'</b></div></div>'
+   +'<div class="card kpi"><small>Email</small><b class="'+((d.email||d.brevo)?"pos":"neg")+'">'+((d.email||d.brevo)?"OK (Cloudflare)":"δεν έχει ρυθμιστεί")+'</b></div></div>'
    +'<div class="two" style="margin-top:10px"><div class="card"><h3>Κλήσεις API σήμερα ανά εργασία</h3>'+list(d.byJob.map(function(x){return[x.job+" ("+x.runs+")",x.calls||0];}))+'</div>'
    +'<div class="card"><h3>Λάθη 24 ωρών</h3>'+(d.errors.length?'<table>'+d.errors.map(function(x){return '<tr><td class="mu">'+e(x.at)+'</td><td class="err">'+e(x.note)+'</td><td class="n">×'+x.n+'</td></tr>';}).join("")+'</table>':'<p class="ok">Κανένα.</p>')+'</div></div>'
    +'<h2>Τελευταίες εργασίες</h2><div class="card"><table>'+d.last.map(function(x){return '<tr><td class="mu">'+e(x.at)+'</td><td>'+e(x.job)+'</td><td>'+(x.ok?'<span class="ok">ok</span>':'<span class="err">λάθος</span>')+'</td><td class="n">'+(x.calls||0)+'</td><td class="mu">'+e(x.note)+'</td></tr>';}).join("")+'</table></div>'
