@@ -1602,7 +1602,9 @@ function passL(m,l){if(l==="top5")return isTop5(m.key);if(l==="top30")return top
 function passF(m,f){ if(f==="called")return !!m.hit; if(f==="tips")return m.tips.length>0; if(f==="top")return topIx(m.key)<999; if(f==="live")return m.live; if(f==="upcoming")return m.open; return true; }
 function passAll(m,o){o=o||{};var tf=o.t!=null?o.t:mFilter,lf=o.l!=null?o.l:lFil,tp=o.tip!=null?o.tip:tipF,cf=o.c!=null?o.c:calF;
   var ff=o.f!=null?o.f:favF;
-  return (tf!=="live"||m.live)&&(ff?FAV.has(String(m.id)):passL(m,lf))&&(!tp||m.tips.length>0)&&(!cf||m.hit);}
+  /* απόφαση Owner 06/11: το Live δείχνει ΟΛΟΥΣ τους live αγώνες, όχι μόνο όσους είναι στα «Τα πρωταθλήματά μου» */
+  if(tf==="live")return m.live&&(!tp||m.tips.length>0)&&(!cf||m.hit);
+  return (ff?FAV.has(String(m.id)):passL(m,lf))&&(!tp||m.tips.length>0)&&(!cf||m.hit);}
 function countFilter(f){return MATCHES.filter(function(m){return passF(m,f);}).length;}
 function cnt(o){return MATCHES.filter(function(m){return passAll(m,o);}).length;}
 function chipEl(html,on,fn,cls,href){var b=document.createElement(href?"a":"button");if(href)b.href=href;else b.type="button";b.className="chip"+(cls?" "+cls:"");b.setAttribute("aria-pressed",on?"true":"false");b.innerHTML=html;if(fn)b.addEventListener("click",fn);return b;}
