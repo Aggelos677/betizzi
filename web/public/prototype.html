@@ -1449,6 +1449,13 @@ var IZZ=0;function loadIzzi(){if(IZZ)return;IZZ=1;var lg=(location.pathname.spli
   fetch("/"+encodeURIComponent(lg)+"/izzistats?frag=1").then(function(r){return r.text();}).then(function(h){$("izziBox").innerHTML=h;
     Array.prototype.forEach.call($("izziBox").querySelectorAll('a[href^="#"]'),function(a){a.addEventListener("click",function(e){var t=document.getElementById(a.getAttribute("href").slice(1));if(!t)return;e.preventDefault();var y=t.getBoundingClientRect().top+window.pageYOffset-70;window.scrollTo({top:y,behavior:"smooth"});});});})
     .catch(function(){IZZ=0;$("izziBox").innerHTML='<div class="empty">–</div>';});}
+/* απόφαση Owner 06/11 (αργό internet: Κένυα, Νιγηρία κ.λπ.): η σελίδα του «Αύριο» κατεβαίνει ήσυχα στο παρασκήνιο όσο ο επισκέπτης κοιτάει τη σημερινή,
+   ώστε όταν το πατήσει να ανοίγει αμέσως. Όχι σε «εξοικονόμηση δεδομένων» ή σε 2G. Και σε κάθε άλλη μέρα: ξεκινάει όταν ο δάχτυλος/ποντίκι πάει στο κουμπί. */
+(function(){var pf={};function pre(h){if(!h||pf[h])return;pf[h]=1;var l=document.createElement("link");l.rel="prefetch";l.href=h;l.as="document";document.head.appendChild(l);}
+  var c=navigator.connection||{},slow=c.saveData||/(^|-)2g$/.test(c.effectiveType||"");
+  window.addEventListener("load",function(){if(slow||typeof DAYNAV==="undefined"||!DAYNAV||!DAYNAV.nav)return;var t=DAYNAV.nav.filter(function(d){return d.n===1;})[0];
+    if(t&&DAYNAV.date===DAYNAV.today)setTimeout(function(){(window.requestIdleCallback||setTimeout)(function(){pre(t.href);});},3000);});
+  ["touchstart","mouseover"].forEach(function(ev){document.addEventListener(ev,function(e){var a=e.target.closest&&e.target.closest('#mFilter a[href],#dayStrip a[href]');if(a&&a.getAttribute("href")!=="#")pre(a.getAttribute("href"));},{passive:true});});})();
 var NOT_TODAY=typeof DAYNAV!=="undefined"&&DAYNAV&&DAYNAV.today&&DAYNAV.date!==DAYNAV.today;
 TABS.forEach(function(t){$("tab-"+t).addEventListener("click",function(){if(t==="tips"&&NOT_TODAY){store("ko-tab2","tips");location.href=location.pathname;return;}showTab(t);});});
 if(NOT_TODAY)setTimeout(function(){try{var l=document.createElement("link");l.rel="prefetch";l.href=location.pathname;l.as="document";document.head.appendChild(l);}catch(e){}},2000);
