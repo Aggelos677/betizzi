@@ -1028,15 +1028,15 @@ const SCSS = `
 .doc ul.sl li{padding:10px 12px;margin:0;border-top:1px solid var(--ln);color:inherit;list-style:none}.doc ul.sl li::before,.doc ul.sl li::marker{content:none}.sl li:first-child{border-top:0}
 .sr{display:grid;grid-template-columns:20px 1fr auto;gap:8px;align-items:center}
 .sr .n{color:var(--mu);font:500 12px "JetBrains Mono",monospace}.sr b{font-weight:700;font-size:15px}.sr small{display:block;color:var(--mu);font-size:12px;margin-top:1px}
-.mt{text-align:right}.mt .bg{display:inline-block;border-radius:8px;padding:3px 8px;font:700 15px "JetBrains Mono",monospace;color:#06120a}.mt em{display:block;font-style:normal;color:var(--mu);font-size:11px;margin-top:2px}
-.run{color:var(--lime);font-size:11px;font-weight:700;margin-left:6px;white-space:nowrap}
+.mt{text-align:right}.mt .bg{display:inline-block;font:700 17px "JetBrains Mono",monospace;color:#ffb547}.mt em{display:block;font-style:normal;color:var(--mu);font-size:11px;margin-top:2px}
+.run{color:#ffb547;opacity:.85;font-size:11px;font-weight:700;margin-left:6px;white-space:nowrap}
 .fm{display:inline-flex;gap:2px;vertical-align:middle;margin-left:6px}.fm i{width:12px;height:5px;border-radius:2px;display:inline-block}.fm .W{background:#3ccf6e}.fm .D{background:#ffb547}.fm .L{background:#ff6b6b}
-.nx{display:flex;align-items:center;gap:8px;margin:8px 0 0;padding:7px 10px;border-radius:10px;background:var(--c2);text-decoration:none;min-height:40px}
-.nx>span:first-child{flex:1;min-width:0;font-size:13px;line-height:1.35}.nx>span:first-child b{font-weight:700}.nx span small{color:var(--mu)}.nx i{display:block;font-style:normal;color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
-.nx .od{font:700 13px "JetBrains Mono",monospace;border:1px solid rgba(182,242,58,.5);color:var(--lime);border-radius:8px;padding:3px 7px;white-space:nowrap}
-.doc ul.sl li.lk{background:linear-gradient(90deg,rgba(232,185,49,.12),transparent 70%);box-shadow:inset 3px 0 0 #e8b931}
-.lk .nx .od{background:#e8b931;border-color:#e8b931;color:#0c0f0d}.lk .nx .od small{color:#3a2f0a!important}
-.lkt{display:none}.lk .lkt{display:block;order:3;flex-basis:100%;color:#e8b931;font-size:12px;font-weight:700}.lk .nx{flex-wrap:wrap}
+.nx{display:flex;align-items:center;gap:8px;margin:8px 0 0;color:var(--tx)!important;padding:7px 10px;border-radius:10px;background:var(--c2);text-decoration:none;min-height:40px}
+.nx>span:first-child{flex:1;min-width:0;font-size:13px;line-height:1.35}.nx>span:first-child b{font-weight:700;color:var(--tx)}.nx span small{color:var(--mu)}.nx i{display:block;font-style:normal;color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
+.nx .od{font:700 14px "JetBrains Mono",monospace;border:1px solid rgba(182,242,58,.5);color:var(--lime);border-radius:8px;padding:3px 7px;white-space:nowrap}
+.doc ul.sl li.lk{background:linear-gradient(90deg,rgba(182,242,58,.08),transparent 70%);box-shadow:inset 3px 0 0 var(--lime)}
+.lk .nx .od{background:var(--lime);border-color:var(--lime);color:#0c0f0d}.lk .nx .od small{color:#2b3a0c!important}
+.lkt{display:none}.lk .lkt{display:block;order:3;flex-basis:100%;color:var(--lime);font-size:12px;font-weight:700}.lk .nx{flex-wrap:wrap}
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
 `;
 async function streaksPage(env, lang) {
@@ -1052,7 +1052,6 @@ async function streaksPage(env, lang) {
     : k === "gg" ? [String(r.run), S.u.gg + ` · ${r.c}/${r.n}`, Math.min(1, r.run / 8)]
     : [`${r.c}/${r.n}`, k === "form" ? S.u.w : k === "home" ? S.u.h : k === "away" ? S.u.a : "", r.c / r.n];
   // χρώμα: πιο πράσινο = πιο δυνατό (όπως το FootyStats)
-  const shade = (p) => `background:rgba(60,207,110,${(0.4 + 0.6 * Math.max(0, Math.min(1, p))).toFixed(2)})`;
   const sec = (k) => {
     const L = (data.cats && data.cats[k]) || [];
     const rows = L.map((r, i) => {
@@ -1065,7 +1064,7 @@ async function streaksPage(env, lang) {
       const run = k !== "gg" && k !== "goals" && r.run >= 3 ? `<span class="run">🔥 ${r.run} ${esc(S.run)}</span>` : "";
       const fm = `<span class="fm" aria-label="${esc(r.form)}">${[...r.form].reverse().map((x) => `<i class="${x}"></i>`).join("")}</span>`;
       return `<li${look ? ' class="lk"' : ""}><div class="sr"><span class="n">${i + 1}</span><div><b>${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
-        + `<div class="mt"><span class="bg" style="${shade(k === "goals" || k === "gg" ? p : (p - 0.6) / 0.4)}">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
+        + `<div class="mt"><span class="bg">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
         + `<a class="nx" href="${href}"><span><i>${esc(S.nx)}</i><b>${esc(r.fixture.home)} – ${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
         + (look ? `<span class="lkt">${esc(S.look)}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `</a></li>`;
     }).join("");
