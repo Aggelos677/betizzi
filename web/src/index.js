@@ -653,6 +653,8 @@ function splitTemplate(t) {
   if (a < 0 || b < 0 || !raw || !top || raw.index < a || top.index > b) return { tpl: t, js: "" };
   let body = t.slice(a + 8, b);
   body = body.replace(raw[0], "").replace(top[0], "");
+  // 06/11 (δοκιμή παικτών): η ημερομηνία πάνω-πάνω τη γράφει ο server στο HTML· το app.js δεν πρέπει να τη σβήνει με το «Sunday 1 November» του πρωτοτύπου
+  body = body.replace('$("today").textContent="Sunday 1 November";', "");
   const v = h32(body);
   return { tpl: t.slice(0, a) + "<script>\n" + raw[0] + top[0] + "</script>\n<script src=\"/app.js?v=" + v + "\"></script>" + t.slice(b + 9), js: body, v };
 }
