@@ -37,7 +37,8 @@ header{padding-top:20px;display:flex;flex-direction:column;gap:10px}
 .tag{display:inline-block;font-size:.64rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
 .tag.demo{color:var(--warn)}
 .tag.lime{color:var(--lime)}
-nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;border-bottom:1px solid var(--line);margin:0 -16px;padding-inline:16px}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;border-bottom:1px solid var(--line);margin:0 -16px;padding-inline:16px}
+
 .tab{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--muted);font:800 1rem var(--f-display);letter-spacing:.06em;text-transform:uppercase;padding:10px 6px;border-radius:10px;cursor:pointer;min-height:44px}
 .tab[aria-selected="true"]{background:var(--lime);color:var(--lime-ink);border-color:var(--lime)}
 section.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:16px}
@@ -206,8 +207,15 @@ body{padding-top:env(safe-area-inset-top,0px)}
 .datanote{display:flex;gap:10px;align-items:flex-start;background:var(--lime-soft);border:1px solid rgba(182,242,58,.35);border-radius:10px;padding:10px 12px;font-size:.85rem;color:var(--fg)}
 .tag.vip{color:var(--vip)}
 .tag.free{color:var(--lime)}
-.search{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--fg);border-radius:10px;padding:10px 12px;font:600 .95rem var(--f-body);min-height:44px}
-.search::placeholder{color:var(--muted)}
+.search{width:100%;background:var(--panel-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23b6f23a' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E") no-repeat 14px 50%;border:1.5px solid rgba(182,242,58,.38);color:var(--fg);border-radius:12px;padding:12px 14px 12px 44px;font:700 1rem var(--f-body);min-height:50px;box-shadow:0 0 0 3px rgba(182,242,58,.06)}
+.search::placeholder{color:#c5d0c8;font-weight:600}
+.n3h{margin:14px 0 6px;font:800 .95rem "Fira Sans Extra Condensed",sans-serif;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+.n3l{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.n3r{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-top:1px solid var(--line);text-decoration:none;color:var(--fg);min-height:52px}.n3r:first-child{border-top:0}
+.n3d{display:flex;flex-direction:column;font:600 .75rem var(--f-mono);color:var(--muted)}.n3d b{color:var(--fg);font-weight:700}
+.n3m{min-width:0}.n3m b{display:block;font-weight:700;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.n3m small{color:var(--muted);font-size:.72rem}
+.n3t{font:800 .72rem var(--f-body);border-radius:6px;padding:3px 7px;background:var(--lime);color:#0c0f0d}.n3t.vip{background:#e8b931;color:#0c0f0d}.n3go{color:var(--muted);font-size:1.2rem}
+.search:focus{outline:none;border-color:var(--lime);box-shadow:0 0 0 3px rgba(182,242,58,.18)}
 .legend{display:flex;gap:12px;align-items:center;font-size:.78rem;color:var(--muted);flex-wrap:wrap}
 .fb{display:inline-flex;gap:2px;vertical-align:middle;flex:none}
 .fb i{display:block;width:6px;height:11px;border-radius:2px}
@@ -625,6 +633,7 @@ header{position:relative}
 .bwodd{font-size:1.6rem;font-weight:700;color:var(--lime);text-shadow:0 0 12px rgba(182,242,58,.5)}
 .bwleg{display:grid;grid-template-columns:22px 1fr auto auto;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid var(--line);font-size:.86rem;animation:bwin .4s ease both;animation-delay:var(--d)}
 .bwhead+.bwleg{border-top:0}
+.stb-c.bigwin{padding:0;gap:0;border-width:1px}.stb-won .bwleg:last-of-type{border-bottom:1px solid var(--line)}.stb-won .stb-ft{padding:12px}
 .bwtick{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--win);color:#0c0f0d;align-items:center;justify-content:center;font-size:.75rem;animation:bwpop2 .45s cubic-bezier(.2,1.6,.4,1) both;animation-delay:var(--d)}
 @keyframes bwpop2{0%{transform:scale(0)}100%{transform:scale(1)}}
 @keyframes bwin{0%{opacity:0;transform:translateX(10px)}100%{opacity:1;transform:none}}
@@ -911,6 +920,7 @@ header{position:relative}
     <button type="button" class="tab" role="tab" id="tab-tips" aria-controls="view-tips" aria-selected="false">Our picks</button>
     <button type="button" class="tab" role="tab" id="tab-matches" aria-controls="view-matches" aria-selected="true">Matches<span class="livebdg" id="liveBdg" hidden></span></button>
     <button type="button" class="tab" role="tab" id="tab-build" aria-controls="view-build" aria-selected="false" hidden>Build</button>
+    <button type="button" class="tab" role="tab" id="tab-izzi" aria-controls="view-izzi" aria-selected="false">🔍 Izzistats</button><!-- απόφαση Owner 06/11: 3ο κουμπί (πριν από «Τα κουπόνια μου»), μέσα στην εφαρμογή (το περιεχόμενο έρχεται από τη σελίδα /izzistats) -->
     <button type="button" class="tab" role="tab" id="tab-coupons" aria-controls="view-coupons" aria-selected="false">My coupons<span class="cpbdg" id="cpBdg" hidden></span></button>
   </nav>
 
@@ -936,6 +946,7 @@ header{position:relative}
     <div id="opParlays">
       <div class="ztabs" id="zTabs" role="group" aria-label="Total odds"></div>
       <div id="zMain" style="display:flex;flex-direction:column;gap:12px"></div>
+      <div id="zTmr" style="display:flex;flex-direction:column;gap:12px;margin-top:14px" hidden></div>
       <h3 class="opalt-h" id="zAltH" hidden><span>Not your style? Other</span> <span id="zAltK"></span></h3>
       <div class="opalts" id="zAlts"></div>
     </div>
@@ -976,6 +987,7 @@ header{position:relative}
   </div>
 
   <!-- MY COUPONS -->
+  <div id="view-izzi" role="tabpanel" aria-labelledby="tab-izzi" class="wrap" hidden><div id="izziBox"><div class="empty">…</div></div></div>
   <div id="view-coupons" role="tabpanel" aria-labelledby="tab-coupons" class="wrap" hidden>
     <div id="liveMob"></div>
     <div class="secthead"><h2>My coupons</h2><span class="hint" id="cpCount"></span></div>
@@ -1418,11 +1430,16 @@ function couponWin(c){
   setTimeout(function(){thud();},380);
   setTimeout(function(){w.classList.add("out");},3200);setTimeout(function(){w.remove();},3700);
 }
-var TABS=["matches","tips","build","coupons"];
-function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-selected",t===name?"true":"false");$("view-"+t).hidden=t!==name;});store("ko-tab2",name);if(name==="coupons"&&cpNew){cpNew=0;store("ko-cpnew",0);try{renderCoupons();}catch(e){}}renderSide();
+var TABS=["matches","tips","build","coupons","izzi"];
+function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-selected",t===name?"true":"false");$("view-"+t).hidden=t!==name;});store("ko-tab2",name);if(name==="izzi")loadIzzi();if(name==="coupons"&&cpNew){cpNew=0;store("ko-cpnew",0);try{renderCoupons();}catch(e){}}renderSide();
   /* χωρίς πήδημα: αν έχεις κατέβει, η νέα καρτέλα ξεκινά ακριβώς κάτω από το μενού· αλλιώς η σελίδα μένει όπου είναι */
   var hd=document.querySelector(".wrap.app>header"),top=hd?hd.offsetTop+hd.offsetHeight:0;if(window.scrollY>top)window.scrollTo(0,top);}
 /* απόφαση Owner 04/11: «Οι προτάσεις μας» είναι πάντα οι σημερινές. Αν βλέπεις άλλη μέρα (π.χ. Αύριο στους Αγώνες), το tab σε γυρίζει στη σημερινή σελίδα */
+/* Izzistats μέσα στην εφαρμογή (απόφαση Owner 06/11): φορτώνει μία φορά το κομμάτι της σελίδας /{lang}/izzistats?frag=1 */
+var IZZ=0;function loadIzzi(){if(IZZ)return;IZZ=1;var lg=(location.pathname.split("/")[1]||"en");
+  fetch("/"+encodeURIComponent(lg)+"/izzistats?frag=1").then(function(r){return r.text();}).then(function(h){$("izziBox").innerHTML=h;
+    Array.prototype.forEach.call($("izziBox").querySelectorAll('a[href^="#"]'),function(a){a.addEventListener("click",function(e){var t=document.getElementById(a.getAttribute("href").slice(1));if(!t)return;e.preventDefault();var y=t.getBoundingClientRect().top+window.pageYOffset-70;window.scrollTo({top:y,behavior:"smooth"});});});})
+    .catch(function(){IZZ=0;$("izziBox").innerHTML='<div class="empty">–</div>';});}
 var NOT_TODAY=typeof DAYNAV!=="undefined"&&DAYNAV&&DAYNAV.today&&DAYNAV.date!==DAYNAV.today;
 TABS.forEach(function(t){$("tab-"+t).addEventListener("click",function(){if(t==="tips"&&NOT_TODAY){store("ko-tab2","tips");location.href=location.pathname;return;}showTab(t);});});
 if(NOT_TODAY)setTimeout(function(){try{var l=document.createElement("link");l.rel="prefetch";l.href=location.pathname;l.as="document";document.head.appendChild(l);}catch(e){}},2000);
@@ -1700,6 +1717,8 @@ function detailHTML(m){
   }
   h+=bkTable(m);
   if(m.url)h+='<a class="m-url" href="'+esc(m.url)+'"><span>All about this match</span> →</a>';
+  /* απόφαση Owner 06/11: διακριτικό link «για ψαγμένους» (σερί ομάδων) */
+  if(typeof STKURL!=="undefined"&&STKURL)h+='<a class="m-url" style="opacity:.75" href="'+esc(STKURL[0])+'">'+esc(STKURL[1])+' →</a>';
   /* απουσίες & νέα: κρυφά μέχρι να υπάρχουν δεδομένα */
   return h;
 }
@@ -1740,8 +1759,10 @@ document.addEventListener("click",function(e){var b=e.target.closest&&e.target.c
 var RJOB=0;
 function renderMatches2(){
   var job=++RJOB,box=$("matchList");
-  var list=MATCHES.filter(function(m){return passAll(m);});
+  /* απόφαση Owner 06/11: με αναζήτηση ψάχνουμε σε ΟΛΟΥΣ τους αγώνες της μέρας (όχι μόνο στα φίλτρα από πάνω)· από κάτω οι επόμενες 3 μέρες */
+  var list=q?MATCHES.slice():MATCHES.filter(function(m){return passAll(m);});
   if(q){var s=q.toLowerCase();list=list.filter(function(m){return (m.home+" "+m.away+" "+m.league+" "+m.country).toLowerCase().indexOf(s)>=0;});}
+  setTimeout(renderNext3,0);
   if(!list.length){box.innerHTML=(lFil==="mine"&&!favF&&!ACC?'<button type="button" class="myl-hint" id="mylHint">⭐ <span>These are the 50 main leagues.</span> <b><span>Sign up free to build your own</span> →</b></button>':'')+'<div class="empty" style="border:0">No matches for this filter.</div>';var mh0=$("mylHint");if(mh0)mh0.addEventListener("click",function(){toast("Sign up free to pick your own leagues");openAuth();});return;}
   var cnt={};list.forEach(function(m){cnt[m.key]=(cnt[m.key]||0)+1;});
   var blocks=[],cur=null;
@@ -1749,10 +1770,24 @@ function renderMatches2(){
   var i=0;
   function chunk(limit){var h="",n=0;while(i<blocks.length&&(n<limit||!n)){h+='<div class="lgb">'+blocks[i].h+'</div>';n+=blocks[i].n;i++;}return h;}
   /* απόφαση Owner 02/11 + 04/11: ο επισκέπτης βλέπει έτοιμες τις 50 βασικές λίγκες· για δικές του → εγγραφή */
-  var myh=lFil==="mine"&&!favF&&!ACC?'<button type="button" class="myl-hint" id="mylHint">⭐ <span>These are the 50 main leagues.</span> <b><span>Sign up free to build your own</span> →</b></button>':'';
+  var myh=!q&&lFil==="mine"&&!favF&&!ACC?'<button type="button" class="myl-hint" id="mylHint">⭐ <span>These are the 50 main leagues.</span> <b><span>Sign up free to build your own</span> →</b></button>':'';
   box.innerHTML=myh+chunk(60);bindMatchList();var mh=$("mylHint");if(mh)mh.addEventListener("click",function(){toast("Sign up free to pick your own leagues");openAuth();});
   (function more(){if(job!==RJOB||i>=blocks.length)return;setTimeout(function(){if(job!==RJOB)return;box.insertAdjacentHTML("beforeend",chunk(120));bindMatchList();more();},16);})();
 }
+/* αναζήτηση: οι αγώνες των επόμενων 3 ημερών (από /search.json, μία φορά), με ημέρα και ώρα· πάτημα → σελίδα αγώνα */
+var NX3=null,NX3L=false;
+function renderNext3(){var box=$("next3");if(!box){box=document.createElement("div");box.id="next3";$("matchList").insertAdjacentElement("afterend",box);}
+  var s=(q||"").trim().toLowerCase();if(s.length<2){box.innerHTML="";return;}
+  if(!NX3){box.innerHTML='<div class="n3h"><span>Next 3 days</span> …</div>';if(!NX3L){NX3L=true;
+    var fr=typeof DAYNAV!=="undefined"&&DAYNAV.date?DAYNAV.date:"",lg=(location.pathname.split("/")[1]||"en");
+    fetch("/search.json?lang="+encodeURIComponent(lg)+"&from="+encodeURIComponent(fr)).then(function(r){return r.json();}).then(function(L){NX3=L||[];renderNext3();}).catch(function(){NX3=[];renderNext3();});}return;}
+  var L=NX3.filter(function(m){return (m.h+" "+m.a+" "+m.lg+" "+m.c).toLowerCase().indexOf(s)>=0;}).slice(0,60);
+  if(!L.length){box.innerHTML='<div class="n3h"><span>Next 3 days</span> · 0</div>';return;}
+  var wd=function(ts){try{return new Intl.DateTimeFormat(document.documentElement.lang||"en",{weekday:"short",day:"numeric",month:"numeric"}).format(ts*1000);}catch(e){return "";}};
+  var hm=function(ts){var d=new Date(ts*1000);return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);};
+  box.innerHTML='<div class="n3h"><span>Next 3 days</span> · '+L.length+'</div><div class="n3l">'+L.map(function(m){
+    return '<a class="n3r" href="'+esc(m.url)+'"><span class="n3d"><b>'+esc(wd(m.ts))+'</b><small>'+hm(m.ts)+'</small></span><span class="n3m"><b>'+esc(m.h)+' – '+esc(m.a)+'</b><small>'+esc(m.c)+' · '+esc(m.lg)+'</small></span>'
+      +(m.tip?'<span class="n3t'+(m.tip==="vip"?' vip':'')+'">'+(m.tip==="vip"?'VIP':'TIP')+'</span>':'<span class="n3go" aria-hidden="true">›</span>')+'</a>';}).join("")+'</div>';}
 function bindMatchList(){
   var box=$("matchList");
   Array.prototype.forEach.call(box.querySelectorAll("details.mrow"),function(d){if(d._t)return;d._t=1;
@@ -2121,7 +2156,11 @@ function renderStrong(){var box=$("strongBox");if(!box)return;
     var Ls=tr.legs.map(lvOf),anyLv=Ls.some(function(L){return L.lv;}),allDn=Ls.every(function(L){return L.dn;});
     var rs=tr.legs.map(function(c,i){return stOf(c,Ls[i]);}),tres=tr.result!=null?tr.result:rs.some(function(x){return x===0;})?0:rs.every(function(x){return x===1||x===2;})?1:null;
     var tst=tres===1?'<span class="stb-st w">✓ <span>Won</span></span>':tres===0?'<span class="stb-st l">✗ <span>Lost</span></span>':anyLv?'<span class="stb-st on"><i class="ldot2"></i><span>In progress</span></span>':allDn?'<span class="stb-st"><span>Finished</span></span>':'';
-    h+='<article class="stb-c stb-tr"><div class="stb-hd"><b><span>Treble</span></b>'+tst+'</div><div class="stb-lgn"><span>3 picks in one slip</span></div><ul class="stb-l">'
+    /* απόφαση Owner 06/11: κερδισμένη τριάδα → ίδια εικόνα με τις «μεγαλύτερες νίκες» (WINNER, πράσινο πλαίσιο, ✓ ανά επιλογή) */
+    if(tres===1){h+='<article class="stb-c stb-tr stb-won bigwin"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv"><span>Treble</span></span><span class="mono bwodd">x'+Number(tr.odds).toFixed(2)+'</span></div>'
+      +tr.legs.map(function(c,i){var L=Ls[i],v=rs[i]===2;return '<div class="bwleg'+(v?' cv':'')+'" style="--d:'+(350+i*140)+'ms"><b class="bwtick">'+(v?'–':'✓')+'</b><span class="bzm"><b>'+esc(c.home)+' – '+esc(c.away)+'</b><small>'+(v?'<span>Postponed</span>':'<span>Full time</span> '+sc2(L.sc))+'</small></span>'+(v?'<span class="bzp">–</span><span class="mono bzo">1.00</span>':'<span class="bzp">'+esc(BZC_SEL[c.sel]||c.sel)+'</span><span class="mono bzo">'+Number(c.price).toFixed(2)+'</span>')+'</div>';}).join("")
+      +'<div class="stb-ft"><div class="stb-btn off"><span>Match over</span></div></div></article>';}
+    else h+='<article class="stb-c stb-tr"><div class="stb-hd"><b><span>Treble</span></b>'+tst+'</div><div class="stb-lgn"><span>3 picks in one slip</span></div><ul class="stb-l">'
       +tr.legs.map(function(c,i){var L=Ls[i],r=rs[i];
         /* γραμμή 2: λίγκα · ώρα (ή λεπτό · σκορ, ή ✓/✗ · τελικό) */
         var sub=r===1?'<span class="w">✓ <span>Won</span></span> · <span>Full time</span> '+sc2(L.sc):r===0?'<span class="l">✗ <span>Lost</span></span> · '+sc2(L.sc)
@@ -2159,6 +2198,13 @@ function renderPicks(){
       return '<h3 class="zsec" id="zsec-'+esc(z)+'">'+esc(z.replace("-","–"))+' <small>'+lz.length+'</small></h3>'+lz.map(function(c){return parlayHTML(c,true);}).join("");}).join("")+plEndH;
     Array.prototype.forEach.call($("zTabs").querySelectorAll("[data-z]"),function(b){b.setAttribute("aria-pressed","false");});}
   else $("zMain").innerHTML=(main?inZ.map(function(c){return parlayHTML(c,true);}).join(""):plEnded.length?'<div class="opempty"><b>'+(typeof DAYNAV!=="undefined"&&DAYNAV.date&&DAYNAV.today&&DAYNAV.date!==DAYNAV.today?'This day\'s parlays are settled':'Today\'s parlays are settled')+'</b><span>See them below. New ones every morning.</span></div>':'<div class="opempty"><b>Today\'s parlays are coming</b><span>We make them every morning from our tips.</span></div>')+plEndH;
+  /* απόφαση Owner 06/11: όταν τελειώσουν τα σημερινά, βγαίνουν νωρίτερα τα πρώτα παρολί της αύριο· φαίνονται εδώ με link στη σελίδα της αύριο */
+  (function(){var bx=$("zTmr");if(!bx)return;var N=(typeof BZN!=="undefined"&&BZN)||[],isT=typeof DAYNAV==="undefined"||!DAYNAV.date||DAYNAV.date===DAYNAV.today;
+    if(!N.length||!isT){bx.hidden=true;bx.innerHTML="";return;}
+    var td=typeof DAYNAV!=="undefined"&&DAYNAV.today?DAYNAV.today:"",tm=td?new Date(Date.parse(td+"T12:00:00Z")+864e5).toISOString().slice(0,10):"";
+    bx.hidden=false;bx.innerHTML='<h3 class="zsec"><span>Tomorrow</span> <small>'+N.length+'</small></h3>'
+      +N.map(function(c){return parlayHTML(c,true).replace(/<button type="button" class="pc-sh"[^>]*>↗<\/button>/,'');}).join("")
+      +(tm?'<a class="m-url" href="?d='+tm+'"><span>See tomorrow\'s matches and parlays</span> →</a>':'');})();
   var opts=main?[main].concat(alts):[];
   opts=[];$("zAltH").hidden=true;$("zAltK").textContent=opZone.replace("-","–")+" · "+opts.length;
   $("zAlts").innerHTML=opts.length<2?"":opts.map(function(c,i){return '<button type="button" class="opalt" data-alt="'+i+'" aria-pressed="'+((opAlt||0)===i)+'"><b><span>'+esc(BZC_VAR[c.variant]||c.variant)+'</span></b><small>'+(c.style?'<span>'+esc(STY[c.style]||c.style)+'</span> · ':'')+c.legs.length+' <span>picks</span></small><em>x'+fx2(c.odds)+'</em></button>';}).join("");
@@ -2346,7 +2392,8 @@ $("buildBtn").addEventListener("click",function(){build();$("result").scrollInto
 
 /* ---------- Τελευταία γκολ (δεξιά στους Αγώνες, απόφαση Owner 02/11): όλα τα γκολ, όχι μόνο όσα μας βολεύουν.
    Όταν ένα γκολ κλείνει tip μας (Over / GG), πράσινο + μικρό πανηγύρι ---------- */
-var sideView=load("ko-sv","goals");if(sideView!=="goals"&&sideView!=="mylive")sideView="goals";var _sv0,GOALS=[],GSEEN=null;
+/* απόφαση Owner 06/11: πάντα ξεκινάει στα «Τελευταία γκολ» (να φαίνεται ότι έχουμε live)· τα «Τα παιχνίδια μου live» είναι συνήθως άδεια */
+var sideView="goals";var _sv0,GOALS=[],GSEEN=null;
 function renderSideView(){Array.prototype.forEach.call(document.querySelectorAll("[data-sv]"),function(b){b.setAttribute("aria-pressed",b.dataset.sv===sideView?"true":"false");});
   if($("goalsSide"))$("goalsSide").hidden=sideView!=="goals";if($("myLiveSide"))$("myLiveSide").hidden=sideView!=="mylive";renderMyLive();}
 /* δεξιά: οι αγώνες από τα κουπόνια μου (ανοιχτά) — πρώτα όσοι παίζονται τώρα, μετά όσοι έρχονται */
@@ -2367,7 +2414,7 @@ function renderMyLive(){var box=$("myLiveSide");if(!box)return;var seen={},rows=
   if(!rows.length){box.innerHTML='<div class="gl-empty"><span>Play a slip, take one of our parlays or tap ☆ on a match, and your games show here live.</span></div>';return;}
   box.innerHTML=(live.length?live.map(function(r){return row(r,true);}).join(""):'<div class="gl-empty"><span>None of your games is live right now.</span></div>')
     +(next.length?'<small class="gl-next">'+'<span>Coming up</span></small>'+next.slice(0,5).map(function(r){return row(r,false);}).join(""):"");}
-document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-sv]");if(!b)return;sideView=b.dataset.sv;store("ko-sv",sideView);renderSideView();});
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-sv]");if(!b)return;sideView=b.dataset.sv;renderSideView();});
 function goalLands(g){var out=[];(g.tips||[]).forEach(function(tp){var s=tp[0],tot=g.gh+g.ga;
   if(s==="O25"&&tot===3)out.push("Over 2.5");if(s==="O15"&&tot===2)out.push("Over 1.5");if(s==="GG"&&g.gh>0&&g.ga>0&&(g.side==="h"?g.ga>0&&g.gh===1:g.side==="a"?g.gh>0&&g.ga===1:true))out.push("GG");});return out;}
 function renderGoals(){var box=$("goalsSide");if(!box)return;
