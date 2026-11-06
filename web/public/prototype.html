@@ -534,7 +534,7 @@ body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 body.cshake .wrap.app{animation:cshk .5s ease .15s}
 @keyframes cshk{0%,100%{transform:none}20%{transform:translate(-6px,2px)}40%{transform:translate(6px,-2px)}60%{transform:translate(-4px,1px)}80%{transform:translate(3px,0)}}
 .pnote{font-size:.78rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px;margin-top:2px;line-height:1.5}
-.pnote b{color:var(--fg)}.pnote .below{color:var(--warn)}
+.pnote b{color:var(--fg)}.pnote .below{color:var(--muted)}
 .clrall{appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:5px 11px;font:700 .78rem var(--f-body);cursor:pointer;min-height:32px}.clrall:hover{color:var(--bad);border-color:var(--bad)}
 /* Φτιάξε: δύο τρόποι */
 #resultSideWrap:not(:empty){margin-bottom:6px}
@@ -732,7 +732,10 @@ header{position:relative}
 .sb-sum{display:flex;justify-content:space-between;gap:8px;font-size:.74rem;color:var(--muted);background:var(--panel-2);border-radius:10px;padding:8px 10px}.sb-sum b{display:block;font-size:1rem;color:var(--fg)}.sb-sum span:last-child{text-align:right}.sb-sum span:last-child b{color:var(--lime)}
 .sb-ft{display:flex;gap:6px}.sb-ft select{flex:1;min-width:0;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);font:600 .74rem var(--f-body);padding:0 6px}
 .sb-ft button{height:36px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--fg);font:600 .74rem var(--f-body);cursor:pointer;padding:0 10px}
-.pc-take{flex:1;min-height:48px;border:0;border-radius:12px;background:var(--lime);color:var(--lime-ink);font:800 .92rem var(--f-body);cursor:pointer}
+.pc-take{flex:1;min-height:44px;border:0;border-radius:12px;background:rgba(182,242,58,.1);color:var(--lime);box-shadow:inset 0 0 0 1px rgba(182,242,58,.5);font:700 .88rem var(--f-body);cursor:pointer}
+.ztmr-note{margin:0;font-size:.82rem;color:var(--muted)}.ztmr-go{display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.sb-from{margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--panel-2);font-size:.76rem;line-height:1.4;color:var(--muted)}.sb-from b{color:var(--fg)}
+.cp-bk{font-size:.6em;color:var(--muted);font-family:var(--f-body)}
 .sb-else{min-height:42px;border:1px solid var(--lime);border-radius:12px;background:rgba(182,242,58,.08);color:var(--lime);font:700 .82rem var(--f-body);cursor:pointer;padding:0 10px}
 .fav{display:block;margin:2px auto 0;width:28px;height:24px;border:0;background:transparent;color:var(--muted);font-size:1rem;line-height:1;cursor:pointer;padding:0}.fav.on{color:#e8b931}
 .pc-live{display:flex;flex-direction:column;align-items:flex-start;gap:1px;color:var(--bad)}.pc-live b{font:800 .86rem var(--f-mono);color:var(--fg)}.pc-live small{font:700 .62rem var(--f-mono);color:var(--bad)}
@@ -842,7 +845,7 @@ header{position:relative}
 .sg2 .sg-why{grid-column:1/-1;font-size:.85rem;color:var(--fg);opacity:.9;margin:10px 0 0}
 .sg2 .sg-why small{font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:6px}
 .sg2 .sg-foot{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;border-top:1px solid var(--line);margin-top:12px;padding-top:10px;font-size:.74rem;color:var(--muted)}
-.sg2 .sg-foot b{color:var(--fg)}.sg2 .sg-foot .below{flex-basis:100%;color:var(--warn)}
+.sg2 .sg-foot b{color:var(--fg)}.sg2 .sg-foot .below{flex-basis:100%;color:var(--muted)}
 .sg2.sg-lk{padding:12px 16px}.sg2.sg-lk .sg-mt{grid-column:1}.sg2 .sg-lkt{grid-column:1;font-size:.8rem;color:var(--muted);margin:4px 0 0}
 .sg2.sg-lk .sg-btns{grid-row:2/4;margin:0}
 .sg2 .sg-lock{height:40px;padding:0 14px;font-size:.8rem}
@@ -1107,10 +1110,11 @@ function applyBook(){
   MATCHES.forEach(function(m){m.tips.forEach(function(t){if(t.best==null)t.best=t.odds;var s=t.key&&SEL[t.key];if(s&&t.best){t.odds=s.odd;t.nobk=s.nobk;t.low=s.low;t.pin=s.pin;}});});
 }
 /* απόφαση Owner: η τιμή του tip είναι η τιμή τη στιγμή της έκδοσης· κάτω από τον «πάτο» δεν το προτείνουμε */
+function belowTxt(o){return '<span class="below">↓ <span>Price now</span> <b class="mono">'+o.toFixed(2)+'</b> · <span>below the price we recommend</span></span>';}
 function priceNote(t){var ip=t.best!=null?t.best:t.odds;if(!ip)return "";
   var h='<div class="pnote"><span>Price when issued</span> <b class="mono">'+ip.toFixed(2)+'</b>'+(t.at?' · '+esc(t.at):'');
   if(t.min)h+='<br><span>We recommend it down to</span> <b class="mono">'+t.min.toFixed(2)+'</b>. <span>Below that we don\'t recommend it.</span>';
-  if(t.min&&t.odds&&t.odds<t.min)h+='<br><b class="below">⚠ <span>The price is now below our limit</span></b>';
+  if(t.min&&t.odds&&t.odds<t.min)h+='<br>'+belowTxt(t.odds); /* 06/11 (δοκιμή παικτών): ουδέτερο, όχι ⚠ */
   return h+'</div>';}
 function oddTxt(t){return t.odds?t.odds.toFixed(2)+(t.low?' <i class="lowbk" title="Low price at your bookmaker">⚠</i>':''):"🔒";}
 function bookRowHTML(){return '<div class="bkrow"><span class="label">My bookmaker</span><div class="hscroll bkchips">'
@@ -1239,11 +1243,18 @@ function toggleSel(k){
   afterSlip();
 }
 function addLegs(keys){var mids=keys.map(midOf);slip=slip.filter(function(k){return mids.indexOf(midOf(k))<0;});keys.forEach(function(k){slip.push(k);});afterSlip();toast("Moved to your slip");openSheet();}
+/* 06/11: το δελτίο ήρθε από δικό μας παρολί → δείχνουμε και την απόδοση δημοσίευσης και την τωρινή (για να μη μοιάζει λάθος) */
+var slipFrom=load("ko-from",null);
+function setFrom(keys,o){slipFrom=o?{k:keys.slice().sort().join("|"),o:o}:null;store("ko-from",slipFrom);}
+function fromNote(t,sb){if(!slipFrom||!slip.length||slipFrom.k!==slip.slice().sort().join("|"))return "";var a=+slipFrom.o,b=t.odds;if(!a||Math.abs(a-b)<0.01)return "";
+  return '<p class="sb-from">ℹ️ <span>Our parlay was published at</span> <b class="mono">x'+a.toFixed(2)+'</b>. <span>Prices change during the day.</span> <span>Price now</span>'+(sb?' (<b>'+esc(sb)+'</b>)':'')+': <b class="mono">x'+b.toFixed(2)+'</b></p>';}
 function afterSlip(){save();syncPressed();renderBar();if(!$("sheet").hidden)renderMySlip();else renderSide();}
 /* ο bookmaker του δελτίου: ο δικός του αν τον διάλεξε, αλλιώς (παρολί) εκείνος με το καλύτερο σύνολο */
 function bkRank(keys){var rows=[];ENBK.forEach(function(b){var tot=1,ok=keys.length>0;keys.forEach(function(k){var p=bkP(SEL[k].m,k.split(":")[1],b);if(!p)ok=false;else tot*=p;});if(ok)rows.push({b:b,t:tot});});
   rows.sort(function(a,c){return c.t-a.t;});return rows;}
-function slipBook(){if(myBook!=="best")return myBook;if(slip.length<2)return null;var r=bkRank(slip);return r.length?r[0].b:null;}
+function slipBook(){return legsBook(slip);}
+/* 06/11 (δοκιμή παικτών, κάρτα x4.01 / δελτίο x4.48 / κουπόνι €45.90): ένας κανόνας για δελτίο ΚΑΙ αποθηκευμένο κουπόνι */
+function legsBook(keys){if(myBook!=="best")return myBook;if(keys.length<2)return null;var r=bkRank(keys);return r.length?r[0].b:null;}
 function legOdd(k,sb){var s=SEL[k];if(sb===undefined)sb=slipBook();var p=sb?bkP(s.m,k.split(":")[1],sb):0;return p||s.odd;}
 function totals(){var o=1,p=1,known=true,sb=slipBook();slip.forEach(function(k){o*=legOdd(k,sb);if(SEL[k].p==null)known=false;else p*=SEL[k].p;});return {odds:o,prob:known?p:null};}
 function renderBar(){var b=$("slipBarBtn"),t=totals();$("sbCount").textContent=slip.length;b.dataset.empty=slip.length?"false":"true";
@@ -1300,7 +1311,7 @@ function renderMySlip(target){
       pk=c==="1"?m.home:c==="2"?m.away:c==="X"?'<span>Draw</span>':esc(s.short),note=s.low?'<em class="ss-warn">⚠ <span>Low price here</span></em>':s.nobk?'<em class="ss-warn"><span>Not offered by your bookmaker</span></em>':'';
     return '<li><button type="button" class="sb-x" data-rm="'+esc(k)+'" aria-label="Remove">✕</button><span class="sb-m"><b>'+(c==="1"||c==="2"?esc(pk):pk)+'</b><small>'+(mkLbl(c)?'<span>'+mkLbl(c)+'</span>':'')+'</small><small>'+esc(m.home)+' – '+esc(m.away)+' · '+esc(m.time)+'</small>'+note+'</span>'
       +'<span class="sb-o mono">'+legOdd(k,SB).toFixed(2)+'</span><input type="number" inputmode="decimal" min="0" step="1" class="sb-in" data-stk="'+esc(k)+'" value="'+val(!multi&&sStk[k]==null?stake:sStk[k])+'" placeholder="Stake" aria-label="Stake"></li>';}).join("")+'</ul>';
-  if(multi)h+='<div class="sb-p"><span class="sb-pn"><b>Parlay</b> <small>('+slip.length+')</small></span><span class="sb-o mono">'+t.odds.toFixed(2)+'</span><input type="number" inputmode="decimal" min="0" step="1" class="sb-in" id="pStk" value="'+val(stake)+'" placeholder="Stake" aria-label="Parlay stake"></div>'
+  if(multi)h+='<div class="sb-p"><span class="sb-pn"><b>Parlay</b> <small>('+slip.length+')</small></span><span class="sb-o mono">'+t.odds.toFixed(2)+'</span><input type="number" inputmode="decimal" min="0" step="1" class="sb-in" id="pStk" value="'+val(stake)+'" placeholder="Stake" aria-label="Parlay stake"></div>'+fromNote(t,SB)
     ;
   h+='<div class="sb-sum"><span><span>Total stake</span> <b class="mono" id="sbTot"></b></span><span><span>Potential return</span> <b class="mono" id="retOut"></b></span></div>';
   /* κουμπί χορηγού: μόνο όταν υπάρχει συνεργάτης (SPONSOR = {name, url}). Μέχρι τότε δεν φαίνεται (03/11) */
@@ -1343,7 +1354,7 @@ var cpHid=CP_ALL.filter(function(c){return !cpOn(c)&&(Date.now()-(+c.id||0))<30*
 var coupons=CP_ALL.filter(cpOn);
 function saveCoupons(){store("ko-coupons",coupons.concat(cpHid));}
 var cpNew=+load("ko-cpnew",0)||0;
-function saveCoupon(legs,stk){if(curTab()!=="coupons"){cpNew++;store("ko-cpnew",cpNew);var bb=$("cpBdg");if(bb){bb.classList.remove("bump");void bb.offsetWidth;bb.classList.add("bump");}}var o=legs.reduce(function(a,k){return a*SEL[k].odd;},1);coupons.unshift({id:Date.now(),n:coupons.length+cpHid.length+1,legs:legs,stake:stk,odds:o,seen:null,day:(typeof DAYNAV!=="undefined"&&DAYNAV.date)||""});saveCoupons();renderCoupons();}
+function saveCoupon(legs,stk){if(curTab()!=="coupons"){cpNew++;store("ko-cpnew",cpNew);var bb=$("cpBdg");if(bb){bb.classList.remove("bump");void bb.offsetWidth;bb.classList.add("bump");}}var sb=legsBook(legs),lo=legs.map(function(k){return Math.round(legOdd(k,sb)*100)/100;}),o=lo.reduce(function(a,x){return a*x;},1);coupons.unshift({id:Date.now(),n:coupons.length+cpHid.length+1,legs:legs,stake:stk,odds:o,lo:lo,bk:sb||"",seen:null,day:(typeof DAYNAV!=="undefined"&&DAYNAV.date)||""});saveCoupons();renderCoupons();}
 function legState(k){var s=SEL[k],m=s.m,code=k.split(":")[1];
   if((m.type==="cancelled"||m.type==="postponed"))return "void";
   var st=tipState({sel:({"1":"home","2":"away","X":"x","O25":"over 2.5","U25":"under 2.5","GG":"gg","NG":"ng"})[code]||s.short},m);
@@ -1352,12 +1363,12 @@ function cpState(c){var st=c.legs.map(legState);if(st.indexOf("lost")>=0)return 
 function cpHTML(c){
   var st=c.legs.map(legState),won=st.filter(function(x){return x==="won";}).length,cs=cpState(c),ret=c.stake*c.odds;
   var lab={wait:"Not started",live:"In play",won:"Winner",lost:"Lost"}[cs];
-  var h='<div class="cp cp-'+cs+'" id="cp'+c.id+'"><div class="cp-head"><div><span class="label">'+(c.legs.length===1?'Single':'Coupon #'+c.n+' · '+c.legs.length+' picks')+'</span><div class="cp-odds mono">x'+c.odds.toFixed(2)+'</div></div>'
+  var h='<div class="cp cp-'+cs+'" id="cp'+c.id+'"><div class="cp-head"><div><span class="label">'+(c.legs.length===1?'Single':'Coupon #'+c.n+' · '+c.legs.length+' picks')+'</span><div class="cp-odds mono">x'+c.odds.toFixed(2)+(c.bk?' <small class="cp-bk">@ '+esc(c.bk)+'</small>':'')+'</div></div>'
     +'<div style="text-align:right"><span class="cp-st">'+lab+'</span><div class="cp-ret mono">'+fmt(c.stake)+' → <b>'+ret.toFixed(2)+'</b> €</div></div></div>'
     +'<div class="cp-prog"><i style="width:'+(won/c.legs.length*100)+'%"></i></div><div class="cp-legs">';
   c.legs.forEach(function(k,i){var s=SEL[k],m=s.m,x=st[i];
     var ic={won:"✓",lost:"✗",live:"●",wait:"",void:"–"}[x];
-    h+='<div class="cp-leg l-'+x+'"><span class="cp-ic">'+ic+'</span><span class="cp-m"><b>'+esc(m.home)+' v '+esc(m.away)+'</b><span>'+esc(s.label)+' · '+(m.live||m.done?'<span class="cp-sc">'+esc(m.score)+(m.live?" live":" FT")+'</span>':m.time)+'</span></span><span class="mono cp-o">'+s.odd.toFixed(2)+'</span></div>';});
+    h+='<div class="cp-leg l-'+x+'"><span class="cp-ic">'+ic+'</span><span class="cp-m"><b>'+esc(m.home)+' v '+esc(m.away)+'</b><span>'+esc(s.label)+' · '+(m.live||m.done?'<span class="cp-sc">'+esc(m.score)+(m.live?" live":" FT")+'</span>':m.time)+'</span></span><span class="mono cp-o">'+((c.lo&&c.lo[i])||s.odd).toFixed(2)+'</span></div>';});
   h+='</div>'+(cs==="won"?'<div class="cp-win">🏆 Coupon landed · <b>'+ret.toFixed(2)+' €</b></div>':cs==="lost"?'<div class="cp-lose">Not this time. Every extra pick lowers the chance.</div>':'')
     +'<div class="cp-foot"><button type="button" class="btn sec cp-share" data-share="'+c.id+'">'+(cs==="won"?'🏆 Share my win':'📤 Share coupon')+'</button><button type="button" class="linkb" data-del="'+c.id+'">Remove</button></div></div>';
   return h;}
@@ -1407,7 +1418,7 @@ function couponImage(c,cb){
     if(x.roundRect){x.beginPath();x.roundRect(70,y-50,W-140,78,16);x.fill();x.stroke();}else{x.fillRect(70,y-50,W-140,78);}
     x.font=f(B,32);x.fillStyle="#eef3ee";var mt=m.home+" v "+m.away;if(mt.length>30)mt=mt.slice(0,29)+"…";x.fillText(mt,150,y-8);
     x.font=f(B,26);x.fillStyle="#b6f23a";x.fillText(s.label.length>34?s.label.slice(0,33)+"…":s.label,150,y+18);
-    x.textAlign="right";x.font=f(M,36);x.fillStyle="#eef3ee";x.fillText(s.odd.toFixed(2),W-100,y+5);x.textAlign="left";
+    x.textAlign="right";x.font=f(M,36);x.fillStyle="#eef3ee";x.fillText(((c.lo&&c.lo[i])||s.odd).toFixed(2),W-100,y+5);x.textAlign="left";
     x.beginPath();x.arc(110,y-11,20,0,7);x.fillStyle=stt==="won"?"#b6f23a":stt==="lost"?"#ff6b6b":"#1b231e";x.fill();
     x.font=f(B,26);x.fillStyle=stt==="won"?"#14200a":"#fff";x.textAlign="center";x.fillText(stt==="won"?"✓":stt==="lost"?"✗":stt==="live"?"●":"",110,y-2);x.textAlign="left";
     y+=92;});
@@ -2195,7 +2206,7 @@ function renderStrong(){var box=$("strongBox");if(!box)return;
       +'<div class="stb-tot"><span>Total odds</span><b class="mono">'+Number(tr.odds).toFixed(2)+'</b></div>'
       +'<div class="stb-ft">'+(tr.result==null&&tres==null&&!Ls.some(function(L){return L.lv||L.dn;})&&keys.length===3?'<button type="button" class="pc-take" id="stbTake">+ <span>Treble to my slip</span></button>':'<div class="stb-btn off">'+(allDn||tres!=null?'<span>Match over</span>':'<span>In progress</span>')+'</div>')+'</div></article>';}
   h+='</div>';box.innerHTML=h;bindButtons(box);syncPressed();
-  var tk=$("stbTake");if(tk)tk.addEventListener("click",function(){var keys=tr.legs.map(function(c){return c.id+":"+c.sel;}).filter(function(k){return SEL[k];});slip=keys.slice();sStk={};store("ko-sstk",sStk);afterSlip();toast("In your slip");if(!sideOn())openSheet();});}
+  var tk=$("stbTake");if(tk)tk.addEventListener("click",function(){var keys=tr.legs.map(function(c){return c.id+":"+c.sel;}).filter(function(k){return SEL[k];});slip=keys.slice();sStk={};store("ko-sstk",sStk);setFrom(keys,+tr.odds);afterSlip();toast("In your slip");if(!sideOn())openSheet();});}
 function renderPicks(){
   renderStrip();try{renderStrong();}catch(e){}
   Array.prototype.forEach.call(document.querySelectorAll("[data-op]"),function(b){b.setAttribute("aria-pressed",b.dataset.op===opView?"true":"false");});
@@ -2228,9 +2239,14 @@ function renderPicks(){
   (function(){var bx=$("zTmr");if(!bx)return;var N=(typeof BZN!=="undefined"&&BZN)||[],isT=typeof DAYNAV==="undefined"||!DAYNAV.date||DAYNAV.date===DAYNAV.today;
     if(!N.length||!isT){bx.hidden=true;bx.innerHTML="";return;}
     var td=typeof DAYNAV!=="undefined"&&DAYNAV.today?DAYNAV.today:"",tm=td?new Date(Date.parse(td+"T12:00:00Z")+864e5).toISOString().slice(0,10):"";
+    /* 06/11 (δοκιμή παικτών): το βράδυ, όταν κανένα σημερινό παρολί δεν παίζεται πια (όλα ξεκίνησαν/κρίθηκαν), τα αυριανά πάνε ΠΡΩΤΑ */
+    var playable=L.some(function(c){return c.result==null&&!parlayLost(c)&&!c.legs.some(function(l){return (l.status&&l.status!=="NS"&&l.status!=="TBD")||(l.ts&&l.ts*1000<=Date.now());});});
+    var zm=$("zMain"),first=!playable;if(zm&&zm.parentNode)zm.parentNode.insertBefore(bx,first?zm:zm.nextSibling);bx.style.marginTop=first?"0":"14px";if(first)bx.style.marginBottom="14px";else bx.style.marginBottom="";
+    var lnk=tm?'<a class="m-url" href="?d='+tm+'"><span>See tomorrow\'s matches and parlays</span> →</a>':'';
     bx.hidden=false;bx.innerHTML='<h3 class="zsec"><span>Tomorrow</span> <small>'+N.length+'</small></h3>'
+      +(first?'<p class="ztmr-note"><span>Today\'s parlays have all started. Tomorrow\'s are ready to play.</span></p>'+(tm?'<a class="pc-take ztmr-go" href="?d='+tm+'">🎟️ <span>See tomorrow\'s parlays</span> →</a>':''):'')
       +N.map(function(c){return parlayHTML(c,true).replace(/<button type="button" class="pc-sh"[^>]*>↗<\/button>/,'');}).join("")
-      +(tm?'<a class="m-url" href="?d='+tm+'"><span>See tomorrow\'s matches and parlays</span> →</a>':'');})();
+      +(first?'':lnk);})();
   var opts=main?[main].concat(alts):[];
   opts=[];$("zAltH").hidden=true;$("zAltK").textContent=opZone.replace("-","–")+" · "+opts.length;
   $("zAlts").innerHTML=opts.length<2?"":opts.map(function(c,i){return '<button type="button" class="opalt" data-alt="'+i+'" aria-pressed="'+((opAlt||0)===i)+'"><b><span>'+esc(BZC_VAR[c.variant]||c.variant)+'</span></b><small>'+(c.style?'<span>'+esc(STY[c.style]||c.style)+'</span> · ':'')+c.legs.length+' <span>picks</span></small><em>x'+fx2(c.odds)+'</em></button>';}).join("");
@@ -2240,7 +2256,7 @@ function renderPicks(){
   Array.prototype.forEach.call($("zAlts").querySelectorAll("[data-alt]"),function(b){b.addEventListener("click",function(){opAlt=+b.dataset.alt;renderPicks();});});
   Array.prototype.forEach.call($("zMain").querySelectorAll("[data-take]"),function(b){b.addEventListener("click",function(){var c=L.filter(function(x){return String(x.n)===b.dataset.take;})[0];if(!c)return;
     var keys=c.legs.map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});if(!keys.length)return;
-    slip=keys.slice();sStk={};store("ko-sstk",sStk);afterSlip();toast("In your slip");if(!sideOn())openSheet();});});
+    slip=keys.slice();sStk={};store("ko-sstk",sStk);setFrom(keys,cpX(c));afterSlip();toast("In your slip");if(!sideOn())openSheet();});});
   Array.prototype.forEach.call($("zMain").querySelectorAll("[data-bztrk]"),function(b){b.addEventListener("click",function(){var c=L.filter(function(x){return String(x.n)===b.dataset.bztrk;})[0];if(!c)return;
     var keys=c.legs.map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});if(!keys.length||tracked(keys))return;saveCoupon(keys,stake);toast("Added to My coupons");renderPicks();});});
   Array.prototype.forEach.call($("zMain").querySelectorAll("[data-bzsh]"),function(b){b.addEventListener("click",function(){var c=L.filter(function(x){return String(x.n)===b.dataset.bzsh;})[0];if(!c)return;
@@ -2276,7 +2292,7 @@ function singleHTML(m,x){
   var ip=x.best!=null?x.best:x.odds,foot='';
   if(!off&&(x.min||ip))foot='<div class="sg-foot"><span>'+(x.min?'<span>Recommended at</span> <b class="mono">'+x.min.toFixed(2)+'</b> <span>or higher</span>':'')+'</span>'
     +'<span>'+(ip?'<span>Issued at</span> <b class="mono">'+ip.toFixed(2)+'</b>'+(x.at?' · '+esc(x.at):''):'')+'</span>'
-    +(x.min&&x.odds&&x.odds<x.min?'<b class="below">⚠ <span>The price is now below our limit</span></b>':'')+'</div>';
+    +(x.min&&x.odds&&x.odds<x.min?belowTxt(x.odds):'')+'</div>';
   return '<article class="sg sg2" data-sg="'+esc(k)+'">'+meta
     +'<div class="sg-pl"><span class="sg-pick">'+pick+(x.tier==="vip"?' <span class="vipt">VIP</span>':'')+'</span><span class="sg-sep" aria-hidden="true"></span><span class="sg-odd">'+oddTxt(x)+'</span></div>'+btn
     +(x.why?'<p class="sg-why"><small>Why this pick</small> '+esc(x.why)+'</p>':'')+foot+'</article>';}
