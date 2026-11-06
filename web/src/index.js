@@ -98,7 +98,7 @@ export default {
     if (!env.PAGESKV) return;
     const url0 = new URL("https://" + PROD_HOST + "/"), today = ymdIn(DAYTZ);
     const tmr = new Date(Date.parse(today + "T12:00:00Z") + 864e5).toISOString().slice(0, 10);
-    const ver = (await template(env, url0)).length;
+    await template(env, url0); const ver = TPL_VER;
     for (const lang of LANGS) for (const d of ["", tmr, "all"]) {
       try {
         const u = new URL(`https://${PROD_HOST}/${lang}/${d ? "?d=" + d : ""}`);
@@ -116,6 +116,10 @@ const handle = async (req, env, ctx) => {
     const p = url.pathname;
     if (url.hostname === "www.betizzi.com") return Response.redirect("https://betizzi.com" + p + url.search, 301);
     if (p === "/") return Response.redirect(url.origin + "/en/", 301);
+    if (p === "/app.js") {
+      await template(env, url);
+      return new Response(APP_JS || "/* */", { headers: { "content-type": "application/javascript; charset=utf-8", "cache-control": url.searchParams.get("v") ? "public, max-age=31536000, immutable" : "no-cache" } });
+    }
     if (p === "/goals.json") {
       const r = env.ENGINE ? await env.ENGINE.fetch("https://engine/api/goals") : await fetch("https://betizzi-engine.bettipsters79.workers.dev/api/goals");
       return new Response(r.ok ? await r.text() : "[]", { headers: { "content-type": "application/json", "cache-control": "public, max-age=20" } });
@@ -178,12 +182,12 @@ const handle = async (req, env, ctx) => {
       const key = m[1] + (url.searchParams.has("demo") ? "?demo" : "") + (dq ? "|" + dq : "");
       // 2ο επίπεδο (03/11): κοινή cache του Cloudflare, για να μη χτίζεται η σελίδα από την αρχή σε κάθε νέο «αντίγραφο» του worker (αργή πρώτη φόρτωση)
       // 06/11: η έκδοση της σελίδας (μήκος του template) μπαίνει στο κλειδί, ώστε μετά από κάθε ανέβασμα να μη σερβίρεται η παλιά
-      const ck = new Request("https://betizzi.com/__page/" + encodeURIComponent(key) + "?v=" + (await template(env, url)).length);
+      const ck = new Request("https://betizzi.com/__page/" + encodeURIComponent(key) + "?v=" + (await template(env, url), TPL_VER));
       let hit = PAGES.get(key);
       if (!hit) { try { const r = await caches.default.match(ck); if (r) { hit = { t: +r.headers.get("x-t"), b: await r.text() }; PAGES.set(key, hit); } } catch (e) {} }
       // 06/11: 3ο επίπεδο, το KV (παγκόσμιο, γεμίζει από το cron κάθε 10΄)· μπορεί να είναι λίγο παλιότερο ή προηγούμενης έκδοσης,
       // αλλά δίνεται αμέσως και η καινούργια φτιάχνεται στο παρασκήνιο
-      const kvk = url.hostname + "|" + key, ver = (await template(env, url)).length;
+      const kvk = url.hostname + "|" + key, ver = (await template(env, url), TPL_VER);
       if (!hit && env.PAGESKV) { try { const v = await env.PAGESKV.get(kvk, { type: "json", cacheTtl: 60 }); if (v && v.b) hit = { t: v.t, b: v.b, kv: 1, old: v.v !== ver }; } catch (e) {} }
       // σελίδα «σήμερα» φτιαγμένη χθες (ώρα Ελλάδας) δεν δίνεται ποτέ
       if (hit && !dq && ymdIn(DAYTZ, hit.t || 0) !== ymdIn(DAYTZ)) hit = null;
@@ -638,9 +642,22 @@ ${matches.length && !allDays ? "" : '<meta name="robots" content="noindex,follow
   return tpl;
 }
 
-let TPL = null;
+let TPL = null, TPL_VER = "", APP_JS = "";
+// 06/11 (απόφαση Owner, αργό internet): ο κώδικας της εφαρμογής (~200 KB) βγαίνει σε ξεχωριστό αρχείο /app.js?v=<έκδοση>
+// που ο browser κρατάει για πάντα (immutable)· στη σελίδα μένουν inline μόνο τα δεδομένα της μέρας (RAW, TOP30/DAYNAV…).
+// Το prototype.html μένει ως έχει (μία πηγή)· ο διαχωρισμός γίνεται εδώ, μία φορά ανά isolate.
+const h32 = (s) => { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
+function splitTemplate(t) {
+  const a = t.indexOf("<script>\n(function(){"), b = t.indexOf("</script>", a);
+  const raw = t.match(/var RAW = \[[\s\S]*?\];\n/), top = t.match(/var TOP30 = \[[\s\S]*?\];[^\n]*\n/);
+  if (a < 0 || b < 0 || !raw || !top || raw.index < a || top.index > b) return { tpl: t, js: "" };
+  let body = t.slice(a + 8, b);
+  body = body.replace(raw[0], "").replace(top[0], "");
+  const v = h32(body);
+  return { tpl: t.slice(0, a) + "<script>\n" + raw[0] + top[0] + "</script>\n<script src=\"/app.js?v=" + v + "\"></script>" + t.slice(b + 9), js: body, v };
+}
 async function template(env, url) {
-  if (!TPL) TPL = await (await env.ASSETS.fetch(new Request(url.origin + "/prototype.html"))).text();
+  if (!TPL) { const t = await (await env.ASSETS.fetch(new Request(url.origin + "/prototype.html"))).text(); TPL_VER = h32(t); const sp = splitTemplate(t); TPL = sp.tpl; APP_JS = sp.js; }
   return TPL;
 }
 
