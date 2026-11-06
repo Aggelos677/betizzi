@@ -182,7 +182,7 @@ const handle = async (req, env, ctx) => {
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
     }
     // «Σερί ομάδων» (απόφαση Owner 06/11): σελίδα «για ψαγμένους», ίδια μνήμη με το «Παρολί σήμερα»
-    if (pr && LANGS.includes(pr[1]) && LANGS.some((l) => STK[l].slug === pr[2])) {
+    if (pr && LANGS.includes(pr[1]) && LANGS.some((l) => STK[l].slug === pr[2] || STK[l].oldSlug === pr[2])) {
       const lang = pr[1];
       if (STK[lang].slug !== pr[2]) return Response.redirect(url.origin + stkPath(lang), 301);
       const key = "stk|" + lang, hit = PAGES.get(key), age = hit ? Date.now() - hit.t : Infinity;
