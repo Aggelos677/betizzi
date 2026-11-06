@@ -205,9 +205,11 @@ const handle = async (req, env, ctx) => {
       if (STK[lang].slug !== pr[2]) return Response.redirect(url.origin + stkPath(lang), 301);
       const key = "stk|" + lang, hit = PAGES.get(key), age = hit ? Date.now() - hit.t : Infinity;
       const build = () => streaksPage(env, lang).then((b) => { PAGES.set(key, { t: Date.now(), b }); return b; });
-      if (hit && age < 5 * 60000) return html(hit.b, 200, age21(req, lang));
-      if (hit && age < 30 * 60000) { ctx.waitUntil(build().catch(() => {})); return html(hit.b, 200, age21(req, lang)); }
-      try { return html(await build(), 200, age21(req, lang)); }
+      // ?frag=1: μόνο το περιεχόμενο, για την καρτέλα μέσα στην εφαρμογή (απόφαση Owner 06/11)
+      const out = (b) => (url.searchParams.has("frag") ? new Response(izziFrag(b), { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=120", "x-robots-tag": "noindex" } }) : html(b, 200, age21(req, lang)));
+      if (hit && age < 5 * 60000) return out(hit.b);
+      if (hit && age < 30 * 60000) { ctx.waitUntil(build().catch(() => {})); return out(hit.b); }
+      try { return out(await build()); }
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
     }
     const sp = p.match(/^\/([a-z]{2})\/([a-z0-9-]+)$/);
@@ -1059,6 +1061,17 @@ const SCSS = `
 .lkt{display:none}.lk .lkt{display:block;order:3;flex-basis:100%;color:var(--lime);font-size:12px;font-weight:700}.lk .nx{flex-wrap:wrap}
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
 `;
+// Κομμάτι για την καρτέλα της εφαρμογής: το <main> χωρίς breadcrumb και link «εφαρμογή», με CSS μόνο μέσα στο .izz
+function izziFrag(b) {
+  let m = (b.match(/<main class="doc">([\s\S]*?)<\/main>/) || [, ""])[1];
+  m = m.replace(/<nav class="bc">[\s\S]*?<\/nav>/, "").replace(/<a class="cta"[^>]*>[\s\S]*?<\/a>/, "");
+  const css = (SCSS + `.ans{background:var(--c1);border:1px solid var(--ln);border-radius:12px;padding:12px;margin:0 0 10px;color:#cfd8d1;line-height:1.55}
+h1{font:800 28px/1.1 "Fira Sans Extra Condensed",sans-serif;margin:4px 0 8px;text-transform:uppercase}h2{font:800 20px "Fira Sans Extra Condensed",sans-serif;margin:18px 0 4px}
+.how,.note{color:var(--mu);font-size:13px}a{color:inherit}`)
+    .replace(/([^{}]+)\{/g, (_, sel) => sel.split(",").map((x) => (x.trim().startsWith("@") ? x : ".izz " + x.trim())).join(",") + "{")
+    .replace(/\.izz @media/g, "@media");
+  return `<style>.izz{--c1:#141a16;--c2:#1b231e;--ln:#2a352e;--tx:#eef3ee;--mu:#9aa89f;--lime:#b6f23a;--bg:#0c0f0d}${css}</style><div class="izz"><div class="doc">${m}</div></div>`;
+}
 async function streaksPage(env, lang) {
   const S = STK[lang], t = T[lang], tz = TZ[lang], today = ymdIn(DAYTZ);
   const data = await getStreaks(env);

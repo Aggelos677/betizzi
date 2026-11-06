@@ -38,7 +38,7 @@ header{padding-top:20px;display:flex;flex-direction:column;gap:10px}
 .tag.demo{color:var(--warn)}
 .tag.lime{color:var(--lime)}
 nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;border-bottom:1px solid var(--line);margin:0 -16px;padding-inline:16px}
-.tab-izzi{display:flex;align-items:center;justify-content:center;text-decoration:none;text-align:center;text-transform:none!important}
+
 .tab{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--muted);font:800 1rem var(--f-display);letter-spacing:.06em;text-transform:uppercase;padding:10px 6px;border-radius:10px;cursor:pointer;min-height:44px}
 .tab[aria-selected="true"]{background:var(--lime);color:var(--lime-ink);border-color:var(--lime)}
 section.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:16px}
@@ -921,7 +921,7 @@ header{position:relative}
     <button type="button" class="tab" role="tab" id="tab-matches" aria-controls="view-matches" aria-selected="true">Matches<span class="livebdg" id="liveBdg" hidden></span></button>
     <button type="button" class="tab" role="tab" id="tab-build" aria-controls="view-build" aria-selected="false" hidden>Build</button>
     <button type="button" class="tab" role="tab" id="tab-coupons" aria-controls="view-coupons" aria-selected="false">My coupons<span class="cpbdg" id="cpBdg" hidden></span></button>
-    <a class="tab tab-izzi" href="izzistats">🔍 Izzistats</a><!-- απόφαση Owner 06/11: 4ο κουμπί, τελευταίο (σελίδα από τον server) -->
+    <button type="button" class="tab" role="tab" id="tab-izzi" aria-controls="view-izzi" aria-selected="false">🔍 Izzistats</button><!-- απόφαση Owner 06/11: 4ο κουμπί, μέσα στην εφαρμογή (το περιεχόμενο έρχεται από τη σελίδα /izzistats) -->
   </nav>
 
   <!-- MATCHES -->
@@ -987,6 +987,7 @@ header{position:relative}
   </div>
 
   <!-- MY COUPONS -->
+  <div id="view-izzi" role="tabpanel" aria-labelledby="tab-izzi" class="wrap" hidden><div id="izziBox"><div class="empty">…</div></div></div>
   <div id="view-coupons" role="tabpanel" aria-labelledby="tab-coupons" class="wrap" hidden>
     <div id="liveMob"></div>
     <div class="secthead"><h2>My coupons</h2><span class="hint" id="cpCount"></span></div>
@@ -1429,11 +1430,16 @@ function couponWin(c){
   setTimeout(function(){thud();},380);
   setTimeout(function(){w.classList.add("out");},3200);setTimeout(function(){w.remove();},3700);
 }
-var TABS=["matches","tips","build","coupons"];
-function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-selected",t===name?"true":"false");$("view-"+t).hidden=t!==name;});store("ko-tab2",name);if(name==="coupons"&&cpNew){cpNew=0;store("ko-cpnew",0);try{renderCoupons();}catch(e){}}renderSide();
+var TABS=["matches","tips","build","coupons","izzi"];
+function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-selected",t===name?"true":"false");$("view-"+t).hidden=t!==name;});store("ko-tab2",name);if(name==="izzi")loadIzzi();if(name==="coupons"&&cpNew){cpNew=0;store("ko-cpnew",0);try{renderCoupons();}catch(e){}}renderSide();
   /* χωρίς πήδημα: αν έχεις κατέβει, η νέα καρτέλα ξεκινά ακριβώς κάτω από το μενού· αλλιώς η σελίδα μένει όπου είναι */
   var hd=document.querySelector(".wrap.app>header"),top=hd?hd.offsetTop+hd.offsetHeight:0;if(window.scrollY>top)window.scrollTo(0,top);}
 /* απόφαση Owner 04/11: «Οι προτάσεις μας» είναι πάντα οι σημερινές. Αν βλέπεις άλλη μέρα (π.χ. Αύριο στους Αγώνες), το tab σε γυρίζει στη σημερινή σελίδα */
+/* Izzistats μέσα στην εφαρμογή (απόφαση Owner 06/11): φορτώνει μία φορά το κομμάτι της σελίδας /{lang}/izzistats?frag=1 */
+var IZZ=0;function loadIzzi(){if(IZZ)return;IZZ=1;var lg=(location.pathname.split("/")[1]||"en");
+  fetch("/"+encodeURIComponent(lg)+"/izzistats?frag=1").then(function(r){return r.text();}).then(function(h){$("izziBox").innerHTML=h;
+    Array.prototype.forEach.call($("izziBox").querySelectorAll('a[href^="#"]'),function(a){a.addEventListener("click",function(e){var t=document.getElementById(a.getAttribute("href").slice(1));if(!t)return;e.preventDefault();var y=t.getBoundingClientRect().top+window.pageYOffset-70;window.scrollTo({top:y,behavior:"smooth"});});});})
+    .catch(function(){IZZ=0;$("izziBox").innerHTML='<div class="empty">–</div>';});}
 var NOT_TODAY=typeof DAYNAV!=="undefined"&&DAYNAV&&DAYNAV.today&&DAYNAV.date!==DAYNAV.today;
 TABS.forEach(function(t){$("tab-"+t).addEventListener("click",function(){if(t==="tips"&&NOT_TODAY){store("ko-tab2","tips");location.href=location.pathname;return;}showTab(t);});});
 if(NOT_TODAY)setTimeout(function(){try{var l=document.createElement("link");l.rel="prefetch";l.href=location.pathname;l.as="document";document.head.appendChild(l);}catch(e){}},2000);
