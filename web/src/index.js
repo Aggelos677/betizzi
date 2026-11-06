@@ -1039,7 +1039,7 @@ const PZL = { "x3-5": "3–5", "x8-12": "8–12", "x20-30": "20–30", mega: "30
 function parPath(lang) { return `/${lang}/${PAR[lang].slug}`; }
 function stkPath(lang) { return `/${lang}/${STK[lang].slug}`; }
 const SCSS = `
-.grid9{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 4px}.grid9 a{display:flex;align-items:center;justify-content:center;text-align:center;border:1px solid var(--ln);border-radius:12px;padding:8px 6px;min-height:52px;text-decoration:none;font-weight:700;font-size:13px;line-height:1.25;background:var(--c1);color:var(--tx)!important}.grid9 a:nth-child(-n+3){border-color:rgba(60,207,110,.35)}.grid9 a:nth-child(n+4):nth-child(-n+6){border-color:rgba(255,181,71,.35)}
+.grid9{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 4px}.grid9 a{display:flex;align-items:center;justify-content:center;text-align:center;border:1px solid var(--ln);border-radius:12px;padding:8px 6px;min-height:52px;text-decoration:none;font-weight:700;font-size:13px;line-height:1.25;background:var(--c1);color:var(--tx)!important}.grid9 a:nth-child(-n+3){border-color:rgba(255,181,71,.45)}.grid9 a:nth-child(n+4):nth-child(-n+6){border-color:rgba(60,207,110,.35)}
 .up{float:right;text-decoration:none;color:var(--mu)!important;font-size:16px}#cats{scroll-margin-top:60px}
 .chips{display:flex;gap:6px;overflow-x:auto;margin:4px -14px 6px;padding:2px 14px 6px;position:sticky;top:51px;background:var(--bg);z-index:1;scrollbar-width:none}
 .chips a{flex:none;border:1px solid var(--ln);border-radius:999px;padding:8px 12px;text-decoration:none;font-weight:700;font-size:13px;background:var(--c1);min-height:36px}
@@ -1065,7 +1065,7 @@ async function streaksPage(env, lang) {
   const [y0, m0, d0] = today.split("-").map(Number), noon = Date.UTC(y0, m0 - 1, d0, 12);
   const dLong = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(noon);
   const when = (ts) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(ts * 1000);
-  const KEYS = ["form", "home", "away", "goals", "over", "under", "gg", "draws", "bad"]; // 3 τριάδες (απόφαση Owner 06/11)
+  const KEYS = ["over", "goals", "gg", "form", "home", "away", "under", "draws", "bad"]; // 3 τριάδες (απόφαση Owner 06/11): πρώτα τα γκολ που αγαπά ο κόσμος, μετά φόρμα/έδρα, τέλος Under/X/κακή φόρμα
   const SL = (r) => (r.sel === "1" || r.sel === "2" ? r.sel : SELNAME[r.sel] || r.sel);
   // ο δείκτης κάθε κατηγορίας, με απλά λόγια (π.χ. «8/10 νίκες», «3.6 γκολ/αγώνα», «6 στη σειρά»)
   const metric = (k, r) => k === "goals" ? [r.avg.toFixed(1), S.u.g, Math.min(1, (r.avg - 2.6) / 1.4)]
