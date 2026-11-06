@@ -625,6 +625,7 @@ header{position:relative}
 .bwodd{font-size:1.6rem;font-weight:700;color:var(--lime);text-shadow:0 0 12px rgba(182,242,58,.5)}
 .bwleg{display:grid;grid-template-columns:22px 1fr auto auto;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid var(--line);font-size:.86rem;animation:bwin .4s ease both;animation-delay:var(--d)}
 .bwhead+.bwleg{border-top:0}
+.stb-c.bigwin{padding:0;gap:0;border-width:1px}.stb-won .bwleg:last-of-type{border-bottom:1px solid var(--line)}.stb-won .stb-ft{padding:12px}
 .bwtick{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--win);color:#0c0f0d;align-items:center;justify-content:center;font-size:.75rem;animation:bwpop2 .45s cubic-bezier(.2,1.6,.4,1) both;animation-delay:var(--d)}
 @keyframes bwpop2{0%{transform:scale(0)}100%{transform:scale(1)}}
 @keyframes bwin{0%{opacity:0;transform:translateX(10px)}100%{opacity:1;transform:none}}
@@ -2121,7 +2122,11 @@ function renderStrong(){var box=$("strongBox");if(!box)return;
     var Ls=tr.legs.map(lvOf),anyLv=Ls.some(function(L){return L.lv;}),allDn=Ls.every(function(L){return L.dn;});
     var rs=tr.legs.map(function(c,i){return stOf(c,Ls[i]);}),tres=tr.result!=null?tr.result:rs.some(function(x){return x===0;})?0:rs.every(function(x){return x===1||x===2;})?1:null;
     var tst=tres===1?'<span class="stb-st w">✓ <span>Won</span></span>':tres===0?'<span class="stb-st l">✗ <span>Lost</span></span>':anyLv?'<span class="stb-st on"><i class="ldot2"></i><span>In progress</span></span>':allDn?'<span class="stb-st"><span>Finished</span></span>':'';
-    h+='<article class="stb-c stb-tr"><div class="stb-hd"><b><span>Treble</span></b>'+tst+'</div><div class="stb-lgn"><span>3 picks in one slip</span></div><ul class="stb-l">'
+    /* απόφαση Owner 06/11: κερδισμένη τριάδα → ίδια εικόνα με τις «μεγαλύτερες νίκες» (WINNER, πράσινο πλαίσιο, ✓ ανά επιλογή) */
+    if(tres===1){h+='<article class="stb-c stb-tr stb-won bigwin"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv"><span>Treble</span> · <span>3 picks in one slip</span></span><span class="mono bwodd">x'+Number(tr.odds).toFixed(2)+'</span></div>'
+      +tr.legs.map(function(c,i){var L=Ls[i],v=rs[i]===2;return '<div class="bwleg'+(v?' cv':'')+'" style="--d:'+(350+i*140)+'ms"><b class="bwtick">'+(v?'–':'✓')+'</b><span class="bzm"><b>'+esc(c.home)+' – '+esc(c.away)+'</b><small>'+(v?'<span>Postponed</span>':'<span>Full time</span> '+sc2(L.sc))+'</small></span>'+(v?'<span class="bzp">–</span><span class="mono bzo">1.00</span>':'<span class="bzp">'+esc(BZC_SEL[c.sel]||c.sel)+'</span><span class="mono bzo">'+Number(c.price).toFixed(2)+'</span>')+'</div>';}).join("")
+      +'<div class="stb-ft"><div class="stb-btn off"><span>Match over</span></div></div></article>';}
+    else h+='<article class="stb-c stb-tr"><div class="stb-hd"><b><span>Treble</span></b>'+tst+'</div><div class="stb-lgn"><span>3 picks in one slip</span></div><ul class="stb-l">'
       +tr.legs.map(function(c,i){var L=Ls[i],r=rs[i];
         /* γραμμή 2: λίγκα · ώρα (ή λεπτό · σκορ, ή ✓/✗ · τελικό) */
         var sub=r===1?'<span class="w">✓ <span>Won</span></span> · <span>Full time</span> '+sc2(L.sc):r===0?'<span class="l">✗ <span>Lost</span></span> · '+sc2(L.sc)
