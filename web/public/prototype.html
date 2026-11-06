@@ -1612,7 +1612,7 @@ var mFilter="all", q="";
 var DN=(typeof DAYNAV!=="undefined"&&DAYNAV)||{date:"",today:"",nav:[]},IS_TODAY=!DN.date||DN.date===DN.today;
 /* απόφαση Owner 02/11: δύο κουμπιά, «⭐ Τα πρωταθλήματά μου» (ξεκινάει με τα 50 σημαντικά) και «Όλα».
    Αλλαγή της λίστας μόνο με λογαριασμό (αλλιώς → εγγραφή). */
-var lFil=load("ko-lfil2","mine");if(["all","mine"].indexOf(lFil)<0)lFil="mine"; /* απόφαση Owner 02/11: προεπιλογή «Τα πρωταθλήματά μου» (50 λίγκες) */
+var lFil=load("ko-lfil2","mine");if(["all","mine"].indexOf(lFil)<0)lFil="mine"; /* 06/11 (αργό internet): οι «Όλες οι μέρες» ανοίγουν πάντα στα «Τα πρωταθλήματά μου» (900+ αγώνες αλλιώς) */ if(typeof DAYNAV!=="undefined"&&DAYNAV&&DAYNAV.all)lFil="mine"; /* απόφαση Owner 02/11: προεπιλογή «Τα πρωταθλήματά μου» (50 λίγκες) */
 var MYL=load("ko-myl",null); /* null = τα 50 σημαντικά */
 function inMyL(k){return MYL&&ACC?MYL.indexOf(k)>=0:topIx(k)<999;}
 var tipF=false,calF=false,favF=false,stripOpen=false,FAV=new Set(load("ko-fav",[])||[]);

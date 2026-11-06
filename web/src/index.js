@@ -502,7 +502,8 @@ async function todayPage(env, lang, url) {
     return `<li class="m${x.tips.length ? " has" : ""}"><div class="t">${mid}${st}</div><a class="teams" href="${matchPath(lang, x)}">${team(x.home)}${team(x.away)}</a><div class="tips">${topTip(x.tips)}${off && x.tips.length ? ` · <span>Void</span>` : ""}</div></li>`;
   };
 
-  const leaguesHtml = order.map((g, i) => {
+  // 06/11 (αργό internet): στις «Όλες οι μέρες» η λίστα του server έχει μόνο τις μεγάλες λίγκες και αγώνες με tip (αλλιώς 900+ γραμμές· η σελίδα είναι noindex)
+  const leaguesHtml = order.filter((g) => !allDays || rankOf(g.league.id) < 999 || g.list.some((x) => x.tips.length)).map((g, i) => {
     const open = i < 40 || g.list.some((x) => x.tips.length);
     const head = `<h3>${esc(g.league.country)} · ${esc(g.league.name)} <small>${g.list.length}</small></h3>`;
     const body = `<ul>${g.list.sort((a, b) => a.ts - b.ts).map(row).join("")}</ul>`;
@@ -541,7 +542,7 @@ async function todayPage(env, lang, url) {
   const head = `<title>${esc(title)} — ${esc(dLong)} | betizzi</title>
 <meta name="description" content="${esc(t.desc)}">
 <link rel="canonical" href="${canonical}">
-${matches.length ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
+${matches.length && !allDays ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
 <meta property="og:type" content="website"><meta property="og:site_name" content="betizzi">
 <meta property="og:title" content="${esc(title)} — ${esc(dLong)}"><meta property="og:description" content="${esc(answer)}">
 <meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
