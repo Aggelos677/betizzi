@@ -37,7 +37,8 @@ header{padding-top:20px;display:flex;flex-direction:column;gap:10px}
 .tag{display:inline-block;font-size:.64rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
 .tag.demo{color:var(--warn)}
 .tag.lime{color:var(--lime)}
-nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;border-bottom:1px solid var(--line);margin:0 -16px;padding-inline:16px}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;border-bottom:1px solid var(--line);margin:0 -16px;padding-inline:16px}
+.tab-izzi{display:flex;align-items:center;justify-content:center;text-decoration:none;text-align:center;text-transform:none!important}
 .tab{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--muted);font:800 1rem var(--f-display);letter-spacing:.06em;text-transform:uppercase;padding:10px 6px;border-radius:10px;cursor:pointer;min-height:44px}
 .tab[aria-selected="true"]{background:var(--lime);color:var(--lime-ink);border-color:var(--lime)}
 section.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:16px}
@@ -920,6 +921,7 @@ header{position:relative}
     <button type="button" class="tab" role="tab" id="tab-matches" aria-controls="view-matches" aria-selected="true">Matches<span class="livebdg" id="liveBdg" hidden></span></button>
     <button type="button" class="tab" role="tab" id="tab-build" aria-controls="view-build" aria-selected="false" hidden>Build</button>
     <button type="button" class="tab" role="tab" id="tab-coupons" aria-controls="view-coupons" aria-selected="false">My coupons<span class="cpbdg" id="cpBdg" hidden></span></button>
+    <a class="tab tab-izzi" href="izzistats">🔍 Izzistats</a><!-- απόφαση Owner 06/11: 4ο κουμπί, τελευταίο (σελίδα από τον server) -->
   </nav>
 
   <!-- MATCHES -->
