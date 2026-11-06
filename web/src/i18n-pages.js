@@ -947,7 +947,7 @@ export const STK = {
     app: "Abrir a app →", upd: "Atualizado" },
   fr: { slug: "izzistats", oldSlug: "series-equipes", link: "🔍 Izzistats · Séries des équipes", title: "Izzistats · Séries des équipes aujourd'hui : victoires, Over 2.5, Under, les deux marquent", h1: "Izzistats",
     desc: "Les équipes qui jouent aujourd'hui ou demain avec les meilleures séries sur leurs 10 derniers matchs : victoires, Over 2.5, Under 2.5, les deux équipes marquent et forme. Gratuit. 18+.",
-    ans: (d, n) => `Le ${d}, ${n} équipes de nos championnats jouent aujourd'hui ou demain. Voici celles qui ont les meilleures séries sur leurs 10 derniers matchs (forme : 5 derniers).`,
+    ans: (d, n) => `Le ${d}, ${n} équipes de nos championnats jouent aujourd'hui ou demain. Voici celles qui ont les meilleures séries sur leurs 10 derniers matchs.`,
     cats: { form: "🔥 En forme", home: "🏠 Forts à domicile", away: "✈️ Gagnent à l'extérieur", goals: "⚽ Beaucoup de buts", gg: "🤝 Série les deux marquent", over: "📈 Over 2.5", under: "🧱 Under 2.5" },
     sub: { form: "Le plus de victoires sur les 10 derniers matchs", home: "Victoires sur les 5 derniers à domicile, et ils jouent à domicile", away: "Victoires sur les 5 derniers à l'extérieur, et ils jouent à l'extérieur", goals: "Moyenne de buts par match (les deux équipes), 10 derniers", gg: "Matchs d'affilée où les deux équipes ont marqué", over: "Over 2.5 sur les 10 derniers", under: "Under 2.5 sur les 10 derniers" },
     u: {"w": "victoires", "h": "victoires à domicile", "a": "victoires à l'extérieur", "g": "buts/match", "gg": "d'affilée"}, nx: "Prochain", soon: "🚩 Corners : bientôt.",
