@@ -26,6 +26,9 @@ const CATS = {
   goals: { sel: () => "O25", f: (all) => { const avg = all.reduce((a, x) => a + x.gf + x.ga, 0) / all.length; return avg >= 3 ? { c: Math.round(avg * 100), n: all.length, avg: Math.round(avg * 10) / 10, run: runOf(all, O) } : null; } },
   gg: { sel: () => "GG", f: (all) => { const run = runOf(all, G), c = all.filter(G).length; return run >= 4 || c >= 8 ? { c, n: all.length, run, key: run * 100 + c } : null; } },
   over: { sel: () => "O25", f: (all) => { const c = all.filter(O).length; return c >= 7 ? { c, n: all.length, run: runOf(all, O) } : null; } },
+  // 06/11: 9 κατηγορίες σε 3 τριάδες — + Ισοπαλίες (≥4/10) και Σε κακή φόρμα (ήττες ≥7/10 ή 5 στη σειρά· τιμή = νίκη του αντιπάλου)
+  draws: { sel: () => "X", f: (all) => { const D = (x) => x.gf === x.ga, c = all.filter(D).length; return c >= 4 ? { c, n: all.length, run: runOf(all, D) } : null; } },
+  bad: { sel: (h) => (h ? "2" : "1"), f: (all) => { const L = (x) => x.gf < x.ga, c = all.filter(L).length, run = runOf(all, L); return c >= 7 || run >= 5 ? { c, n: all.length, run } : null; } },
   under: { sel: () => "U25", f: (all) => { const c = all.filter(U).length; return c >= 7 ? { c, n: all.length, run: runOf(all, U) } : null; } },
 };
 

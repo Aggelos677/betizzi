@@ -1039,9 +1039,11 @@ const PZL = { "x3-5": "3–5", "x8-12": "8–12", "x20-30": "20–30", mega: "30
 function parPath(lang) { return `/${lang}/${PAR[lang].slug}`; }
 function stkPath(lang) { return `/${lang}/${STK[lang].slug}`; }
 const SCSS = `
+.grid9{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 4px}.grid9 a{display:flex;align-items:center;justify-content:center;text-align:center;border:1px solid var(--ln);border-radius:12px;padding:8px 6px;min-height:52px;text-decoration:none;font-weight:700;font-size:13px;line-height:1.25;background:var(--c1);color:var(--tx)!important}.grid9 a:nth-child(-n+3){border-color:rgba(60,207,110,.35)}.grid9 a:nth-child(n+4):nth-child(-n+6){border-color:rgba(255,181,71,.35)}
+.up{float:right;text-decoration:none;color:var(--mu)!important;font-size:16px}#cats{scroll-margin-top:60px}
 .chips{display:flex;gap:6px;overflow-x:auto;margin:4px -14px 6px;padding:2px 14px 6px;position:sticky;top:51px;background:var(--bg);z-index:1;scrollbar-width:none}
 .chips a{flex:none;border:1px solid var(--ln);border-radius:999px;padding:8px 12px;text-decoration:none;font-weight:700;font-size:13px;background:var(--c1);min-height:36px}
-.st{scroll-margin-top:110px}.st h2{margin:22px 0 2px}.st .sub{color:var(--mu);font-size:13px;margin:0 0 8px}
+.st{scroll-margin-top:60px}.st h2{margin:22px 0 2px}.st .sub{color:var(--mu);font-size:13px;margin:0 0 8px}
 .doc ul.sl{list-style:none;padding:0;margin:0;background:var(--c1);border:1px solid var(--ln);border-radius:12px;overflow:hidden}
 .doc ul.sl li{padding:10px 12px;margin:0;border-top:1px solid var(--ln);color:inherit;list-style:none}.doc ul.sl li::before,.doc ul.sl li::marker{content:none}.sl li:first-child{border-top:0}
 .sr{display:grid;grid-template-columns:20px 1fr auto;gap:8px;align-items:center}
@@ -1063,12 +1065,12 @@ async function streaksPage(env, lang) {
   const [y0, m0, d0] = today.split("-").map(Number), noon = Date.UTC(y0, m0 - 1, d0, 12);
   const dLong = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(noon);
   const when = (ts) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(ts * 1000);
-  const KEYS = ["form", "home", "away", "goals", "gg", "over", "under"];
+  const KEYS = ["form", "home", "away", "goals", "over", "under", "gg", "draws", "bad"]; // 3 τριάδες (απόφαση Owner 06/11)
   const SL = (r) => (r.sel === "1" || r.sel === "2" ? r.sel : SELNAME[r.sel] || r.sel);
   // ο δείκτης κάθε κατηγορίας, με απλά λόγια (π.χ. «8/10 νίκες», «3.6 γκολ/αγώνα», «6 στη σειρά»)
   const metric = (k, r) => k === "goals" ? [r.avg.toFixed(1), S.u.g, Math.min(1, (r.avg - 2.6) / 1.4)]
     : k === "gg" ? [String(r.run), S.u.gg + ` · ${r.c}/${r.n}`, Math.min(1, r.run / 8)]
-    : [`${r.c}/${r.n}`, k === "form" ? S.u.w : k === "home" ? S.u.h : k === "away" ? S.u.a : "", r.c / r.n];
+    : [`${r.c}/${r.n}`, k === "form" ? S.u.w : k === "home" ? S.u.h : k === "away" ? S.u.a : k === "draws" ? S.u.d : k === "bad" ? S.u.l : "", r.c / r.n];
   // χρώμα: πιο πράσινο = πιο δυνατό (όπως το FootyStats)
   const sec = (k) => {
     const L = (data.cats && data.cats[k]) || [];
@@ -1086,7 +1088,7 @@ async function streaksPage(env, lang) {
         + `<a class="nx" href="${href}"><span><i>${esc(S.nx)}</i><b>${esc(r.fixture.home)} – ${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
         + (look ? `<span class="lkt">${esc(S.look)}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `</a></li>`;
     }).join("");
-    return `<section class="st" id="${k}"><h2>${esc(S.cats[k])}</h2><p class="sub">${esc(S.sub[k])}</p>`
+    return `<section class="st" id="${k}"><h2>${esc(S.cats[k])} <a class="up" href="#cats" aria-label="${esc(S.catH)}">↑</a></h2><p class="sub">${esc(S.sub[k])}</p>`
       + (rows ? `<ul class="sl">${rows}</ul>` : `<p class="note">${esc(S.none)}</p>`) + `</section>`;
   };
   const any = KEYS.some((k) => ((data.cats || {})[k] || []).length);
@@ -1123,7 +1125,7 @@ ${any ? "" : '<meta name="robots" content="noindex,follow">'}
 <nav class="bc"><a href="/${lang}/">betizzi</a> › ${esc(S.h1)}</nav>
 <h1>${esc(S.h1)}</h1>
 <p class="ans">${esc(ans)}</p>
-<nav class="chips">${KEYS.map((k) => `<a href="#${k}">${esc(S.cats[k])}</a>`).join("")}</nav>
+<nav class="grid9" id="cats" aria-label="${esc(S.catH)}">${KEYS.map((k) => `<a href="#${k}">${esc(S.cats[k])}</a>`).join("")}</nav>
 ${KEYS.map(sec).join("")}
 <p class="soon">${esc(S.soon)}</p>
 <p class="how" style="font-size:13px">${esc(S.note)}</p>
