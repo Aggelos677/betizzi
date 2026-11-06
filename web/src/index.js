@@ -1034,6 +1034,9 @@ const SCSS = `
 .nx{display:flex;align-items:center;gap:8px;margin:8px 0 0;padding:7px 10px;border-radius:10px;background:var(--c2);text-decoration:none;min-height:40px}
 .nx>span:first-child{flex:1;min-width:0;font-size:13px;line-height:1.35}.nx>span:first-child b{font-weight:700}.nx span small{color:var(--mu)}.nx i{display:block;font-style:normal;color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
 .nx .od{font:700 13px "JetBrains Mono",monospace;border:1px solid rgba(182,242,58,.5);color:var(--lime);border-radius:8px;padding:3px 7px;white-space:nowrap}
+.doc ul.sl li.lk{background:linear-gradient(90deg,rgba(232,185,49,.12),transparent 70%);box-shadow:inset 3px 0 0 #e8b931}
+.lk .nx .od{background:#e8b931;border-color:#e8b931;color:#0c0f0d}.lk .nx .od small{color:#3a2f0a!important}
+.lkt{display:none}.lk .lkt{display:block;order:3;flex-basis:100%;color:#e8b931;font-size:12px;font-weight:700}.lk .nx{flex-wrap:wrap}
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
 `;
 async function streaksPage(env, lang) {
@@ -1055,12 +1058,16 @@ async function streaksPage(env, lang) {
     const rows = L.map((r, i) => {
       const href = matchPath(lang, { home: { name: r.fixture.home }, away: { name: r.fixture.away }, ts: r.fixture.ts, id: r.fixture.id });
       const [big, unit, p] = metric(k, r);
+      // απόφαση Owner 06/11: «για ψάξιμο» όταν η τιμή είναι 1.60+ ΚΑΙ το σερί είναι αισθητά πιο δυνατό από όσο λέει η τιμή
+      // (ποσοστό του σερί − πιθανότητα της τιμής ≥ 20 μονάδες). Π.χ. Over 2.5 10/10 στο 1.25 όχι· στο 1.60 ναι. Γκολ (μ.ό.): μόνο η τιμή.
+      const rate = k === "goals" ? null : r.c / r.n;
+      const look = r.price >= 1.6 && (rate == null || rate - 1 / r.price >= 0.2);
       const run = k !== "gg" && k !== "goals" && r.run >= 3 ? `<span class="run">🔥 ${r.run} ${esc(S.run)}</span>` : "";
       const fm = `<span class="fm" aria-label="${esc(r.form)}">${[...r.form].reverse().map((x) => `<i class="${x}"></i>`).join("")}</span>`;
-      return `<li><div class="sr"><span class="n">${i + 1}</span><div><b>${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
+      return `<li${look ? ' class="lk"' : ""}><div class="sr"><span class="n">${i + 1}</span><div><b>${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg" style="${shade(k === "goals" || k === "gg" ? p : (p - 0.6) / 0.4)}">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
         + `<a class="nx" href="${href}"><span><i>${esc(S.nx)}</i><b>${esc(r.fixture.home)} – ${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
-        + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `</a></li>`;
+        + (look ? `<span class="lkt">${esc(S.look)}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `</a></li>`;
     }).join("");
     return `<section class="st" id="${k}"><h2>${esc(S.cats[k])}</h2><p class="sub">${esc(S.sub[k])}</p>`
       + (rows ? `<ul class="sl">${rows}</ul>` : `<p class="note">${esc(S.none)}</p>`) + `</section>`;

@@ -1,15 +1,15 @@
 // «Σερί ομάδων» (απόφαση Owner 06/11/2026): για τη σελίδα «για ψαγμένους», σαν τους πίνακες του FootyStats.
-// Μόνο ομάδες των δικών μας λιγκών που παίζουν σήμερα ή αύριο (ώρα Ελλάδας). Πίνακες στους 10 τελευταίους αγώνες
+// Μόνο ομάδες των δικών μας λιγκών που παίζουν τις επόμενες 3 μέρες (ώρα Ελλάδας). Πίνακες στους 10 τελευταίους αγώνες
 // (ελάχιστο 10, αλλιώς η ομάδα δεν μπαίνει)· «Φόρμα» στους 5 τελευταίους. Μόνο από τη δική μας βάση (results), χωρίς κλήσεις API.
 // Κατηγορίες: σε φόρμα, δυνατοί εντός, νικούν εκτός, πολλά γκολ, σερί GG, Over 2.5, Under 2.5. Κόρνερ: όταν έρθουν δεδομένα από το BTFStats / MODIX90.
 import { NOT_FIRST_TEAM } from "./tips.js";
 
 const DAY = 86400;
 const now = () => Math.floor(Date.now() / 1000);
-// τέλος της αυριανής μέρας Ελλάδας
+// τέλος της μεθαυριανής μέρας Ελλάδας (σήμερα, αύριο, μεθαύριο)
 const athEndTomorrow = () => {
   const t = now(), d = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens" }).format(t * 1000);
-  const [y, m, dd] = d.split("-").map(Number), u = Date.UTC(y, m - 1, dd + 2) / 1000;
+  const [y, m, dd] = d.split("-").map(Number), u = Date.UTC(y, m - 1, dd + 3) / 1000; // απόφαση Owner 06/11: οι επόμενες 3 μέρες (σήμερα + 2)
   const off = (+new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", hour: "2-digit", hourCycle: "h23" }).format(u * 1000) - new Date(u * 1000).getUTCHours() + 24) % 24;
   return u - off * 3600;
 };
