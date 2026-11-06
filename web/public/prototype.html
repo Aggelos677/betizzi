@@ -649,7 +649,7 @@ header{position:relative}
 .winrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);animation:bwin .4s ease both;animation-delay:var(--d)}
 .winrow .wm{min-width:0;display:flex;flex-direction:column}
 .winrow .wm b{font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.winrow .wm small{font-size:.76rem;color:var(--muted)}
+.winrow .wm small{font-size:.76rem;color:var(--muted)}.winrow .wm small .wsel{display:inline;color:var(--fg);font-weight:700;font-size:.8rem} /* 06/11: η επιλογή μας ξεχωρίζει λίγο */
 .winrow .wo{font:700 1.1rem var(--f-mono);color:var(--win);flex:none;text-shadow:0 0 10px rgba(60,207,110,.45)}
 
 /* ---------- «Οι προτάσεις μας» (design: πρωτότυπο Lovable, 02/11/2026) ---------- */
@@ -1575,7 +1575,7 @@ function renderWins(){var box=$("winsSide");if(!box)return;
     /* απόφαση Owner 03/11: το πρωί, μέχρι να έρθουν νίκες σήμερα, δείχνουμε τις χθεσινές (πρώτα τα παρολί) */
     h=YW.cps.map(function(c){var legs=c.legs.map(function(l,j){return '<div class="bwleg'+(l.v?' cv':'')+'" style="--d:'+(350+j*140)+'ms"><b class="bwtick">'+(l.v?'–':'✓')+'</b><span class="bzm"><b>'+esc(l.h||"")+' – '+esc(l.a||"")+'</b>'+(l.v?'<small><span>Postponed</span></small>':'')+'</span>'+(l.v?'<span class="bzp">–</span><span class="mono bzo">1.00</span>':'<span class="bzp">'+esc(l.sel||"")+'</span><span class="mono bzo">'+(l.p?(+l.p).toFixed(2):"")+'</span>')+'</div>';}).join("");
       return '<div class="bigwin"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv">'+esc(zk(c.kind))+(c.variant?' · '+esc(BZC_VAR[c.variant]||c.variant):'')+'</span><span class="mono bwodd">x'+(+c.odds).toFixed(2)+'</span></div>'+legs+'</div>';}).join("");
-    if(YW.tips.length)h+='<div>'+YW.tips.map(function(x,i){return '<div class="winrow" style="--d:'+(i*90)+'ms"><span class="wm"><b>'+esc(x.h)+' v '+esc(x.a)+'</b><small>'+esc(x.sel)+(x.sc?' · FT '+esc(x.sc):'')+'</small></span><span class="wo">✓ '+(x.p?(+x.p).toFixed(2):'')+'</span></div>';}).join("")+'</div>';
+    if(YW.tips.length)h+='<div>'+YW.tips.map(function(x,i){return '<div class="winrow" style="--d:'+(i*90)+'ms"><span class="wm"><b>'+esc(x.h)+' v '+esc(x.a)+'</b><small><b class="wsel">'+esc(x.sel)+'</b>'+(x.sc?' · FT '+esc(x.sc):'')+'</small></span><span class="wo">✓ '+(x.p?(+x.p).toFixed(2):'')+'</span></div>';}).join("")+'</div>';
   }
   else if(!cw.length&&!wins.length)h='<div class="empty">No wins yet today. Matches are still running.</div>';
   if(useY)h=wh0+h;
@@ -1583,7 +1583,7 @@ function renderWins(){var box=$("winsSide");if(!box)return;
     h=cw.map(function(c){var legs=c.legs.map(function(l,j){var v=cpVoid(l);return '<div class="bwleg'+(v?' cv':'')+'" style="--d:'+(350+j*140)+'ms"><b class="bwtick">'+(v?'–':'✓')+'</b><span class="bzm"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+esc(l.league||"")+(v?' · <span>Postponed</span>':l.gh!=null?' · '+l.gh+'-'+l.ga:'')+'</small></span>'+(v?'<span class="bzp">–</span><span class="mono bzo">1.00</span>':l.locked?'<span class="bzp vip">VIP</span><span></span>':'<span class="bzp">'+esc(BZC_SEL[l.sel]||l.sel)+'</span><span class="mono bzo">'+(l.price?l.price.toFixed(2):"")+'</span>')+'</div>';}).join("");
       return '<div class="bigwin"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv">'+esc(zk(c.kind))+' · '+esc(BZC_VAR[c.variant]||c.variant)+'</span><span class="mono bwodd">x'+cpX(c).toFixed(2)+'</span></div>'+legs+'</div>';}).join("");
     var top=wins.slice(0,8);
-    h=wh0+h;if(top.length)h+='<div>'+top.map(function(x,i){return '<div class="winrow" style="--d:'+(i*90)+'ms"><span class="wm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small>'+esc(x.t.sel)+' · FT '+esc(x.m.score)+'</small></span><span class="wo">✓ '+(x.t.odds?x.t.odds.toFixed(2):'')+'</span></div>';}).join("")+'</div>';
+    h=wh0+h;if(top.length)h+='<div>'+top.map(function(x,i){return '<div class="winrow" style="--d:'+(i*90)+'ms"><span class="wm"><b>'+esc(x.m.home)+' v '+esc(x.m.away)+'</b><small><b class="wsel">'+esc(x.t.sel)+'</b> · FT '+esc(x.m.score)+'</small></span><span class="wo">✓ '+(x.t.odds?x.t.odds.toFixed(2):'')+'</span></div>';}).join("")+'</div>';
   }
   /* απόφαση Owner 04/11: στις μεγαλύτερες νίκες πάντα και παρολί· αν δεν κέρδισε κανένα σήμερα/χθες, το τελευταίο που κέρδισε, με ημερομηνία */
   /* απόφαση Owner 04/11: πάνω πάντα (αν υπάρχει) το τελευταίο x8+ των 3 ημερών· ο server δεν δίνει το χθεσινό, άρα δεν φαίνεται δύο φορές */
