@@ -32,6 +32,10 @@ const minFor = (d) => MIN_ACTIVE[new Date(d + "T12:00:00Z").getUTCDay()];
 const athDate = (t) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens" }).format(t * 1000);
 const addDay = (d, n = 1) => new Date(Date.parse(d + "T12:00:00Z") + n * 86400000).toISOString().slice(0, 10);
 const activeOf = async (env, d) => (await apiCoupons(env, d)).filter((c) => c.style && c.result == null).length;
+// 06/11 (δοκιμή παικτών): «παίζεται ακόμα» = δεν έχει ξεκινήσει κανένας αγώνας του. Το βράδυ τα σημερινά είναι συχνά όλα LIVE
+// (ενεργά, αλλά ο επισκέπτης δεν έχει τι να παίξει)· τότε βγαίνουν νωρίτερα τα πρώτα της αύριο.
+const playableOf = async (env, d) => (await apiCoupons(env, d)).filter((c) => c.style && c.result == null
+  && !c.legs.some((l) => (l.status && l.status !== "NS" && l.status !== "TBD") || (l.ts && l.ts <= now()))).length;
 const typeOf = (sel) => (WINS.has(sel) ? "wins" : GOALS.has(sel) ? "goals" : "other");
 
 export async function makeCoupons(env, date = ymd(now()), dry = false, limit = Infinity) {
@@ -154,7 +158,7 @@ export async function ensureCoupons(env) {
   const today = athDate(now()), tmr = addDay(today), res = {};
   let a = await activeOf(env, today);
   if (a < minFor(today)) { res.today = await makeCoupons(env, today, false, minFor(today) - a); a = await activeOf(env, today); }
-  if (a < minFor(today)) {
+  if (a < minFor(today) || await playableOf(env, today) === 0) {
     const need = minFor(tmr) - await activeOf(env, tmr);
     if (need > 0) res.tomorrow = await makeCoupons(env, tmr, false, need);
   }
