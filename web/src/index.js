@@ -109,6 +109,10 @@ const handle = async (req, env, ctx) => {
       const from = /^\d{4}-\d{2}-\d{2}$/.test(url.searchParams.get("from") || "") ? url.searchParams.get("from") : ymdIn(DAYTZ);
       const key = "srch|" + lang + "|" + from, hit = PAGES.get(key);
       if (hit && Date.now() - hit.t < 10 * 60000) return new Response(hit.b, { headers: { "content-type": "application/json", "cache-control": "public, max-age=300" } });
+      // 06/11 (QA): κοινή μνήμη Cloudflare 10΄ (αλλιώς 1,7–2΄΄ σε κάθε isolate)
+      const sck = new Request("https://betizzi.com/__srch/" + lang + "/" + from);
+      const sm = await caches.default.match(sck).catch(() => null);
+      if (sm && Date.now() - +(sm.headers.get("x-built") || 0) < 10 * 60000) { const b = await sm.text(); PAGES.set(key, { t: +sm.headers.get("x-built"), b }); return new Response(b, { headers: { "content-type": "application/json", "cache-control": "public, max-age=300" } }); }
       const days = [1, 2, 3].map((n) => new Date(Date.parse(from + "T12:00:00Z") + n * 864e5).toISOString().slice(0, 10));
       const all = await Promise.all(days.map((d) => getDay(env, d).catch(() => null)));
       const now = Date.now() / 1000, out = [], seen = new Set();
@@ -118,7 +122,8 @@ const handle = async (req, env, ctx) => {
         out.push({ id: x.id, ts: x.ts, h: x.home.name, a: x.away.name, lg: x.league.name, c: x.league.country, url: matchPath(lang, x), tip: tp });
       }
       out.sort((a, b) => a.ts - b.ts);
-      const b = JSON.stringify(out); PAGES.set(key, { t: Date.now(), b });
+      const b = JSON.stringify(out), bt = Date.now(); PAGES.set(key, { t: bt, b });
+      ctx.waitUntil(caches.default.put(sck, new Response(b, { headers: { "content-type": "application/json", "cache-control": "public, max-age=900", "x-built": String(bt) } })).catch(() => {}));
       return new Response(b, { headers: { "content-type": "application/json", "cache-control": "public, max-age=300" } });
     }
     if (p === "/live.json") {
@@ -204,8 +209,13 @@ const handle = async (req, env, ctx) => {
     if (pr && LANGS.includes(pr[1]) && LANGS.some((l) => STK[l].slug === pr[2] || STK[l].oldSlug === pr[2])) {
       const lang = pr[1];
       if (STK[lang].slug !== pr[2]) return Response.redirect(url.origin + stkPath(lang), 301);
-      const key = "stk|" + lang, hit = PAGES.get(key), age = hit ? Date.now() - hit.t : Infinity;
-      const build = () => streaksPage(env, lang).then((b) => { PAGES.set(key, { t: Date.now(), b }); return b; });
+      const key = "stk|" + lang;
+      // 06/11 (QA): εκτός από τη μνήμη του isolate, και στη μνήμη του Cloudflare (κοινή), ώστε το πρώτο άνοιγμα να μην αργεί 2–4΄΄
+      const eck = new Request("https://betizzi.com/__stk/" + lang);
+      if (!PAGES.get(key)) { const m = await caches.default.match(eck).catch(() => null); if (m) PAGES.set(key, { t: +(m.headers.get("x-built") || 0), b: await m.text() }); }
+      const hit = PAGES.get(key), age = hit ? Date.now() - hit.t : Infinity;
+      const build = () => streaksPage(env, lang).then((b) => { const t = Date.now(); PAGES.set(key, { t, b });
+        ctx.waitUntil(caches.default.put(eck, new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600", "x-built": String(t) } })).catch(() => {})); return b; });
       // ?frag=1: μόνο το περιεχόμενο, για την καρτέλα μέσα στην εφαρμογή (απόφαση Owner 06/11)
       const out = (b) => (url.searchParams.has("frag") ? new Response(izziFrag(b), { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=120", "x-robots-tag": "noindex" } }) : html(b, 200, age21(req, lang)));
       if (hit && age < 5 * 60000) return out(hit.b);
@@ -500,7 +510,9 @@ async function todayPage(env, lang, url) {
   }).join("");
 
   const canonical = isToday ? `${SITE}/${lang}/` : `${SITE}/${lang}/?d=${date}`;
-  const alt = LANGS.map((l) => `<link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE}/${l}/">`).join("") + `<link rel="alternate" hreflang="x-default" href="${SITE}/en/">`;
+  // 06/11 (QA): οι σελίδες άλλης μέρας δείχνουν στις ίδιες μέρες στις άλλες γλώσσες (όχι στις σημερινές)
+  const dQ = isToday ? "" : `?d=${date}`;
+  const alt = LANGS.map((l) => `<link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE}/${l}/${dQ}">`).join("") + `<link rel="alternate" hreflang="x-default" href="${SITE}/en/${dQ}">`;
   const answer = t.answer(dLong, matches.length, tipsFree, tipsVip);
   const nowIso = new Date().toISOString();
   const tipped = matches.filter((x) => x.tips.length).slice(0, 50);
@@ -522,7 +534,7 @@ async function todayPage(env, lang, url) {
       },
     },
   ];
-  const langNav = LANGS.map((l) => `<a href="/${l}/" hreflang="${HREFLANG[l]}"${l === lang ? ' aria-current="page"' : ""}>${l.toUpperCase()}</a>`).join("");
+  const langNav = LANGS.map((l) => `<a href="/${l}/${dQ}" hreflang="${HREFLANG[l]}"${l === lang ? ' aria-current="page"' : ""}>${l.toUpperCase()}</a>`).join("");
 
   // απόφαση Owner 04/11: ένα σύντομο κείμενο (ημερομηνία, αριθμοί, δυνατά) αντί για δύο· το πλήρες «answer» μένει στο schema
   const ssr = `<h1 class="ssrh">${esc(title)}</h1>`;
@@ -1068,7 +1080,7 @@ function izziFrag(b) {
   m = m.replace(/<nav class="bc">[\s\S]*?<\/nav>/, "").replace(/<a class="cta"[^>]*>[\s\S]*?<\/a>/, "");
   const css = (SCSS + `.ans{background:var(--c1);border:1px solid var(--ln);border-radius:12px;padding:12px;margin:0 0 10px;color:#cfd8d1;line-height:1.55}
 h1{font:800 28px/1.1 "Fira Sans Extra Condensed",sans-serif;margin:4px 0 8px;text-transform:uppercase}h2{font:800 20px "Fira Sans Extra Condensed",sans-serif;margin:18px 0 4px}
-.how,.note{color:var(--mu);font-size:13px}a{color:inherit}`)
+.how,.note{color:var(--mu);font-size:13px}a{color:inherit}.soon{border:0;border-radius:0;padding:0}.sub{display:block}`)
     .replace(/([^{}]+)\{/g, (_, sel) => sel.split(",").map((x) => (x.trim().startsWith("@") ? x : ".izz " + x.trim())).join(",") + "{")
     .replace(/\.izz @media/g, "@media");
   return `<style>.izz{--c1:#141a16;--c2:#1b231e;--ln:#2a352e;--tx:#eef3ee;--mu:#9aa89f;--lime:#b6f23a;--bg:#0c0f0d}${css}</style><div class="izz"><div class="doc">${m}</div></div>`;

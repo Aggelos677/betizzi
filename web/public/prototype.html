@@ -1446,9 +1446,12 @@ function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-s
 /* απόφαση Owner 04/11: «Οι προτάσεις μας» είναι πάντα οι σημερινές. Αν βλέπεις άλλη μέρα (π.χ. Αύριο στους Αγώνες), το tab σε γυρίζει στη σημερινή σελίδα */
 /* Izzistats μέσα στην εφαρμογή (απόφαση Owner 06/11): φορτώνει μία φορά το κομμάτι της σελίδας /{lang}/izzistats?frag=1 */
 var IZZ=0;function loadIzzi(){if(IZZ)return;IZZ=1;var lg=(location.pathname.split("/")[1]||"en");
-  fetch("/"+encodeURIComponent(lg)+"/izzistats?frag=1").then(function(r){return r.text();}).then(function(h){$("izziBox").innerHTML=h;
+  $("izziBox").innerHTML='<div class="empty"><span class="ldot"></span> <span>Loading…</span></div>';
+  fetch("/"+encodeURIComponent(lg)+"/izzistats?frag=1").then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(h){$("izziBox").innerHTML=h;
     Array.prototype.forEach.call($("izziBox").querySelectorAll('a[href^="#"]'),function(a){a.addEventListener("click",function(e){var t=document.getElementById(a.getAttribute("href").slice(1));if(!t)return;e.preventDefault();var y=t.getBoundingClientRect().top+window.pageYOffset-70;window.scrollTo({top:y,behavior:"smooth"});});});})
-    .catch(function(){IZZ=0;$("izziBox").innerHTML='<div class="empty">–</div>';});}
+    .catch(function(){IZZ=0;$("izziBox").innerHTML='<div class="empty"><span>Could not load. Tap Izzistats again.</span></div>';});}
+/* προφόρτωση του Izzistats στο παρασκήνιο (μικρό, ~13 KB), ώστε το πρώτο πάτημα να ανοίγει αμέσως· όχι σε saveData/2G */
+window.addEventListener("load",function(){var c=navigator.connection||{};if(c.saveData||/(^|-)2g$/.test(c.effectiveType||""))return;setTimeout(function(){(window.requestIdleCallback||setTimeout)(function(){if(!IZZ&&$("view-izzi").hidden){var lg=(location.pathname.split("/")[1]||"en");fetch("/"+encodeURIComponent(lg)+"/izzistats?frag=1").catch(function(){});}});},5000);});
 /* απόφαση Owner 06/11 (αργό internet: Κένυα, Νιγηρία κ.λπ.): η σελίδα του «Αύριο» κατεβαίνει ήσυχα στο παρασκήνιο όσο ο επισκέπτης κοιτάει τη σημερινή,
    ώστε όταν το πατήσει να ανοίγει αμέσως. Όχι σε «εξοικονόμηση δεδομένων» ή σε 2G. Και σε κάθε άλλη μέρα: ξεκινάει όταν ο δάχτυλος/ποντίκι πάει στο κουμπί. */
 (function(){var pf={};function pre(h){if(!h||pf[h])return;pf[h]=1;var l=document.createElement("link");l.rel="prefetch";l.href=h;l.as="document";document.head.appendChild(l);}
@@ -1662,9 +1665,7 @@ function renderFilters(){
   var nc=cnt({c:true});if(nc)lb2.appendChild(chipEl('<span>🎯 Called</span> <span class="c">'+nc+'</span>',calF,function(){calF=!calF;renderFilters();renderMatches();},"tog calledchip"));
   box.scrollLeft=_sl1;lb2.scrollLeft=_sl2;
 }
-/* 04/11: λίγο μετά το άνοιγμα, προφορτώνουμε «Αύριο» και «Όλες οι μέρες» (ο browser τις έχει έτοιμες όταν πατηθούν) */
-setTimeout(function(){try{if(!DN.nav||!DN.nav.length)return;var hs=[];DN.nav.forEach(function(d){if(d.n===1&&d.d!==DN.date)hs.push(d.href);});if(!DN.all)hs.push("?d=all");
-  hs.forEach(function(h){var l=document.createElement("link");l.rel="prefetch";l.href=h;l.as="document";document.head.appendChild(l);});}catch(e){}},2500);
+/* 04/11 προφόρτωση «Αύριο»+«Όλες οι μέρες»: αφαιρέθηκε 06/11 (QA: 455 KB σε κάθε επισκέπτη). Τώρα μόνο «Αύριο», όχι σε saveData/2G (βλ. NOT_TODAY). */
 /* live: is a tip already settled? Over/GG can land before full time; Under/NG can be lost early */
 function tipState(t,m){
   if(!(m.live||m.done)||!m.score||m.score.indexOf("-")<0)return null;
