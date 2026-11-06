@@ -580,7 +580,7 @@ ${matches.length ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml)
     .replace("<!--datanote-->", "")
     // απόφαση Owner 04/11: γλώσσες σε κουμπί «EN ▾» πάνω δεξιά (οι σύνδεσμοι μένουν στο HTML για τη Google)
-    .replace('<div class="hdrbtns">', () => `<div class="hdrbtns"><details class="langdd"><summary aria-label="Language">${lang.toUpperCase()} ▾</summary><nav class="langs" aria-label="Language">${langNav}</nav></details>`)
+    .replace('<div class="hdrbtns">', () => `<div class="hdrbtns"><details class="langdd" translate="no"><summary aria-label="Language">${lang.toUpperCase()} ▾</summary><nav class="langs" aria-label="Language">${langNav}</nav></details>`)
     .replace("<!--footlinks-->", () => `<p class="footl" style="margin:0;opacity:.7;font-size:.8rem;line-height:1.9">${footLinks(lang, ' style="color:inherit"')}</p>`);
   // μετάφραση της εφαρμογής + σωστή ημερομηνία στη γλώσσα της σελίδας
   const dShort = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", weekday: "short", day: "numeric", month: "short" }).format(noon);
