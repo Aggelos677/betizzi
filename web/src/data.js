@@ -66,3 +66,12 @@ export async function getCoupons(env, date) {
   if (!r.ok) return [];
   return (await r.json()) || [];
 }
+
+// «Σερί ομάδων» (06/11): πίνακες ανά κατηγορία από τη μηχανή
+export async function getStreaks(env) {
+  const r = env.ENGINE
+    ? await env.ENGINE.fetch("https://engine/api/streaks")
+    : await fetch("https://betizzi-engine.bettipsters79.workers.dev/api/streaks");
+  if (!r.ok) throw new Error("streaks " + r.status);
+  return await r.json();
+}

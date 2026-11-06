@@ -1702,6 +1702,8 @@ function detailHTML(m){
   }
   h+=bkTable(m);
   if(m.url)h+='<a class="m-url" href="'+esc(m.url)+'"><span>All about this match</span> →</a>';
+  /* απόφαση Owner 06/11: διακριτικό link «για ψαγμένους» (σερί ομάδων) */
+  if(typeof STKURL!=="undefined"&&STKURL)h+='<a class="m-url" style="opacity:.75" href="'+esc(STKURL[0])+'">'+esc(STKURL[1])+' →</a>';
   /* απουσίες & νέα: κρυφά μέχρι να υπάρχουν δεδομένα */
   return h;
 }

@@ -4,8 +4,8 @@ import { analysis, tipWhy } from "./analysis.js";
 import { LANGS, HREFLANG, TZ, LOCALE, T, SEL, UI, UI_ORDER, REC, CONSENT, GA_ID } from "./i18n.js";
 import { TRANSLATOR } from "./translator.js";
 import { ADMIN_HTML } from "./admin-page.js";
-import { getDay, getMatch, getRecord, getCoupons } from "./data.js";
-import { PG, PG_ORDER, OP, PAR } from "./i18n-pages.js";
+import { getDay, getMatch, getRecord, getCoupons, getStreaks } from "./data.js";
+import { PG, PG_ORDER, OP, PAR, STK } from "./i18n-pages.js";
 
 const SITE = "https://betizzi.com";
 // Σειρά λιγκών: πρώτα οι μεγάλες (Top 30), μετά οι υπόλοιπες ανά χώρα.
@@ -178,6 +178,17 @@ const handle = async (req, env, ctx) => {
       const build = () => paroliPage(env, lang).then((b) => { PAGES.set(key, { t: Date.now(), b }); return b; });
       if (hit && age < 60000) return html(hit.b, 200, age21(req, lang));
       if (hit && age < 15 * 60000) { ctx.waitUntil(build().catch(() => {})); return html(hit.b, 200, age21(req, lang)); }
+      try { return html(await build(), 200, age21(req, lang)); }
+      catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
+    }
+    // «Σερί ομάδων» (απόφαση Owner 06/11): σελίδα «για ψαγμένους», ίδια μνήμη με το «Παρολί σήμερα»
+    if (pr && LANGS.includes(pr[1]) && LANGS.some((l) => STK[l].slug === pr[2])) {
+      const lang = pr[1];
+      if (STK[lang].slug !== pr[2]) return Response.redirect(url.origin + stkPath(lang), 301);
+      const key = "stk|" + lang, hit = PAGES.get(key), age = hit ? Date.now() - hit.t : Infinity;
+      const build = () => streaksPage(env, lang).then((b) => { PAGES.set(key, { t: Date.now(), b }); return b; });
+      if (hit && age < 5 * 60000) return html(hit.b, 200, age21(req, lang));
+      if (hit && age < 30 * 60000) { ctx.waitUntil(build().catch(() => {})); return html(hit.b, 200, age21(req, lang)); }
       try { return html(await build(), 200, age21(req, lang)); }
       catch (e) { return html(`<!doctype html><meta charset="utf-8"><p>betizzi — ${esc(e.message)}</p>`, 503); }
     }
@@ -543,7 +554,7 @@ ${matches.length ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
   tpl = tpl.replace('<html lang="en">', `<html lang="${HREFLANG[lang]}">`)
     .replace(/<title>[\s\S]*?<\/title>/, () => head)
     .replace(/var RAW = \[[\s\S]*?\];\n/, () => "var RAW = " + JSON.stringify(raw).replace(/</g, "\\u003c") + ";\n")
-    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav, all: allDays, cnt: dayCnt }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var BZN = " + JSON.stringify(nextC).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";var BZS = " + JSON.stringify(BZS).replace(/</g, "\\u003c") + ";")
+    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav, all: allDays, cnt: dayCnt }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var BZN = " + JSON.stringify(nextC).replace(/</g, "\\u003c") + ";var STKURL = " + JSON.stringify([stkPath(lang), STK[lang].link]).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";var BZS = " + JSON.stringify(BZS).replace(/</g, "\\u003c") + ";")
     .replace('<div class="hscroll" id="mFilter"', () => ssr + `<p class="ssra">${esc(t.short(dLong, matches.length, tipsFree, tipsVip) + (sLine ? " " + sLine : ""))}</p>` + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml)
     .replace("<!--datanote-->", "")
@@ -627,6 +638,7 @@ async function sitemapLang(env, lang) {
   out.push(smUrl(`/${lang}/`, smAlt((l) => `/${l}/`), today));
   out.push(smUrl(`/${lang}/${REC[lang].slug}`, smAlt((l) => `/${l}/${REC[l].slug}`), today));
   out.push(smUrl(parPath(lang), smAlt((l) => parPath(l)), today));
+  out.push(smUrl(stkPath(lang), smAlt((l) => stkPath(l)), today));
   for (const k of PG_ORDER) if (PG[k].body[lang] && PG[k].slug[lang]) {
     const langs = LANGS.filter((l) => PG[k].body[l] && PG[k].slug[l]);
     out.push(`<url><loc>${xmlEsc(SITE + pgPath(k, lang))}</loc>${langs.map((l) => `<xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${xmlEsc(SITE + pgPath(k, l))}"/>`).join("")}<xhtml:link rel="alternate" hreflang="x-default" href="${xmlEsc(SITE + pgPath(k, "en"))}"/></url>`);
@@ -940,7 +952,7 @@ function pgPath(key, lang) {
 }
 const pgLabel = (key, lang) => (PG[key].title[lang] || PG[key].title.en).replace(/\s*·\s*(18\+|for bookmakers)$/, "");
 function footLinks(lang, attr = "") {
-  const a = [`<a href="${parPath(lang)}"${attr}>${esc(PAR[lang].h1)}</a>`, `<a href="/${lang}/${REC[lang].slug}"${attr}>${esc(REC[lang].nav)}</a>`];
+  const a = [`<a href="${parPath(lang)}"${attr}>${esc(PAR[lang].h1)}</a>`, `<a href="${stkPath(lang)}"${attr}>${esc(STK[lang].h1)}</a>`, `<a href="/${lang}/${REC[lang].slug}"${attr}>${esc(REC[lang].nav)}</a>`];
   for (const k of PG_ORDER) a.push(`<a href="${pgPath(k, lang)}"${attr}${PG[k].slug[lang] ? "" : ' hreflang="en"'}>${esc(pgLabel(k, lang))}</a>`);
   return a.join(" · ");
 }
@@ -1007,6 +1019,99 @@ ${md(pg.body[L])}
 const PZ = ["x3-5", "x8-12", "x20-30", "mega", "x100"]; // x100: παλιά (πριν 05/11)
 const PZL = { "x3-5": "3–5", "x8-12": "8–12", "x20-30": "20–30", mega: "30–50", x100: "~100" };
 function parPath(lang) { return `/${lang}/${PAR[lang].slug}`; }
+function stkPath(lang) { return `/${lang}/${STK[lang].slug}`; }
+const SCSS = `
+.chips{display:flex;gap:6px;overflow-x:auto;margin:4px -14px 6px;padding:2px 14px 6px;position:sticky;top:51px;background:var(--bg);z-index:1;scrollbar-width:none}
+.chips a{flex:none;border:1px solid var(--ln);border-radius:999px;padding:8px 12px;text-decoration:none;font-weight:700;font-size:13px;background:var(--c1);min-height:36px}
+.st{scroll-margin-top:110px}.st h2{margin:22px 0 2px}.st .sub{color:var(--mu);font-size:13px;margin:0 0 8px}
+.sl{list-style:none;padding:0;margin:0;background:var(--c1);border:1px solid var(--ln);border-radius:12px;overflow:hidden}
+.sl li{padding:10px 12px;border-top:1px solid var(--ln)}.sl li:first-child{border-top:0}
+.sr{display:grid;grid-template-columns:20px 1fr auto;gap:8px;align-items:center}
+.sr .n{color:var(--mu);font:500 12px "JetBrains Mono",monospace}.sr b{font-weight:700;font-size:15px}.sr small{display:block;color:var(--mu);font-size:12px;margin-top:1px}
+.mt{text-align:right}.mt .bg{display:inline-block;border-radius:8px;padding:3px 8px;font:700 15px "JetBrains Mono",monospace;color:#06120a}.mt em{display:block;font-style:normal;color:var(--mu);font-size:11px;margin-top:2px}
+.run{color:var(--lime);font-size:11px;font-weight:700;margin-left:6px;white-space:nowrap}
+.fm{display:inline-flex;gap:2px;vertical-align:middle;margin-left:6px}.fm i{width:12px;height:5px;border-radius:2px;display:inline-block}.fm .W{background:#3ccf6e}.fm .D{background:#ffb547}.fm .L{background:#ff6b6b}
+.nx{display:flex;align-items:center;gap:8px;margin:8px 0 0 28px;padding:7px 10px;border-radius:10px;background:var(--c2);text-decoration:none;min-height:40px}
+.nx span{flex:1;min-width:0;font-size:13px}.nx span small{color:var(--mu)}.nx span i{font-style:normal;color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
+.nx .od{font:700 13px "JetBrains Mono",monospace;border:1px solid rgba(182,242,58,.5);color:var(--lime);border-radius:8px;padding:3px 7px;white-space:nowrap}
+.soon{color:var(--mu);font-size:13px;margin:18px 0 0}
+`;
+async function streaksPage(env, lang) {
+  const S = STK[lang], t = T[lang], tz = TZ[lang], today = ymdIn(DAYTZ);
+  const data = await getStreaks(env);
+  const [y0, m0, d0] = today.split("-").map(Number), noon = Date.UTC(y0, m0 - 1, d0, 12);
+  const dLong = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(noon);
+  const when = (ts) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(ts * 1000);
+  const KEYS = ["form", "home", "away", "goals", "gg", "over", "under"];
+  // χρώμα κελιού ανάλογα με το ποσοστό (όπως το FootyStats: πιο πράσινο = πιο δυνατό)
+  const shade = (p) => `background:rgba(60,207,110,${(0.35 + 0.65 * Math.max(0, Math.min(1, (p - 0.6) / 0.4))).toFixed(2)})`;
+  const SL = (r) => (r.sel === "1" || r.sel === "2" ? r.sel : SELNAME[r.sel] || r.sel);
+  // ο δείκτης κάθε κατηγορίας, με απλά λόγια (π.χ. «8/10 νίκες», «3.6 γκολ/αγώνα», «6 στη σειρά»)
+  const metric = (k, r) => k === "goals" ? [r.avg.toFixed(1), S.u.g, Math.min(1, (r.avg - 2.6) / 1.4)]
+    : k === "gg" ? [String(r.run), S.u.gg + ` · ${r.c}/${r.n}`, Math.min(1, r.run / 8)]
+    : [`${r.c}/${r.n}`, k === "form" ? S.u.w : k === "home" ? S.u.h : k === "away" ? S.u.a : "", r.c / r.n];
+  // χρώμα: πιο πράσινο = πιο δυνατό (όπως το FootyStats)
+  const shade = (p) => `background:rgba(60,207,110,${(0.4 + 0.6 * Math.max(0, Math.min(1, p))).toFixed(2)})`;
+  const sec = (k) => {
+    const L = (data.cats && data.cats[k]) || [];
+    const rows = L.map((r, i) => {
+      const href = matchPath(lang, { home: { name: r.fixture.home }, away: { name: r.fixture.away }, ts: r.fixture.ts, id: r.fixture.id });
+      const [big, unit, p] = metric(k, r);
+      const run = k !== "gg" && r.run >= 3 ? `<span class="run">🔥 ${r.run} ${esc(S.run)}</span>` : "";
+      const fm = `<span class="fm" aria-label="${esc(r.form)}">${[...r.form].reverse().map((x) => `<i class="${x}"></i>`).join("")}</span>`;
+      return `<li><div class="sr"><span class="n">${i + 1}</span><div><b>${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
+        + `<div class="mt"><span class="bg" style="${shade(k === "goals" || k === "gg" ? p : (p - 0.6) / 0.4)}">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
+        + `<a class="nx" href="${href}"><span><i>${esc(S.nx)}</i><b>${esc(r.fixture.home)} – ${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
+        + (r.price ? `<span class="od">${esc(SL(r))} ${Number(r.price).toFixed(2)}</span>` : "") + `</a></li>`;
+    }).join("");
+    return `<section class="st" id="${k}"><h2>${esc(S.cats[k])}</h2><p class="sub">${esc(S.sub[k])}</p>`
+      + (rows ? `<ul class="sl">${rows}</ul>` : `<p class="note">${esc(S.none)}</p>`) + `</section>`;
+  };
+  const any = KEYS.some((k) => ((data.cats || {})[k] || []).length);
+  const ans = S.ans(dLong, data.teams || 0);
+  const mod = new Date((data.updated || Math.floor(noon / 1000)) * 1000).toISOString();
+  const canonical = SITE + stkPath(lang);
+  const alt = LANGS.map((l) => `<link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE}${stkPath(l)}">`).join("") + `<link rel="alternate" hreflang="x-default" href="${SITE}${stkPath("en")}">`;
+  const langNav = LANGS.map((l) => `<a href="${stkPath(l)}" hreflang="${HREFLANG[l]}"${l === lang ? ' aria-current="page"' : ""}>${l.toUpperCase()}</a>`).join("");
+  const ld = [
+    { "@context": "https://schema.org", "@type": "WebPage", name: S.title, description: S.desc, url: canonical, inLanguage: HREFLANG[lang], dateModified: mod },
+    { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
+      { "@type": "ListItem", position: 1, name: "betizzi", item: `${SITE}/${lang}/` }, { "@type": "ListItem", position: 2, name: S.h1, item: canonical }] },
+  ];
+  return `<!doctype html>
+<html lang="${HREFLANG[lang]}">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(S.title)} | betizzi</title>
+<meta name="description" content="${esc(S.desc)}">
+<link rel="canonical" href="${canonical}">
+${alt}
+${any ? "" : '<meta name="robots" content="noindex,follow">'}
+<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:title" content="${esc(S.title)}">
+<meta property="og:description" content="${esc(ans)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
+<meta property="article:modified_time" content="${mod}"><meta name="theme-color" content="#0c0f0d">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>
+<style>${CSS}${PCSS}${SCSS}</style>
+</head>
+<body>
+<header><a class="logo" href="/${lang}/"><b>bet</b><i>izzi</i></a><nav class="l" aria-label="Language">${langNav}</nav></header>
+<main class="doc">
+<nav class="bc"><a href="/${lang}/">betizzi</a> › ${esc(S.h1)}</nav>
+<h1>${esc(S.h1)}</h1>
+<p class="ans">${esc(ans)}</p>
+<nav class="chips">${KEYS.map((k) => `<a href="#${k}">${esc(S.cats[k])}</a>`).join("")}</nav>
+${KEYS.map(sec).join("")}
+<p class="soon">${esc(S.soon)}</p>
+<p class="how" style="font-size:13px">${esc(S.note)}</p>
+<a class="cta" href="/${lang}/">${esc(S.app)}</a>
+<p class="how" style="font-size:13px;margin-top:18px">${esc(S.upd)}: <time datetime="${mod}">${esc(new Intl.DateTimeFormat(LOCALE[lang], { timeZone: DAYTZ, day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(Date.parse(mod)))}</time></p>
+</main>
+<footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi · ${esc(OP.name)}, ${esc(OP.city)}</p></footer>
+</body>
+</html>`;
+}
 const PCSS = `
 .doc ul.lgl{list-style:none;padding:0;margin:0}.doc ul.lgl li{margin:0;color:inherit}.pz{margin:18px 0 6px}.cp{background:var(--c1);border:1px solid var(--ln);border-radius:12px;margin:0 0 10px;overflow:hidden}
 .cph{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--c2);flex-wrap:wrap}.cph b{font:700 15px "Fira Sans Extra Condensed",sans-serif}
