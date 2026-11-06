@@ -4,6 +4,7 @@
 import { makeStrong, apiStrong, strongKeys } from "./strong.js";
 import { aiStrong } from "./ai.js";
 import { makeCoupons, ensureCoupons, apiCoupons, parlayRecord } from "./coupons.js";
+import { apiStreaks } from "./streaks.js";
 import { authStart, authVerify, authMe, authLogout, authVip, authApp, userFrom } from "./auth.js";
 import { tgPoll, tgJoin, tgExpire, tgPostStrong, tgStatus } from "./tg.js";
 import { hit, isAdmin, aToday, aUsers, aUserAct, aExport, aPartners, aPartnerSave, aHealth, aAudit, aLeagues, aLeagueSave, aMkt } from "./admin.js";
@@ -459,6 +460,7 @@ export default {
       }
       if (u.pathname === "/api/coupons") return json(await apiCoupons(env, u.searchParams.get("date") || ymd(now())));
       if (u.pathname === "/api/record") return json(await apiRecord(env));
+      if (u.pathname === "/api/streaks") return json(await apiStreaks(env, leagueIds)); // 06/11: σελίδα «Σερί ομάδων»
       if (u.pathname === "/api/match") return json(await apiMatch(env, +u.searchParams.get("id")));
       if (u.pathname === "/api/day") {
         // έτοιμο από το cron (κάθε 2΄) → γρήγορη απάντηση· αλλιώς υπολογισμός επί τόπου
