@@ -103,6 +103,24 @@ const handle = async (req, env, ctx) => {
       const r = env.ENGINE ? await env.ENGINE.fetch("https://engine/api/goals") : await fetch("https://betizzi-engine.bettipsters79.workers.dev/api/goals");
       return new Response(r.ok ? await r.text() : "[]", { headers: { "content-type": "application/json", "cache-control": "public, max-age=20" } });
     }
+    // απόφαση Owner 06/11: η αναζήτηση δείχνει και τους αγώνες των επόμενων 3 ημερών (μετά από αυτούς της μέρας που βλέπει)
+    if (p === "/search.json") {
+      const lang = LANGS.includes(url.searchParams.get("lang")) ? url.searchParams.get("lang") : "en";
+      const from = /^\d{4}-\d{2}-\d{2}$/.test(url.searchParams.get("from") || "") ? url.searchParams.get("from") : ymdIn(DAYTZ);
+      const key = "srch|" + lang + "|" + from, hit = PAGES.get(key);
+      if (hit && Date.now() - hit.t < 10 * 60000) return new Response(hit.b, { headers: { "content-type": "application/json", "cache-control": "public, max-age=300" } });
+      const days = [1, 2, 3].map((n) => new Date(Date.parse(from + "T12:00:00Z") + n * 864e5).toISOString().slice(0, 10));
+      const all = await Promise.all(days.map((d) => getDay(env, d).catch(() => null)));
+      const now = Date.now() / 1000, out = [], seen = new Set();
+      for (const d of all) for (const x of (d && d.matches) || []) {
+        if (x.ts < now - 3 * 3600 || seen.has(x.id)) continue; seen.add(x.id);
+        const tp = x.tips.length ? (x.tips.some((t) => t.tier === "vip") ? "vip" : "free") : "";
+        out.push({ id: x.id, ts: x.ts, h: x.home.name, a: x.away.name, lg: x.league.name, c: x.league.country, url: matchPath(lang, x), tip: tp });
+      }
+      out.sort((a, b) => a.ts - b.ts);
+      const b = JSON.stringify(out); PAGES.set(key, { t: Date.now(), b });
+      return new Response(b, { headers: { "content-type": "application/json", "cache-control": "public, max-age=300" } });
+    }
     if (p === "/live.json") {
       const r = env.ENGINE ? await env.ENGINE.fetch("https://engine/api/live") : await fetch("https://betizzi-engine.bettipsters79.workers.dev/api/live");
       return new Response(await r.text(), { headers: { "content-type": "application/json", "cache-control": "public, max-age=20" } });
