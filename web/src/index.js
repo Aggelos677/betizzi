@@ -155,7 +155,8 @@ const handle = async (req, env, ctx) => {
       const dq = url.searchParams.get("d") || "";
       const key = m[1] + (url.searchParams.has("demo") ? "?demo" : "") + (dq ? "|" + dq : "");
       // 2ο επίπεδο (03/11): κοινή cache του Cloudflare, για να μη χτίζεται η σελίδα από την αρχή σε κάθε νέο «αντίγραφο» του worker (αργή πρώτη φόρτωση)
-      const ck = new Request("https://betizzi.com/__page/" + encodeURIComponent(key));
+      // 06/11: η έκδοση της σελίδας (μήκος του template) μπαίνει στο κλειδί, ώστε μετά από κάθε ανέβασμα να μη σερβίρεται η παλιά
+      const ck = new Request("https://betizzi.com/__page/" + encodeURIComponent(key) + "?v=" + (await template(env, url)).length);
       let hit = PAGES.get(key);
       if (!hit) { try { const r = await caches.default.match(ck); if (r) { hit = { t: +r.headers.get("x-t"), b: await r.text() }; PAGES.set(key, hit); } } catch (e) {} }
       const age = hit ? Date.now() - hit.t : Infinity;
