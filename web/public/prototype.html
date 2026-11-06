@@ -90,6 +90,15 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .preset .meta{font-size:.74rem;color:var(--muted)}
 /* compact match list */
 .mlist{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+/* 06/11: η λίστα από τον server (για Google) φαίνεται για λίγο πριν τη φτιάξει η σελίδα (π.χ. «Όλες οι μέρες»): ίδια εμφάνιση με τις κανονικές γραμμές */
+.mlist>.lg h3,.mlist>details.lg summary h3{margin:0;padding:10px 12px;font:800 .82rem var(--f-display,"Fira Sans Extra Condensed"),sans-serif;text-transform:uppercase;letter-spacing:.02em;background:var(--panel-2);display:flex;gap:8px}
+.mlist>.lg h3 small,.mlist>details.lg summary h3 small{margin-left:auto;color:var(--muted);font-weight:600}
+.mlist>.lg ul,.mlist>details.lg ul{list-style:none;margin:0;padding:0}
+.mlist li.m{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:8px 12px;border-top:1px solid var(--line);min-height:52px}
+.mlist li.m .t{display:flex;flex-direction:column;align-items:center;font:600 .8rem var(--f-mono);color:var(--muted)}
+.mlist li.m .teams{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--fg);font-weight:600;font-size:.9rem;min-width:0}
+.mlist li.m .tm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mlist details.lg summary{list-style:none;cursor:pointer}.mlist details.lg summary::-webkit-details-marker{display:none}
 .mlist>:first-child{border-radius:13px 13px 0 0}
 .mlist>:last-child,.mlist>:last-child>summary{border-radius:0 0 13px 13px}
 .dayhead{position:sticky;top:calc(env(safe-area-inset-top,0px) + 61px);z-index:5;background:var(--panel-2);border-bottom:1px solid var(--line);padding:6px 12px;display:flex;justify-content:space-between;font:800 .95rem var(--f-display);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
