@@ -1043,8 +1043,6 @@ async function streaksPage(env, lang) {
   const dLong = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(noon);
   const when = (ts) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(ts * 1000);
   const KEYS = ["form", "home", "away", "goals", "gg", "over", "under"];
-  // χρώμα κελιού ανάλογα με το ποσοστό (όπως το FootyStats: πιο πράσινο = πιο δυνατό)
-  const shade = (p) => `background:rgba(60,207,110,${(0.35 + 0.65 * Math.max(0, Math.min(1, (p - 0.6) / 0.4))).toFixed(2)})`;
   const SL = (r) => (r.sel === "1" || r.sel === "2" ? r.sel : SELNAME[r.sel] || r.sel);
   // ο δείκτης κάθε κατηγορίας, με απλά λόγια (π.χ. «8/10 νίκες», «3.6 γκολ/αγώνα», «6 στη σειρά»)
   const metric = (k, r) => k === "goals" ? [r.avg.toFixed(1), S.u.g, Math.min(1, (r.avg - 2.6) / 1.4)]
@@ -1057,7 +1055,7 @@ async function streaksPage(env, lang) {
     const rows = L.map((r, i) => {
       const href = matchPath(lang, { home: { name: r.fixture.home }, away: { name: r.fixture.away }, ts: r.fixture.ts, id: r.fixture.id });
       const [big, unit, p] = metric(k, r);
-      const run = k !== "gg" && r.run >= 3 ? `<span class="run">🔥 ${r.run} ${esc(S.run)}</span>` : "";
+      const run = k !== "gg" && k !== "goals" && r.run >= 3 ? `<span class="run">🔥 ${r.run} ${esc(S.run)}</span>` : "";
       const fm = `<span class="fm" aria-label="${esc(r.form)}">${[...r.form].reverse().map((x) => `<i class="${x}"></i>`).join("")}</span>`;
       return `<li><div class="sr"><span class="n">${i + 1}</span><div><b>${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg" style="${shade(k === "goals" || k === "gg" ? p : (p - 0.6) / 0.4)}">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
