@@ -536,13 +536,14 @@ ${matches.length ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
   const sLine = LS && t.strongK ? (t.strongK + (BZT ? "" : " (" + dS + ")") + " " + "{list}").replace("{list}", [LS.win, LS.goals].filter(Boolean)
     .map((c) => `${SEL[c.sel] || c.sel} ${c.home} – ${c.away} (${Number(c.price).toFixed(2)})`).concat(LS.treble ? [`${t.treble} x${Number(LS.treble.odds).toFixed(2)}`] : []).join(" · ")) : "";
   const coupons = (day.coupons || []).map((c) => ({ ...c, legs: c.legs.map((l) => ({ ...l, time: l.ts ? hm(l.ts) : "" })) }));
+  const nextC = (day.next_coupons || []).map((c) => ({ ...c, legs: c.legs.map((l) => ({ ...l, time: l.ts ? hm(l.ts) : "" })) })); // 06/11: τα πρώτα παρολί της αύριο
   // και οι μεγάλες λίγκες των επόμενων ημερών, για να μετράνε σωστά «Top»/«Τα πρωταθλήματά μου» στο «Αύριο»
   const top = TOP.map((id) => (groups.get(id) ? groups.get(id).league.country + "|" + groups.get(id).league.name : cTop.get(id))).filter(Boolean);
   let tpl = await template(env, url);
   tpl = tpl.replace('<html lang="en">', `<html lang="${HREFLANG[lang]}">`)
     .replace(/<title>[\s\S]*?<\/title>/, () => head)
     .replace(/var RAW = \[[\s\S]*?\];\n/, () => "var RAW = " + JSON.stringify(raw).replace(/</g, "\\u003c") + ";\n")
-    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav, all: allDays, cnt: dayCnt }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";var BZS = " + JSON.stringify(BZS).replace(/</g, "\\u003c") + ";")
+    .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav, all: allDays, cnt: dayCnt }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var BZN = " + JSON.stringify(nextC).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";var BZS = " + JSON.stringify(BZS).replace(/</g, "\\u003c") + ";")
     .replace('<div class="hscroll" id="mFilter"', () => ssr + `<p class="ssra">${esc(t.short(dLong, matches.length, tipsFree, tipsVip) + (sLine ? " " + sLine : ""))}</p>` + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml)
     .replace("<!--datanote-->", "")

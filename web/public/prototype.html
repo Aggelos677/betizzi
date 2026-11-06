@@ -937,6 +937,7 @@ header{position:relative}
     <div id="opParlays">
       <div class="ztabs" id="zTabs" role="group" aria-label="Total odds"></div>
       <div id="zMain" style="display:flex;flex-direction:column;gap:12px"></div>
+      <div id="zTmr" style="display:flex;flex-direction:column;gap:12px;margin-top:14px" hidden></div>
       <h3 class="opalt-h" id="zAltH" hidden><span>Not your style? Other</span> <span id="zAltK"></span></h3>
       <div class="opalts" id="zAlts"></div>
     </div>
@@ -2164,6 +2165,13 @@ function renderPicks(){
       return '<h3 class="zsec" id="zsec-'+esc(z)+'">'+esc(z.replace("-","–"))+' <small>'+lz.length+'</small></h3>'+lz.map(function(c){return parlayHTML(c,true);}).join("");}).join("")+plEndH;
     Array.prototype.forEach.call($("zTabs").querySelectorAll("[data-z]"),function(b){b.setAttribute("aria-pressed","false");});}
   else $("zMain").innerHTML=(main?inZ.map(function(c){return parlayHTML(c,true);}).join(""):plEnded.length?'<div class="opempty"><b>'+(typeof DAYNAV!=="undefined"&&DAYNAV.date&&DAYNAV.today&&DAYNAV.date!==DAYNAV.today?'This day\'s parlays are settled':'Today\'s parlays are settled')+'</b><span>See them below. New ones every morning.</span></div>':'<div class="opempty"><b>Today\'s parlays are coming</b><span>We make them every morning from our tips.</span></div>')+plEndH;
+  /* απόφαση Owner 06/11: όταν τελειώσουν τα σημερινά, βγαίνουν νωρίτερα τα πρώτα παρολί της αύριο· φαίνονται εδώ με link στη σελίδα της αύριο */
+  (function(){var bx=$("zTmr");if(!bx)return;var N=(typeof BZN!=="undefined"&&BZN)||[],isT=typeof DAYNAV==="undefined"||!DAYNAV.date||DAYNAV.date===DAYNAV.today;
+    if(!N.length||!isT){bx.hidden=true;bx.innerHTML="";return;}
+    var td=typeof DAYNAV!=="undefined"&&DAYNAV.today?DAYNAV.today:"",tm=td?new Date(Date.parse(td+"T12:00:00Z")+864e5).toISOString().slice(0,10):"";
+    bx.hidden=false;bx.innerHTML='<h3 class="zsec"><span>Tomorrow</span> <small>'+N.length+'</small></h3>'
+      +N.map(function(c){return parlayHTML(c,true).replace(/<button type="button" class="pc-sh"[^>]*>↗<\/button>/,'');}).join("")
+      +(tm?'<a class="m-url" href="?d='+tm+'"><span>See tomorrow\'s matches and parlays</span> →</a>':'');})();
   var opts=main?[main].concat(alts):[];
   opts=[];$("zAltH").hidden=true;$("zAltK").textContent=opZone.replace("-","–")+" · "+opts.length;
   $("zAlts").innerHTML=opts.length<2?"":opts.map(function(c,i){return '<button type="button" class="opalt" data-alt="'+i+'" aria-pressed="'+((opAlt||0)===i)+'"><b><span>'+esc(BZC_VAR[c.variant]||c.variant)+'</span></b><small>'+(c.style?'<span>'+esc(STY[c.style]||c.style)+'</span> · ':'')+c.legs.length+' <span>picks</span></small><em>x'+fx2(c.odds)+'</em></button>';}).join("");
