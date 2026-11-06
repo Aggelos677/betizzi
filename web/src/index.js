@@ -1024,15 +1024,15 @@ const SCSS = `
 .chips{display:flex;gap:6px;overflow-x:auto;margin:4px -14px 6px;padding:2px 14px 6px;position:sticky;top:51px;background:var(--bg);z-index:1;scrollbar-width:none}
 .chips a{flex:none;border:1px solid var(--ln);border-radius:999px;padding:8px 12px;text-decoration:none;font-weight:700;font-size:13px;background:var(--c1);min-height:36px}
 .st{scroll-margin-top:110px}.st h2{margin:22px 0 2px}.st .sub{color:var(--mu);font-size:13px;margin:0 0 8px}
-.sl{list-style:none;padding:0;margin:0;background:var(--c1);border:1px solid var(--ln);border-radius:12px;overflow:hidden}
-.sl li{padding:10px 12px;border-top:1px solid var(--ln)}.sl li:first-child{border-top:0}
+.doc ul.sl{list-style:none;padding:0;margin:0;background:var(--c1);border:1px solid var(--ln);border-radius:12px;overflow:hidden}
+.doc ul.sl li{padding:10px 12px;margin:0;border-top:1px solid var(--ln);color:inherit;list-style:none}.doc ul.sl li::before,.doc ul.sl li::marker{content:none}.sl li:first-child{border-top:0}
 .sr{display:grid;grid-template-columns:20px 1fr auto;gap:8px;align-items:center}
 .sr .n{color:var(--mu);font:500 12px "JetBrains Mono",monospace}.sr b{font-weight:700;font-size:15px}.sr small{display:block;color:var(--mu);font-size:12px;margin-top:1px}
 .mt{text-align:right}.mt .bg{display:inline-block;border-radius:8px;padding:3px 8px;font:700 15px "JetBrains Mono",monospace;color:#06120a}.mt em{display:block;font-style:normal;color:var(--mu);font-size:11px;margin-top:2px}
 .run{color:var(--lime);font-size:11px;font-weight:700;margin-left:6px;white-space:nowrap}
 .fm{display:inline-flex;gap:2px;vertical-align:middle;margin-left:6px}.fm i{width:12px;height:5px;border-radius:2px;display:inline-block}.fm .W{background:#3ccf6e}.fm .D{background:#ffb547}.fm .L{background:#ff6b6b}
-.nx{display:flex;align-items:center;gap:8px;margin:8px 0 0 28px;padding:7px 10px;border-radius:10px;background:var(--c2);text-decoration:none;min-height:40px}
-.nx span{flex:1;min-width:0;font-size:13px}.nx span small{color:var(--mu)}.nx span i{font-style:normal;color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
+.nx{display:flex;align-items:center;gap:8px;margin:8px 0 0;padding:7px 10px;border-radius:10px;background:var(--c2);text-decoration:none;min-height:40px}
+.nx>span:first-child{flex:1;min-width:0;font-size:13px;line-height:1.35}.nx>span:first-child b{font-weight:700}.nx span small{color:var(--mu)}.nx i{display:block;font-style:normal;color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
 .nx .od{font:700 13px "JetBrains Mono",monospace;border:1px solid rgba(182,242,58,.5);color:var(--lime);border-radius:8px;padding:3px 7px;white-space:nowrap}
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
 `;
@@ -1060,7 +1060,7 @@ async function streaksPage(env, lang) {
       return `<li><div class="sr"><span class="n">${i + 1}</span><div><b>${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg" style="${shade(k === "goals" || k === "gg" ? p : (p - 0.6) / 0.4)}">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
         + `<a class="nx" href="${href}"><span><i>${esc(S.nx)}</i><b>${esc(r.fixture.home)} – ${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
-        + (r.price ? `<span class="od">${esc(SL(r))} ${Number(r.price).toFixed(2)}</span>` : "") + `</a></li>`;
+        + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `</a></li>`;
     }).join("");
     return `<section class="st" id="${k}"><h2>${esc(S.cats[k])}</h2><p class="sub">${esc(S.sub[k])}</p>`
       + (rows ? `<ul class="sl">${rows}</ul>` : `<p class="note">${esc(S.none)}</p>`) + `</section>`;
