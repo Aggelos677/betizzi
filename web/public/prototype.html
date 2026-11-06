@@ -1762,7 +1762,7 @@ function renderMatches2(){
   var i=0;
   function chunk(limit){var h="",n=0;while(i<blocks.length&&(n<limit||!n)){h+='<div class="lgb">'+blocks[i].h+'</div>';n+=blocks[i].n;i++;}return h;}
   /* απόφαση Owner 02/11 + 04/11: ο επισκέπτης βλέπει έτοιμες τις 50 βασικές λίγκες· για δικές του → εγγραφή */
-  var myh=lFil==="mine"&&!favF&&!ACC?'<button type="button" class="myl-hint" id="mylHint">⭐ <span>These are the 50 main leagues.</span> <b><span>Sign up free to build your own</span> →</b></button>':'';
+  var myh=!q&&lFil==="mine"&&!favF&&!ACC?'<button type="button" class="myl-hint" id="mylHint">⭐ <span>These are the 50 main leagues.</span> <b><span>Sign up free to build your own</span> →</b></button>':'';
   box.innerHTML=myh+chunk(60);bindMatchList();var mh=$("mylHint");if(mh)mh.addEventListener("click",function(){toast("Sign up free to pick your own leagues");openAuth();});
   (function more(){if(job!==RJOB||i>=blocks.length)return;setTimeout(function(){if(job!==RJOB)return;box.insertAdjacentHTML("beforeend",chunk(120));bindMatchList();more();},16);})();
 }
