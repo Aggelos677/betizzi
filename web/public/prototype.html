@@ -2386,7 +2386,8 @@ $("buildBtn").addEventListener("click",function(){build();$("result").scrollInto
 
 /* ---------- Τελευταία γκολ (δεξιά στους Αγώνες, απόφαση Owner 02/11): όλα τα γκολ, όχι μόνο όσα μας βολεύουν.
    Όταν ένα γκολ κλείνει tip μας (Over / GG), πράσινο + μικρό πανηγύρι ---------- */
-var sideView=load("ko-sv","goals");if(sideView!=="goals"&&sideView!=="mylive")sideView="goals";var _sv0,GOALS=[],GSEEN=null;
+/* απόφαση Owner 06/11: πάντα ξεκινάει στα «Τελευταία γκολ» (να φαίνεται ότι έχουμε live)· τα «Τα παιχνίδια μου live» είναι συνήθως άδεια */
+var sideView="goals";var _sv0,GOALS=[],GSEEN=null;
 function renderSideView(){Array.prototype.forEach.call(document.querySelectorAll("[data-sv]"),function(b){b.setAttribute("aria-pressed",b.dataset.sv===sideView?"true":"false");});
   if($("goalsSide"))$("goalsSide").hidden=sideView!=="goals";if($("myLiveSide"))$("myLiveSide").hidden=sideView!=="mylive";renderMyLive();}
 /* δεξιά: οι αγώνες από τα κουπόνια μου (ανοιχτά) — πρώτα όσοι παίζονται τώρα, μετά όσοι έρχονται */
@@ -2407,7 +2408,7 @@ function renderMyLive(){var box=$("myLiveSide");if(!box)return;var seen={},rows=
   if(!rows.length){box.innerHTML='<div class="gl-empty"><span>Play a slip, take one of our parlays or tap ☆ on a match, and your games show here live.</span></div>';return;}
   box.innerHTML=(live.length?live.map(function(r){return row(r,true);}).join(""):'<div class="gl-empty"><span>None of your games is live right now.</span></div>')
     +(next.length?'<small class="gl-next">'+'<span>Coming up</span></small>'+next.slice(0,5).map(function(r){return row(r,false);}).join(""):"");}
-document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-sv]");if(!b)return;sideView=b.dataset.sv;store("ko-sv",sideView);renderSideView();});
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-sv]");if(!b)return;sideView=b.dataset.sv;renderSideView();});
 function goalLands(g){var out=[];(g.tips||[]).forEach(function(tp){var s=tp[0],tot=g.gh+g.ga;
   if(s==="O25"&&tot===3)out.push("Over 2.5");if(s==="O15"&&tot===2)out.push("Over 1.5");if(s==="GG"&&g.gh>0&&g.ga>0&&(g.side==="h"?g.ga>0&&g.gh===1:g.side==="a"?g.gh>0&&g.ga===1:true))out.push("GG");});return out;}
 function renderGoals(){var box=$("goalsSide");if(!box)return;
