@@ -25,9 +25,16 @@ const STYLE = {
   fav: { wins: [1.40, 1.65], goals: [1.50, 1.75], other: [1.45, 1.75] },
 };
 const LEVEL = { A: 2, B: 1, C: 0 };
+// Απόφαση Owner 06/11: η σελίδα έχει ΠΑΝΤΑ τουλάχιστον τόσα ενεργά (μη κριμένα) παρολί: Δευ–Πεμ 1 · Παρ 2 · Σάβ/Κυρ 3.
+// Αν δεν βγαίνουν από τους αγώνες της ημέρας, βγαίνουν νωρίτερα τα παρολί της επόμενης μέρας (μέρος του κανονικού της σετ).
+const MIN_ACTIVE = [3, 1, 1, 1, 1, 2, 3]; // Κυρ, Δευ … Σάβ
+const minFor = (d) => MIN_ACTIVE[new Date(d + "T12:00:00Z").getUTCDay()];
+const athDate = (t) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens" }).format(t * 1000);
+const addDay = (d, n = 1) => new Date(Date.parse(d + "T12:00:00Z") + n * 86400000).toISOString().slice(0, 10);
+const activeOf = async (env, d) => (await apiCoupons(env, d)).filter((c) => c.style && c.result == null).length;
 const typeOf = (sel) => (WINS.has(sel) ? "wins" : GOALS.has(sel) ? "goals" : "other");
 
-export async function makeCoupons(env, date = ymd(now()), dry = false) {
+export async function makeCoupons(env, date = ymd(now()), dry = false, limit = Infinity) {
   await env.DB.prepare(`CREATE TABLE IF NOT EXISTS coupons(date TEXT, n INTEGER, kind TEXT, variant TEXT, legs TEXT, odds REAL, prob REAL,
     created_at INTEGER, model_version TEXT, hash TEXT, PRIMARY KEY(date, n))`).run();
   for (const col of ["style TEXT", "pick INTEGER", "slot TEXT"]) { try { await env.DB.prepare("ALTER TABLE coupons ADD COLUMN " + col).run(); } catch (e) { /* υπάρχει */ } }
@@ -84,7 +91,7 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
   const out = [];
   // μία θέση: ζώνη + είδος + ώρα. Πρώτα Ισορροπημένο, αν δεν βγαίνει Φαβορί.
   const make = (zone, lo, hi, variant, win) => {
-    const slot = `${zone}|${variant}|${win}`; if (have.has(slot)) return;
+    const slot = `${zone}|${variant}|${win}`; if (have.has(slot) || out.length >= limit) return;
     const free = tips.filter((t) => !usedFx.has(t.f));
     for (const style of ["bal", "fav"]) {
       const c = win === "day" ? (build(lo, hi, variant, style, free.filter((t) => t.late)) || build(lo, hi, variant, style, free))
@@ -100,7 +107,7 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
   // Μεγάλο παρολί (30–50, πριν ~x100): ένα τη μέρα (κυρίως βραδινοί)· Σάβ–Κυρ ένα έως τις 17:00 και ένα μετά.
   // Ό,τι περισσεύει + έως τις ΜΙΣΕΣ επιλογές από τα πιο δυνατά tips που μπήκαν ήδη σε άλλα παρολί.
   for (const w of wins) {
-    const [z, lo, hi] = CRAZY, slot = `${z}|mix|${w}`; if (have.has(slot)) continue;
+    const [z, lo, hi] = CRAZY, slot = `${z}|mix|${w}`; if (have.has(slot) || out.length >= limit) continue;
     const ok = (t) => w === "day" || inWin(t, w);
     const rest = tips.filter((t) => !usedFx.has(t.f) && ok(t)), reused = tips.filter((t) => usedFx.has(t.f) && ok(t));
     const sortP = (a) => a.sort((x, y) => (w === "day" ? y.late - x.late : 0) || (y.q - x.q));
@@ -112,21 +119,20 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
     }
     if (c) { c.legs.forEach((l) => usedFx.add(l.f)); have.add(slot); out.push({ kind: z, variant: "mix", style: "bal", slot, ...c }); }
   }
-  // Απόφαση Owner 04/11: καθημερινές, αν τα παρολί της ημέρας χάθηκαν νωρίς («ζει» το πολύ 1), ΜΙΑ φορά τη μέρα 2–3 νέα μικρά (x3–5)
-  // από tips που δεν μπήκαν σε άλλο παρολί, με αγώνες που δεν έχουν αρχίσει. Μετράνε στο record κανονικά (slot «…|extraN»).
-  if (!weekend && !prev.some((r) => /\|extra/.test(r.slot || "")) && hAth(now()) < 20) {
+  // Απόφαση Owner 06/11 (αντικαθιστά το «2–3 νέα μικρά» της 04/11): αν τα ενεργά της ΣΗΜΕΡΙΝΗΣ μέρας είναι λιγότερα από το
+  // ελάχιστο (Δευ–Πεμ 1 · Παρ 2 · Σάβ/Κυρ 3), νέα x3–5 (μετά x8–12) από tips που δεν μπήκαν αλλού, με αγώνες που δεν άρχισαν.
+  // Μετράνε στο record κανονικά (slot «…|extraN», σήμα «🆕 Νέο»).
+  if (date === athDate(now())) {
     const cur = (await apiCoupons(env, date)).filter((c) => c.style);
-    const lost = cur.filter((c) => c.result === 0).length, alive = cur.filter((c) => c.result == null).length + out.length;
-    if (lost >= 1 && alive <= 1) {
-      const [z, lo, hi] = ZONES[0], ex = [];
-      for (const v of ["mix", "goals", "wins", "mix", "goals"]) {
-        if (ex.length >= 3) break;
-        const free = tips.filter((t) => !usedFx.has(t.f) && !ex.some((e) => e.legs.some((l) => l.f === t.f)));
-        let c = null, sty = null;
-        for (const s2 of ["bal", "fav"]) { c = build(lo, hi, v, s2, free); if (c) { sty = s2; break; } }
-        if (c) ex.push({ kind: z, variant: v, style: sty, slot: `${z}|${v}|extra${ex.length + 1}`, ...c });
-      }
-      if (ex.length >= 2) for (const c of ex) { c.legs.forEach((l) => usedFx.add(l.f)); have.add(c.slot); out.push(c); }
+    let need = Math.min(limit - out.length, minFor(date) - cur.filter((c) => c.result == null).length - out.length);
+    let k = prev.filter((r) => /\|extra/.test(r.slot || "")).length;
+    for (const [z, lo, hi] of [ZONES[0], ZONES[0], ZONES[0], ZONES[1], ZONES[1]]) {
+      if (need <= 0) break;
+      const free = tips.filter((t) => !usedFx.has(t.f));
+      let c = null;
+      for (const v of ["mix", "goals", "wins"]) { for (const s2 of ["bal", "fav"]) { c = build(lo, hi, v, s2, free); if (c) { c = { kind: z, variant: v, style: s2, ...c }; break; } } if (c) break; }
+      if (!c) continue;
+      c.slot = `${z}|${c.variant}|extra${++k}`; c.legs.forEach((l) => usedFx.add(l.f)); have.add(c.slot); out.push(c); need--;
     }
   }
   if (dry) return { date, dry: true, weekend, tips: tips.length, had: [...have].length - out.length, made: out.map((c) => ({ slot: c.slot, style: c.style, odds: c.odds, prob: Math.round(c.prob * 1000) / 10, value: Math.round(c.value * 100) / 100, legs: c.legs.map((l) => l.sel + "@" + l.price + "(" + l.src + ")") })) };
@@ -140,6 +146,19 @@ export async function makeCoupons(env, date = ymd(now()), dry = false) {
   }
   if (st.length) await env.DB.batch(st);
   return { date, made: out.map((c) => `${c.slot} ${c.style} ${c.legs.length} legs x${c.odds}`) };
+}
+
+// Κάθε 10΄, όλο το 24ωρο (απόφαση Owner 06/11): κρατά το ελάχιστο ενεργών παρολί.
+// 1) λείπουν σήμερα → από τους αγώνες της ημέρας (μόνο όσα λείπουν, όχι όλο το σετ)· 2) δεν φτάνουν → τα πρώτα της αύριο.
+export async function ensureCoupons(env) {
+  const today = athDate(now()), tmr = addDay(today), res = {};
+  let a = await activeOf(env, today);
+  if (a < minFor(today)) { res.today = await makeCoupons(env, today, false, minFor(today) - a); a = await activeOf(env, today); }
+  if (a < minFor(today)) {
+    const need = minFor(tmr) - await activeOf(env, tmr);
+    if (need > 0) res.tomorrow = await makeCoupons(env, tmr, false, need);
+  }
+  return { today, active: a, min: minFor(today), ...res };
 }
 
 async function sha256(s) {

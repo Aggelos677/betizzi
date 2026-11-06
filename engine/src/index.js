@@ -3,7 +3,7 @@
 // και τα γράφει στη βάση betizzi-db. Η σελίδα διαβάζει ΜΟΝΟ από τη βάση (/api/...).
 import { makeStrong, apiStrong, strongKeys } from "./strong.js";
 import { aiStrong } from "./ai.js";
-import { makeCoupons, apiCoupons, parlayRecord } from "./coupons.js";
+import { makeCoupons, ensureCoupons, apiCoupons, parlayRecord } from "./coupons.js";
 import { authStart, authVerify, authMe, authLogout, authVip, authApp, userFrom } from "./auth.js";
 import { tgPoll, tgJoin, tgExpire, tgPostStrong, tgStatus } from "./tg.js";
 import { hit, isAdmin, aToday, aUsers, aUserAct, aExport, aPartners, aPartnerSave, aHealth, aAudit, aLeagues, aLeagueSave, aMkt } from "./admin.js";
@@ -270,7 +270,7 @@ async function apiDay(env, date) {
       f[side + "_gg"] = list.length ? list.filter((r) => r.gf > 0 && r.ga > 0).length / list.length : null;
     }
   }
-  return { date, fixtures: fx.results, tips: out, coupons: await apiCoupons(env, date), strong: await apiStrong(env, date).catch(() => null) };
+  return { date, fixtures: fx.results, tips: out, coupons: await apiCoupons(env, date), next_coupons: (await apiCoupons(env, new Date(Date.parse(date + "T12:00:00Z") + 86400000).toISOString().slice(0, 10))).filter((c) => c.style && c.result == null), strong: await apiStrong(env, date).catch(() => null) };
 }
 
 // Ένας αγώνας: στοιχεία, tips (VIP κρυφό ως τη σέντρα), αποδόσεις, φόρμα 10 αγώνων, πιθανότητες και πιθανό σκορ.
@@ -476,7 +476,7 @@ export default {
           return json({ key_tail: String(env.APIF_KEY || "").slice(-4), plan: j.response?.subscription?.plan, account: j.response?.account?.firstname,
             today: j.response?.requests, per_min_limit: r.headers.get("x-ratelimit-limit"), per_min_left: r.headers.get("x-ratelimit-remaining"), errors: j.errors });
         }
-        const jobs = { tg_status: tgStatus, tg_poll: tgPoll, tg_post: tgPostStrong, ai_strong: (e) => aiStrong(e, new Date().toISOString().slice(0, 10)), strong: makeStrong, strong_force: (e) => makeStrong(e, undefined, true), coupons: makeCoupons, coupons_dry: (e) => makeCoupons(e, undefined, true), cache: cacheDays, seed: seedLeagues, fixtures: syncFixtures, form: syncForm, odds: syncOdds, live: syncLive, tips: runTips };
+        const jobs = { tg_status: tgStatus, tg_poll: tgPoll, tg_post: tgPostStrong, ai_strong: (e) => aiStrong(e, new Date().toISOString().slice(0, 10)), strong: makeStrong, strong_force: (e) => makeStrong(e, undefined, true), coupons: makeCoupons, coupons_min: ensureCoupons, coupons_dry: (e) => makeCoupons(e, undefined, true), cache: cacheDays, seed: seedLeagues, fixtures: syncFixtures, form: syncForm, odds: syncOdds, live: syncLive, tips: runTips };
         if (!jobs[job]) return json({ error: "unknown job", jobs: Object.keys(jobs) }, 400);
         return json({ job, result: await jobs[job](env) });
       }
@@ -501,6 +501,7 @@ export default {
     if (m % 2 === 0) tasks.push(cacheDays(env));
     if (h === 6 && m === 50) tasks.push(makeCoupons(env)); // μετά τα tips των 06:40 UTC
     if (h >= 7 && h < 21 && m % 10 === 5) tasks.push(makeCoupons(env)); // συμπληρώνει όσα παρολί λείπουν (νέα tips)
+    if (m % 10 === 8) tasks.push(ensureCoupons(env)); // 06/11: πάντα το ελάχιστο ενεργών παρολί (αλλιώς τα πρώτα της αύριο)
     if (h >= 5 && h < 14 && m % 5 === 0) tasks.push(makeStrong(env)); // 05/11: η ίδια περιμένει την ώρα του (releaseMin)
     if (env.TG_BOT_TOKEN) {
       tasks.push(tgPoll(env)); // Telegram: νέα μέλη / κανάλια (1 κλήση/λεπτό στο Telegram, όχι στο API-Football)
