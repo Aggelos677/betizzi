@@ -2,12 +2,11 @@
 // Συμπλήρωμα του i18n.js: όλα τα κείμενα σελίδων ζουν ΜΟΝΟ εδώ. Όλα «προς έλεγχο» από ντόπιους.
 // Μορφή σώματος: "## τίτλος", "- λίστα", κενή γραμμή = νέα παράγραφος, **έντονα**, [κείμενο](link).
 // ΠΡΟΣΟΧΗ: μην γράφεις «18+» μέσα σε πρόταση· σε σελίδες 21+ αλλάζει αυτόματα σε «21+».
-// Όροι/Απόρρητο/Cookies: προς το παρόν EN + EL. Οι άλλες γλώσσες δείχνουν στα αγγλικά.
 
-export const OP = { name: "Christos Menelaou", city: "Paphos, Cyprus", hello: "hello@betizzi.com", partners: "marketing@betizzi.com", privacy: "privacy@betizzi.com", updated: "2026-11-03" };
+export const OP = { name: "Christos Menelaou", city: "Paphos, Cyprus", addr: "Annis Komninis 2, 8010 Paphos, Cyprus", legal: "admin@betizzi.com", hello: "hello@betizzi.com", partners: "marketing@betizzi.com", privacy: "privacy@betizzi.com", updated: "2026-11-03" };
 
-export const PG_ORDER = ["about", "contact", "responsible", "affiliate", "partners", "terms", "privacy", "cookies"];
-export const PG_FULL = ["terms", "privacy", "cookies"]; // μόνο EN + EL
+// 07/11: + «Πώς δουλεύουμε» (how) και Impressum/Νομικά στοιχεία (impressum, ΠΑΝΤΑ τελευταίο στο footer). Όροι/Απόρρητο/Cookies σε όλες τις γλώσσες.
+export const PG_ORDER = ["about", "how", "contact", "responsible", "affiliate", "partners", "terms", "privacy", "cookies", "impressum"];
 
 export const PG = {
   about: {
@@ -810,6 +809,997 @@ If we ever add advertising cookies, we will update this page and ask for your co
     },
   },
 };
+
+// ---------- 07/11/2026 (απόφαση Owner): «Πώς δουλεύουμε» + FAQ και Impressum / Νομικά στοιχεία ----------
+// {REC} = σελίδα Record, {CONTACT} = σελίδα Επικοινωνίας (αντικαθίστανται στη σελίδα). Όλα «προς έλεγχο» από ντόπιους.
+// Impressum: ΜΟΝΟ στο footer, τελευταίο link (απόφαση Owner 07/11: όχι σε εμφανές σημείο). Η διεύθυνση εμφανίζεται ΜΟΝΟ εδώ.
+PG.how = {
+  slug: { en: "how-we-work", el: "pos-doulevoume", es: "como-trabajamos", pt: "como-trabalhamos", fr: "comment-ca-marche", de: "so-arbeiten-wir", ro: "cum-lucram", sr: "kako-radimo", bg: "kak-rabotim" },
+  title: { en: "How we work", el: "Πώς δουλεύουμε", es: "Cómo trabajamos", pt: "Como trabalhamos", fr: "Comment ça marche", de: "So arbeiten wir", ro: "Cum lucrăm", sr: "Kako radimo", bg: "Как работим" },
+  desc: {
+    en: "How betizzi picks football tips: recent form of both teams, prices from several bookmakers, ready-made parlays and a public record of every tip. No promise of winnings.",
+    el: "Πώς βγάζει tips το betizzi: πρόσφατη φόρμα και των δύο ομάδων, αποδόσεις από πολλούς bookmakers, έτοιμα παρολί και δημόσιο ιστορικό κάθε tip. Χωρίς υποσχέσεις για κέρδη.",
+    es: "Cómo elige betizzi sus pronósticos: forma reciente de ambos equipos, cuotas de varias casas, combinadas listas y un historial público de cada tip. Sin promesas de ganancias.",
+    pt: "Como o betizzi escolhe os palpites: forma recente das duas equipas, odds de várias casas, múltiplas prontas e um histórico público de cada palpite. Sem promessas de ganhos.",
+    fr: "Comment betizzi choisit ses pronos : forme récente des deux équipes, cotes de plusieurs bookmakers, combinés prêts et un historique public de chaque tip. Aucune promesse de gain.",
+    de: "Wie betizzi Fußball-Tipps auswählt: aktuelle Form beider Teams, Quoten mehrerer Buchmacher, fertige Kombis und eine öffentliche Bilanz jedes Tipps. Kein Gewinnversprechen.",
+    ro: "Cum alege betizzi ponturile: forma recentă a ambelor echipe, cote de la mai multe case, bilete gata făcute și un istoric public al fiecărui pont. Fără promisiuni de câștig.",
+    sr: "Kako betizzi bira tipove: skorašnja forma oba tima, kvote više kladionica, gotovi tiketi i javna istorija svakog tipa. Bez obećanja dobitka.",
+    bg: "Как betizzi избира прогнозите си: скорошна форма на двата отбора, коефициенти от няколко букмейкъра, готови фишове и публична история на всяка прогноза. Без обещания за печалба.",
+  },
+  body: {
+    en: `betizzi gives free football tips from simple rules based on data. We look at the recent games of both teams and publish a tip only when a clear pattern repeats. Every tip is published before kick-off with its price, is never edited or deleted, and counts in our public record.
+
+## How a tip is chosen
+- **Goals (Over/Under, GG/NG):** the pattern must have happened in most of the two teams' recent games — usually 7 or more out of 10.
+- **Win (1 or 2):** the team has collected clearly more points than its opponent in recent games. We do not back a team when its opponent is a clear favourite.
+- **Draw:** rarely, only when draws keep repeating.
+- Injuries, news and market moves are not part of the decision.
+
+## Free and VIP
+- Free tips are open to everyone.
+- VIP tips are our strongest. They open with a free sign-up (a code by email, no password), and for everyone 10 minutes after kick-off.
+- Inside our ready-made parlays, VIP picks are open to everyone.
+
+## The price
+- Every tip shows the price when we published it and the lowest price we still recommend.
+- We compare prices from several bookmakers and show where the price is best. If the price drops below our limit, the tip stays and we show the new price.
+
+## Ready-made parlays
+- Every day: parlays around x3–5, x8–12 and x20–30, and a big parlay of the day (x30–50). They use only our own tips.
+- They come out in the morning and new ones are added during the day. A published parlay never changes.
+- Big parlays win rarely.
+
+## Public record
+Every tip since 2 November 2026 is counted, wins and losses. Nothing is deleted. See the [record]({REC}).
+
+## What we don't do
+- We don't promise winnings and never call a tip "sure".
+- We are not a bookmaker and we don't accept bets.
+- Bet only what you can afford to lose.`,
+    el: `Το betizzi δίνει δωρεάν tips ποδοσφαίρου με απλούς κανόνες από δεδομένα. Κοιτάμε τα πρόσφατα παιχνίδια και των δύο ομάδων και βγάζουμε tip μόνο όταν ένα μοτίβο επαναλαμβάνεται καθαρά. Κάθε tip δημοσιεύεται πριν από τη σέντρα με την απόδοσή του, δεν αλλάζει, δεν σβήνεται και μετράει στο δημόσιο ιστορικό μας.
+
+## Πώς βγαίνει ένα tip
+- **Γκολ (Over/Under, GG/NG):** το μοτίβο πρέπει να έχει συμβεί στα περισσότερα πρόσφατα παιχνίδια των δύο ομάδων, συνήθως σε 7 ή περισσότερα από τα 10.
+- **Νίκη (1 ή 2):** η ομάδα έχει μαζέψει καθαρά περισσότερους βαθμούς από τον αντίπαλο στα τελευταία παιχνίδια. Δεν προτείνουμε ομάδα όταν ο αντίπαλος είναι καθαρό φαβορί.
+- **Ισοπαλία:** σπάνια, μόνο όταν οι ισοπαλίες επαναλαμβάνονται.
+- Οι απουσίες, τα νέα και οι κινήσεις της αγοράς δεν παίζουν ρόλο στην απόφαση.
+
+## Free και VIP
+- Τα Free tips είναι ανοιχτά για όλους.
+- Τα VIP είναι τα πιο δυνατά μας. Ανοίγουν με δωρεάν εγγραφή (κωδικός στο email, χωρίς password) και για όλους 10 λεπτά μετά τη σέντρα.
+- Μέσα στα έτοιμα παρολί μας, οι VIP επιλογές είναι ανοιχτές για όλους.
+
+## Η απόδοση
+- Κάθε tip δείχνει την απόδοση τη στιγμή που δημοσιεύτηκε και τη χαμηλότερη απόδοση που ακόμα προτείνουμε.
+- Συγκρίνουμε αποδόσεις από πολλούς bookmakers και δείχνουμε πού είναι η καλύτερη. Αν η απόδοση πέσει κάτω από το όριό μας, το tip μένει και δείχνουμε τη νέα απόδοση.
+
+## Έτοιμα παρολί
+- Κάθε μέρα: παρολί γύρω στο x3–5, x8–12 και x20–30, και ένα μεγάλο παρολί της ημέρας (x30–50). Μόνο από τα δικά μας tips.
+- Βγαίνουν το πρωί και μέσα στη μέρα προστίθενται νέα. Ένα παρολί που δημοσιεύτηκε δεν αλλάζει.
+- Τα μεγάλα παρολί κερδίζουν σπάνια.
+
+## Δημόσιο ιστορικό
+Μετράμε κάθε tip από τις 2 Νοεμβρίου 2026, νίκες και ήττες. Δεν σβήνεται τίποτα. Δες το [ιστορικό]({REC}).
+
+## Τι δεν κάνουμε
+- Δεν υποσχόμαστε κέρδη και δεν λέμε ποτέ ότι ένα tip είναι «σίγουρο».
+- Δεν είμαστε bookmaker και δεν δεχόμαστε στοιχήματα.
+- Παίξε μόνο όσα μπορείς να χάσεις.`,
+    es: `betizzi ofrece pronósticos de fútbol gratuitos con reglas sencillas basadas en datos. Miramos los partidos recientes de ambos equipos y publicamos un tip solo cuando un patrón se repite con claridad. Cada tip se publica antes del inicio con su cuota, nunca se edita ni se borra y cuenta en nuestro historial público.
+
+## Cómo se elige un tip
+- **Goles (Over/Under, GG/NG):** el patrón debe haberse dado en la mayoría de los partidos recientes de ambos equipos, normalmente en 7 o más de 10.
+- **Victoria (1 o 2):** el equipo ha sumado claramente más puntos que su rival en los últimos partidos. No apostamos por un equipo cuando su rival es claro favorito.
+- **Empate:** pocas veces, solo cuando los empates se repiten.
+- Las bajas, las noticias y los movimientos del mercado no forman parte de la decisión.
+
+## Free y VIP
+- Los tips Free están abiertos para todos.
+- Los VIP son los más fuertes. Se abren con un registro gratuito (un código por email, sin contraseña) y para todos 10 minutos después del inicio.
+- Dentro de nuestras combinadas, las selecciones VIP están abiertas para todos.
+
+## La cuota
+- Cada tip muestra la cuota cuando lo publicamos y la cuota mínima que aún recomendamos.
+- Comparamos cuotas de varias casas y mostramos dónde es mejor. Si la cuota baja de nuestro límite, el tip se mantiene y mostramos la nueva cuota.
+
+## Combinadas listas
+- Cada día: combinadas de aprox. x3–5, x8–12 y x20–30, y una combinada mega del día (x30–50). Solo con nuestros tips.
+- Salen por la mañana y se añaden nuevas durante el día. Una combinada publicada no cambia.
+- Las combinadas grandes ganan pocas veces.
+
+## Historial público
+Contamos cada tip desde el 2 de noviembre de 2026, aciertos y fallos. No se borra nada. Mira el [historial]({REC}).
+
+## Lo que no hacemos
+- No prometemos ganancias y nunca decimos que un tip es «seguro».
+- No somos una casa de apuestas y no aceptamos apuestas.
+- Apuesta solo lo que puedas permitirte perder.`,
+    pt: `O betizzi dá palpites de futebol gratuitos com regras simples baseadas em dados. Olhamos para os jogos recentes das duas equipas e publicamos um palpite só quando um padrão se repete com clareza. Cada palpite é publicado antes do início com a sua odd, nunca é editado nem apagado e conta no nosso histórico público.
+
+## Como escolhemos um palpite
+- **Golos (Over/Under, GG/NG):** o padrão tem de ter acontecido na maioria dos jogos recentes das duas equipas, normalmente em 7 ou mais de 10.
+- **Vitória (1 ou 2):** a equipa somou claramente mais pontos do que o adversário nos últimos jogos. Não apostamos numa equipa quando o adversário é claro favorito.
+- **Empate:** raramente, só quando os empates se repetem.
+- Lesões, notícias e movimentos do mercado não entram na decisão.
+
+## Free e VIP
+- Os palpites Free estão abertos a todos.
+- Os VIP são os mais fortes. Abrem com um registo gratuito (um código por email, sem palavra-passe) e para todos 10 minutos após o início.
+- Dentro das nossas múltiplas prontas, as seleções VIP estão abertas a todos.
+
+## A odd
+- Cada palpite mostra a odd quando o publicámos e a odd mínima que ainda recomendamos.
+- Comparamos odds de várias casas e mostramos onde é melhor. Se a odd descer abaixo do nosso limite, o palpite mantém-se e mostramos a nova odd.
+
+## Múltiplas prontas
+- Todos os dias: múltiplas de cerca de x3–5, x8–12 e x20–30, e uma múltipla grande do dia (x30–50). Só com os nossos palpites.
+- Saem de manhã e são acrescentadas novas ao longo do dia. Uma múltipla publicada não muda.
+- As múltiplas grandes ganham raramente.
+
+## Histórico público
+Contamos cada palpite desde 2 de novembro de 2026, acertos e falhas. Nada é apagado. Vê o [histórico]({REC}).
+
+## O que não fazemos
+- Não prometemos ganhos e nunca dizemos que um palpite é «certo».
+- Não somos uma casa de apostas e não aceitamos apostas.
+- Aposta só o que podes perder.`,
+    fr: `betizzi propose des pronostics foot gratuits à partir de règles simples basées sur les données. Nous regardons les matchs récents des deux équipes et publions un tip seulement quand un schéma se répète clairement. Chaque tip est publié avant le coup d'envoi avec sa cote, n'est jamais modifié ni supprimé et compte dans notre historique public.
+
+## Comment un tip est choisi
+- **Buts (Over/Under, GG/NG) :** le schéma doit s'être produit dans la plupart des matchs récents des deux équipes, en général 7 fois ou plus sur 10.
+- **Victoire (1 ou 2) :** l'équipe a pris nettement plus de points que son adversaire lors des derniers matchs. Nous ne soutenons pas une équipe face à un net favori.
+- **Nul :** rarement, seulement quand les nuls se répètent.
+- Les blessures, l'actualité et les mouvements du marché n'entrent pas dans la décision.
+
+## Free et VIP
+- Les tips Free sont ouverts à tous.
+- Les VIP sont nos plus forts. Ils s'ouvrent avec une inscription gratuite (un code par e-mail, sans mot de passe), et pour tous 10 minutes après le coup d'envoi.
+- Dans nos combinés prêts, les sélections VIP sont ouvertes à tous.
+
+## La cote
+- Chaque tip affiche la cote au moment de la publication et la cote minimale que nous recommandons encore.
+- Nous comparons les cotes de plusieurs bookmakers et montrons où elle est la meilleure. Si la cote passe sous notre limite, le tip reste et nous affichons la nouvelle cote.
+
+## Combinés prêts
+- Chaque jour : des combinés autour de x3–5, x8–12 et x20–30, et un méga combiné du jour (x30–50). Uniquement avec nos tips.
+- Ils sortent le matin et de nouveaux s'ajoutent dans la journée. Un combiné publié ne change pas.
+- Les gros combinés gagnent rarement.
+
+## Historique public
+Chaque tip depuis le 2 novembre 2026 est compté, gagnés et perdus. Rien n'est supprimé. Voir l'[historique]({REC}).
+
+## Ce que nous ne faisons pas
+- Nous ne promettons pas de gains et ne disons jamais qu'un tip est « sûr ».
+- Nous ne sommes pas un bookmaker et n'acceptons pas de paris.
+- Ne misez que ce que vous pouvez vous permettre de perdre.`,
+    de: `betizzi gibt kostenlose Fußball-Tipps nach einfachen, datenbasierten Regeln. Wir schauen uns die letzten Spiele beider Teams an und veröffentlichen einen Tipp nur, wenn sich ein Muster klar wiederholt. Jeder Tipp wird vor Anpfiff mit seiner Quote veröffentlicht, nie geändert oder gelöscht und zählt in unserer öffentlichen Bilanz.
+
+## Wie ein Tipp entsteht
+- **Tore (Over/Under, GG/NG):** Das Muster muss in den meisten letzten Spielen beider Teams aufgetreten sein, meist in 7 oder mehr von 10.
+- **Sieg (1 oder 2):** Das Team hat in den letzten Spielen deutlich mehr Punkte geholt als der Gegner. Gegen einen klaren Favoriten tippen wir nicht.
+- **Unentschieden:** selten, nur wenn sich Remis wiederholen.
+- Verletzungen, Nachrichten und Marktbewegungen fließen nicht in die Entscheidung ein.
+
+## Free und VIP
+- Free-Tipps sind für alle offen.
+- VIP-Tipps sind unsere stärksten. Sie öffnen sich mit einer kostenlosen Anmeldung (Code per E-Mail, ohne Passwort) und für alle 10 Minuten nach Anpfiff.
+- In unseren fertigen Kombis sind VIP-Tipps für alle offen.
+
+## Die Quote
+- Jeder Tipp zeigt die Quote bei Veröffentlichung und die niedrigste Quote, die wir noch empfehlen.
+- Wir vergleichen Quoten mehrerer Buchmacher und zeigen, wo sie am besten ist. Fällt die Quote unter unser Limit, bleibt der Tipp stehen und wir zeigen die neue Quote.
+
+## Fertige Kombis
+- Jeden Tag: Kombis um x3–5, x8–12 und x20–30 sowie eine Mega-Kombi des Tages (x30–50). Nur aus unseren eigenen Tipps.
+- Sie erscheinen morgens, im Laufe des Tages kommen neue hinzu. Eine veröffentlichte Kombi ändert sich nicht.
+- Große Kombis gewinnen selten.
+
+## Öffentliche Bilanz
+Jeder Tipp seit dem 2. November 2026 wird gezählt, Gewinne und Verluste. Nichts wird gelöscht. Siehe die [Bilanz]({REC}).
+
+## Was wir nicht tun
+- Wir versprechen keine Gewinne und nennen einen Tipp nie „sicher“.
+- Wir sind kein Buchmacher und nehmen keine Wetten an.
+- Setze nur, was du dir leisten kannst zu verlieren.`,
+    ro: `betizzi oferă ponturi gratuite la fotbal, după reguli simple bazate pe date. Ne uităm la meciurile recente ale ambelor echipe și publicăm un pont doar când un tipar se repetă clar. Fiecare pont este publicat înainte de start, cu cota lui, nu este modificat sau șters niciodată și intră în istoricul nostru public.
+
+## Cum alegem un pont
+- **Goluri (Over/Under, GG/NG):** tiparul trebuie să fi apărut în majoritatea meciurilor recente ale celor două echipe, de obicei în 7 sau mai multe din 10.
+- **Victorie (1 sau 2):** echipa a strâns clar mai multe puncte decât adversara în ultimele meciuri. Nu mergem pe o echipă când adversara e favorită clară.
+- **Egal:** rar, doar când egalurile se repetă.
+- Absențele, știrile și mișcările pieței nu intră în decizie.
+
+## Free și VIP
+- Ponturile Free sunt deschise pentru toți.
+- Ponturile VIP sunt cele mai puternice. Se deschid cu o înregistrare gratuită (un cod pe email, fără parolă) și pentru toți la 10 minute după start.
+- În biletele noastre gata făcute, selecțiile VIP sunt deschise pentru toți.
+
+## Cota
+- Fiecare pont arată cota din momentul publicării și cota minimă pe care încă o recomandăm.
+- Comparăm cotele de la mai multe case și arătăm unde e cea mai bună. Dacă cota scade sub limita noastră, pontul rămâne și arătăm noua cotă.
+
+## Bilete gata făcute
+- În fiecare zi: bilete de aproximativ x3–5, x8–12 și x20–30, plus biletul mare al zilei (x30–50). Doar din ponturile noastre.
+- Apar dimineața și se adaugă altele noi în timpul zilei. Un bilet publicat nu se schimbă.
+- Biletele mari câștigă rar.
+
+## Istoric public
+Numărăm fiecare pont din 2 noiembrie 2026, câștigate și pierdute. Nu se șterge nimic. Vezi [istoricul]({REC}).
+
+## Ce nu facem
+- Nu promitem câștiguri și nu spunem niciodată că un pont e „sigur“.
+- Nu suntem casă de pariuri și nu acceptăm pariuri.
+- Pariază doar cât îți permiți să pierzi.`,
+    sr: `betizzi daje besplatne fudbalske tipove po jednostavnim pravilima zasnovanim na podacima. Gledamo skorašnje utakmice oba tima i objavljujemo tip samo kada se obrazac jasno ponavlja. Svaki tip se objavljuje pre početka sa svojom kvotom, nikada se ne menja niti briše i ulazi u našu javnu istoriju.
+
+## Kako biramo tip
+- **Golovi (Over/Under, GG/NG):** obrazac mora da se desio u većini skorašnjih utakmica oba tima, obično u 7 ili više od 10.
+- **Pobeda (1 ili 2):** tim je u poslednjim utakmicama osvojio jasno više bodova od protivnika. Ne biramo tim kada je protivnik jasan favorit.
+- **Nerešeno:** retko, samo kada se nerešeni ishodi ponavljaju.
+- Povrede, vesti i kretanja tržišta nisu deo odluke.
+
+## Free i VIP
+- Free tipovi su otvoreni za sve.
+- VIP tipovi su naši najjači. Otvaraju se besplatnom registracijom (kod na email, bez lozinke), a za sve 10 minuta posle početka.
+- U našim gotovim tiketima VIP izbori su otvoreni za sve.
+
+## Kvota
+- Svaki tip prikazuje kvotu u trenutku objave i najnižu kvotu koju još preporučujemo.
+- Poredimo kvote više kladionica i pokazujemo gde je najbolja. Ako kvota padne ispod naše granice, tip ostaje i prikazujemo novu kvotu.
+
+## Gotovi tiketi
+- Svakog dana: tiketi oko x3–5, x8–12 i x20–30, i veliki tiket dana (x30–50). Samo od naših tipova.
+- Izlaze ujutru, a tokom dana se dodaju novi. Objavljeni tiket se ne menja.
+- Veliki tiketi retko prolaze.
+
+## Javna istorija
+Brojimo svaki tip od 2. novembra 2026, dobitne i gubitne. Ništa se ne briše. Pogledaj [istoriju]({REC}).
+
+## Šta ne radimo
+- Ne obećavamo dobitak i nikada ne kažemo da je tip „siguran“.
+- Nismo kladionica i ne primamo opklade.
+- Kladi se samo onoliko koliko možeš da izgubiš.`,
+    bg: `betizzi дава безплатни футболни прогнози по прости правила, базирани на данни. Гледаме последните мачове на двата отбора и публикуваме прогноза само когато даден модел ясно се повтаря. Всяка прогноза се публикува преди началото с коефициента си, никога не се променя или изтрива и влиза в публичната ни история.
+
+## Как избираме прогноза
+- **Голове (Over/Under, GG/NG):** моделът трябва да се е случил в повечето от последните мачове на двата отбора, обикновено в 7 или повече от 10.
+- **Победа (1 или 2):** отборът е събрал ясно повече точки от съперника в последните мачове. Не залагаме на отбор, когато съперникът е явен фаворит.
+- **Равен:** рядко, само когато равенствата се повтарят.
+- Контузиите, новините и движенията на пазара не участват в решението.
+
+## Free и VIP
+- Free прогнозите са отворени за всички.
+- VIP прогнозите са най-силните ни. Отварят се с безплатна регистрация (код по имейл, без парола), а за всички — 10 минути след началото.
+- В готовите ни фишове VIP изборите са отворени за всички.
+
+## Коефициентът
+- Всяка прогноза показва коефициента в момента на публикуване и най-ниския коефициент, който още препоръчваме.
+- Сравняваме коефициенти от няколко букмейкъра и показваме къде е най-добрият. Ако коефициентът падне под нашия праг, прогнозата остава и показваме новия коефициент.
+
+## Готови фишове
+- Всеки ден: фишове около x3–5, x8–12 и x20–30, плюс голям фиш на деня (x30–50). Само от нашите прогнози.
+- Излизат сутрин и през деня се добавят нови. Публикуваният фиш не се променя.
+- Големите фишове печелят рядко.
+
+## Публична история
+Броим всяка прогноза от 2 ноември 2026, познати и непознати. Нищо не се изтрива. Виж [историята]({REC}).
+
+## Какво не правим
+- Не обещаваме печалби и никога не казваме, че прогноза е „сигурна“.
+- Не сме букмейкър и не приемаме залози.
+- Залагай само толкова, колкото можеш да си позволиш да загубиш.`,
+  },
+  faq: {
+    en: [["Are betizzi tips free?", "Yes. Free tips are open to everyone. VIP tips only need a free sign-up with your email."], ["Is betizzi a bookmaker?", "No. We publish tips and compare prices. Bets are placed with licensed bookmakers."], ["Do you guarantee wins?", "No. A tip is an estimate from data. All results, including losses, are in our public record."], ["How many tips do you give?", "We aim for a Free tip in at least one in three matches with odds, and a VIP tip in about one in ten. Some days there are fewer."], ["When are tips published?", "During the day, always before kick-off. New tips are added every few hours."]],
+    el: [["Είναι δωρεάν τα tips του betizzi;", "Ναι. Τα Free είναι ανοιχτά για όλους. Τα VIP θέλουν μόνο δωρεάν εγγραφή με το email σου."], ["Είναι το betizzi bookmaker;", "Όχι. Δημοσιεύουμε tips και συγκρίνουμε αποδόσεις. Τα στοιχήματα γίνονται σε αδειοδοτημένους bookmakers."], ["Εγγυάστε κέρδη;", "Όχι. Ένα tip είναι εκτίμηση από δεδομένα. Όλα τα αποτελέσματα, και οι ήττες, είναι στο δημόσιο ιστορικό μας."], ["Πόσα tips δίνετε;", "Στόχος είναι Free tip σε τουλάχιστον έναν στους τρεις αγώνες με αποδόσεις και VIP σε περίπου έναν στους δέκα. Κάποιες μέρες είναι λιγότερα."], ["Πότε βγαίνουν τα tips;", "Μέσα στη μέρα, πάντα πριν από τη σέντρα. Νέα tips προστίθενται κάθε λίγες ώρες."]],
+    es: [["¿Los tips de betizzi son gratis?", "Sí. Los tips Free están abiertos para todos. Los VIP solo necesitan un registro gratuito con tu email."], ["¿betizzi es una casa de apuestas?", "No. Publicamos tips y comparamos cuotas. Las apuestas se hacen en casas con licencia."], ["¿Garantizáis ganancias?", "No. Un tip es una estimación a partir de datos. Todos los resultados, también los fallos, están en nuestro historial público."], ["¿Cuántos tips dais?", "Buscamos un tip Free en al menos uno de cada tres partidos con cuotas, y un VIP en uno de cada diez aprox. Algunos días hay menos."], ["¿Cuándo se publican los tips?", "Durante el día, siempre antes del inicio. Se añaden tips nuevos cada pocas horas."]],
+    pt: [["Os palpites do betizzi são grátis?", "Sim. Os Free estão abertos a todos. Os VIP só precisam de um registo gratuito com o teu email."], ["O betizzi é uma casa de apostas?", "Não. Publicamos palpites e comparamos odds. As apostas são feitas em casas licenciadas."], ["Garantem ganhos?", "Não. Um palpite é uma estimativa a partir de dados. Todos os resultados, incluindo as falhas, estão no nosso histórico público."], ["Quantos palpites dão?", "Procuramos um palpite Free em pelo menos um em cada três jogos com odds, e um VIP em cerca de um em cada dez. Há dias com menos."], ["Quando são publicados os palpites?", "Ao longo do dia, sempre antes do início. São acrescentados novos a cada poucas horas."]],
+    fr: [["Les tips betizzi sont-ils gratuits ?", "Oui. Les tips Free sont ouverts à tous. Les VIP demandent seulement une inscription gratuite avec votre e-mail."], ["betizzi est-il un bookmaker ?", "Non. Nous publions des tips et comparons les cotes. Les paris se font chez des bookmakers agréés."], ["Garantissez-vous des gains ?", "Non. Un tip est une estimation à partir de données. Tous les résultats, pertes comprises, sont dans notre historique public."], ["Combien de tips donnez-vous ?", "Nous visons un tip Free dans au moins un match sur trois avec cotes, et un VIP dans environ un sur dix. Certains jours, il y en a moins."], ["Quand les tips sont-ils publiés ?", "Pendant la journée, toujours avant le coup d'envoi. De nouveaux tips s'ajoutent toutes les quelques heures."]],
+    de: [["Sind die Tipps von betizzi kostenlos?", "Ja. Free-Tipps sind für alle offen. VIP-Tipps brauchen nur eine kostenlose Anmeldung mit deiner E-Mail."], ["Ist betizzi ein Buchmacher?", "Nein. Wir veröffentlichen Tipps und vergleichen Quoten. Wetten werden bei lizenzierten Buchmachern platziert."], ["Garantiert ihr Gewinne?", "Nein. Ein Tipp ist eine Schätzung aus Daten. Alle Ergebnisse, auch Verluste, stehen in unserer öffentlichen Bilanz."], ["Wie viele Tipps gebt ihr?", "Wir zielen auf einen Free-Tipp in mindestens jedem dritten Spiel mit Quoten und einen VIP-Tipp in etwa jedem zehnten. An manchen Tagen sind es weniger."], ["Wann erscheinen die Tipps?", "Im Laufe des Tages, immer vor Anpfiff. Alle paar Stunden kommen neue hinzu."]],
+    ro: [["Ponturile betizzi sunt gratuite?", "Da. Ponturile Free sunt deschise pentru toți. Cele VIP cer doar o înregistrare gratuită cu emailul tău."], ["Este betizzi casă de pariuri?", "Nu. Publicăm ponturi și comparăm cote. Pariurile se fac la case licențiate."], ["Garantați câștiguri?", "Nu. Un pont este o estimare din date. Toate rezultatele, inclusiv cele pierdute, sunt în istoricul nostru public."], ["Câte ponturi dați?", "Ne propunem un pont Free la cel puțin unul din trei meciuri cu cote și un VIP la aproximativ unul din zece. În unele zile sunt mai puține."], ["Când apar ponturile?", "În timpul zilei, mereu înainte de start. Se adaugă ponturi noi la câteva ore."]],
+    sr: [["Da li su betizzi tipovi besplatni?", "Da. Free tipovi su otvoreni za sve. Za VIP je potrebna samo besplatna registracija emailom."], ["Da li je betizzi kladionica?", "Ne. Objavljujemo tipove i poredimo kvote. Opklade se uplaćuju kod licenciranih kladionica."], ["Da li garantujete dobitak?", "Ne. Tip je procena iz podataka. Svi rezultati, i gubitni, nalaze se u našoj javnoj istoriji."], ["Koliko tipova dajete?", "Cilj je Free tip na bar svakoj trećoj utakmici sa kvotama i VIP na otprilike svakoj desetoj. Nekih dana ih je manje."], ["Kada izlaze tipovi?", "Tokom dana, uvek pre početka. Novi tipovi se dodaju na svakih nekoliko sati."]],
+    bg: [["Безплатни ли са прогнозите на betizzi?", "Да. Free прогнозите са отворени за всички. За VIP е нужна само безплатна регистрация с имейл."], ["betizzi букмейкър ли е?", "Не. Публикуваме прогнози и сравняваме коефициенти. Залозите се правят при лицензирани букмейкъри."], ["Гарантирате ли печалба?", "Не. Прогнозата е оценка от данни. Всички резултати, включително загубите, са в публичната ни история."], ["Колко прогнози давате?", "Целим Free прогноза в поне един от три мача с коефициенти и VIP в около един от десет. В някои дни са по-малко."], ["Кога излизат прогнозите?", "През деня, винаги преди началото. Нови прогнози се добавят на всеки няколко часа."]],
+  },
+  faqH: { en: "Questions", el: "Ερωτήσεις", es: "Preguntas", pt: "Perguntas", fr: "Questions", de: "Fragen", ro: "Întrebări", sr: "Pitanja", bg: "Въпроси" },
+};
+
+const IMP = { name: OP.name, addr: OP.addr, mail: OP.legal };
+PG.impressum = {
+  slug: { en: "legal-notice", el: "nomika-stoixeia", es: "aviso-legal", pt: "aviso-legal", fr: "mentions-legales", de: "impressum", ro: "informatii-legale", sr: "pravne-informacije", bg: "pravna-informacia" },
+  title: { en: "Legal notice", el: "Νομικά στοιχεία", es: "Aviso legal", pt: "Aviso legal", fr: "Mentions légales", de: "Impressum", ro: "Informații legale", sr: "Pravne informacije", bg: "Правна информация" },
+  desc: {
+    en: "Who operates betizzi.com and how to contact us.", el: "Ποιος λειτουργεί το betizzi.com και πώς να επικοινωνήσεις.", es: "Quién gestiona betizzi.com y cómo contactarnos.", pt: "Quem gere o betizzi.com e como nos contactar.",
+    fr: "Qui exploite betizzi.com et comment nous contacter.", de: "Anbieterkennzeichnung von betizzi.com.", ro: "Cine operează betizzi.com și cum ne contactezi.", sr: "Ko upravlja sajtom betizzi.com i kako da nas kontaktirate.", bg: "Кой управлява betizzi.com и как да се свържете с нас.",
+  },
+  body: {
+    en: `## Operator
+- ${IMP.name} (sole proprietorship)
+- ${IMP.addr}
+
+## Contact
+- Email: [${IMP.mail}](mailto:${IMP.mail})
+- Contact page: [contact]({CONTACT})
+
+## Responsible for content
+- ${IMP.name}, address as above
+
+## Note
+betizzi is not a bookmaker and does not accept bets. We are not willing or obliged to take part in dispute resolution proceedings before a consumer arbitration board.`,
+    el: `## Ποιος λειτουργεί το site
+- ${IMP.name} (ατομική επιχείρηση)
+- ${IMP.addr}
+
+## Επικοινωνία
+- Email: [${IMP.mail}](mailto:${IMP.mail})
+- Σελίδα επικοινωνίας: [επικοινωνία]({CONTACT})
+
+## Υπεύθυνος περιεχομένου
+- ${IMP.name}, στην παραπάνω διεύθυνση
+
+## Σημείωση
+Το betizzi δεν είναι bookmaker και δεν δέχεται στοιχήματα. Δεν συμμετέχουμε σε διαδικασίες εξωδικαστικής επίλυσης διαφορών καταναλωτών.`,
+    es: `## Responsable
+- ${IMP.name} (empresario individual)
+- ${IMP.addr}
+
+## Contacto
+- Email: [${IMP.mail}](mailto:${IMP.mail})
+- Página de contacto: [contacto]({CONTACT})
+
+## Responsable del contenido
+- ${IMP.name}, en la dirección indicada
+
+## Nota
+betizzi no es una casa de apuestas y no acepta apuestas. No participamos en procedimientos de resolución de conflictos ante una entidad de arbitraje de consumo.`,
+    pt: `## Responsável
+- ${IMP.name} (empresário em nome individual)
+- ${IMP.addr}
+
+## Contacto
+- Email: [${IMP.mail}](mailto:${IMP.mail})
+- Página de contacto: [contacto]({CONTACT})
+
+## Responsável pelo conteúdo
+- ${IMP.name}, na morada acima
+
+## Nota
+O betizzi não é uma casa de apostas e não aceita apostas. Não participamos em procedimentos de resolução alternativa de litígios de consumo.`,
+    fr: `## Éditeur
+- ${IMP.name} (entreprise individuelle)
+- ${IMP.addr}
+
+## Contact
+- E-mail : [${IMP.mail}](mailto:${IMP.mail})
+- Page de contact : [contact]({CONTACT})
+
+## Directeur de la publication
+- ${IMP.name}, adresse ci-dessus
+
+## Hébergement
+- Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, États-Unis
+
+## Note
+betizzi n'est pas un bookmaker et n'accepte pas de paris. Nous ne participons pas à des procédures de règlement des litiges devant un organisme de médiation de la consommation.`,
+    de: `## Angaben gemäß § 5 DDG
+- ${IMP.name} (Einzelunternehmer)
+- Annis Komninis 2, 8010 Paphos, Zypern
+
+## Kontakt
+- E-Mail: [${IMP.mail}](mailto:${IMP.mail})
+- Kontaktseite: [Kontakt]({CONTACT})
+
+## Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV
+- ${IMP.name}, Anschrift wie oben
+
+## Hinweis
+betizzi ist kein Buchmacher und nimmt keine Wetten an.
+
+## Verbraucherstreitbeilegung
+Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.`,
+    ro: `## Operator
+- ${IMP.name} (întreprindere individuală)
+- ${IMP.addr}
+
+## Contact
+- Email: [${IMP.mail}](mailto:${IMP.mail})
+- Pagina de contact: [contact]({CONTACT})
+
+## Responsabil pentru conținut
+- ${IMP.name}, la adresa de mai sus
+
+## Notă
+betizzi nu este casă de pariuri și nu acceptă pariuri. Nu participăm la proceduri de soluționare alternativă a litigiilor cu consumatorii.`,
+    sr: `## Operater
+- ${IMP.name} (preduzetnik)
+- ${IMP.addr}
+
+## Kontakt
+- Email: [${IMP.mail}](mailto:${IMP.mail})
+- Stranica za kontakt: [kontakt]({CONTACT})
+
+## Odgovoran za sadržaj
+- ${IMP.name}, na adresi iznad
+
+## Napomena
+betizzi nije kladionica i ne prima opklade. Ne učestvujemo u postupcima vansudskog rešavanja potrošačkih sporova.`,
+    bg: `## Оператор
+- ${IMP.name} (едноличен търговец)
+- ${IMP.addr}
+
+## Контакт
+- Имейл: [${IMP.mail}](mailto:${IMP.mail})
+- Страница за контакт: [контакт]({CONTACT})
+
+## Отговорен за съдържанието
+- ${IMP.name}, на адреса по-горе
+
+## Бележка
+betizzi не е букмейкър и не приема залози. Не участваме в процедури за извънсъдебно решаване на потребителски спорове.`,
+  },
+};
+
+// ---------- 07/11/2026 (απόφαση Owner): Όροι / Απόρρητο / Cookies σε ES, PT, FR, DE, RO, SR, BG ----------
+// Μεταφράσεις του αγγλικού κειμένου. Όλα «προς έλεγχο» από ντόπιους (και νομικό έλεγχο).
+Object.assign(PG.terms.slug, { es: "terminos", pt: "termos", fr: "conditions", de: "nutzungsbedingungen", ro: "termeni", sr: "uslovi", bg: "usloviya" });
+Object.assign(PG.terms.title, { es: "Términos de uso", pt: "Termos de utilização", fr: "Conditions d'utilisation", de: "Nutzungsbedingungen", ro: "Termeni de utilizare", sr: "Uslovi korišćenja", bg: "Условия за ползване" });
+Object.assign(PG.terms.desc, { es: "Los términos para usar betizzi.", pt: "Os termos de utilização do betizzi.", fr: "Les conditions d'utilisation de betizzi.", de: "Die Bedingungen für die Nutzung von betizzi.", ro: "Termenii de utilizare betizzi.", sr: "Uslovi korišćenja sajta betizzi.", bg: "Условията за ползване на betizzi." });
+Object.assign(PG.privacy.slug, { es: "privacidad", pt: "privacidade", fr: "confidentialite", de: "datenschutz", ro: "confidentialitate", sr: "privatnost", bg: "poveritelnost" });
+Object.assign(PG.privacy.title, { es: "Política de privacidad", pt: "Política de privacidade", fr: "Politique de confidentialité", de: "Datenschutzerklärung", ro: "Politica de confidențialitate", sr: "Politika privatnosti", bg: "Политика за поверителност" });
+Object.assign(PG.privacy.desc, { es: "Qué datos personales usa betizzi y por qué.", pt: "Que dados pessoais o betizzi usa e porquê.", fr: "Quelles données personnelles betizzi utilise et pourquoi.", de: "Welche personenbezogenen Daten betizzi verwendet und warum.", ro: "Ce date personale folosește betizzi și de ce.", sr: "Koje lične podatke betizzi koristi i zašto.", bg: "Какви лични данни използва betizzi и защо." });
+Object.assign(PG.cookies.slug, { es: "cookies", pt: "cookies", fr: "cookies", de: "cookies", ro: "cookies", sr: "kolacici", bg: "biskvitki" });
+Object.assign(PG.cookies.title, { es: "Política de cookies", pt: "Política de cookies", fr: "Politique de cookies", de: "Cookie-Richtlinie", ro: "Politica de cookie-uri", sr: "Politika kolačića", bg: "Политика за бисквитките" });
+Object.assign(PG.cookies.desc, { es: "Qué guarda betizzi en tu navegador.", pt: "O que o betizzi guarda no teu navegador.", fr: "Ce que betizzi enregistre dans votre navigateur.", de: "Was betizzi in deinem Browser speichert.", ro: "Ce salvează betizzi în browserul tău.", sr: "Šta betizzi čuva u tvom pregledaču.", bg: "Какво съхранява betizzi в браузъра ти." });
+
+const H = `[${OP.hello}](mailto:${OP.hello})`, PV = `[${OP.privacy}](mailto:${OP.privacy})`;
+
+Object.assign(PG.terms.body, {
+  es: `Fecha de entrada en vigor: 1 de noviembre de 2026.
+
+Estos Términos regulan el uso de betizzi.com (el «Servicio»). El Servicio lo gestiona el empresario individual ${OP.name}, Pafos, Chipre («nosotros»). Contacto: ${H}. Al usar el Servicio aceptas estos Términos.
+
+## Qué es el Servicio
+betizzi publica información de partidos de fútbol, estadísticas, tips basados en un modelo y probabilidades estimadas, cuotas de casas de apuestas y herramientas como un creador de boletos, con fines informativos y de entretenimiento. Los tips y las probabilidades son estimaciones a partir de datos y reglas que pueden cambiar. Las cuotas mostradas pertenecen a casas de apuestas de terceros y pueden cambiar, variar según el país o la cuenta, o dejar de estar disponibles.
+
+betizzi no es una casa de apuestas ni un operador de juego. No aceptamos ni liquidamos apuestas y no guardamos fondos de jugadores. Lo que hagas con una casa de apuestas es entre tú y esa casa, según sus términos y la ley de tu país.
+
+## Quién puede usarlo
+El Servicio es para adultos de 18 años o más, o más si la ley lo exige (por ejemplo, 21 en Grecia). No lo uses donde sea ilegal. Solo tú decides si apuestas.
+
+## Sin promesa de ganancias
+Un tip no es una promesa de que una apuesta ganará. Los datos, resultados, horarios y cuotas pueden estar incompletos, llegar tarde o ser erróneos. Los resultados pasados no predicen los futuros. No damos asesoramiento personal de apuestas ni financiero. En la medida en que la ley lo permita, no somos responsables de las pérdidas de tus apuestas.
+
+## Créditos y recompensas
+Si ofrecemos créditos o recompensas (por ejemplo, por compartir o invitar a amigos), no tienen valor monetario, no se pueden vender ni transferir y pueden cambiar o terminar. Podemos anular créditos obtenidos mediante abuso, cuentas falsas o automatización.
+
+## Cuentas
+Si se ofrecen cuentas, debes usar un email que controles y mantener el acceso seguro. Podemos suspender o eliminar una cuenta por abuso, uso ilegal o un incumplimiento grave de estos Términos. Puedes pedirnos que borremos tu cuenta en cualquier momento.
+
+## Uso aceptable
+No copies el Servicio de forma masiva, no lo extraigas automáticamente, no interfieras en él ni lo uses para infringir la ley. No presentes nuestros tips como tu propio servicio de pago.
+
+## Enlaces y publicidad
+El Servicio contiene enlaces a sitios de terceros, incluidas casas de apuestas, algunas de las cuales pueden pagarnos (ver la Declaración de afiliados). No somos responsables de los sitios de terceros.
+
+## Propiedad intelectual
+El sitio, el nombre y el logotipo de betizzi, los textos y los diseños nos pertenecen a nosotros o a nuestros licenciantes. Los nombres y escudos de los equipos pertenecen a sus dueños y se usan solo para identificarlos.
+
+## Cambios y ley aplicable
+Podemos actualizar estos Términos; la fecha de arriba indica la versión vigente. Estos Términos se rigen por la ley de la República de Chipre, sin limitar los derechos imperativos de consumidor que tengas donde vives.`,
+  pt: `Data de entrada em vigor: 1 de novembro de 2026.
+
+Estes Termos regulam a utilização do betizzi.com (o «Serviço»). O Serviço é gerido pelo empresário em nome individual ${OP.name}, Pafos, Chipre («nós»). Contacto: ${H}. Ao usar o Serviço aceitas estes Termos.
+
+## O que é o Serviço
+O betizzi publica informação sobre jogos de futebol, estatísticas, palpites baseados num modelo e probabilidades estimadas, odds de casas de apostas e ferramentas como um criador de boletins, para informação e entretenimento. Os palpites e as probabilidades são estimativas a partir de dados e regras que podem mudar. As odds mostradas pertencem a casas de apostas de terceiros e podem mudar, variar por país ou conta, ou deixar de estar disponíveis.
+
+O betizzi não é uma casa de apostas nem um operador de jogo. Não aceitamos nem liquidamos apostas e não guardamos fundos de jogadores. O que fazes com uma casa de apostas é entre ti e essa casa, segundo os seus termos e a lei do teu país.
+
+## Quem pode usar
+O Serviço destina-se a adultos com 18 anos ou mais, ou mais se a lei o exigir (por exemplo, 21 na Grécia). Não o uses onde isso seja ilegal. Só tu decides se apostas.
+
+## Sem promessa de ganhos
+Um palpite não é uma promessa de que uma aposta vai ganhar. Dados, resultados, horários e odds podem estar incompletos, atrasados ou errados. Resultados passados não preveem os futuros. Não damos aconselhamento pessoal de apostas nem financeiro. Na medida em que a lei o permita, não somos responsáveis por perdas das tuas apostas.
+
+## Créditos e recompensas
+Se oferecermos créditos ou recompensas (por exemplo, por partilhar ou convidar amigos), não têm valor em dinheiro, não podem ser vendidos nem transferidos e podem ser alterados ou terminar. Podemos anular créditos obtidos por abuso, contas falsas ou automatização.
+
+## Contas
+Se houver contas, tens de usar um email que controles e manter o acesso seguro. Podemos suspender ou remover uma conta por abuso, uso ilegal ou violação grave destes Termos. Podes pedir-nos para apagar a tua conta a qualquer momento.
+
+## Uso aceitável
+Não copies o Serviço em massa, não o extraias automaticamente, não interfiras com ele nem o uses para violar a lei. Não apresentes os nossos palpites como um serviço pago teu.
+
+## Links e publicidade
+O Serviço contém links para sites de terceiros, incluindo casas de apostas, algumas das quais nos podem pagar (ver a Declaração de afiliados). Não somos responsáveis por sites de terceiros.
+
+## Propriedade intelectual
+O site, o nome e o logótipo betizzi, os textos e os designs pertencem-nos a nós ou aos nossos licenciadores. Os nomes e emblemas das equipas pertencem aos seus donos e são usados apenas para identificação.
+
+## Alterações e lei aplicável
+Podemos atualizar estes Termos; a data acima indica a versão em vigor. Estes Termos regem-se pela lei da República de Chipre, sem limitar direitos imperativos de consumidor que tenhas onde vives.`,
+  fr: `Date d'entrée en vigueur : 1er novembre 2026.
+
+Les présentes Conditions régissent votre utilisation de betizzi.com (le « Service »). Le Service est exploité par l'entreprise individuelle de ${OP.name}, Paphos, Chypre (« nous »). Contact : ${H}. En utilisant le Service, vous acceptez ces Conditions.
+
+## Ce qu'est le Service
+betizzi publie des informations sur les matchs de football, des statistiques, des tips issus d'un modèle et des chances estimées, des cotes de bookmakers et des outils comme un créateur de ticket, à titre d'information et de divertissement. Les tips et les chances sont des estimations à partir de données et de règles susceptibles de changer. Les cotes affichées appartiennent à des bookmakers tiers et peuvent changer, varier selon le pays ou le compte, ou ne plus être disponibles.
+
+betizzi n'est ni un bookmaker ni un opérateur de jeux. Nous n'acceptons ni ne réglons de paris et ne détenons aucun fonds de joueurs. Ce que vous faites avec un bookmaker relève de vous et de ce bookmaker, selon ses conditions et la loi de votre pays.
+
+## Qui peut l'utiliser
+Le Service est réservé aux adultes de 18 ans ou plus, ou plus si la loi l'exige (par exemple 21 ans en Grèce). Ne l'utilisez pas là où ce serait illégal. Vous seul décidez de parier ou non.
+
+## Aucune promesse de gain
+Un tip n'est pas une promesse qu'un pari sera gagnant. Les données, résultats, horaires et cotes peuvent être incomplets, en retard ou erronés. Les résultats passés ne prédisent pas les résultats futurs. Nous ne donnons pas de conseil personnel en paris ni de conseil financier. Dans la mesure permise par la loi, nous ne sommes pas responsables des pertes liées à vos paris.
+
+## Crédits et récompenses
+Si nous proposons des crédits ou des récompenses (par exemple pour un partage ou une invitation), ils n'ont aucune valeur monétaire, ne peuvent être ni vendus ni transférés et peuvent être modifiés ou supprimés. Nous pouvons annuler des crédits obtenus par abus, faux comptes ou automatisation.
+
+## Comptes
+Si des comptes sont proposés, vous devez utiliser une adresse e-mail que vous contrôlez et garder l'accès sécurisé. Nous pouvons suspendre ou supprimer un compte en cas d'abus, d'usage illégal ou de manquement grave aux présentes Conditions. Vous pouvez nous demander de supprimer votre compte à tout moment.
+
+## Usage acceptable
+Ne copiez pas le Service en masse, ne l'aspirez pas automatiquement, n'en perturbez pas le fonctionnement et ne l'utilisez pas pour enfreindre la loi. Ne présentez pas nos tips comme votre propre service payant.
+
+## Liens et publicité
+Le Service contient des liens vers des sites tiers, dont des bookmakers, dont certains peuvent nous rémunérer (voir la Déclaration d'affiliation). Nous ne sommes pas responsables des sites tiers.
+
+## Propriété intellectuelle
+Le site, le nom et le logo betizzi, les textes et les designs nous appartiennent ou appartiennent à nos concédants. Les noms et logos des équipes appartiennent à leurs propriétaires et ne servent qu'à les identifier.
+
+## Modifications et droit applicable
+Nous pouvons mettre à jour ces Conditions ; la date ci-dessus indique la version en vigueur. Ces Conditions sont régies par le droit de la République de Chypre, sans limiter les droits impératifs dont vous bénéficiez en tant que consommateur là où vous vivez.`,
+  de: `Gültig ab: 1. November 2026.
+
+Diese Bedingungen regeln die Nutzung von betizzi.com (der „Dienst“). Der Dienst wird vom Einzelunternehmen ${OP.name}, Paphos, Zypern („wir“) betrieben. Kontakt: ${H}. Mit der Nutzung des Dienstes stimmst du diesen Bedingungen zu.
+
+## Was der Dienst ist
+betizzi veröffentlicht Informationen zu Fußballspielen, Statistiken, modellbasierte Tipps und geschätzte Chancen, Quoten von Buchmachern sowie Werkzeuge wie einen Wettschein-Baukasten – zur Information und Unterhaltung. Tipps und Chancen sind Schätzungen aus Daten und Regeln, die sich ändern können. Angezeigte Quoten gehören Drittanbietern und können sich ändern, je nach Land oder Konto abweichen oder nicht mehr verfügbar sein.
+
+betizzi ist kein Buchmacher und kein Glücksspielanbieter. Wir nehmen keine Wetten an, rechnen keine ab und verwahren keine Spielergelder. Was du bei einem Buchmacher tust, betrifft nur dich und diesen Buchmacher, nach dessen Bedingungen und dem Recht deines Wohnorts.
+
+## Wer ihn nutzen darf
+Der Dienst richtet sich an Erwachsene ab 18 Jahren oder älter, wo das Gesetz es verlangt (zum Beispiel 21 in Griechenland). Nutze ihn nicht, wo das rechtswidrig wäre. Nur du entscheidest, ob du wettest.
+
+## Kein Gewinnversprechen
+Ein Tipp ist kein Versprechen, dass eine Wette gewinnt. Daten, Ergebnisse, Anstoßzeiten und Quoten können unvollständig, verspätet oder falsch sein. Frühere Ergebnisse sagen nichts über künftige aus. Wir geben keine persönliche Wett- oder Finanzberatung. Soweit gesetzlich zulässig, haften wir nicht für Verluste aus deinen Wetten.
+
+## Credits und Belohnungen
+Wenn wir Credits oder Belohnungen anbieten (zum Beispiel fürs Teilen oder Einladen), haben sie keinen Geldwert, sind nicht verkäuflich oder übertragbar und können geändert oder eingestellt werden. Durch Missbrauch, Fake-Konten oder Automatisierung erlangte Credits können wir streichen.
+
+## Konten
+Wenn Konten angeboten werden, musst du eine E-Mail-Adresse angeben, über die du verfügst, und den Zugang sicher halten. Bei Missbrauch, rechtswidriger Nutzung oder schwerem Verstoß gegen diese Bedingungen können wir ein Konto sperren oder löschen. Du kannst jederzeit die Löschung deines Kontos verlangen.
+
+## Zulässige Nutzung
+Kopiere den Dienst nicht massenhaft, lies ihn nicht automatisiert aus, störe ihn nicht und nutze ihn nicht für Rechtsverstöße. Gib unsere Tipps nicht als deinen eigenen kostenpflichtigen Dienst aus.
+
+## Links und Werbung
+Der Dienst enthält Links zu Seiten Dritter, auch zu Buchmachern, von denen uns manche bezahlen können (siehe Affiliate-Hinweis). Für Seiten Dritter sind wir nicht verantwortlich.
+
+## Geistiges Eigentum
+Die Website, der Name und das Logo betizzi, Texte und Designs gehören uns oder unseren Lizenzgebern. Vereinsnamen und -logos gehören ihren Inhabern und dienen nur der Kennzeichnung.
+
+## Änderungen und Recht
+Wir können diese Bedingungen aktualisieren; das Datum oben zeigt die aktuelle Fassung. Es gilt das Recht der Republik Zypern; zwingende Verbraucherrechte deines Wohnsitzlandes bleiben unberührt.`,
+  ro: `Data intrării în vigoare: 1 noiembrie 2026.
+
+Acești Termeni reglementează folosirea betizzi.com („Serviciul“). Serviciul este operat de întreprinderea individuală ${OP.name}, Pafos, Cipru („noi“). Contact: ${H}. Folosind Serviciul, accepți acești Termeni.
+
+## Ce este Serviciul
+betizzi publică informații despre meciuri de fotbal, statistici, ponturi bazate pe un model și șanse estimate, cote ale caselor de pariuri și instrumente precum un constructor de bilete, în scop informativ și de divertisment. Ponturile și șansele sunt estimări din date și reguli care se pot schimba. Cotele afișate aparțin caselor de pariuri terțe și se pot schimba, pot diferi în funcție de țară sau cont ori pot să nu mai fie disponibile.
+
+betizzi nu este casă de pariuri sau operator de jocuri de noroc. Nu acceptăm și nu decontăm pariuri și nu păstrăm fondurile jucătorilor. Ce faci la o casă de pariuri este între tine și acea casă, conform termenilor ei și legii din țara ta.
+
+## Cine îl poate folosi
+Serviciul este pentru adulți de 18 ani sau mai mult, ori mai mult acolo unde legea cere (de exemplu 21 în Grecia). Nu-l folosi acolo unde ar fi ilegal. Doar tu decizi dacă pariezi.
+
+## Fără promisiune de câștig
+Un pont nu este o promisiune că un pariu va câștiga. Datele, rezultatele, orele de start și cotele pot fi incomplete, întârziate sau greșite. Rezultatele trecute nu prezic rezultatele viitoare. Nu oferim consultanță personală de pariuri sau financiară. În măsura permisă de lege, nu răspundem pentru pierderile din pariurile tale.
+
+## Credite și recompense
+Dacă oferim credite sau recompense (de exemplu pentru distribuire sau invitarea prietenilor), ele nu au valoare în bani, nu pot fi vândute sau transferate și pot fi modificate sau oprite. Putem anula creditele obținute prin abuz, conturi false sau automatizare.
+
+## Conturi
+Dacă oferim conturi, trebuie să folosești o adresă de email pe care o controlezi și să păstrezi accesul în siguranță. Putem suspenda sau șterge un cont pentru abuz, folosire ilegală sau încălcarea gravă a acestor Termeni. Ne poți cere oricând să-ți ștergem contul.
+
+## Utilizare acceptabilă
+Nu copia Serviciul în masă, nu-l extrage automat, nu interfera cu el și nu-l folosi pentru a încălca legea. Nu prezenta ponturile noastre ca pe propriul tău serviciu plătit.
+
+## Linkuri și publicitate
+Serviciul conține linkuri către site-uri terțe, inclusiv case de pariuri, dintre care unele ne pot plăti (vezi Declarația de afiliere). Nu răspundem pentru site-urile terțe.
+
+## Proprietate intelectuală
+Site-ul, numele și logoul betizzi, textele și designul ne aparțin nouă sau licențiatorilor noștri. Numele și siglele echipelor aparțin proprietarilor lor și sunt folosite doar pentru identificare.
+
+## Modificări și legea aplicabilă
+Putem actualiza acești Termeni; data de mai sus arată versiunea în vigoare. Acești Termeni sunt guvernați de legea Republicii Cipru, fără a limita drepturile obligatorii de consumator pe care le ai acolo unde locuiești.`,
+  sr: `Datum stupanja na snagu: 1. novembar 2026.
+
+Ovi Uslovi uređuju korišćenje sajta betizzi.com („Usluga“). Uslugom upravlja preduzetnik ${OP.name}, Pafos, Kipar („mi“). Kontakt: ${H}. Korišćenjem Usluge prihvataš ove Uslove.
+
+## Šta je Usluga
+betizzi objavljuje informacije o fudbalskim utakmicama, statistiku, tipove zasnovane na modelu i procenjene šanse, kvote kladionica i alate kao što je pravljenje tiketa, radi informisanja i zabave. Tipovi i šanse su procene iz podataka i pravila koja se mogu menjati. Prikazane kvote pripadaju kladionicama trećih strana i mogu se promeniti, razlikovati po zemlji ili nalogu ili više ne biti dostupne.
+
+betizzi nije kladionica niti priređivač igara na sreću. Ne primamo i ne obračunavamo opklade i ne čuvamo novac igrača. Ono što radiš kod kladionice je između tebe i te kladionice, prema njenim uslovima i zakonu tvoje zemlje.
+
+## Ko može da je koristi
+Usluga je za odrasle od 18 godina ili starije, ili više gde zakon to traži (na primer 21 u Grčkoj). Ne koristi je gde bi to bilo nezakonito. Samo ti odlučuješ da li ćeš se kladiti.
+
+## Bez obećanja dobitka
+Tip nije obećanje da će opklada proći. Podaci, rezultati, satnice i kvote mogu biti nepotpuni, zakasneli ili pogrešni. Prošli rezultati ne predviđaju buduće. Ne dajemo lične savete za klađenje niti finansijske savete. U meri u kojoj zakon dozvoljava, nismo odgovorni za gubitke od tvojih opklada.
+
+## Krediti i nagrade
+Ako nudimo kredite ili nagrade (na primer za deljenje ili pozivanje prijatelja), oni nemaju novčanu vrednost, ne mogu se prodati niti preneti i mogu se promeniti ili ukinuti. Možemo poništiti kredite stečene zloupotrebom, lažnim nalozima ili automatizacijom.
+
+## Nalozi
+Ako nudimo naloge, moraš da navedeš email adresu koju kontrolišeš i da čuvaš pristup bezbednim. Možemo suspendovati ili ukloniti nalog zbog zloupotrebe, nezakonitog korišćenja ili ozbiljnog kršenja ovih Uslova. U svakom trenutku možeš tražiti da obrišemo tvoj nalog.
+
+## Prihvatljivo korišćenje
+Ne kopiraj Uslugu masovno, ne preuzimaj je automatski, ne ometaj je i ne koristi je za kršenje zakona. Ne predstavljaj naše tipove kao svoju plaćenu uslugu.
+
+## Linkovi i oglašavanje
+Usluga sadrži linkove ka sajtovima trećih strana, uključujući kladionice, od kojih nam neke mogu plaćati (vidi Izjavu o affiliate saradnji). Nismo odgovorni za sajtove trećih strana.
+
+## Intelektualna svojina
+Sajt, ime i logo betizzi, tekstovi i dizajn pripadaju nama ili našim davaocima licence. Imena i grbovi timova pripadaju njihovim vlasnicima i koriste se samo radi identifikacije.
+
+## Izmene i merodavno pravo
+Možemo ažurirati ove Uslove; datum iznad pokazuje važeću verziju. Na ove Uslove primenjuje se pravo Republike Kipar, bez ograničavanja obaveznih potrošačkih prava koja imaš tamo gde živiš.`,
+  bg: `В сила от: 1 ноември 2026 г.
+
+Тези Условия уреждат ползването на betizzi.com („Услугата“). Услугата се управлява от едноличния търговец ${OP.name}, Пафос, Кипър („ние“). Контакт: ${H}. Като ползваш Услугата, приемаш тези Условия.
+
+## Какво е Услугата
+betizzi публикува информация за футболни мачове, статистика, прогнози на базата на модел и оценени шансове, коефициенти на букмейкъри и инструменти като създаване на фиш, с информационна и развлекателна цел. Прогнозите и шансовете са оценки от данни и правила, които могат да се променят. Показаните коефициенти принадлежат на букмейкъри трети страни и могат да се променят, да се различават според държавата или профила или да не са вече налични.
+
+betizzi не е букмейкър, нито организатор на хазартни игри. Не приемаме и не уреждаме залози и не държим средства на играчи. Това, което правиш при букмейкър, е между теб и него, според неговите условия и закона в твоята страна.
+
+## Кой може да я ползва
+Услугата е за пълнолетни на 18 или повече години, или повече, където законът го изисква (например 21 в Гърция). Не я ползвай там, където това би било незаконно. Само ти решаваш дали да залагаш.
+
+## Без обещание за печалба
+Прогнозата не е обещание, че залогът ще спечели. Данните, резултатите, часовете и коефициентите може да са непълни, закъснели или грешни. Миналите резултати не предсказват бъдещите. Не даваме лични съвети за залагане или финансови съвети. Доколкото законът позволява, не носим отговорност за загуби от твоите залози.
+
+## Кредити и награди
+Ако предлагаме кредити или награди (например за споделяне или покана на приятели), те нямат парична стойност, не могат да се продават или прехвърлят и могат да бъдат променени или прекратени. Можем да анулираме кредити, получени чрез злоупотреба, фалшиви профили или автоматизация.
+
+## Профили
+Ако предлагаме профили, трябва да посочиш имейл, който контролираш, и да пазиш достъпа сигурен. Можем да спрем или изтрием профил при злоупотреба, незаконно ползване или сериозно нарушение на тези Условия. Можеш по всяко време да поискаш да изтрием профила ти.
+
+## Допустимо ползване
+Не копирай Услугата масово, не я извличай автоматично, не пречи на работата ѝ и не я ползвай за нарушаване на закона. Не представяй нашите прогнози като своя платена услуга.
+
+## Връзки и реклама
+Услугата съдържа връзки към сайтове на трети страни, включително букмейкъри, някои от които може да ни плащат (виж Декларацията за афилиейт). Не носим отговорност за сайтове на трети страни.
+
+## Интелектуална собственост
+Сайтът, името и логото betizzi, текстовете и дизайнът принадлежат на нас или на нашите лицензодатели. Имената и емблемите на отборите принадлежат на собствениците им и се ползват само за идентификация.
+
+## Промени и приложимо право
+Можем да обновяваме тези Условия; датата по-горе показва действащата версия. Условията се уреждат от правото на Република Кипър, без да ограничават задължителните потребителски права, които имаш там, където живееш.`,
+});
+
+Object.assign(PG.privacy.body, {
+  es: `Fecha de entrada en vigor: 3 de noviembre de 2026.
+
+## Quién es el responsable
+El responsable del tratamiento es el empresario individual ${OP.name}, Pafos, Chipre, que gestiona betizzi.com. Solicitudes de privacidad: ${PV}.
+
+## Qué usamos
+- **Datos técnicos de la solicitud** (dirección IP, navegador, hora, país según nuestro proveedor de alojamiento). Finalidad: mostrar el sitio, mostrar el aviso de edad de tu país, proteger contra abusos y corregir errores. Base legal: interés legítimo. Se guardan en registros breves de nuestro proveedor (Cloudflare), normalmente unos días.
+- **Recuento de visitas.** Contamos páginas vistas y toques en botones por tipo de página, idioma y país, sin cookie y sin identificador, así que no sabemos quién eres. Finalidad: saber qué partes del sitio se usan. Base legal: interés legítimo.
+- **Tus elecciones en el sitio** (boleto, importe, casa de apuestas, filtros, pestaña abierta, cupones guardados). Se guardan solo en tu navegador (almacenamiento local) y no se nos envían.
+- **Emails que nos envías.** Finalidad: responderte. Base legal: interés legítimo. Se guardan el tiempo necesario para tratar tu mensaje.
+
+## Si creas una cuenta gratuita
+- **Qué guardamos:** tu email, idioma, país (según tu conexión), tu confirmación de que tienes la edad legal, la fecha de registro, tu historial de créditos y tu elección sobre la newsletter.
+- **Acceso:** te enviamos un código de 6 dígitos por email. Guardamos solo una forma cifrada (hash) del código durante 10 minutos. Al entrar ponemos una cookie de sesión (bz_s) durante un máximo de 90 días; guardamos una copia cifrada para reconocer tu sesión.
+- **Registro de seguridad:** accesos y acciones importantes de la cuenta, para proteger tu cuenta y el servicio.
+- **Finalidad y base legal:** darte la cuenta y sus funciones (tips VIP, créditos). Base legal: nuestro contrato contigo. Newsletter solo si marcas la casilla aparte (consentimiento); puedes retirarlo cuando quieras.
+- **Emails que enviamos:** solo el código de acceso y un email de bienvenida. Sin publicidad.
+- **Cuánto tiempo:** mientras mantengas la cuenta. Puedes pedir que la borremos en cualquier momento escribiendo a ${PV}.
+
+## Google Analytics (solo si aceptas)
+Si pulsas «Aceptar» en el aviso de cookies, usamos Google Analytics (Google Ireland Ltd) para ver cómo se usa el sitio: páginas vistas, tipo de dispositivo, ubicación aproximada (país/ciudad) y cómo llegaste. Base legal: tu consentimiento. Google guarda estos datos 14 meses. Si pulsas «Rechazar», no se ponen cookies de analítica; Google recibe solo señales básicas sin cookies, que no te identifican. Puedes cambiar tu elección en cualquier momento con «Ajustes de cookies» al pie de cada página.
+
+No usamos cookies publicitarias y no vendemos datos personales.
+
+## Quién trata datos por nosotros
+Cloudflare, Inc. (alojamiento, base de datos, seguridad y envío de nuestros emails) y, solo si aceptas las cookies de analítica, Google Ireland Ltd (Google Analytics). Los datos pueden tratarse fuera de la UE con cláusulas contractuales tipo de la Comisión Europea o una decisión de adecuación.
+
+## Tus derechos
+Puedes pedir acceso, rectificación, supresión, limitación o portabilidad de tus datos, u oponerte al tratamiento, escribiendo a ${PV}. Respondemos en un mes. También puedes reclamar ante el Comisionado de Protección de Datos de Chipre ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) o la autoridad de tu país.
+
+## Edad
+betizzi no es para menores de 18 años (21 en Grecia). No tratamos a sabiendas datos de menores.`,
+  pt: `Data de entrada em vigor: 3 de novembro de 2026.
+
+## Quem é o responsável
+O responsável pelo tratamento é o empresário em nome individual ${OP.name}, Pafos, Chipre, que gere o betizzi.com. Pedidos de privacidade: ${PV}.
+
+## O que usamos
+- **Dados técnicos do pedido** (endereço IP, navegador, hora, país segundo o nosso fornecedor de alojamento). Finalidade: mostrar o site, mostrar o aviso de idade do teu país, proteger contra abusos e corrigir erros. Base legal: interesse legítimo. Guardados em registos curtos do nosso fornecedor (Cloudflare), normalmente alguns dias.
+- **Contagem de visitas.** Contamos páginas vistas e toques em botões por tipo de página, idioma e país, sem cookie e sem identificador, por isso não sabemos quem és. Finalidade: saber que partes do site são usadas. Base legal: interesse legítimo.
+- **As tuas escolhas no site** (boletim, valor, casa de apostas, filtros, separador aberto, cupões guardados). Guardadas só no teu navegador (armazenamento local); não nos são enviadas.
+- **Emails que nos envias.** Finalidade: responder-te. Base legal: interesse legítimo. Guardados o tempo necessário para tratar a tua mensagem.
+
+## Se criares uma conta gratuita
+- **O que guardamos:** o teu email, idioma, país (pela tua ligação), a confirmação de que tens a idade legal, a data de registo, o histórico de créditos e a tua escolha sobre a newsletter.
+- **Entrada:** enviamos-te um código de 6 dígitos por email. Guardamos só uma forma cifrada (hash) do código durante 10 minutos. Ao entrares, criamos um cookie de sessão (bz_s) por até 90 dias; guardamos uma cópia cifrada para reconhecer a tua sessão.
+- **Registo de segurança:** entradas e ações importantes da conta, para proteger a tua conta e o serviço.
+- **Finalidade e base legal:** dar-te a conta e as suas funções (palpites VIP, créditos). Base legal: o nosso contrato contigo. Newsletter só se marcares a caixa separada (consentimento); podes retirá-lo a qualquer momento.
+- **Emails que enviamos:** só o código de entrada e um email de boas-vindas. Sem publicidade.
+- **Durante quanto tempo:** enquanto mantiveres a conta. Podes pedir que a apaguemos a qualquer momento escrevendo para ${PV}.
+
+## Google Analytics (só se aceitares)
+Se carregares em «Aceitar» no aviso de cookies, usamos o Google Analytics (Google Ireland Ltd) para ver como o site é usado: páginas vistas, tipo de dispositivo, localização aproximada (país/cidade) e como chegaste. Base legal: o teu consentimento. A Google guarda estes dados 14 meses. Se carregares em «Rejeitar», não são criados cookies de análise; a Google recebe só sinais básicos sem cookies, que não te identificam. Podes mudar a tua escolha a qualquer momento em «Definições de cookies» no fundo de cada página.
+
+Não usamos cookies de publicidade e não vendemos dados pessoais.
+
+## Quem trata dados por nós
+Cloudflare, Inc. (alojamento, base de dados, segurança e envio dos nossos emails) e, só se aceitares os cookies de análise, Google Ireland Ltd (Google Analytics). Os dados podem ser tratados fora da UE ao abrigo de cláusulas contratuais-tipo da Comissão Europeia ou de uma decisão de adequação.
+
+## Os teus direitos
+Podes pedir acesso, retificação, apagamento, limitação ou portabilidade dos teus dados, ou opor-te ao tratamento, escrevendo para ${PV}. Respondemos no prazo de um mês. Podes também apresentar queixa ao Comissário para a Proteção de Dados de Chipre ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) ou à autoridade do teu país.
+
+## Idade
+O betizzi não se destina a menores de 18 anos (21 na Grécia). Não tratamos conscientemente dados de menores.`,
+  fr: `Date d'entrée en vigueur : 3 novembre 2026.
+
+## Responsable du traitement
+Le responsable du traitement est l'entreprise individuelle de ${OP.name}, Paphos, Chypre, qui exploite betizzi.com. Demandes relatives à la vie privée : ${PV}.
+
+## Ce que nous utilisons
+- **Données techniques de la requête** (adresse IP, navigateur, heure, pays selon notre hébergeur). Finalité : afficher le site, afficher l'avertissement d'âge de votre pays, protéger contre les abus et corriger les erreurs. Base légale : intérêt légitime. Conservées dans des journaux courts de notre hébergeur (Cloudflare), en général quelques jours.
+- **Comptage des visites.** Nous comptons les pages vues et les clics par type de page, langue et pays, sans cookie ni identifiant : nous ne savons pas qui vous êtes. Finalité : savoir quelles parties du site sont utilisées. Base légale : intérêt légitime.
+- **Vos choix sur le site** (ticket, mise, bookmaker, filtres, onglet ouvert, coupons enregistrés). Enregistrés uniquement dans votre navigateur (stockage local) ; ils ne nous sont pas envoyés.
+- **E-mails que vous nous envoyez.** Finalité : vous répondre. Base légale : intérêt légitime. Conservés le temps nécessaire pour traiter votre message.
+
+## Si vous créez un compte gratuit
+- **Ce que nous conservons :** votre adresse e-mail, votre langue, votre pays (selon votre connexion), votre confirmation d'avoir l'âge légal, la date d'inscription, l'historique de vos crédits et votre choix concernant la newsletter.
+- **Connexion :** nous vous envoyons un code à 6 chiffres par e-mail. Nous ne conservons qu'une forme brouillée (hachée) du code pendant 10 minutes. À la connexion, nous plaçons un cookie de session (bz_s) pour 90 jours maximum ; nous en gardons une copie brouillée pour reconnaître votre session.
+- **Journal de sécurité :** connexions et actions importantes sur le compte, pour protéger votre compte et le service.
+- **Finalité et base légale :** vous fournir le compte et ses fonctions (tips VIP, crédits). Base légale : notre contrat avec vous. Newsletter uniquement si vous cochez la case séparée (consentement) ; vous pouvez le retirer à tout moment.
+- **E-mails que nous envoyons :** uniquement le code de connexion et un e-mail de bienvenue. Aucune publicité.
+- **Durée :** tant que vous gardez votre compte. Vous pouvez demander sa suppression à tout moment en écrivant à ${PV}.
+
+## Google Analytics (seulement si vous acceptez)
+Si vous cliquez sur « Accepter » dans notre bandeau cookies, nous utilisons Google Analytics (Google Ireland Ltd) pour voir comment le site est utilisé : pages vues, type d'appareil, localisation approximative (pays/ville) et provenance. Base légale : votre consentement. Google conserve ces données 14 mois. Si vous cliquez sur « Refuser », aucun cookie d'analyse n'est déposé ; Google ne reçoit que des signaux de base sans cookies, qui ne permettent pas de vous identifier. Vous pouvez modifier votre choix à tout moment via « Paramètres des cookies » en bas de chaque page.
+
+Nous n'utilisons pas de cookies publicitaires et ne vendons pas de données personnelles.
+
+## Qui traite les données pour nous
+Cloudflare, Inc. (hébergement, base de données, sécurité et envoi de nos e-mails) et, uniquement si vous acceptez les cookies d'analyse, Google Ireland Ltd (Google Analytics). Les données peuvent être traitées hors de l'UE sur la base des clauses contractuelles types de la Commission européenne ou d'une décision d'adéquation.
+
+## Vos droits
+Vous pouvez demander l'accès, la rectification, l'effacement, la limitation ou la portabilité de vos données, ou vous opposer au traitement, en écrivant à ${PV}. Nous répondons sous un mois. Vous pouvez aussi saisir le Commissaire à la protection des données de Chypre ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) ou l'autorité de votre pays (en France, la CNIL).
+
+## Âge
+betizzi n'est pas destiné aux moins de 18 ans (21 en Grèce). Nous ne traitons pas sciemment de données de mineurs.`,
+  de: `Gültig ab: 3. November 2026.
+
+## Verantwortlicher
+Verantwortlich ist das Einzelunternehmen ${OP.name}, Paphos, Zypern, das betizzi.com betreibt. Datenschutzanfragen: ${PV}.
+
+## Was wir verwenden
+- **Technische Anfragedaten** (IP-Adresse, Browser, Zeitpunkt, Land laut unserem Hosting-Anbieter). Zweck: die Website ausliefern, den Altershinweis für dein Land zeigen, vor Missbrauch schützen und Fehler beheben. Rechtsgrundlage: berechtigtes Interesse. Gespeichert in kurzlebigen Logs unseres Anbieters (Cloudflare), meist einige Tage.
+- **Besuchszählung.** Wir zählen Seitenaufrufe und Klicks nach Seitentyp, Sprache und Land, ohne Cookie und ohne Kennung – wir wissen also nicht, wer du bist. Zweck: wissen, welche Teile der Website genutzt werden. Rechtsgrundlage: berechtigtes Interesse.
+- **Deine Einstellungen auf der Website** (Wettschein, Einsatz, Buchmacher, Filter, offener Tab, gespeicherte Scheine). Nur in deinem Browser gespeichert (lokaler Speicher); sie werden nicht an uns gesendet.
+- **E-Mails an uns.** Zweck: dir antworten. Rechtsgrundlage: berechtigtes Interesse. Gespeichert, solange es für deine Anfrage nötig ist.
+
+## Wenn du ein kostenloses Konto anlegst
+- **Was wir speichern:** deine E-Mail-Adresse, Sprache, Land (aus deiner Verbindung), deine Bestätigung der Volljährigkeit, das Anmeldedatum, deinen Credit-Verlauf und deine Wahl zum Newsletter.
+- **Anmeldung:** Wir senden dir einen 6-stelligen Code per E-Mail. Wir speichern nur eine verschlüsselte (gehashte) Form des Codes für 10 Minuten. Bei der Anmeldung setzen wir ein Sitzungs-Cookie (bz_s) für bis zu 90 Tage; wir speichern eine verschlüsselte Kopie, um deine Sitzung zu erkennen.
+- **Sicherheitsprotokoll:** Anmeldungen und wichtige Kontoaktionen, um dein Konto und den Dienst zu schützen.
+- **Zweck und Rechtsgrundlage:** dir das Konto und seine Funktionen bereitstellen (VIP-Tipps, Credits). Rechtsgrundlage: unser Vertrag mit dir. Newsletter nur, wenn du das separate Kästchen ankreuzt (Einwilligung); du kannst sie jederzeit widerrufen.
+- **E-Mails, die wir senden:** nur den Anmeldecode und eine Willkommens-E-Mail. Keine Werbung.
+- **Wie lange:** solange du dein Konto behältst. Du kannst jederzeit die Löschung verlangen, per E-Mail an ${PV}.
+
+## Google Analytics (nur mit deiner Zustimmung)
+Wenn du im Cookie-Banner auf „Akzeptieren“ klickst, nutzen wir Google Analytics (Google Ireland Ltd), um zu sehen, wie die Website genutzt wird: aufgerufene Seiten, Gerätetyp, ungefährer Standort (Land/Stadt) und wie du zu uns gekommen bist. Rechtsgrundlage: deine Einwilligung. Google speichert diese Daten 14 Monate. Wenn du auf „Ablehnen“ klickst, werden keine Analyse-Cookies gesetzt; Google erhält nur einfache Signale ohne Cookies, die dich nicht identifizieren. Du kannst deine Wahl jederzeit über „Cookie-Einstellungen“ unten auf jeder Seite ändern.
+
+Wir verwenden keine Werbe-Cookies und verkaufen keine personenbezogenen Daten.
+
+## Wer Daten für uns verarbeitet
+Cloudflare, Inc. (Hosting, Datenbank, Sicherheit und Versand unserer E-Mails) und, nur wenn du Analyse-Cookies akzeptierst, Google Ireland Ltd (Google Analytics). Daten können außerhalb der EU auf Grundlage der Standardvertragsklauseln der Europäischen Kommission oder eines Angemessenheitsbeschlusses verarbeitet werden.
+
+## Deine Rechte
+Du kannst Auskunft, Berichtigung, Löschung, Einschränkung oder Übertragbarkeit deiner Daten verlangen oder der Verarbeitung widersprechen, per E-Mail an ${PV}. Wir antworten innerhalb eines Monats. Du kannst dich auch beim zyprischen Datenschutzbeauftragten ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) oder bei der Aufsichtsbehörde deines Wohnorts beschweren.
+
+## Alter
+betizzi ist nicht für Personen unter 18 Jahren (21 in Griechenland). Wir verarbeiten nicht wissentlich Daten von Minderjährigen.`,
+  ro: `Data intrării în vigoare: 3 noiembrie 2026.
+
+## Cine este operatorul
+Operatorul de date este întreprinderea individuală ${OP.name}, Pafos, Cipru, care administrează betizzi.com. Cereri privind datele: ${PV}.
+
+## Ce folosim
+- **Date tehnice ale cererii** (adresa IP, browserul, ora, țara după furnizorul nostru de găzduire). Scop: afișarea site-ului, afișarea avertismentului de vârstă pentru țara ta, protecție împotriva abuzurilor și corectarea erorilor. Temei legal: interes legitim. Păstrate în jurnale de scurtă durată ale furnizorului (Cloudflare), de obicei câteva zile.
+- **Numărarea vizitelor.** Numărăm afișările de pagini și apăsările pe butoane după tipul paginii, limbă și țară, fără cookie și fără identificator, deci nu știm cine ești. Scop: să știm ce părți ale site-ului sunt folosite. Temei legal: interes legitim.
+- **Alegerile tale pe site** (bilet, miză, casă de pariuri, filtre, fila deschisă, bilete salvate). Salvate doar în browserul tău (stocare locală); nu ne sunt trimise.
+- **Emailurile pe care ni le trimiți.** Scop: să-ți răspundem. Temei legal: interes legitim. Păstrate cât e nevoie pentru a rezolva mesajul.
+
+## Dacă îți faci un cont gratuit
+- **Ce păstrăm:** adresa de email, limba, țara (după conexiune), confirmarea că ai vârsta legală, data înregistrării, istoricul creditelor și alegerea ta privind newsletterul.
+- **Autentificare:** îți trimitem un cod de 6 cifre pe email. Păstrăm doar o formă criptată (hash) a codului timp de 10 minute. La autentificare setăm un cookie de sesiune (bz_s) pentru cel mult 90 de zile; păstrăm o copie criptată ca să-ți recunoaștem sesiunea.
+- **Jurnal de securitate:** autentificări și acțiuni importante în cont, pentru protecția contului și a serviciului.
+- **Scop și temei legal:** să-ți oferim contul și funcțiile lui (ponturi VIP, credite). Temei legal: contractul nostru cu tine. Newsletter doar dacă bifezi căsuța separată (consimțământ); îl poți retrage oricând.
+- **Emailuri pe care le trimitem:** doar codul de autentificare și un email de bun venit. Fără publicitate.
+- **Cât timp:** cât timp păstrezi contul. Ne poți cere oricând să-l ștergem, scriind la ${PV}.
+
+## Google Analytics (doar dacă accepți)
+Dacă apeși „Accept“ în bannerul de cookie-uri, folosim Google Analytics (Google Ireland Ltd) ca să vedem cum e folosit site-ul: pagini vizitate, tipul dispozitivului, locația aproximativă (țară/oraș) și cum ai ajuns. Temei legal: consimțământul tău. Google păstrează aceste date 14 luni. Dacă apeși „Refuz“, nu se setează cookie-uri de analiză; Google primește doar semnale de bază fără cookie-uri, care nu te identifică. Îți poți schimba oricând alegerea din „Setări cookie-uri“, în josul fiecărei pagini.
+
+Nu folosim cookie-uri de publicitate și nu vindem date personale.
+
+## Cine prelucrează date pentru noi
+Cloudflare, Inc. (găzduire, bază de date, securitate și trimiterea emailurilor noastre) și, doar dacă accepți cookie-urile de analiză, Google Ireland Ltd (Google Analytics). Datele pot fi prelucrate în afara UE pe baza clauzelor contractuale standard ale Comisiei Europene sau a unei decizii de adecvare.
+
+## Drepturile tale
+Poți cere acces, rectificare, ștergere, restricționare sau portabilitatea datelor ori te poți opune prelucrării, scriind la ${PV}. Răspundem în cel mult o lună. Poți depune și plângere la Comisarul pentru Protecția Datelor din Cipru ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) sau la autoritatea din țara ta (în România, ANSPDCP).
+
+## Vârsta
+betizzi nu este pentru persoane sub 18 ani (21 în Grecia). Nu prelucrăm cu bună știință date ale minorilor.`,
+  sr: `Datum stupanja na snagu: 3. novembar 2026.
+
+## Ko je rukovalac
+Rukovalac podacima je preduzetnik ${OP.name}, Pafos, Kipar, koji upravlja sajtom betizzi.com. Zahtevi u vezi sa privatnošću: ${PV}.
+
+## Šta koristimo
+- **Tehnički podaci zahteva** (IP adresa, pregledač, vreme, zemlja prema našem provajderu hostinga). Svrha: prikaz sajta, prikaz upozorenja o uzrastu za tvoju zemlju, zaštita od zloupotrebe i ispravljanje grešaka. Pravni osnov: legitimni interes. Čuvaju se u kratkotrajnim logovima provajdera (Cloudflare), obično nekoliko dana.
+- **Brojanje poseta.** Brojimo prikaze stranica i dodire dugmadi po tipu stranice, jeziku i zemlji, bez kolačića i bez identifikatora, pa ne znamo ko si. Svrha: da znamo koji delovi sajta se koriste. Pravni osnov: legitimni interes.
+- **Tvoji izbori na sajtu** (tiket, ulog, kladionica, filteri, otvorena kartica, sačuvani tiketi). Čuvaju se samo u tvom pregledaču (lokalno skladište); ne šalju se nama.
+- **Emailovi koje nam pošalješ.** Svrha: da ti odgovorimo. Pravni osnov: legitimni interes. Čuvaju se koliko je potrebno da obradimo poruku.
+
+## Ako napraviš besplatan nalog
+- **Šta čuvamo:** tvoju email adresu, jezik, zemlju (prema konekciji), potvrdu da si punoletan, datum registracije, istoriju kredita i tvoj izbor u vezi sa newsletterom.
+- **Prijava:** šaljemo ti šestocifreni kod na email. Čuvamo samo šifrovani (heširani) oblik koda 10 minuta. Pri prijavi postavljamo kolačić sesije (bz_s) do 90 dana; čuvamo šifrovanu kopiju da bismo prepoznali sesiju.
+- **Bezbednosni zapis:** prijave i važne radnje na nalogu, radi zaštite naloga i usluge.
+- **Svrha i pravni osnov:** da ti obezbedimo nalog i njegove funkcije (VIP tipovi, krediti). Pravni osnov: naš ugovor sa tobom. Newsletter samo ako označiš posebno polje (pristanak); možeš ga povući bilo kada.
+- **Emailovi koje šaljemo:** samo kod za prijavu i jedan email dobrodošlice. Bez reklama.
+- **Koliko dugo:** dok god imaš nalog. Bilo kada možeš tražiti brisanje pisanjem na ${PV}.
+
+## Google Analytics (samo ako prihvatiš)
+Ako klikneš „Prihvati“ u obaveštenju o kolačićima, koristimo Google Analytics (Google Ireland Ltd) da vidimo kako se sajt koristi: posećene stranice, vrsta uređaja, približna lokacija (zemlja/grad) i kako si stigao. Pravni osnov: tvoj pristanak. Google čuva ove podatke 14 meseci. Ako klikneš „Odbij“, kolačići za analitiku se ne postavljaju; Google dobija samo osnovne signale bez kolačića, koji te ne identifikuju. Izbor možeš promeniti bilo kada preko „Podešavanja kolačića“ na dnu svake stranice.
+
+Ne koristimo reklamne kolačiće i ne prodajemo lične podatke.
+
+## Ko obrađuje podatke za nas
+Cloudflare, Inc. (hosting, baza podataka, bezbednost i slanje naših emailova) i, samo ako prihvatiš kolačiće za analitiku, Google Ireland Ltd (Google Analytics). Podaci se mogu obrađivati van EU na osnovu standardnih ugovornih klauzula Evropske komisije ili odluke o adekvatnosti.
+
+## Tvoja prava
+Možeš tražiti pristup, ispravku, brisanje, ograničenje ili prenosivost podataka, ili se usprotiviti obradi, pisanjem na ${PV}. Odgovaramo u roku od mesec dana. Možeš podneti i pritužbu Poverenici za zaštitu podataka Kipra ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) ili nadležnom organu u tvojoj zemlji.
+
+## Uzrast
+betizzi nije za osobe mlađe od 18 godina (21 u Grčkoj). Svesno ne obrađujemo podatke maloletnika.`,
+  bg: `В сила от: 3 ноември 2026 г.
+
+## Кой е администраторът
+Администратор на данните е едноличният търговец ${OP.name}, Пафос, Кипър, който управлява betizzi.com. Искания за поверителност: ${PV}.
+
+## Какво използваме
+- **Технически данни от заявката** (IP адрес, браузър, час, държава според хостинг доставчика ни). Цел: показване на сайта, показване на предупреждението за възраст за твоята държава, защита от злоупотреби и поправка на грешки. Правно основание: законен интерес. Пазят се в краткосрочни логове на доставчика (Cloudflare), обикновено няколко дни.
+- **Броене на посещенията.** Броим прегледите на страници и натисканията на бутони по вид страница, език и държава, без бисквитка и без идентификатор, така че не знаем кой си. Цел: да знаем кои части на сайта се ползват. Правно основание: законен интерес.
+- **Твоите избори в сайта** (фиш, залог, букмейкър, филтри, отворен раздел, запазени фишове). Пазят се само в браузъра ти (локално хранилище); не се изпращат до нас.
+- **Имейли, които ни пишеш.** Цел: да ти отговорим. Правно основание: законен интерес. Пазят се толкова, колкото е нужно за съобщението.
+
+## Ако създадеш безплатен профил
+- **Какво пазим:** имейла ти, езика, държавата (според връзката), потвърждението ти, че си пълнолетен, датата на регистрация, историята на кредитите и избора ти за бюлетина.
+- **Вход:** изпращаме ти 6-цифрен код по имейл. Пазим само кодирана (хеширана) форма на кода за 10 минути. При вход поставяме бисквитка за сесия (bz_s) за до 90 дни; пазим кодирано копие, за да разпознаваме сесията ти.
+- **Дневник за сигурност:** влизания и важни действия в профила, за защита на профила и услугата.
+- **Цел и правно основание:** да ти предоставим профила и функциите му (VIP прогнози, кредити). Правно основание: договорът ни с теб. Бюлетин само ако отметнеш отделното поле (съгласие); можеш да го оттеглиш по всяко време.
+- **Имейли, които изпращаме:** само кода за вход и един приветствен имейл. Без реклама.
+- **Колко дълго:** докато пазиш профила си. Можеш по всяко време да поискаш изтриването му на ${PV}.
+
+## Google Analytics (само ако приемеш)
+Ако натиснеш „Приемам“ в банера за бисквитки, използваме Google Analytics (Google Ireland Ltd), за да виждаме как се ползва сайтът: прегледани страници, вид устройство, приблизително местоположение (държава/град) и откъде си дошъл. Правно основание: твоето съгласие. Google пази тези данни 14 месеца. Ако натиснеш „Отказвам“, не се поставят аналитични бисквитки; Google получава само основни сигнали без бисквитки, които не те идентифицират. Можеш да промениш избора си по всяко време от „Настройки за бисквитки“ в долната част на всяка страница.
+
+Не използваме рекламни бисквитки и не продаваме лични данни.
+
+## Кой обработва данни за нас
+Cloudflare, Inc. (хостинг, база данни, сигурност и изпращане на имейлите ни) и, само ако приемеш аналитичните бисквитки, Google Ireland Ltd (Google Analytics). Данните може да се обработват извън ЕС въз основа на стандартните договорни клаузи на Европейската комисия или решение за адекватност.
+
+## Твоите права
+Можеш да поискаш достъп, поправка, изтриване, ограничаване или преносимост на данните си, или да възразиш срещу обработването, като пишеш на ${PV}. Отговаряме в срок от един месец. Можеш да подадеш и жалба до Комисаря за защита на личните данни на Кипър ([dataprotection.gov.cy](https://www.dataprotection.gov.cy)) или до органа в твоята държава (в България — КЗЛД).
+
+## Възраст
+betizzi не е за лица под 18 години (21 в Гърция). Не обработваме съзнателно данни на непълнолетни.`,
+});
+
+const CK = (intro, h1, s, ga, change, h2, store, l1, l2, l3, l4, l5, need, ads) => `${intro}
+
+## ${h1}
+- **bz_s** — ${s}
+- **_ga, _ga_WW02BKK8TV** — ${ga}
+
+${change}
+
+## ${h2}
+${store}
+- **ko-slip, ko-stake, ko-smode** — ${l1}
+- **ko-book** — ${l2}
+- **ko-lfil, ko-tab, ko-vip** — ${l3}
+- **ko-builder, ko-bmode, ko-coupons** — ${l4}
+- **ko-y** — ${l5}
+
+${need}
+
+${ads}`;
+
+Object.assign(PG.cookies.body, {
+  es: CK(`Fecha de entrada en vigor: 3 de noviembre de 2026.
+
+betizzi no usa cookies publicitarias. Las cookies de analítica solo se ponen si pulsas «Aceptar» en nuestro aviso de cookies.`, "Cookies que usamos",
+    "la cookie de sesión. Solo se pone cuando entras en tu cuenta gratuita, para que sigas conectado. Es HttpOnly y segura, dura hasta 90 días y se borra al salir. Es estrictamente necesaria para que funcione la cuenta, así que no requiere tu consentimiento.",
+    "Google Analytics, solo si aceptas. Distinguen visitas para que podamos contar cómo se usa el sitio. Duran hasta 2 años. Si rechazas, no se ponen.",
+    "Puedes cambiar tu elección en cualquier momento con «Ajustes de cookies» al pie de cada página.", "Lo que guardamos en tu navegador",
+    "También usamos el almacenamiento de tu navegador para recordar tus elecciones, para que el sitio funcione como lo dejaste. Estos datos se quedan en tu dispositivo y no se nos envían.",
+    "tu boleto, importe y modo de boleto.", "la casa de apuestas que elegiste para las cuotas.", "tu filtro de ligas, la pestaña abierta y la vista VIP.", "ajustes del creador y cupones guardados.", "(solo durante una visita) tu posición de desplazamiento.",
+    "Son necesarios para las funciones que usas. Puedes borrarlos cuando quieras en los ajustes de tu navegador; el sitio simplemente olvidará tus elecciones (y cerrará tu sesión).",
+    "Si algún día añadimos cookies publicitarias, actualizaremos esta página y te pediremos antes tu consentimiento."),
+  pt: CK(`Data de entrada em vigor: 3 de novembro de 2026.
+
+O betizzi não usa cookies de publicidade. Os cookies de análise só são criados se carregares em «Aceitar» no nosso aviso de cookies.`, "Cookies que usamos",
+    "o cookie de sessão. Só é criado quando entras na tua conta gratuita, para continuares ligado. É HttpOnly e seguro, dura até 90 dias e é apagado quando sais. É estritamente necessário para a conta funcionar, por isso não precisa do teu consentimento.",
+    "Google Analytics, só se aceitares. Distinguem visitas para podermos contar como o site é usado. Duram até 2 anos. Se rejeitares, não são criados.",
+    "Podes mudar a tua escolha a qualquer momento em «Definições de cookies» no fundo de cada página.", "O que guardamos no teu navegador",
+    "Também usamos o armazenamento do teu navegador para lembrar as tuas escolhas, para o site funcionar como o deixaste. Estes dados ficam no teu dispositivo e não nos são enviados.",
+    "o teu boletim, valor e modo do boletim.", "a casa de apostas que escolheste para as odds.", "o teu filtro de ligas, o separador aberto e a vista VIP.", "definições do criador e cupões guardados.", "(só durante uma visita) a tua posição na página.",
+    "São necessários para as funções que usas. Podes apagá-los quando quiseres nas definições do navegador; o site simplesmente esquece as tuas escolhas (e termina a tua sessão).",
+    "Se algum dia acrescentarmos cookies de publicidade, atualizamos esta página e pedimos primeiro o teu consentimento."),
+  fr: CK(`Date d'entrée en vigueur : 3 novembre 2026.
+
+betizzi ne dépose pas de cookies publicitaires. Les cookies d'analyse ne sont déposés que si vous cliquez sur « Accepter » dans notre bandeau cookies.`, "Cookies que nous déposons",
+    "le cookie de connexion. Déposé uniquement quand vous vous connectez à votre compte gratuit, pour rester connecté. HttpOnly et sécurisé, il dure 90 jours maximum et est supprimé à la déconnexion. Il est strictement nécessaire au fonctionnement du compte et ne requiert donc pas votre consentement.",
+    "Google Analytics, uniquement si vous acceptez. Ils distinguent les visites pour mesurer l'usage du site. Ils durent jusqu'à 2 ans. Si vous refusez, ils ne sont pas déposés.",
+    "Vous pouvez modifier votre choix à tout moment via « Paramètres des cookies » en bas de chaque page.", "Ce que nous enregistrons dans votre navigateur",
+    "Nous utilisons aussi le stockage de votre navigateur pour retenir vos choix, afin que le site fonctionne comme vous l'avez laissé. Ces données restent sur votre appareil et ne nous sont pas envoyées.",
+    "votre ticket, votre mise et le mode du ticket.", "le bookmaker choisi pour les cotes.", "votre filtre de ligues, l'onglet ouvert et la vue VIP.", "réglages du créateur et coupons enregistrés.", "(pendant une seule visite) votre position de défilement.",
+    "Ils sont nécessaires aux fonctions que vous utilisez. Vous pouvez les supprimer à tout moment dans les réglages de votre navigateur ; le site oubliera simplement vos choix (et vous déconnectera).",
+    "Si nous ajoutons un jour des cookies publicitaires, nous mettrons cette page à jour et vous demanderons d'abord votre consentement."),
+  de: CK(`Gültig ab: 3. November 2026.
+
+betizzi setzt keine Werbe-Cookies. Analyse-Cookies werden nur gesetzt, wenn du in unserem Cookie-Banner auf „Akzeptieren“ klickst.`, "Cookies, die wir setzen",
+    "das Anmelde-Cookie. Wird nur gesetzt, wenn du dich in dein kostenloses Konto einloggst, damit du angemeldet bleibst. HttpOnly und sicher, gilt bis zu 90 Tage und wird beim Abmelden gelöscht. Es ist für das Konto technisch notwendig und braucht daher keine Einwilligung.",
+    "Google Analytics, nur wenn du zustimmst. Sie unterscheiden Besuche, damit wir die Nutzung zählen können. Laufzeit bis zu 2 Jahre. Wenn du ablehnst, werden sie nicht gesetzt.",
+    "Du kannst deine Wahl jederzeit über „Cookie-Einstellungen“ unten auf jeder Seite ändern.", "Was wir in deinem Browser speichern",
+    "Wir nutzen außerdem den Speicher deines Browsers, um deine Einstellungen zu merken, damit die Website so funktioniert, wie du sie verlassen hast. Diese Daten bleiben auf deinem Gerät und werden nicht an uns gesendet.",
+    "dein Wettschein, Einsatz und Schein-Modus.", "der gewählte Buchmacher für die Quoten.", "dein Liga-Filter, der offene Tab und die VIP-Ansicht.", "Einstellungen des Baukastens und gespeicherte Scheine.", "(nur für einen Besuch) deine Scrollposition.",
+    "Sie sind für Funktionen nötig, die du nutzt. Du kannst sie jederzeit in den Browser-Einstellungen löschen; die Website vergisst dann einfach deine Einstellungen (und meldet dich ab).",
+    "Sollten wir jemals Werbe-Cookies einführen, aktualisieren wir diese Seite und fragen vorher nach deiner Einwilligung."),
+  ro: CK(`Data intrării în vigoare: 3 noiembrie 2026.
+
+betizzi nu folosește cookie-uri de publicitate. Cookie-urile de analiză se setează doar dacă apeși „Accept“ în bannerul nostru de cookie-uri.`, "Cookie-uri pe care le setăm",
+    "cookie-ul de autentificare. Se setează doar când intri în contul tău gratuit, ca să rămâi conectat. Este HttpOnly și securizat, durează cel mult 90 de zile și se șterge când ieși din cont. Este strict necesar pentru funcționarea contului, deci nu necesită consimțământ.",
+    "Google Analytics, doar dacă accepți. Deosebesc vizitele ca să putem număra cum e folosit site-ul. Durează cel mult 2 ani. Dacă refuzi, nu se setează.",
+    "Îți poți schimba oricând alegerea din „Setări cookie-uri“, în josul fiecărei pagini.", "Ce salvăm în browserul tău",
+    "Folosim și spațiul de stocare al browserului ca să ținem minte alegerile tale, ca site-ul să funcționeze cum l-ai lăsat. Aceste date rămân pe dispozitivul tău și nu ne sunt trimise.",
+    "biletul, miza și modul biletului.", "casa de pariuri aleasă pentru cote.", "filtrul de ligi, fila deschisă și vizualizarea VIP.", "setările constructorului și biletele salvate.", "(doar pentru o vizită) poziția de derulare.",
+    "Sunt necesare pentru funcțiile pe care le folosești. Le poți șterge oricând din setările browserului; site-ul îți va uita pur și simplu alegerile (și te va deconecta).",
+    "Dacă vom adăuga vreodată cookie-uri de publicitate, vom actualiza această pagină și îți vom cere mai întâi consimțământul."),
+  sr: CK(`Datum stupanja na snagu: 3. novembar 2026.
+
+betizzi ne postavlja reklamne kolačiće. Kolačići za analitiku se postavljaju samo ako klikneš „Prihvati“ u obaveštenju o kolačićima.`, "Kolačići koje postavljamo",
+    "kolačić za prijavu. Postavlja se samo kada se prijaviš na besplatan nalog, da bi ostao prijavljen. HttpOnly i bezbedan, traje do 90 dana i briše se kada se odjaviš. Neophodan je za rad naloga, pa mu nije potreban tvoj pristanak.",
+    "Google Analytics, samo ako prihvatiš. Razlikuju posete da bismo brojali kako se sajt koristi. Traju do 2 godine. Ako odbiješ, ne postavljaju se.",
+    "Izbor možeš promeniti bilo kada preko „Podešavanja kolačića“ na dnu svake stranice.", "Šta čuvamo u tvom pregledaču",
+    "Koristimo i skladište tvog pregledača da zapamtimo tvoje izbore, da bi sajt radio onako kako si ga ostavio. Ovi podaci ostaju na tvom uređaju i ne šalju se nama.",
+    "tvoj tiket, ulog i režim tiketa.", "kladionica koju si izabrao za kvote.", "filter liga, otvorena kartica i VIP prikaz.", "podešavanja alata i sačuvani tiketi.", "(samo tokom jedne posete) položaj na stranici.",
+    "Potrebni su za funkcije koje koristiš. Možeš ih obrisati bilo kada u podešavanjima pregledača; sajt će jednostavno zaboraviti tvoje izbore (i odjaviti te).",
+    "Ako ikada dodamo reklamne kolačiće, ažuriraćemo ovu stranicu i prvo tražiti tvoj pristanak."),
+  bg: CK(`В сила от: 3 ноември 2026 г.
+
+betizzi не поставя рекламни бисквитки. Аналитичните бисквитки се поставят само ако натиснеш „Приемам“ в банера ни за бисквитки.`, "Бисквитки, които поставяме",
+    "бисквитката за вход. Поставя се само когато влезеш в безплатния си профил, за да останеш влязъл. HttpOnly и защитена, трае до 90 дни и се изтрива при изход. Строго необходима е за работата на профила, затова не изисква съгласие.",
+    "Google Analytics, само ако приемеш. Различават посещенията, за да броим как се ползва сайтът. Траят до 2 години. Ако откажеш, не се поставят.",
+    "Можеш да промениш избора си по всяко време от „Настройки за бисквитки“ в долната част на всяка страница.", "Какво пазим в браузъра ти",
+    "Използваме и хранилището на браузъра ти, за да помним изборите ти, така че сайтът да работи както си го оставил. Тези данни остават на устройството ти и не се изпращат до нас.",
+    "фишът, залогът и режимът на фиша.", "букмейкърът, който избра за коефициентите.", "филтърът по лиги, отвореният раздел и VIP изгледът.", "настройките на инструмента и запазените фишове.", "(само за едно посещение) позицията на превъртане.",
+    "Нужни са за функциите, които ползваш. Можеш да ги изтриеш по всяко време от настройките на браузъра; сайтът просто ще забрави изборите ти (и ще те изведе от профила).",
+    "Ако някога добавим рекламни бисквитки, ще обновим тази страница и първо ще поискаме съгласието ти."),
+});
+
 
 // ---------- «Παρολί σήμερα» (απόφαση Owner 05/11): σταθερό URL ανά γλώσσα, λέξεις από την έρευνα 5/11 (υποθέσεις, χωρίς όγκο) ----------
 export const PAR = {
