@@ -2221,10 +2221,13 @@ function renderPicks(){
   L=L.filter(function(c){if(!parlayLost(c))return true;var k=String(c.n);if(PL_LOST[k]==null)PL_LOST[k]=PL_FIRST?0:plNow;
     if(plNow-PL_LOST[k]<120000){plSoon=true;return true;}plEnded.push(c);return false;});
   PL_FIRST=false;if(plSoon&&!PL_TMR)PL_TMR=setTimeout(function(){PL_TMR=null;try{renderPicks();}catch(e){}},20000);
-  var plEndH=plEnded.length?'<details class="pend"><summary><span>Ended</span> · '+plEnded.length+'</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">'+plEnded.map(function(c){return parlayHTML(c,false);}).join("")+'</div></details>':'';
+  /* 07/11 (Owner): «Έληξαν» ΜΟΝΟ κάτω από τη ζώνη του (πριν έμπαινε το ίδιο κάτω από κάθε ζώνη και έμοιαζε ότι χάθηκε ένα σε κάθε κατηγορία) */
+  var endH=function(lst){return lst.length?'<details class="pend"><summary><span>Ended</span> · '+lst.length+'</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">'+lst.map(function(c){return parlayHTML(c,false);}).join("")+'</div></details>':'';};
+  var endOf=function(z){return endH(plEnded.filter(function(c){return c.kind===z;}));};
   if($("pkN"))$("pkN").textContent=L.length?"· "+L.length:""; /* απόφαση Owner 02/11: πόσα παρολί «ζουν», όπως στα Μονά */
   var zones=ZORDER.filter(function(z){return L.some(function(c){return c.kind===z;});});
   L.forEach(function(c){if(zones.indexOf(c.kind)<0)zones.push(c.kind);});
+  var plEndH=endH(plEnded.filter(function(c){return zones.indexOf(c.kind)<0;})); /* μόνο ζώνες που δεν έχουν πια ζωντανό παρολί */
   if(zones.indexOf(opZone)<0)opZone=zones[0]||"";
   $("zTabs").innerHTML=zones.map(function(z){return '<button type="button" class="ztab" data-z="'+esc(z)+'" aria-pressed="'+(z===opZone)+'">'+esc(zk(z))+'<sup>'+L.filter(function(c){return c.kind===z;}).length+'</sup></button>';}).join("");
   $("zTabs").style.gridTemplateColumns="repeat("+Math.max(1,Math.min(4,zones.length))+",1fr)";
@@ -2235,9 +2238,9 @@ function renderPicks(){
   var allMob=!sideOn()&&zones.length>1;
   if(allMob){var srt=function(a,b){var w=function(c){return /\|early$/.test(c.slot||"")?0:1;};return w(a)-w(b)||a.odds-b.odds;};
     $("zMain").innerHTML=zones.map(function(z){var lz=L.filter(function(c){return c.kind===z;}).sort(srt);
-      return '<h3 class="zsec" id="zsec-'+esc(z)+'">'+esc(z.replace("-","–"))+' <small>'+lz.length+'</small></h3>'+lz.map(function(c){return parlayHTML(c,true);}).join("");}).join("")+plEndH;
+      return '<h3 class="zsec" id="zsec-'+esc(z)+'">'+esc(z.replace("-","–"))+' <small>'+lz.length+'</small></h3>'+lz.map(function(c){return parlayHTML(c,true);}).join("")+endOf(z);}).join("")+plEndH;
     Array.prototype.forEach.call($("zTabs").querySelectorAll("[data-z]"),function(b){b.setAttribute("aria-pressed","false");});}
-  else $("zMain").innerHTML=(main?inZ.map(function(c){return parlayHTML(c,true);}).join(""):plEnded.length?'<div class="opempty"><b>'+(typeof DAYNAV!=="undefined"&&DAYNAV.date&&DAYNAV.today&&DAYNAV.date!==DAYNAV.today?'This day\'s parlays are settled':'Today\'s parlays are settled')+'</b><span>See them below. New ones every morning.</span></div>':'<div class="opempty"><b>Today\'s parlays are coming</b><span>We make them every morning from our tips.</span></div>')+plEndH;
+  else $("zMain").innerHTML=(main?inZ.map(function(c){return parlayHTML(c,true);}).join("")+endOf(opZone):plEnded.length?'<div class="opempty"><b>'+(typeof DAYNAV!=="undefined"&&DAYNAV.date&&DAYNAV.today&&DAYNAV.date!==DAYNAV.today?'This day\'s parlays are settled':'Today\'s parlays are settled')+'</b><span>See them below. New ones every morning.</span></div>':'<div class="opempty"><b>Today\'s parlays are coming</b><span>We make them every morning from our tips.</span></div>')+plEndH;
   /* απόφαση Owner 06/11: όταν τελειώσουν τα σημερινά, βγαίνουν νωρίτερα τα πρώτα παρολί της αύριο· φαίνονται εδώ με link στη σελίδα της αύριο */
   (function(){var bx=$("zTmr");if(!bx)return;var N=(typeof BZN!=="undefined"&&BZN)||[],isT=typeof DAYNAV==="undefined"||!DAYNAV.date||DAYNAV.date===DAYNAV.today;
     if(!N.length||!isT){bx.hidden=true;bx.innerHTML="";return;}
