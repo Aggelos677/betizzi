@@ -71,8 +71,48 @@ function ymdIn(tz, ts = Date.now()) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(ts);
 }
 
+// Launch (SEO): indexable ΜΟΝΟ στο betizzi.com. Test/preview (*.workers.dev) μένουν noindex.
+// Ιδιωτικά (admin, auth, me/vip.json, ?demo) πάντα noindex.
+// /pt/: ΠΡΟΣΩΡΙΝΑ noindex (απόφαση Owner 05/11, προληπτικά): τα πορτογαλικά στοχεύουν τώρα Βραζιλία.
+// Δεν είναι επιβεβαιωμένη νομική υποχρέωση· φεύγει όταν τα /pt/ γίνουν Πορτογαλίας (ή μετά από νομικό έλεγχο).
+const PROD_HOST = "betizzi.com";
+// /de/: ΠΡΟΣΩΡΙΝΑ noindex (απόφαση Owner 07/11, επιλογή Β): μέχρι να μπει το Impressum (νομική υποχρέωση στη Γερμανία).
+const NOINDEX_LANGS = ["pt", "de"];
+function isPrivate(url) {
+  const p = url.pathname;
+  return p === "/admin" || p.startsWith("/admin/") || p.startsWith("/auth/") || p === "/me.json" || p === "/vip.json" || p === "/h" || url.searchParams.has("demo")
+    || NOINDEX_LANGS.some((l) => p === "/" + l || p.startsWith("/" + l + "/") || p === "/sitemap-" + l + ".xml");
+}
 export default {
   async fetch(req, env, ctx) {
+    const res = await handle(req, env, ctx);
+    const url = new URL(req.url);
+    if (url.hostname === PROD_HOST && !isPrivate(url)) return res;
+    const r = new Response(res.body, res);
+    r.headers.set("x-robots-tag", "noindex, nofollow");
+    return r;
+  },
+  // 06/11 (απόφαση Owner: «όταν μπαίνεις και αργεί, νομίζεις ότι κάτι πάει λάθος»): κάθε 10΄ φτιάχνουμε από πριν
+  // τις σελίδες σήμερα + αύριο σε 9 γλώσσες και τις αποθηκεύουμε στο KV (betizzi-pages, παγκόσμιο), ώστε ο επισκέπτης
+  // σε οποιαδήποτε χώρα να παίρνει αμέσως έτοιμη σελίδα και να μην περιμένει ποτέ τον server.
+  async scheduled(ev, env, ctx) {
+    if (!env.PAGESKV) return;
+    const url0 = new URL("https://" + PROD_HOST + "/"), today = ymdIn(DAYTZ);
+    const tmr = new Date(Date.parse(today + "T12:00:00Z") + 864e5).toISOString().slice(0, 10);
+    await template(env, url0); const ver = TPL_VER;
+    for (const lang of LANGS) for (const d of ["", tmr, "all"]) {
+      try {
+        const u = new URL(`https://${PROD_HOST}/${lang}/${d ? "?d=" + d : ""}`);
+        const b = await todayPage(env, lang, u), key = lang + (d ? "|" + d : "");
+        PAGES.set(key, { t: Date.now(), b });
+        await env.PAGESKV.put(PROD_HOST + "|" + key, JSON.stringify({ t: Date.now(), v: ver, b }), { expirationTtl: 2 * 86400 });
+      } catch (e) {}
+    }
+  },
+};
+
+const handle = async (req, env, ctx) => {
+  {
     const url = new URL(req.url);
     const p = url.pathname;
     if (url.hostname === "www.betizzi.com") return Response.redirect("https://betizzi.com" + p + url.search, 301);
@@ -223,23 +263,7 @@ export default {
     }
     if (m === null && /^\/[a-z]{2}$/.test(p) && LANGS.includes(p.slice(1))) return Response.redirect(url.origin + p + "/", 301);
     return env.ASSETS.fetch(req);
-  },
-  // 06/11 (απόφαση Owner: «όταν μπαίνεις και αργεί, νομίζεις ότι κάτι πάει λάθος»): κάθε 10΄ φτιάχνουμε από πριν
-  // τις σελίδες σήμερα + αύριο + όλες τις μέρες σε 9 γλώσσες στο KV (betizzi-pages, παγκόσμιο).
-  async scheduled(ev, env, ctx) {
-    if (!env.PAGESKV) return;
-    const host = "betizzi.com", url0 = new URL("https://" + host + "/"), today = ymdIn(DAYTZ);
-    const tmr = new Date(Date.parse(today + "T12:00:00Z") + 864e5).toISOString().slice(0, 10);
-    await template(env, url0); const ver = TPL_VER;
-    for (const lang of LANGS) for (const d of ["", tmr, "all"]) {
-      try {
-        const u = new URL(`https://${host}/${lang}/${d ? "?d=" + d : ""}`);
-        const b = await todayPage(env, lang, u), key = lang + (d ? "|" + d : "");
-        PAGES.set(key, { t: Date.now(), b });
-        await env.PAGESKV.put(host + "|" + key, JSON.stringify({ t: Date.now(), v: ver, b }), { expirationTtl: 2 * 86400 });
-      } catch (e) {}
-    }
-  },
+  }
 };
 
 const AUTH_COOKIE = "bz_s";
@@ -348,7 +372,7 @@ function html(body, status = 200, a21 = false) {
   if (a21) body = body.replace(/18\+/g, "21+");
   if (body.includes("</head>") && !body.includes('rel="manifest"')) {
     const lg = (body.match(/<html[^>]*\slang="([a-z]{2})/) || [])[1] || "en";
-    body = body.replace("</head>", `<link rel="manifest" href="/${LANGS.includes(lg) ? lg : "en"}/manifest.webmanifest"><meta name="theme-color" content="#0c0f0d"><link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="betizzi"></head>`);
+    body = body.replace("</head>", `<link rel="manifest" href="/${LANGS.includes(lg) ? lg : "en"}/manifest.webmanifest"><meta name="theme-color" content="#0c0f0d"><link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="betizzi"></head>`);
   }
   if (body.includes("</head>") && !body.includes("googletagmanager")) body = body.replace("</head>", GA_HEAD + "</head>");
   if (body.includes("</body>")) body = body.replace(/<\/body>(?![\s\S]*<\/body>)/, GA_BODY + "</body>");
@@ -358,7 +382,6 @@ function html(body, status = 200, a21 = false) {
     headers: {
       "content-type": "text/html; charset=utf-8",
       "cache-control": "public, max-age=60",
-      "x-robots-tag": "noindex, nofollow", // αφαιρείται την ημέρα που ανοίγει το site
     },
   });
 }
@@ -685,7 +708,7 @@ const smUrl = (loc, alt, lastmod) => `<url><loc>${xmlEsc(SITE + loc)}</loc>${las
 function sitemapIndex() {
   const today = new Date().toISOString().slice(0, 10);
   return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`
-    + LANGS.map((l) => `<sitemap><loc>${SITE}/sitemap-${l}.xml</loc><lastmod>${today}</lastmod></sitemap>`).join("") + `</sitemapindex>`;
+    + LANGS.filter((l) => !NOINDEX_LANGS.includes(l)).map((l) => `<sitemap><loc>${SITE}/sitemap-${l}.xml</loc><lastmod>${today}</lastmod></sitemap>`).join("") + `</sitemapindex>`;
 }
 async function sitemapLang(env, lang) {
   const today = new Date().toISOString().slice(0, 10), out = [];
@@ -766,7 +789,7 @@ function matchPage(lang, x) {
   return `<!doctype html>
 <html lang="${HREFLANG[lang]}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <title>${esc(title)} | betizzi</title>
 <meta name="description" content="${esc(answer.slice(0, 160))}">
 <link rel="canonical" href="${canonical}">
@@ -959,7 +982,7 @@ function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) 
   return `<!doctype html>
 <html lang="${HREFLANG[lang]}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <title>${esc(r.title)}${mo && mo !== months[0] ? " · " + esc(mo === "all" ? r.allM : mName(mo)) : ""}</title>
 <meta name="description" content="${esc(r.desc)}">
 <link rel="canonical" href="${canonical}">
@@ -1040,7 +1063,7 @@ function staticPage(lang, key) {
   return `<!doctype html>
 <html lang="${HREFLANG[L]}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <title>${esc(pg.title[L])} | betizzi</title>
 <meta name="description" content="${esc(pg.desc[L])}">
 <link rel="canonical" href="${canonical}">
@@ -1152,7 +1175,7 @@ async function streaksPage(env, lang) {
   return `<!doctype html>
 <html lang="${HREFLANG[lang]}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <title>${esc(S.title)} | betizzi</title>
 <meta name="description" content="${esc(S.desc)}">
 <link rel="canonical" href="${canonical}">
@@ -1239,7 +1262,7 @@ async function paroliPage(env, lang) {
   return `<!doctype html>
 <html lang="${HREFLANG[lang]}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <title>${esc(title)} | betizzi</title>
 <meta name="description" content="${esc(P.desc)}">
 <link rel="canonical" href="${canonical}">
