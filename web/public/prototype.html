@@ -506,6 +506,7 @@ body{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .r-teams .tl span.nm,.r-teams span.nm{white-space:normal;font-size:.86rem;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.15}
 .bzm b{white-space:normal}
 .r-pick.none{border:0;background:none;min-height:0}.r-pick.none span{font-size:.72rem;font-weight:500;opacity:.7}
+.r-pick.none.an{cursor:pointer;color:var(--fg);opacity:.85;font-size:.72rem;white-space:nowrap}.r-pick.none.an span{color:var(--fg);opacity:1;font-weight:600;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line)}
 .netp{text-align:right;font-size:.78rem;color:var(--muted);margin-top:-4px}
 
 /* --- PC: πιο φαρδιά σελίδα, κουπόνια ημέρας σε στήλη δεξιά --- */
@@ -1692,7 +1693,9 @@ function tipState(t,m){
 }
 function pickBtn(m){
   var offT=m.type==="postponed"?"Postponed":m.type==="cancelled"?"Cancelled":""; /* 04/11: η λέξη στη στήλη του tip (χωράει), όχι στο στενό κουτί του σκορ */
-  if(!m.tips.length) return '<span class="r-pick none">'+(offT?'<span>'+offT+'</span>':'<span>No tip</span>')+'</span>';
+  /* 07/11 (απόφαση Owner): «Δες ανάλυση» αντί για «Χωρίς tip» όταν υπάρχει ανάλυση (η τίμια φράση «δεν βάζουμε tip» είναι μέσα στο dropdown). Γκρι, όχι lime (lime = tip) */
+  if(!m.tips.length){var hasAn=!!(m.an||(m.hfd&&m.hfd.length)||(m.afd&&m.afd.length));
+    return '<span class="r-pick none'+(hasAn&&!offT?' an':'')+'">'+(offT?'<span>'+offT+'</span>':hasAn?'<span>See analysis</span> ▾':'<span>No tip</span>')+'</span>';}
   var t=m.tips[0], locked=t.tier==="vip"&&!vipMember&&!t.sel;
   if(locked) return '<button type="button" class="r-pick vip locked" data-unlock="1" aria-label="VIP tip, sign up free to see"><span>VIP · free</span><b aria-hidden="true">•.••</b></button>';
   if(m.type==="postponed"||m.type==="cancelled") return '<span class="r-pick none"><span>'+offT+'</span><small style="white-space:nowrap">'+esc(t.sel)+' · <span>Void</span></small></span>'; /* 03/11: αναβολή/ακύρωση = άκυρο, χωρίς κουμπί */
