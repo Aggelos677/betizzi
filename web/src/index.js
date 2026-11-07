@@ -76,7 +76,8 @@ function ymdIn(tz, ts = Date.now()) {
 // /pt/: ΠΡΟΣΩΡΙΝΑ noindex (απόφαση Owner 05/11, προληπτικά): τα πορτογαλικά στοχεύουν τώρα Βραζιλία.
 // Δεν είναι επιβεβαιωμένη νομική υποχρέωση· φεύγει όταν τα /pt/ γίνουν Πορτογαλίας (ή μετά από νομικό έλεγχο).
 const PROD_HOST = "betizzi.com";
-const NOINDEX_LANGS = ["pt"];
+// /de/: ΠΡΟΣΩΡΙΝΑ noindex (απόφαση Owner 07/11, επιλογή Β): μέχρι να μπει το Impressum (νομική υποχρέωση στη Γερμανία).
+const NOINDEX_LANGS = ["pt", "de"];
 function isPrivate(url) {
   const p = url.pathname;
   return p === "/admin" || p.startsWith("/admin/") || p.startsWith("/auth/") || p === "/me.json" || p === "/vip.json" || p === "/h" || url.searchParams.has("demo")
@@ -371,7 +372,7 @@ function html(body, status = 200, a21 = false) {
   if (a21) body = body.replace(/18\+/g, "21+");
   if (body.includes("</head>") && !body.includes('rel="manifest"')) {
     const lg = (body.match(/<html[^>]*\slang="([a-z]{2})/) || [])[1] || "en";
-    body = body.replace("</head>", `<link rel="manifest" href="/${LANGS.includes(lg) ? lg : "en"}/manifest.webmanifest"><meta name="theme-color" content="#0c0f0d"><link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="betizzi"></head>`);
+    body = body.replace("</head>", `<link rel="manifest" href="/${LANGS.includes(lg) ? lg : "en"}/manifest.webmanifest"><meta name="theme-color" content="#0c0f0d"><link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="betizzi"></head>`);
   }
   if (body.includes("</head>") && !body.includes("googletagmanager")) body = body.replace("</head>", GA_HEAD + "</head>");
   if (body.includes("</body>")) body = body.replace(/<\/body>(?![\s\S]*<\/body>)/, GA_BODY + "</body>");
@@ -788,7 +789,7 @@ function matchPage(lang, x) {
   return `<!doctype html>
 <html lang="${HREFLANG[lang]}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <title>${esc(title)} | betizzi</title>
 <meta name="description" content="${esc(answer.slice(0, 160))}">
 <link rel="canonical" href="${canonical}">
@@ -981,7 +982,7 @@ function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) 
   return `<!doctype html>
 <html lang="${HREFLANG[lang]}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <title>${esc(r.title)}${mo && mo !== months[0] ? " · " + esc(mo === "all" ? r.allM : mName(mo)) : ""}</title>
 <meta name="description" content="${esc(r.desc)}">
 <link rel="canonical" href="${canonical}">
@@ -1062,7 +1063,7 @@ function staticPage(lang, key) {
   return `<!doctype html>
 <html lang="${HREFLANG[L]}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <title>${esc(pg.title[L])} | betizzi</title>
 <meta name="description" content="${esc(pg.desc[L])}">
 <link rel="canonical" href="${canonical}">
@@ -1174,7 +1175,7 @@ async function streaksPage(env, lang) {
   return `<!doctype html>
 <html lang="${HREFLANG[lang]}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <title>${esc(S.title)} | betizzi</title>
 <meta name="description" content="${esc(S.desc)}">
 <link rel="canonical" href="${canonical}">
@@ -1261,7 +1262,7 @@ async function paroliPage(env, lang) {
   return `<!doctype html>
 <html lang="${HREFLANG[lang]}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <title>${esc(title)} | betizzi</title>
 <meta name="description" content="${esc(P.desc)}">
 <link rel="canonical" href="${canonical}">
