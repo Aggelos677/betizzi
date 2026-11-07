@@ -1607,6 +1607,10 @@ function renderWins(){var box=$("winsSide");if(!box)return;
   /* απόφαση Owner 04/11: στις μεγαλύτερες νίκες πάντα και παρολί· αν δεν κέρδισε κανένα σήμερα/χθες, το τελευταίο που κέρδισε, με ημερομηνία */
   /* απόφαση Owner 04/11: πάνω πάντα (αν υπάρχει) το τελευταίο x8+ των 3 ημερών· ο server δεν δίνει το χθεσινό, άρα δεν φαίνεται δύο φορές */
   var LW=(typeof YREC!=="undefined"&&YREC&&YREC.last)||null;
+  /* 07/11 ΣΦΑΛΜΑ (Owner): μετά τις 14:00 η στήλη δείχνει «σήμερα» και το χθεσινό κερδισμένο παρολί χανόταν παντού
+     (ο server δεν το δίνει πάνω γιατί «είναι κάτω»). Αν σήμερα δεν κέρδισε ακόμα παρολί: πάνω το χθεσινό, με ημερομηνία. */
+  if(!LW&&!useY&&!cw.length&&YW&&YW.cps&&YW.cps.length&&(typeof DAYNAV==="undefined"||DAYNAV.date===DAYNAV.today)){var yb=YW.cps.filter(function(c){return c.r===1;}).sort(function(a,b){return b.odds-a.odds;})[0];
+    if(yb){LW=Object.assign({},yb);try{LW.label=new Intl.DateTimeFormat(document.documentElement.lang||"en",{timeZone:"UTC",weekday:"long",day:"numeric",month:"numeric"}).format(Date.parse(yb.date+"T12:00:00Z"));}catch(e){LW.label=yb.date;}}}
   if(LW){var LL=LW.legs||[],lg=LL.slice(0,4).map(function(l,j){return '<div class="bwleg'+(l.v?' cv':'')+'" style="--d:'+(350+j*140)+'ms"><b class="bwtick">'+(l.v?'–':'✓')+'</b><span class="bzm"><b>'+esc(l.h||"")+' – '+esc(l.a||"")+'</b>'+(l.v?'<small><span>Postponed</span></small>':'<small>'+esc(l.sel||"")+'</small>')+'</span>'+(l.v?'<span class="bzp"><s>'+(l.p?(+l.p).toFixed(2):'')+'</s> 1.00</span>':'<span class="bzp mono">'+(l.p?(+l.p).toFixed(2):'')+'</span>')+'</div>';}).join("");
     h='<div class="bigwin bwlast" role="button" tabindex="0" data-lastwin2="1" aria-label="Last parlay that won"><span class="bwshine"></span><div class="bwhead"><span class="bwstamp">WINNER</span><span class="bzv"><span>Last parlay that won</span> · '+esc(LW.label||LW.date||"")+'</span><span class="mono bwodd">x'+(+LW.odds).toFixed(2)+'</span></div>'+lg
       +'<div class="bwmore">'+(LL.length>4?'<b class="mono">+'+(LL.length-4)+'</b> <span>more picks</span> · ':'')+'<span>See the whole parlay</span> <span aria-hidden="true">›</span></div></div>'+(h||"");}
