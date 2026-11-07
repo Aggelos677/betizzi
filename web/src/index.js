@@ -1061,7 +1061,7 @@ function staticPage(lang, key) {
   if (faq) ld.push({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) });
   const body = pg.body[L].replace(/\{REC\}/g, `/${lang}/${REC[lang].slug}`).replace(/\{CONTACT\}/g, pgPath("contact", lang));
   if (key === "about") ld.push({ "@context": "https://schema.org", "@type": "Organization", name: "betizzi", url: SITE, logo: `${SITE}/og/en.png`,
-    description: pg.desc.en, email: OP.hello, founder: { "@type": "Person", name: OP.name },
+    description: pg.desc.en, email: OP.hello,
     address: { "@type": "PostalAddress", addressLocality: "Paphos", addressCountry: "CY" },
     contactPoint: [{ "@type": "ContactPoint", contactType: "customer support", email: OP.hello }, { "@type": "ContactPoint", contactType: "partnerships", email: OP.partners }] });
   return `<!doctype html>
@@ -1090,7 +1090,7 @@ ${faq ? `<h2>${esc(pg.faqH[L])}</h2>` + faq.map(([q, a]) => `<h3>${esc(q)}</h3><
 <p class="how" style="font-size:13px;margin-top:24px"><time datetime="${upd}">${esc(dUpd)}</time></p>
 <p><a href="/${lang}/">← ${esc(t.back)}</a></p>
 </main>
-<footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi · ${esc(OP.name)}, ${esc(OP.city)}</p></footer>
+<footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi</p></footer>
 </body>
 </html>`;
 }
@@ -1207,7 +1207,7 @@ ${KEYS.map(sec).join("")}
 <a class="cta" href="/${lang}/">${esc(S.app)}</a>
 <p class="how" style="font-size:13px;margin-top:18px">${esc(S.upd)}: <time datetime="${mod}">${esc(new Intl.DateTimeFormat(LOCALE[lang], { timeZone: DAYTZ, day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(Date.parse(mod)))}</time></p>
 </main>
-<footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi · ${esc(OP.name)}, ${esc(OP.city)}</p></footer>
+<footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi</p></footer>
 </body>
 </html>`;
 }
@@ -1297,7 +1297,7 @@ ${last ? `<p>${esc(P.last(last.o, last.d))} <a href="/${lang}/${REC[lang].slug}"
 <dl class="faq">${P.faq.map(([q, a]) => `<dt>${esc(q)}</dt><dd>${esc(a)}</dd>`).join("")}</dl>
 <p class="how" style="font-size:13px;margin-top:24px">${esc(P.upd)}: <time datetime="${mod}">${esc(new Intl.DateTimeFormat(LOCALE[lang], { timeZone: DAYTZ, day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(Date.parse(mod)))}</time></p>
 </main>
-<footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi · ${esc(OP.name)}, ${esc(OP.city)}</p></footer>
+<footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi</p></footer>
 </body>
 </html>`;
 }

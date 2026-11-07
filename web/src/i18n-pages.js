@@ -36,7 +36,7 @@ export const PG = {
 We look at each team's recent form (last 10 games, home and away), the league table and bookmaker prices. A tip appears only when the numbers agree. Every tip is published before kick-off and is never edited afterwards; results (wins and losses) are shown on our [Record](/en/record) page.
 
 ## Who runs betizzi
-betizzi is operated by the sole proprietorship of ${OP.name}, ${OP.city}. Contact: [${OP.hello}](mailto:${OP.hello}).
+betizzi is run from ${OP.city}. Contact: [${OP.hello}](mailto:${OP.hello}).
 
 ## What we are not
 We are not a bookmaker and we do not take bets. We may earn a commission from bookmakers — see our [Affiliate disclosure](/en/affiliate-disclosure).`,
@@ -52,7 +52,7 @@ We are not a bookmaker and we do not take bets. We may earn a commission from bo
 Κοιτάμε τη φόρμα κάθε ομάδας (τελευταία 10 παιχνίδια, εντός και εκτός), τη βαθμολογία και τις αποδόσεις. Tip βγαίνει μόνο όταν τα νούμερα συμφωνούν. Κάθε tip δημοσιεύεται πριν τη σέντρα και δεν αλλάζει ποτέ μετά· τα αποτελέσματα, νίκες και ήττες, φαίνονται στη σελίδα [Record](/el/istoriko-tips).
 
 ## Ποιος είναι πίσω από το betizzi
-Το betizzi λειτουργεί από την ατομική επιχείρηση ${OP.name}, Πάφος, Κύπρος. Επικοινωνία: [${OP.hello}](mailto:${OP.hello}).
+Το betizzi λειτουργεί από την Πάφο της Κύπρου. Επικοινωνία: [${OP.hello}](mailto:${OP.hello}).
 
 ## Τι δεν είμαστε
 Δεν είμαστε bookmaker και δεν δεχόμαστε στοιχήματα. Μπορεί να παίρνουμε προμήθεια από bookmakers — δες τη [Δήλωση affiliate](/el/dilosi-affiliate).`,
@@ -68,7 +68,7 @@ We are not a bookmaker and we do not take bets. We may earn a commission from bo
 Miramos la forma reciente de cada equipo (últimos 10 partidos, en casa y fuera), la clasificación y las cuotas. Solo hay tip cuando los números coinciden. Cada tip se publica antes del partido y nunca se modifica; los resultados, aciertos y fallos, están en nuestro [Historial](/es/historial).
 
 ## Quién está detrás
-betizzi lo gestiona ${OP.name} como empresario individual, en Pafos (Chipre). Contacto: [${OP.hello}](mailto:${OP.hello}).
+betizzi se gestiona desde Pafos (Chipre). Contacto: [${OP.hello}](mailto:${OP.hello}).
 
 ## Qué no somos
 No somos una casa de apuestas y no aceptamos apuestas. Podemos recibir una comisión de casas de apuestas: consulta nuestra [Aviso sobre afiliados](/es/aviso-afiliados).`,
@@ -84,7 +84,7 @@ No somos una casa de apuestas y no aceptamos apuestas. Podemos recibir una comis
 Olhamos a forma recente de cada time (últimos 10 jogos, em casa e fora), a classificação e as odds. Só sai palpite quando os números concordam. Cada palpite é publicado antes do jogo e nunca é alterado; os resultados, acertos e erros, estão no nosso [Histórico](/pt/historico).
 
 ## Quem está por trás
-O betizzi é operado pela empresa individual de ${OP.name}, Pafos, Chipre. Contato: [${OP.hello}](mailto:${OP.hello}).
+O betizzi é gerido a partir de Pafos, Chipre. Contato: [${OP.hello}](mailto:${OP.hello}).
 
 ## O que não somos
 Não somos casa de apostas e não aceitamos apostas. Podemos receber comissão de casas de apostas: veja a nossa [Divulgação de afiliados](/pt/divulgacao-afiliados).`,
@@ -100,7 +100,7 @@ Não somos casa de apostas e não aceitamos apostas. Podemos receber comissão d
 Nous regardons la forme récente de chaque équipe (10 derniers matchs, à domicile et à l'extérieur), le classement et les cotes. Un tip n'apparaît que si les chiffres concordent. Chaque tip est publié avant le coup d'envoi et n'est jamais modifié ; les résultats, gagnés et perdus, figurent dans notre [Historique](/fr/historique).
 
 ## Qui est derrière betizzi
-betizzi est exploité par l'entreprise individuelle de ${OP.name}, Paphos, Chypre. Contact : [${OP.hello}](mailto:${OP.hello}).
+betizzi est exploité depuis Paphos, Chypre. Contact : [${OP.hello}](mailto:${OP.hello}).
 
 ## Ce que nous ne sommes pas
 Nous ne sommes pas un bookmaker et nous ne prenons pas de paris. Nous pouvons toucher une commission de bookmakers : voir [Transparence sur l'affiliation](/fr/affiliation).`,
@@ -116,7 +116,7 @@ Nous ne sommes pas un bookmaker et nous ne prenons pas de paris. Nous pouvons to
 Wir betrachten die aktuelle Form jedes Teams (letzte 10 Spiele, zu Hause und auswärts), die Tabelle und die Quoten. Ein Tipp erscheint nur, wenn die Zahlen übereinstimmen. Jeder Tipp wird vor Anpfiff veröffentlicht und danach nie geändert; die Ergebnisse, Treffer und Niederlagen, stehen in unserer [Bilanz](/de/bilanz).
 
 ## Wer hinter betizzi steht
-betizzi wird vom Einzelunternehmen ${OP.name}, Paphos, Zypern, betrieben. Kontakt: [${OP.hello}](mailto:${OP.hello}).
+betizzi wird von Paphos, Zypern, aus betrieben. Kontakt: [${OP.hello}](mailto:${OP.hello}).
 
 ## Was wir nicht sind
 Wir sind kein Buchmacher und nehmen keine Wetten an. Wir können Provisionen von Buchmachern erhalten – siehe unseren [Affiliate-Hinweis](/de/affiliate-hinweis).`,
@@ -132,7 +132,7 @@ Wir sind kein Buchmacher und nehmen keine Wetten an. Wir können Provisionen von
 Ne uităm la forma recentă a fiecărei echipe (ultimele 10 meciuri, acasă și în deplasare), clasament și cote. Un pont apare doar când cifrele se potrivesc. Fiecare pont e publicat înainte de start și nu se modifică niciodată; rezultatele, câștiguri și pierderi, sunt în [Istoricul](/ro/istoric) nostru.
 
 ## Cine se află în spatele betizzi
-betizzi este operat de întreprinderea individuală ${OP.name}, Paphos, Cipru. Contact: [${OP.hello}](mailto:${OP.hello}).
+betizzi este administrat din Paphos, Cipru. Contact: [${OP.hello}](mailto:${OP.hello}).
 
 ## Ce nu suntem
 Nu suntem casă de pariuri și nu acceptăm pariuri. Putem primi comision de la case de pariuri: vezi [Declarația de afiliere](/ro/declaratie-afiliere).`,
@@ -148,7 +148,7 @@ Nu suntem casă de pariuri și nu acceptăm pariuri. Putem primi comision de la 
 Gledamo skorašnju formu svakog tima (poslednjih 10 utakmica, kod kuće i u gostima), tabelu i kvote. Tip se pojavljuje samo kad se brojke slažu. Svaki tip se objavljuje pre početka i posle se nikad ne menja; rezultati, pogoci i promašaji, su u našoj [Istoriji](/sr/istorija).
 
 ## Ko stoji iza betizzi
-betizzi vodi preduzetnik ${OP.name}, Pafos, Kipar. Kontakt: [${OP.hello}](mailto:${OP.hello}).
+betizzi se vodi iz Pafosa, Kipar. Kontakt: [${OP.hello}](mailto:${OP.hello}).
 
 ## Šta nismo
 Nismo kladionica i ne primamo opklade. Možemo dobiti proviziju od kladionica: pogledaj našu [Izjavu o partnerstvu](/sr/izjava-o-partnerstvu).`,
@@ -164,7 +164,7 @@ Nismo kladionica i ne primamo opklade. Možemo dobiti proviziju od kladionica: p
 Гледаме скорошната форма на всеки отбор (последните 10 мача, у дома и като гост), класирането и коефициентите. Прогноза има само когато числата съвпадат. Всяка прогноза се публикува преди началото и никога не се променя; резултатите, печалби и загуби, са в нашата [История](/bg/istoria).
 
 ## Кой стои зад betizzi
-betizzi се управлява от едноличния търговец ${OP.name}, Пафос, Кипър. Контакт: [${OP.hello}](mailto:${OP.hello}).
+betizzi се управлява от Пафос, Кипър. Контакт: [${OP.hello}](mailto:${OP.hello}).
 
 ## Какво не сме
 Не сме букмейкър и не приемаме залози. Може да получаваме комисионна от букмейкъри: виж нашето [Разкриване на партньорство](/bg/razkrivane-partnyorstva).`,
@@ -186,7 +186,7 @@ betizzi се управлява от едноличния търговец ${OP.
 [${OP.privacy}](mailto:${OP.privacy})
 
 ## Operator
-Sole proprietorship of ${OP.name}, ${OP.city}.
+betizzi, ${OP.city}.
 
 We are not a bookmaker: we cannot help with bets, accounts or payments at a bookmaker. Please contact the bookmaker directly.`,
       el: `## Ερωτήσεις και σχόλια
@@ -199,7 +199,7 @@ We are not a bookmaker: we cannot help with bets, accounts or payments at a book
 [${OP.privacy}](mailto:${OP.privacy})
 
 ## Ποιος λειτουργεί το site
-Ατομική επιχείρηση ${OP.name}, Πάφος, Κύπρος.
+betizzi, Πάφος, Κύπρος.
 
 Δεν είμαστε bookmaker: δεν μπορούμε να βοηθήσουμε με στοιχήματα, λογαριασμούς ή πληρωμές σε bookmaker. Επικοινώνησε απευθείας μαζί του.`,
       es: `## Preguntas y comentarios
@@ -212,7 +212,7 @@ We are not a bookmaker: we cannot help with bets, accounts or payments at a book
 [${OP.privacy}](mailto:${OP.privacy})
 
 ## Titular
-${OP.name}, empresario individual, Pafos (Chipre).
+betizzi, Pafos (Chipre).
 
 No somos una casa de apuestas: no podemos ayudar con apuestas, cuentas o pagos en una casa de apuestas. Contacta directamente con ella.`,
       pt: `## Dúvidas e sugestões
@@ -225,7 +225,7 @@ No somos una casa de apuestas: no podemos ayudar con apuestas, cuentas o pagos e
 [${OP.privacy}](mailto:${OP.privacy})
 
 ## Responsável
-Empresa individual de ${OP.name}, Pafos, Chipre.
+betizzi, Pafos, Chipre.
 
 Não somos casa de apostas: não podemos ajudar com apostas, contas ou pagamentos numa casa de apostas. Fale diretamente com ela.`,
       fr: `## Questions et remarques
@@ -238,7 +238,7 @@ Não somos casa de apostas: não podemos ajudar com apostas, contas ou pagamento
 [${OP.privacy}](mailto:${OP.privacy})
 
 ## Éditeur
-Entreprise individuelle de ${OP.name}, Paphos, Chypre.
+betizzi, Paphos, Chypre.
 
 Nous ne sommes pas un bookmaker : nous ne pouvons pas t'aider pour des paris, comptes ou paiements chez un bookmaker. Contacte-le directement.`,
       de: `## Fragen und Feedback
@@ -251,7 +251,7 @@ Nous ne sommes pas un bookmaker : nous ne pouvons pas t'aider pour des paris, co
 [${OP.privacy}](mailto:${OP.privacy})
 
 ## Betreiber
-Einzelunternehmen ${OP.name}, Paphos, Zypern.
+betizzi, Paphos, Zypern.
 
 Wir sind kein Buchmacher: Bei Wetten, Konten oder Zahlungen bei einem Buchmacher können wir nicht helfen. Bitte wende dich direkt an ihn.`,
       ro: `## Întrebări și sugestii
@@ -264,7 +264,7 @@ Wir sind kein Buchmacher: Bei Wetten, Konten oder Zahlungen bei einem Buchmacher
 [${OP.privacy}](mailto:${OP.privacy})
 
 ## Operator
-Întreprinderea individuală ${OP.name}, Paphos, Cipru.
+betizzi, Paphos, Cipru.
 
 Nu suntem casă de pariuri: nu putem ajuta cu pariuri, conturi sau plăți la o casă de pariuri. Contactează-o direct.`,
       sr: `## Pitanja i komentari
@@ -277,7 +277,7 @@ Nu suntem casă de pariuri: nu putem ajuta cu pariuri, conturi sau plăți la o 
 [${OP.privacy}](mailto:${OP.privacy})
 
 ## Operater
-Preduzetnik ${OP.name}, Pafos, Kipar.
+betizzi, Pafos, Kipar.
 
 Nismo kladionica: ne možemo da pomognemo oko opklada, naloga ili uplata u kladionici. Obrati se direktno njoj.`,
       bg: `## Въпроси и мнения
@@ -290,7 +290,7 @@ Nismo kladionica: ne možemo da pomognemo oko opklada, naloga ili uplata u kladi
 [${OP.privacy}](mailto:${OP.privacy})
 
 ## Оператор
-Едноличен търговец ${OP.name}, Пафос, Кипър.
+betizzi, Пафос, Кипър.
 
 Не сме букмейкър: не можем да помогнем със залози, профили или плащания при букмейкър. Свържи се директно с него.`,
     },
