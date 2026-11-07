@@ -85,8 +85,12 @@ function isPrivate(url) {
 }
 export default {
   async fetch(req, env, ctx) {
-    const res = await handle(req, env, ctx);
     const url = new URL(req.url);
+    // 07/11 (έλεγχος SEO): http → https (αλλιώς δεύτερο αντίγραφο του site)
+    if (url.protocol === "http:" && (url.hostname === PROD_HOST || url.hostname === "www." + PROD_HOST)) { url.protocol = "https:"; return Response.redirect(url.toString(), 301); }
+    const res0 = await handle(req, env, ctx);
+    let res = res0;
+    if (url.hostname === PROD_HOST) { res = new Response(res0.body, res0); res.headers.set("strict-transport-security", "max-age=31536000"); }
     if (url.hostname === PROD_HOST && !isPrivate(url)) return res;
     const r = new Response(res.body, res);
     r.headers.set("x-robots-tag", "noindex, nofollow");
@@ -546,7 +550,7 @@ async function todayPage(env, lang, url) {
   const nowIso = new Date().toISOString();
   const tipped = matches.filter((x) => x.tips.length).slice(0, 50);
   const ld = [
-    { "@context": "https://schema.org", "@type": "Organization", "@id": SITE + "/#org", name: "betizzi", url: SITE, logo: SITE + "/logo.png", description: t.desc },
+    { "@context": "https://schema.org", "@type": "Organization", "@id": SITE + "/#org", name: "betizzi", url: SITE, logo: SITE + "/icons/icon-512.png", description: t.desc },
     {
       "@context": "https://schema.org", "@type": "WebPage", name: `${title} — ${dLong}`, url: canonical, inLanguage: HREFLANG[lang], dateModified: nowIso,
       publisher: { "@id": SITE + "/#org" }, description: answer,
@@ -570,7 +574,7 @@ async function todayPage(env, lang, url) {
   const head = `<title>${esc(title)} — ${esc(dLong)} | betizzi</title>
 <meta name="description" content="${esc(t.desc)}">
 <link rel="canonical" href="${canonical}">
-${matches.length && !allDays ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
+${matches.length && !allDays && isToday ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
 <meta property="og:type" content="website"><meta property="og:site_name" content="betizzi">
 <meta property="og:title" content="${esc(title)} — ${esc(dLong)}"><meta property="og:description" content="${esc(answer)}">
 <meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
@@ -698,8 +702,9 @@ export function matchPath(lang, x) {
 }
 
 // ---- Sitemaps (04/11/2026) ----
-// Indexable αγώνας (κανόνας «indexing σε επίπεδα»): έχει tip ή είναι σε Tier 1 διοργάνωση (TOP). Οι υπόλοιποι: noindex,follow.
-const indexable = (x) => (x.tips && x.tips.length > 0) || TOP.includes(x.league && x.league.id);
+// Indexable αγώνας: ΜΟΝΟ με tip (απόφαση Owner 07/11, μετά τον έλεγχο SEO: σελίδες «χωρίς tip» = φτωχό περιεχόμενο για τη Google).
+// Πριν: και κάθε αγώνας Tier 1 (TOP). Οι υπόλοιποι: noindex,follow (ο επισκέπτης τους βλέπει κανονικά).
+const indexable = (x) => !!(x.tips && x.tips.length > 0);
 const SM_START = "2026-11-02"; // επίσημο record
 const xmlEsc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const smAlt = (pathOf) => LANGS.map((l) => `<xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${xmlEsc(SITE + pathOf(l))}"/>`).join("")
@@ -761,7 +766,7 @@ function matchPage(lang, x) {
     : `<div class="tipc"><div>${(x.strong || []).includes(y.sel) ? `<span class="strongb">⚡ ${esc(t.strongB)}</span>` : ""}<span class="tip ${y.tier}">${y.tier === "vip" ? "VIP" : "TIP"} <b>${esc(SEL[y.sel] || y.sel)}</b> <i>${y.price.toFixed(2)}</i>${y.result === 1 ? " ✓" : y.result === 0 ? " ✗" : ""}</span>${off || y.result === 2 ? ` · <span>${esc(ui("Void"))}</span>` : ""}
        <small>${esc(t.why)}: ${esc(y.reason)}</small></div>
        ${off || live || done ? "" : `<button class="add" data-fx="${x.id}" data-sel="${esc(y.sel)}" data-price="${y.price}">${esc(t.add)}</button>`}</div>`).join("")
-    : `<p class="how">${esc(t.noTipM)}</p>`;
+    : `<p class="how">${esc(t.noTipM)}${live || done || off ? "" : " " + esc(t.noTipF)}${(x.home.form || []).length || (x.away.form || []).length ? " " + esc(t.noTipA) : ""}</p><p><a href="/${lang}/">${esc(t.noTipL)} →</a></p>`;
 
   // 04/11 (Owner): χωρίς λογότυπα· σκορ σε χρωματιστό κουτί (W/D/L στο στενό κινητό), γραμμή από κάτω = εντός έδρας
   const formRow = (team) => `<div class="frow"><span class="tm">${esc(team.name)}</span>
@@ -973,7 +978,7 @@ function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) 
   const nowIso = new Date((d.updated || Date.now() / 1000) * 1000).toISOString();
   const ld = [
     { "@context": "https://schema.org", "@type": "Dataset", name: r.title, description: r.desc, url: `${SITE}${base}`, inLanguage: HREFLANG[lang],
-      creator: { "@type": "Organization", name: "betizzi", url: SITE }, dateModified: nowIso, temporalCoverage: d.since ? `${new Date(d.since * 1000).toISOString().slice(0, 10)}/..` : undefined,
+      creator: { "@type": "Organization", name: "betizzi", url: SITE }, dateModified: nowIso, temporalCoverage: "2026-11-02/..", // επίσημο record από 2/11 (το d.since έδινε 1/11, μέρα δοκιμών)
       isAccessibleForFree: true, variableMeasured: [r.tips, r.won, r.lost, r.hit] },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
       { "@type": "ListItem", position: 1, name: "betizzi", item: `${SITE}/${lang}/` },
@@ -1060,7 +1065,7 @@ function staticPage(lang, key) {
   const faq = pg.faq && pg.faq[L];
   if (faq) ld.push({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) });
   const body = pg.body[L].replace(/\{REC\}/g, `/${lang}/${REC[lang].slug}`).replace(/\{CONTACT\}/g, pgPath("contact", lang));
-  if (key === "about") ld.push({ "@context": "https://schema.org", "@type": "Organization", name: "betizzi", url: SITE, logo: `${SITE}/og/en.png`,
+  if (key === "about") ld.push({ "@context": "https://schema.org", "@type": "Organization", name: "betizzi", url: SITE, "@id": SITE + "/#org", logo: SITE + "/icons/icon-512.png",
     description: pg.desc.en, email: OP.hello,
     address: { "@type": "PostalAddress", addressLocality: "Paphos", addressCountry: "CY" },
     contactPoint: [{ "@type": "ContactPoint", contactType: "customer support", email: OP.hello }, { "@type": "ContactPoint", contactType: "partnerships", email: OP.partners }] });

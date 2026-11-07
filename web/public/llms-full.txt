@@ -11,7 +11,7 @@ People who bet on football for fun and want an honest, data-based second opinion
 - Markets: match result (1X2), Over/Under 2.5 goals, both teams to score (GG/NG).
 - Two tiers: Free and VIP (VIP = stronger signal at a fair price). At most 2 tips per match, in different markets.
 - Every tip shows the odds at publication and the lowest price at which betizzi still recommends it.
-- New tips are added during the day; a published tip is never edited or withdrawn. If the price falls below betizzi's limit, the tip stays with a warning.
+- New tips are added during the day; a published tip is never edited or withdrawn (rule since 2 November 2026; a few tips withdrawn before that rule stay listed in the Record). If the price falls below betizzi's limit, the tip stays with a warning.
 
 ## Ready parlays
 - Built only from betizzi's own tips, in fixed odds zones: about x3–5, x8–12, x20–30 and one "mega parlay of the day" at x30–50 (two on weekends).
