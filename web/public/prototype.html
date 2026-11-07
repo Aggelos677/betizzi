@@ -451,7 +451,7 @@ details.mrow.calledrow>summary{background:radial-gradient(circle at 78% 50%,rgba
 .l-lost .cp-ic{background:var(--bad);color:#fff;border-color:var(--bad)}
 .l-live .cp-ic{color:var(--bad);border-color:var(--bad);animation:lvp 1.2s infinite}
 .cp-leg.pop .cp-ic{animation:cpop .6s cubic-bezier(.2,1.6,.4,1)}
-.cp-m{display:flex;flex-direction:column;min-width:0;font-size:.82rem}.cp-m b{font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cp-m>span{color:var(--muted)}
+.cp-m{display:flex;flex-direction:column;min-width:0;font-size:.82rem}.cp-m .cp-mt{font-size:.84rem;font-weight:500;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cp-m>span:not(.cp-mt){color:var(--muted)}.cp-m .cp-pk{color:var(--lime);font-weight:800;font-size:.9rem}
 .cp-sc{color:var(--fg);font-family:var(--f-mono);font-weight:700}.l-live .cp-sc{color:var(--bad)}
 .cp-o{font-weight:700}
 .cp-win{text-align:center;font:800 1.1rem var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--lime);padding:6px;border:1px dashed rgba(182,242,58,.5);border-radius:10px}
@@ -806,7 +806,10 @@ header{position:relative}
 .pc-legs li{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
 .pc-legs li:first-child{border-top:0}
 .pc-tm{width:40px;font:500 .7rem var(--f-mono);color:var(--muted)}
-.pc-m{flex:1;min-width:0}.pc-m b{display:block;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pc-m small{font-size:.74rem;color:var(--muted)}
+.pc-m{flex:1;min-width:0}
+/* 07/11 (Owner): η επιλογή (αυτό που παίζεις) σε lime, έντονη· οι ομάδες λευκές, κανονικά γράμματα */
+.pc-m .pc-mt{display:block;font-size:.84rem;font-weight:500;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-m .pc-pk{display:block;font-size:.9rem;font-weight:800;color:var(--lime);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pc-m .pc-pk .vipt{margin-left:6px}
 .pc-o{font:700 .9rem var(--f-mono)}.pc-r{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:var(--bg)}
 .pc-r.w{background:#4dff8a;color:#06210f;box-shadow:0 0 0 3px rgba(77,255,138,.22),0 0 12px rgba(77,255,138,.55);font-size:.78rem}.pc-r.l{background:var(--bad)}.pc-r.v{background:var(--line);color:var(--fg)}.pc-o s{opacity:.5;font-size:.7em}.pc-was{opacity:.5;font-size:.42em;display:block;text-align:right}
 .vipt{color:#e8b931;font-weight:800;font-size:.62rem;margin-left:4px}
@@ -1369,7 +1372,7 @@ function cpHTML(c){
     +'<div class="cp-prog"><i style="width:'+(won/c.legs.length*100)+'%"></i></div><div class="cp-legs">';
   c.legs.forEach(function(k,i){var s=SEL[k],m=s.m,x=st[i];
     var ic={won:"✓",lost:"✗",live:"●",wait:"",void:"–"}[x];
-    h+='<div class="cp-leg l-'+x+'"><span class="cp-ic">'+ic+'</span><span class="cp-m"><b>'+esc(m.home)+' v '+esc(m.away)+'</b><span>'+esc(s.label)+' · '+(m.live||m.done?'<span class="cp-sc">'+esc(m.score)+(m.live?" live":" FT")+'</span>':m.time)+'</span></span><span class="mono cp-o">'+((c.lo&&c.lo[i])||s.odd).toFixed(2)+'</span></div>';});
+    h+='<div class="cp-leg l-'+x+'"><span class="cp-ic">'+ic+'</span><span class="cp-m"><span class="cp-mt">'+esc(m.home)+' – '+esc(m.away)+'</span><span><b class="cp-pk">'+esc(s.label)+'</b> · '+(m.live||m.done?'<span class="cp-sc">'+esc(m.score)+(m.live?" live":" FT")+'</span>':m.time)+'</span></span><span class="mono cp-o">'+((c.lo&&c.lo[i])||s.odd).toFixed(2)+'</span></div>';});
   h+='</div>'+(cs==="won"?'<div class="cp-win">🏆 Coupon landed · <b>'+ret.toFixed(2)+' €</b></div>':cs==="lost"?'<div class="cp-lose">Not this time. Every extra pick lowers the chance.</div>':'')
     +'<div class="cp-foot"><button type="button" class="btn sec cp-share" data-share="'+c.id+'">'+(cs==="won"?'🏆 Share my win':'📤 Share coupon')+'</button><button type="button" class="linkb" data-del="'+c.id+'">Remove</button></div></div>';
   return h;}
@@ -2097,7 +2100,7 @@ function parlayHTML(c,feat){
       if(es==="won")r='<span class="pc-r w">✓</span>';else if(es==="lost")r='<span class="pc-r l">✗</span>';}
     var tm=lv?'<span class="pc-live"><i class="ldot2"></i><b>'+esc(sc||"0-0")+'</b><small>'+esc(mn||"LIVE")+'</small></span>':dn?'<span class="pc-ft"><b>'+esc(sc)+'</b><small>FT</small></span>':esc(l.time||"");
     if(l.result===2)tm='<span class="pc-ft"><b>–</b><small>'+(l.status==="PST"||!l.status?'<span>Postponed</span>':'<span>Cancelled</span>')+' · <span>Void</span></small></span>';
-    return '<li'+(lv?' class="lv"':'')+'><span class="pc-tm">'+tm+'</span><span class="pc-m"><b>'+esc(l.home||"")+' – '+esc(l.away||"")+'</b><small>'+legPick(l)+(l.vip?'<span class="vipt">VIP</span>':'')+'</small></span>'+r+'<span class="pc-o">'+(l.result===2?'<s>'+fx2(l.price)+'</s> 1.00':l.price?fx2(l.price):"")+'</span></li>';}).join("");
+    return '<li'+(lv?' class="lv"':'')+'><span class="pc-tm">'+tm+'</span><span class="pc-m"><span class="pc-mt">'+esc(l.home||"")+' – '+esc(l.away||"")+'</span><b class="pc-pk">'+legPick(l)+(l.vip?'<span class="vipt">VIP</span>':'')+'</b></span>'+r+'<span class="pc-o">'+(l.result===2?'<s>'+fx2(l.price)+'</s> 1.00':l.price?fx2(l.price):"")+'</span></li>';}).join("");
   var keys=c.legs.map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});
   /* απόφαση Owner 02/11: το είδος μεγάλο με δικό του χρώμα (Γκολ πορτοκαλοκίτρινο, 1X2 γαλάζιο), το στυλ μικρό */
   var name='<span class="pv pv-'+esc(c.variant)+'">'+esc(BZC_VAR[c.variant]||c.variant)+'</span>'+(/\|extra/.test(c.slot||"")?' <small class="pc-new">🆕 <span>New</span></small>':'')+(c.style?' <small class="pc-sty">· <span>'+esc(STY[c.style]||c.style)+'</span></small>':'');
