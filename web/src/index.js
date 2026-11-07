@@ -120,6 +120,8 @@ const handle = async (req, env, ctx) => {
     const url = new URL(req.url);
     const p = url.pathname;
     if (url.hostname === "www.betizzi.com") return Response.redirect("https://betizzi.com" + p + url.search, 301);
+    // 07/11 (έλεγχος SEO): /en/record/ → /en/record (μία διεύθυνση ανά σελίδα)
+    if (/^\/[a-z]{2}\/[^?]+\/$/.test(p)) return Response.redirect(url.origin + p.slice(0, -1) + url.search, 301);
     if (p === "/") return Response.redirect(url.origin + "/en/", 301);
     if (p === "/app.js") {
       await template(env, url);
@@ -266,7 +268,11 @@ const handle = async (req, env, ctx) => {
       if (other) return Response.redirect(url.origin + pgPath(other, lang), 301);
     }
     if (m === null && /^\/[a-z]{2}$/.test(p) && LANGS.includes(p.slice(1))) return Response.redirect(url.origin + p + "/", 301);
-    return env.ASSETS.fetch(req);
+    // 07/11 (έλεγχος SEO): σελίδα 404 με περιεχόμενο (ήταν κενή), στη γλώσσα του URL
+    const as = await env.ASSETS.fetch(req);
+    if (as.status !== 404 || !(req.headers.get("accept") || "").includes("text/html")) return as;
+    const l4 = LANGS.includes(p.slice(1, 3)) && (p.length === 3 || p[3] === "/") ? p.slice(1, 3) : "en";
+    return html(`<!doctype html><html lang="${HREFLANG[l4]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>404 | betizzi</title><link rel="icon" href="/favicon.ico"><style>body{margin:0;background:#0c0f0d;color:#e9efe9;font:16px/1.5 system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;text-align:center}a{color:#b6f23a}</style></head><body><main><h1>404</h1><p><a href="/${l4}/">betizzi →</a></p></main></body></html>`, 404);
   }
 };
 
@@ -548,18 +554,18 @@ async function todayPage(env, lang, url) {
   const alt = LANGS.map((l) => `<link rel="alternate" hreflang="${HREFLANG[l]}" href="${SITE}/${l}/${dQ}">`).join("") + `<link rel="alternate" hreflang="x-default" href="${SITE}/en/${dQ}">`;
   const answer = t.answer(dLong, matches.length, tipsFree, tipsVip);
   const nowIso = new Date().toISOString();
-  const tipped = matches.filter((x) => x.tips.length).slice(0, 50);
+  const tipped = matches.filter((x) => x.tips.length).slice(0, 20); // 07/11 (έλεγχος SEO): 20 αντί 50 (17 KB schema)
   const ld = [
-    { "@context": "https://schema.org", "@type": "Organization", "@id": SITE + "/#org", name: "betizzi", url: SITE, logo: SITE + "/icons/icon-512.png", description: t.desc },
+    { "@context": "https://schema.org", "@type": "Organization", "@id": SITE + "/#org", name: "betizzi", url: SITE, logo: SITE + "/icons/icon-512.png", description: noAge(t.desc) },
     {
       "@context": "https://schema.org", "@type": "WebPage", name: `${title} — ${dLong}`, url: canonical, inLanguage: HREFLANG[lang], dateModified: nowIso,
       publisher: { "@id": SITE + "/#org" }, description: answer,
       mainEntity: {
         "@type": "ItemList", numberOfItems: tipped.length,
         itemListElement: tipped.map((x, i) => ({
-          "@type": "ListItem", position: i + 1,
+          "@type": "ListItem", position: i + 1, url: SITE + matchPath(lang, x),
           item: {
-            "@type": "SportsEvent", name: `${x.home.name} vs ${x.away.name}`, startDate: new Date(x.ts * 1000).toISOString(), sport: "Football",
+            "@type": "SportsEvent", url: SITE + matchPath(lang, x), name: `${x.home.name} vs ${x.away.name}`, startDate: new Date(x.ts * 1000).toISOString(), sport: "Football",
             homeTeam: { "@type": "SportsTeam", name: x.home.name }, awayTeam: { "@type": "SportsTeam", name: x.away.name },
             superEvent: { "@type": "SportsEvent", name: x.league.name },
           },
@@ -572,10 +578,10 @@ async function todayPage(env, lang, url) {
   // απόφαση Owner 04/11: ένα σύντομο κείμενο (ημερομηνία, αριθμοί, δυνατά) αντί για δύο· το πλήρες «answer» μένει στο schema
   const ssr = `<h1 class="ssrh">${esc(title)}</h1>`;
   const head = `<title>${esc(title)} — ${esc(dLong)} | betizzi</title>
-<meta name="description" content="${esc(t.desc)}">
+<meta name="description" content="${esc(noAge(t.desc))}">
 <link rel="canonical" href="${canonical}">
 ${matches.length && !allDays && isToday ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
-<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi">
+<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:locale" content="${OGLOC[lang]}"><meta name="twitter:card" content="summary_large_image">
 <meta property="og:title" content="${esc(title)} — ${esc(dLong)}"><meta property="og:description" content="${esc(answer)}">
 <meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>
@@ -705,6 +711,9 @@ export function matchPath(lang, x) {
 // Indexable αγώνας: ΜΟΝΟ με tip (απόφαση Owner 07/11, μετά τον έλεγχο SEO: σελίδες «χωρίς tip» = φτωχό περιεχόμενο για τη Google).
 // Πριν: και κάθε αγώνας Tier 1 (TOP). Οι υπόλοιποι: noindex,follow (ο επισκέπτης τους βλέπει κανονικά).
 const indexable = (x) => !!(x.tips && x.tips.length > 0);
+// 07/11 (έλεγχος SEO): χωρίς «18+/21+» σε meta/schema (η Google διαβάζει από ΗΠΑ → 21+ παντού). Η ειδοποίηση ηλικίας μένει ορατή στη σελίδα.
+const noAge = (s) => String(s).replace(/\s*(18|21)\+\.?\s*$/, "").trim();
+const OGLOC = { en: "en_GB", el: "el_GR", es: "es_ES", pt: "pt_PT", fr: "fr_FR", de: "de_DE", ro: "ro_RO", sr: "sr_RS", bg: "bg_BG" };
 const SM_START = "2026-11-02"; // επίσημο record
 const xmlEsc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const smAlt = (pathOf) => LANGS.map((l) => `<xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${xmlEsc(SITE + pathOf(l))}"/>`).join("")
@@ -786,8 +795,8 @@ function matchPage(lang, x) {
       superEvent: { "@type": "SportsEvent", name: x.league.name }, description: answer, url: canonical },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
       { "@type": "ListItem", position: 1, name: "betizzi", item: `${SITE}/${lang}/` },
-      { "@type": "ListItem", position: 2, name: x.league.name },
-      { "@type": "ListItem", position: 3, name: `${x.home.name} – ${x.away.name}`, item: canonical }] },
+      { "@type": "ListItem", position: 2, name: `${x.home.name} – ${x.away.name}`, item: canonical }] }, // 07/11: χωρίς επίπεδο λίγκας (δεν έχει δική του σελίδα)
+    { "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: title, inLanguage: HREFLANG[lang], dateModified: new Date().toISOString() },
   ];
   const langNav = LANGS.map((l) => `<a href="${matchPath(l, x)}" hreflang="${HREFLANG[l]}"${l === lang ? ' aria-current="page"' : ""}>${l.toUpperCase()}</a>`).join("");
   const nowIso = new Date().toISOString();
@@ -799,11 +808,11 @@ function matchPage(lang, x) {
 <meta name="description" content="${esc(answer.slice(0, 160))}">
 <link rel="canonical" href="${canonical}">
 ${indexable(x) ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
-<meta property="og:type" content="article"><meta property="og:site_name" content="betizzi"><meta property="og:title" content="${esc(title)}">
+<meta property="og:type" content="article"><meta property="og:site_name" content="betizzi"><meta property="og:locale" content="${OGLOC[lang]}"><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(answer)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
 <meta property="article:modified_time" content="${nowIso}"><meta name="theme-color" content="#0c0f0d">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"></noscript>
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>
 <style>${CSS}</style>
 </head>
@@ -992,11 +1001,11 @@ function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) 
 <meta name="description" content="${esc(r.desc)}">
 <link rel="canonical" href="${canonical}">
 ${tq || fq || pq > 1 ? '<meta name="robots" content="noindex,follow">' : alt}
-<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:title" content="${esc(r.title)}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:locale" content="${OGLOC[lang]}"><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="${esc(r.title)}">
 <meta property="og:description" content="${esc(answer)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
 <meta property="article:modified_time" content="${nowIso}"><meta name="theme-color" content="#0c0f0d">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"></noscript>
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>
 <style>${CSS}${RCSS}</style>
 </head>
@@ -1060,7 +1069,8 @@ function staticPage(lang, key) {
   const dUpd = new Intl.DateTimeFormat(LOCALE[lang], { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(upd));
   const ld = [{ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
     { "@type": "ListItem", position: 1, name: "betizzi", item: `${SITE}/${lang}/` },
-    { "@type": "ListItem", position: 2, name: pg.title[L], item: canonical }] }];
+    { "@type": "ListItem", position: 2, name: pg.title[L], item: canonical }] },
+    { "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: pg.title[L], inLanguage: HREFLANG[L], dateModified: upd, publisher: { "@id": SITE + "/#org" } }];
   // 07/11: «Πώς δουλεύουμε» με FAQ (FAQPage schema)
   const faq = pg.faq && pg.faq[L];
   if (faq) ld.push({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) });
@@ -1077,11 +1087,11 @@ function staticPage(lang, key) {
 <meta name="description" content="${esc(pg.desc[L])}">
 <link rel="canonical" href="${canonical}">
 ${own ? alt : '<meta name="robots" content="noindex,follow">'}
-<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:title" content="${esc(pg.title[L])}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:locale" content="${OGLOC[lang]}"><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="${esc(pg.title[L])}">
 <meta property="og:description" content="${esc(pg.desc[L])}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
 <meta property="article:modified_time" content="${upd}"><meta name="theme-color" content="#0c0f0d">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"></noscript>
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>
 <style>${CSS}</style>
 </head>
@@ -1191,11 +1201,11 @@ async function streaksPage(env, lang) {
 <link rel="canonical" href="${canonical}">
 ${alt}
 ${any ? "" : '<meta name="robots" content="noindex,follow">'}
-<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:title" content="${esc(S.title)}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:locale" content="${OGLOC[lang]}"><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="${esc(S.title)}">
 <meta property="og:description" content="${esc(ans)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
 <meta property="article:modified_time" content="${mod}"><meta name="theme-color" content="#0c0f0d">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"></noscript>
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>
 <style>${CSS}${PCSS}${SCSS}</style>
 </head>
@@ -1278,11 +1288,11 @@ async function paroliPage(env, lang) {
 <link rel="canonical" href="${canonical}">
 ${alt}
 ${cps.length ? "" : '<meta name="robots" content="noindex,follow">'}
-<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:title" content="${esc(title)}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:locale" content="${OGLOC[lang]}"><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(ans)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE}/og/${lang}.png">
 <meta property="article:modified_time" content="${mod}"><meta name="theme-color" content="#0c0f0d">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,700;1,800&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"></noscript>
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>
 <style>${CSS}${PCSS}</style>
 </head>

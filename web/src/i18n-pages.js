@@ -3,7 +3,7 @@
 // Μορφή σώματος: "## τίτλος", "- λίστα", κενή γραμμή = νέα παράγραφος, **έντονα**, [κείμενο](link).
 // ΠΡΟΣΟΧΗ: μην γράφεις «18+» μέσα σε πρόταση· σε σελίδες 21+ αλλάζει αυτόματα σε «21+».
 
-export const OP = { name: "Christos Menelaou", city: "Paphos, Cyprus", addr: "Annis Komninis 2, 8010 Paphos, Cyprus", legal: "admin@betizzi.com", hello: "hello@betizzi.com", partners: "marketing@betizzi.com", privacy: "privacy@betizzi.com", updated: "2026-11-03" };
+export const OP = { name: "Christos Menelaou", city: "Paphos, Cyprus", addr: "Annis Komninis 2, 8010 Paphos, Cyprus", legal: "admin@betizzi.com", hello: "hello@betizzi.com", partners: "marketing@betizzi.com", privacy: "privacy@betizzi.com", updated: "2026-11-07" };
 
 // 07/11: + «Πώς δουλεύουμε» (how) και Impressum/Νομικά στοιχεία (impressum, ΠΑΝΤΑ τελευταίο στο footer). Όροι/Απόρρητο/Cookies σε όλες τις γλώσσες.
 export const PG_ORDER = ["about", "how", "contact", "responsible", "affiliate", "partners", "terms", "privacy", "cookies", "impressum"];
@@ -1899,7 +1899,7 @@ export const PAR = {
 // Πίνακες στους 10 τελευταίους αγώνες (ελάχιστο 10), Φόρμα στους 5. Μόνο ομάδες των λιγκών μας που παίζουν σήμερα ή αύριο.
 // Όροι στοιχήματος (Over/Under, GG) μένουν όπως τους λέει ο κόσμος.
 export const STK = {
-  en: { slug: "izzistats", look: "👀 Worth a look: the price is high for this run", oldSlug: "team-streaks", link: "🔍 Izzistats · Team streaks", title: "Izzistats · Football team streaks, next 3 days: wins, Over 2.5, Under, GG", h1: "Izzistats",
+  en: { slug: "izzistats", look: "👀 Worth a look: the price is high for this run", oldSlug: "team-streaks", link: "🔍 Izzistats · Team streaks", title: "Team streaks: wins, Over 2.5, Under, GG · Izzistats", h1: "Izzistats",
     desc: "Teams playing in the next 3 days with the strongest runs in their last 10 games: wins, Over 2.5, Under 2.5, both teams to score (GG) and form. Free. 18+.",
     ans: (d, n) => `On ${d}, ${n} teams in our leagues play in the next 3 days. These are the ones with the strongest runs in their last 10 games.`,
     cats: { form: "🔥 In form", home: "🏠 Strong at home", away: "✈️ Win away", goals: "⚽ Lots of goals", gg: "🤝 GG streak", over: "📈 Over 2.5", under: "🧱 Under 2.5" , draws: "⚖️ Draws", bad: "📉 Out of form" },
@@ -1908,7 +1908,7 @@ export const STK = {
     col: { team: "Team", c: "Last 10", cf: "Points", next: "Next match", odd: "Odds" }, run: "in a row", none: "No team qualifies right now.",
     note: "Each team's last 10 games in all competitions; a team needs at least 10 to appear. Only teams playing in the next 3 days in the leagues we cover. Odds: best price we have.",
     app: "Open the app →", upd: "Updated" },
-  el: { slug: "izzistats", look: "👀 Για ψάξιμο: η τιμή είναι ψηλή για τέτοιο σερί", oldSlug: "seri-omadon", link: "🔍 Izzistats · Σερί ομάδων", title: "Izzistats · Σερί ομάδων, επόμενες 3 μέρες: νίκες, Over 2.5, Under, GG", h1: "Izzistats",
+  el: { slug: "izzistats", look: "👀 Για ψάξιμο: η τιμή είναι ψηλή για τέτοιο σερί", oldSlug: "seri-omadon", link: "🔍 Izzistats · Σερί ομάδων", title: "Σερί ομάδων: νίκες, Over 2.5, Under, GG · Izzistats", h1: "Izzistats",
     desc: "Ομάδες που παίζουν τις επόμενες 3 μέρες με τα πιο δυνατά σερί στους 10 τελευταίους αγώνες: νίκες, Over 2.5, Under 2.5, GG και φόρμα. Δωρεάν. 21+.",
     ans: (d, n) => `Στις ${d} παίζουν τις επόμενες 3 μέρες ${n} ομάδες από τις λίγκες μας. Εδώ είναι όσες έχουν τα πιο δυνατά σερί στους 10 τελευταίους αγώνες τους.`,
     cats: { form: "🔥 Σε φόρμα", home: "🏠 Δυνατοί εντός", away: "✈️ Νικούν εκτός", goals: "⚽ Πολλά γκολ", gg: "🤝 Σερί GG", over: "📈 Over 2.5", under: "🧱 Under 2.5" , draws: "⚖️ Ισοπαλίες", bad: "📉 Σε κακή φόρμα" },
@@ -1917,7 +1917,7 @@ export const STK = {
     col: { team: "Ομάδα", c: "Στους 10", cf: "Βαθμοί", next: "Επόμενος αγώνας", odd: "Απόδοση" }, run: "στη σειρά", none: "Καμία ομάδα δεν πληροί τα κριτήρια αυτή τη στιγμή.",
     note: "Οι 10 τελευταίοι αγώνες κάθε ομάδας σε όλες τις διοργανώσεις· χρειάζονται τουλάχιστον 10 για να μπει. Μόνο ομάδες που παίζουν τις επόμενες 3 μέρες στις λίγκες που καλύπτουμε. Απόδοση: η καλύτερη που έχουμε.",
     app: "Άνοιξε την εφαρμογή →", upd: "Ενημέρωση" },
-  es: { slug: "izzistats", look: "👀 Para mirar: la cuota es alta para esta racha", oldSlug: "rachas-equipos", link: "🔍 Izzistats · Rachas de equipos", title: "Izzistats · Rachas de equipos hoy: victorias, Over 2.5, Under, ambos marcan", h1: "Izzistats",
+  es: { slug: "izzistats", look: "👀 Para mirar: la cuota es alta para esta racha", oldSlug: "rachas-equipos", link: "🔍 Izzistats · Rachas de equipos", title: "Rachas de equipos: victorias, Over 2.5, GG · Izzistats", h1: "Izzistats",
     desc: "Equipos que juegan en los próximos 3 días con las mejores rachas en sus últimos 10 partidos: victorias, Over 2.5, Under 2.5, ambos marcan (GG) y forma. Gratis. 18+.",
     ans: (d, n) => `El ${d} juegan en los próximos 3 días ${n} equipos de nuestras ligas. Aquí están los que tienen las mejores rachas en sus últimos 10 partidos.`,
     cats: { form: "🔥 En forma", home: "🏠 Fuertes en casa", away: "✈️ Ganan fuera", goals: "⚽ Muchos goles", gg: "🤝 Racha ambos marcan", over: "📈 Over 2.5", under: "🧱 Under 2.5" , draws: "⚖️ Empates", bad: "📉 Mala racha" },
@@ -1926,7 +1926,7 @@ export const STK = {
     col: { team: "Equipo", c: "Últimos 10", cf: "Puntos", next: "Próximo partido", odd: "Cuota" }, run: "seguidos", none: "Ningún equipo cumple los criterios ahora.",
     note: "Últimos 10 partidos de cada equipo en todas las competiciones; hacen falta al menos 10 para aparecer. Solo equipos que juegan en los próximos 3 días en las ligas que cubrimos. Cuota: la mejor que tenemos.",
     app: "Abrir la app →", upd: "Actualizado" },
-  pt: { slug: "izzistats", look: "👀 Vale a pena ver: a odd é alta para esta sequência", oldSlug: "sequencias-equipas", link: "🔍 Izzistats · Sequências das equipas", title: "Izzistats · Sequências das equipas hoje: vitórias, Over 2.5, Under, ambas marcam", h1: "Izzistats",
+  pt: { slug: "izzistats", look: "👀 Vale a pena ver: a odd é alta para esta sequência", oldSlug: "sequencias-equipas", link: "🔍 Izzistats · Sequências das equipas", title: "Sequências das equipas: Over 2.5, GG · Izzistats", h1: "Izzistats",
     desc: "Equipas que jogam nos próximos 3 dias com as melhores sequências nos últimos 10 jogos: vitórias, Over 2.5, Under 2.5, ambas marcam (GG) e forma. Grátis. 18+.",
     ans: (d, n) => `A ${d} jogam nos próximos 3 dias ${n} equipas das nossas ligas. Aqui estão as que têm as melhores sequências nos últimos 10 jogos.`,
     cats: { form: "🔥 Em forma", home: "🏠 Fortes em casa", away: "✈️ Ganham fora", goals: "⚽ Muitos golos", gg: "🤝 Série ambas marcam", over: "📈 Over 2.5", under: "🧱 Under 2.5" , draws: "⚖️ Empates", bad: "📉 Má forma" },
@@ -1935,7 +1935,7 @@ export const STK = {
     col: { team: "Equipa", c: "Últimos 10", cf: "Pontos", next: "Próximo jogo", odd: "Odd" }, run: "seguidos", none: "Nenhuma equipa cumpre os critérios agora.",
     note: "Últimos 10 jogos de cada equipa em todas as competições; são precisos pelo menos 10 para aparecer. Só equipas que jogam nos próximos 3 dias nas ligas que cobrimos. Odd: a melhor que temos.",
     app: "Abrir a app →", upd: "Atualizado" },
-  fr: { slug: "izzistats", look: "👀 À creuser : la cote est élevée pour cette série", oldSlug: "series-equipes", link: "🔍 Izzistats · Séries des équipes", title: "Izzistats · Séries des équipes aujourd'hui : victoires, Over 2.5, Under, les deux marquent", h1: "Izzistats",
+  fr: { slug: "izzistats", look: "👀 À creuser : la cote est élevée pour cette série", oldSlug: "series-equipes", link: "🔍 Izzistats · Séries des équipes", title: "Séries des équipes : victoires, Over 2.5, GG · Izzistats", h1: "Izzistats",
     desc: "Les équipes qui jouent dans les 3 prochains jours avec les meilleures séries sur leurs 10 derniers matchs : victoires, Over 2.5, Under 2.5, les deux équipes marquent et forme. Gratuit. 18+.",
     ans: (d, n) => `Le ${d}, ${n} équipes de nos championnats jouent dans les 3 prochains jours. Voici celles qui ont les meilleures séries sur leurs 10 derniers matchs.`,
     cats: { form: "🔥 En forme", home: "🏠 Forts à domicile", away: "✈️ Gagnent à l'extérieur", goals: "⚽ Beaucoup de buts", gg: "🤝 Série les deux marquent", over: "📈 Over 2.5", under: "🧱 Under 2.5" , draws: "⚖️ Nuls", bad: "📉 En méforme" },
@@ -1944,7 +1944,7 @@ export const STK = {
     col: { team: "Équipe", c: "Sur 10", cf: "Points", next: "Prochain match", odd: "Cote" }, run: "d'affilée", none: "Aucune équipe ne remplit les critères pour l'instant.",
     note: "Les 10 derniers matchs de chaque équipe, toutes compétitions ; il en faut au moins 10 pour apparaître. Seulement les équipes qui jouent dans les 3 prochains jours dans nos championnats. Cote : la meilleure que nous avons.",
     app: "Ouvrir l'appli →", upd: "Mis à jour" },
-  de: { slug: "izzistats", look: "👀 Genauer hinsehen: die Quote ist hoch für diese Serie", oldSlug: "serien-teams", link: "🔍 Izzistats · Serien der Teams", title: "Izzistats · Serien der Teams heute: Siege, Over 2.5, Under, beide treffen", h1: "Izzistats",
+  de: { slug: "izzistats", look: "👀 Genauer hinsehen: die Quote ist hoch für diese Serie", oldSlug: "serien-teams", link: "🔍 Izzistats · Serien der Teams", title: "Team-Serien: Siege, Over 2.5, Under, GG · Izzistats", h1: "Izzistats",
     desc: "Teams, die in den nächsten 3 Tagen spielen, mit den stärksten Serien in den letzten 10 Spielen: Siege, Over 2.5, Under 2.5, beide treffen und Form. Kostenlos. 18+.",
     ans: (d, n) => `Am ${d} spielen in den nächsten 3 Tagen ${n} Teams aus unseren Ligen. Hier sind die mit den stärksten Serien in ihren letzten 10 Spielen.`,
     cats: { form: "🔥 In Form", home: "🏠 Heimstark", away: "✈️ Siegen auswärts", goals: "⚽ Viele Tore", gg: "🤝 Serie beide treffen", over: "📈 Over 2.5", under: "🧱 Under 2.5" , draws: "⚖️ Unentschieden", bad: "📉 Formtief" },
@@ -1953,7 +1953,7 @@ export const STK = {
     col: { team: "Team", c: "Letzte 10", cf: "Punkte", next: "Nächstes Spiel", odd: "Quote" }, run: "in Folge", none: "Im Moment erfüllt kein Team die Kriterien.",
     note: "Die letzten 10 Spiele jedes Teams in allen Wettbewerben; mindestens 10 sind nötig. Nur Teams, die in den nächsten 3 Tagen in unseren Ligen spielen. Quote: die beste, die wir haben.",
     app: "App öffnen →", upd: "Aktualisiert" },
-  ro: { slug: "izzistats", look: "👀 De analizat: cota e mare pentru o astfel de serie", oldSlug: "serii-echipe", link: "🔍 Izzistats · Seriile echipelor", title: "Izzistats · Seriile echipelor azi: victorii, Over 2.5, Under, ambele marchează", h1: "Izzistats",
+  ro: { slug: "izzistats", look: "👀 De analizat: cota e mare pentru o astfel de serie", oldSlug: "serii-echipe", link: "🔍 Izzistats · Seriile echipelor", title: "Seriile echipelor: victorii, Over 2.5, GG · Izzistats", h1: "Izzistats",
     desc: "Echipele care joacă în următoarele 3 zile cu cele mai bune serii în ultimele 10 meciuri: victorii, Over 2.5, Under 2.5, ambele marchează (GG) și formă. Gratuit. 18+.",
     ans: (d, n) => `Pe ${d}, ${n} echipe din ligile noastre joacă în următoarele 3 zile. Iată cele cu cele mai bune serii în ultimele 10 meciuri.`,
     cats: { form: "🔥 În formă", home: "🏠 Puternice acasă", away: "✈️ Câștigă în deplasare", goals: "⚽ Multe goluri", gg: "🤝 Serie GG", over: "📈 Over 2.5", under: "🧱 Under 2.5" , draws: "⚖️ Egaluri", bad: "📉 Formă slabă" },
@@ -1962,7 +1962,7 @@ export const STK = {
     col: { team: "Echipă", c: "Din 10", cf: "Puncte", next: "Următorul meci", odd: "Cotă" }, run: "la rând", none: "Nicio echipă nu îndeplinește criteriile acum.",
     note: "Ultimele 10 meciuri ale fiecărei echipe, în toate competițiile; sunt necesare cel puțin 10. Doar echipele care joacă în următoarele 3 zile în ligile pe care le acoperim. Cotă: cea mai bună pe care o avem.",
     app: "Deschide aplicația →", upd: "Actualizat" },
-  sr: { slug: "izzistats", look: "👀 Vredi pogledati: kvota je visoka za ovakvu seriju", oldSlug: "serije-timova", link: "🔍 Izzistats · Serije timova", title: "Izzistats · Serije timova danas: pobede, Over 2.5, Under, oba tima daju gol", h1: "Izzistats",
+  sr: { slug: "izzistats", look: "👀 Vredi pogledati: kvota je visoka za ovakvu seriju", oldSlug: "serije-timova", link: "🔍 Izzistats · Serije timova", title: "Serije timova: pobede, Over 2.5, GG · Izzistats", h1: "Izzistats",
     desc: "Timovi koji igraju u naredna 3 dana sa najjačim serijama u poslednjih 10 utakmica: pobede, Over 2.5, Under 2.5, GG i forma. Besplatno. 18+.",
     ans: (d, n) => `Dana ${d} u naredna 3 dana igra ${n} timova iz naših liga. Ovde su oni sa najjačim serijama u poslednjih 10 utakmica.`,
     cats: { form: "🔥 U formi", home: "🏠 Jaki kod kuće", away: "✈️ Pobeđuju u gostima", goals: "⚽ Mnogo golova", gg: "🤝 Serija GG", over: "📈 Over 2.5", under: "🧱 Under 2.5" , draws: "⚖️ Nerešeno", bad: "📉 Loša forma" },
@@ -1971,7 +1971,7 @@ export const STK = {
     col: { team: "Tim", c: "Od 10", cf: "Bodovi", next: "Sledeća utakmica", odd: "Kvota" }, run: "zaredom", none: "Nijedan tim trenutno ne ispunjava kriterijume.",
     note: "Poslednjih 10 utakmica svakog tima u svim takmičenjima; potrebno je najmanje 10. Samo timovi koji igraju u naredna 3 dana u ligama koje pratimo. Kvota: najbolja koju imamo.",
     app: "Otvori aplikaciju →", upd: "Ažurirano" },
-  bg: { slug: "izzistats", look: "👀 Заслужава внимание: коефициентът е висок за такава серия", oldSlug: "serii-otbori", link: "🔍 Izzistats · Серии на отборите", title: "Izzistats · Серии на отборите днес: победи, Over 2.5, Under, двата отбора бележат", h1: "Izzistats",
+  bg: { slug: "izzistats", look: "👀 Заслужава внимание: коефициентът е висок за такава серия", oldSlug: "serii-otbori", link: "🔍 Izzistats · Серии на отборите", title: "Серии на отборите: победи, Over 2.5, GG · Izzistats", h1: "Izzistats",
     desc: "Отбори, които играят в следващите 3 дни, с най-силните серии в последните 10 мача: победи, Over 2.5, Under 2.5, GG и форма. Безплатно. 18+.",
     ans: (d, n) => `На ${d} в следващите 3 дни играят ${n} отбора от нашите лиги. Тук са тези с най-силните серии в последните им 10 мача.`,
     cats: { form: "🔥 Във форма", home: "🏠 Силни у дома", away: "✈️ Печелят като гост", goals: "⚽ Много голове", gg: "🤝 Серия GG", over: "📈 Over 2.5", under: "🧱 Under 2.5" , draws: "⚖️ Равенства", bad: "📉 Лоша форма" },
