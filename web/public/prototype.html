@@ -2223,10 +2223,11 @@ function renderPicks(){
   /* απόφαση Owner 02/11: παρολί που χάνει φεύγει από τη λίστα της ημέρας (μένουν όσα «ζουν» ή κέρδισαν) */
   var plNow=Date.now(),plEnded=[],plSoon=false;
   L=L.filter(function(c){if(!parlayLost(c))return true;var k=String(c.n);if(PL_LOST[k]==null)PL_LOST[k]=PL_FIRST?0:plNow;
-    if(plNow-PL_LOST[k]<120000){plSoon=true;return true;}plEnded.push(c);return false;});
+    /* 07/11 (Owner): χαμένο παρολί φεύγει ΑΜΕΣΩΣ από τα ενεργά (πριν: έμενε 2΄ με «✗ Χάθηκε») */
+    plEnded.push(c);return false;});
   PL_FIRST=false;if(plSoon&&!PL_TMR)PL_TMR=setTimeout(function(){PL_TMR=null;try{renderPicks();}catch(e){}},20000);
   /* 07/11 (Owner): «Έληξαν» ΜΟΝΟ κάτω από τη ζώνη του (πριν έμπαινε το ίδιο κάτω από κάθε ζώνη και έμοιαζε ότι χάθηκε ένα σε κάθε κατηγορία) */
-  var endH=function(lst){return lst.length?'<details class="pend"><summary><span>Ended</span> · '+lst.length+'</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">'+lst.map(function(c){return parlayHTML(c,false);}).join("")+'</div></details>':'';};
+  var endH=function(lst){return lst.length?'<details class="pend"><summary><span>Lost parlays</span> · '+lst.length+'</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">'+lst.map(function(c){return parlayHTML(c,false);}).join("")+'</div></details>':'';};
   var endOf=function(z){return endH(plEnded.filter(function(c){return c.kind===z;}));};
   if($("pkN"))$("pkN").textContent=L.length?"· "+L.length:""; /* απόφαση Owner 02/11: πόσα παρολί «ζουν», όπως στα Μονά */
   var zones=ZORDER.filter(function(z){return L.some(function(c){return c.kind===z;});});
