@@ -2040,7 +2040,8 @@ function tipCard(m,t){
     +'<div class="why" style="font-size:.82rem;color:var(--muted)">'+(locked?'Free sign-up to see the pick and the reason.':esc(t.why))+'</div>'+(locked?'':priceNote(t))+'</div>';
 }
 /* έτοιμα κουπόνια του betizzi (βγαίνουν από τον server μία φορά τη μέρα) */
-if(typeof BZS==="undefined")var BZS=null;
+/* 07/11 ΣΦΑΛΜΑ: με το app.js χωριστά (06/11) το «var BZS» εδώ έκρυβε το BZS της σελίδας → τα δυνατά δεν φαίνονταν ποτέ. Χωρίς var: διαβάζει το BZS της σελίδας */
+if(typeof BZS==="undefined")window.BZS=null;
 try{if(BZS)[BZS.win,BZS.goals].concat(BZS.treble?BZS.treble.legs:[]).forEach(function(c){if(c&&c.ts)c.time=locT(c.ts,c.time);});}catch(e){}
 var STRONG_IDS=(function(){var s={};if(BZS){[BZS.win,BZS.goals].concat(BZS.treble?BZS.treble.legs:[]).forEach(function(c){if(c)s[c.id+":"+c.sel]=1;});}return s;})();
 var BZC_SEL={"1":"1","2":"2","X":"X","O25":"Over 2.5","U25":"Under 2.5","O15":"Over 1.5","GG":"GG","NG":"NG"};
