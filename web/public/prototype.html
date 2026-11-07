@@ -182,7 +182,10 @@ input:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visib
 .stb-pk{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;display:flex;flex-direction:column;gap:4px}
 .stb-lb{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .stb-pr{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.stb-sel{font:800 18px/1.2 "Fira Sans Extra Condensed",sans-serif;color:var(--lime)}.stb-o{font:800 18px/1 var(--f-mono);color:#fff}
-.stb-v{font-size:.8rem;font-weight:700}.stb-v.w,.stb-l .w{color:var(--win)}.stb-v.l,.stb-l .l{color:var(--bad)}
+.stb-v{font-size:.8rem;font-weight:700}.stb-v.w,.stb-l .w{color:var(--win)}
+/* 07/11 (Owner): η επιλογή που κέρδισε να φαίνεται: ✓ σε κύκλο, φωτεινό πράσινο, ελαφρύ πράσινο φόντο (τριάδα + παρολί) */
+.stb-l li.won,.pc-legs li.won{background:rgba(77,255,138,.07);border-radius:10px;padding-left:8px;padding-right:8px;margin:0 -8px}
+.stb-l li.won .w{color:#4dff8a;font-weight:800}.stb-l li .pc-r{flex:none}.stb-v.l,.stb-l .l{color:var(--bad)}
 .stb-why{margin:0;font-size:.82rem;line-height:1.5;color:#cfd8d0}
 .stb-warn{font-size:.8rem;color:var(--gold)}.stb-now{font-size:.8rem;color:var(--muted)}.stb-wait{color:var(--muted);font-size:.9rem;padding:12px;border:1px dashed var(--line);border-radius:12px}
 .stb-ft{margin-top:auto;padding-top:2px}.stb-ft .stb-add,.stb-ft .pc-take,.stb-btn{width:100%;min-height:40px;border-radius:10px;font-weight:800;font-size:.88rem;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -2104,7 +2107,7 @@ function parlayHTML(c,feat){
       if(es==="won")r='<span class="pc-r w">✓</span>';else if(es==="lost")r='<span class="pc-r l">✗</span>';}
     var tm=lv?'<span class="pc-live"><i class="ldot2"></i><b>'+esc(sc||"0-0")+'</b><small>'+esc(mn||"LIVE")+'</small></span>':dn?'<span class="pc-ft"><b>'+esc(sc)+'</b><small>FT</small></span>':esc(l.time||"");
     if(l.result===2)tm='<span class="pc-ft"><b>–</b><small>'+(l.status==="PST"||!l.status?'<span>Postponed</span>':'<span>Cancelled</span>')+' · <span>Void</span></small></span>';
-    return '<li'+(lv?' class="lv"':'')+'><span class="pc-tm">'+tm+'</span><span class="pc-m"><span class="pc-mt">'+esc(l.home||"")+' – '+esc(l.away||"")+'</span><b class="pc-pk">'+legPick(l)+(l.vip?'<span class="vipt">VIP</span>':'')+'</b></span>'+r+'<span class="pc-o">'+(l.result===2?'<s>'+fx2(l.price)+'</s> 1.00':l.price?fx2(l.price):"")+'</span></li>';}).join("");
+    return '<li'+(lv?' class="lv"':l.result===1?' class="won"':'')+'><span class="pc-tm">'+tm+'</span><span class="pc-m"><span class="pc-mt">'+esc(l.home||"")+' – '+esc(l.away||"")+'</span><b class="pc-pk">'+legPick(l)+(l.vip?'<span class="vipt">VIP</span>':'')+'</b></span>'+r+'<span class="pc-o">'+(l.result===2?'<s>'+fx2(l.price)+'</s> 1.00':l.price?fx2(l.price):"")+'</span></li>';}).join("");
   var keys=c.legs.map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});
   /* απόφαση Owner 02/11: το είδος μεγάλο με δικό του χρώμα (Γκολ πορτοκαλοκίτρινο, 1X2 γαλάζιο), το στυλ μικρό */
   var name='<span class="pv pv-'+esc(c.variant)+'">'+esc(BZC_VAR[c.variant]||c.variant)+'</span>'+(/\|extra/.test(c.slot||"")?' <small class="pc-new">🆕 <span>New</span></small>':'')+(c.style?' <small class="pc-sty">· <span>'+esc(STY[c.style]||c.style)+'</span></small>':'');
@@ -2213,7 +2216,7 @@ function renderStrong(){var box=$("strongBox");if(!box)return;
         /* γραμμή 2: λίγκα · ώρα (ή λεπτό · σκορ, ή ✓/✗ · τελικό) */
         var sub=r===1?'<span class="w">✓ <span>Won</span></span> · <span>Full time</span> '+sc2(L.sc):r===0?'<span class="l">✗ <span>Lost</span></span> · '+sc2(L.sc)
           :L.lv?esc(c.league||"")+' · <span class="on">'+esc(L.mn||"LIVE")+'</span> · <b class="mono on">'+sc2(L.sc||"0-0")+'</b>':L.dn?esc(c.league||"")+' · FT '+sc2(L.sc):esc(c.league||"")+' · '+esc(c.time||"");
-        return '<li><div class="stb-lg"><span class="stb-lm">'+esc(c.home)+' – '+esc(c.away)+'</span><small>'+sub+'</small></div><div class="stb-tp"><b>'+esc(BZC_SEL[c.sel]||c.sel)+(c.tier==="vip"?' <span class="vipt">VIP</span>':'')+'</b><span class="mono">'+Number(c.price).toFixed(2)+'</span></div></li>';}).join("")+'</ul>'
+        return '<li'+(r===1?' class="won"':r===0?' class="lost"':'')+'><div class="stb-lg"><span class="stb-lm">'+esc(c.home)+' – '+esc(c.away)+'</span><small>'+sub+'</small></div><div class="stb-tp"><b>'+esc(BZC_SEL[c.sel]||c.sel)+(c.tier==="vip"?' <span class="vipt">VIP</span>':'')+'</b><span class="mono">'+Number(c.price).toFixed(2)+'</span></div>'+(r===1?'<span class="pc-r w">✓</span>':r===0?'<span class="pc-r l">✗</span>':'')+'</li>';}).join("")+'</ul>'
       +'<div class="stb-tot"><span>Total odds</span><b class="mono">'+Number(tr.odds).toFixed(2)+'</b></div>'
       +'<div class="stb-ft">'+(tr.result==null&&tres==null&&!Ls.some(function(L){return L.lv||L.dn;})&&keys.length===3?'<button type="button" class="pc-take" id="stbTake">+ <span>Treble to my slip</span></button>':'<div class="stb-btn off">'+(allDn||tres!=null?'<span>Match over</span>':'<span>In progress</span>')+'</div>')+'</div></article>';}
   h+='</div>';box.innerHTML=h;bindButtons(box);syncPressed();
