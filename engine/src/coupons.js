@@ -158,7 +158,9 @@ export async function ensureCoupons(env) {
   const today = athDate(now()), tmr = addDay(today), res = {};
   let a = await activeOf(env, today);
   if (a < minFor(today)) { res.today = await makeCoupons(env, today, false, minFor(today) - a); a = await activeOf(env, today); }
-  if (a < minFor(today) || await playableOf(env, today) === 0) {
+  // μόνο από τις 18:00 Ελλάδας: το πρωί τα πρώτα παρολί είναι συχνά LIVE (Ασία) και έρχονται κι άλλα μέσα στη μέρα
+  const athH = +new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", hour: "2-digit", hourCycle: "h23" }).format(new Date());
+  if (a < minFor(today) || (athH >= 18 && await playableOf(env, today) === 0)) {
     const need = minFor(tmr) - await activeOf(env, tmr);
     if (need > 0) res.tomorrow = await makeCoupons(env, tmr, false, need);
   }
