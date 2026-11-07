@@ -76,8 +76,8 @@ function ymdIn(tz, ts = Date.now()) {
 // /pt/: ΠΡΟΣΩΡΙΝΑ noindex (απόφαση Owner 05/11, προληπτικά): τα πορτογαλικά στοχεύουν τώρα Βραζιλία.
 // Δεν είναι επιβεβαιωμένη νομική υποχρέωση· φεύγει όταν τα /pt/ γίνουν Πορτογαλίας (ή μετά από νομικό έλεγχο).
 const PROD_HOST = "betizzi.com";
-// /de/: ΠΡΟΣΩΡΙΝΑ noindex (απόφαση Owner 07/11, επιλογή Β): μέχρι να μπει το Impressum (νομική υποχρέωση στη Γερμανία).
-const NOINDEX_LANGS = ["pt", "de"];
+// /de/: ανοιχτό από 07/11 (μπήκε το Impressum /de/impressum).
+const NOINDEX_LANGS = ["pt"];
 function isPrivate(url) {
   const p = url.pathname;
   return p === "/admin" || p.startsWith("/admin/") || p.startsWith("/auth/") || p === "/me.json" || p === "/vip.json" || p === "/h" || url.searchParams.has("demo")
@@ -1056,6 +1056,10 @@ function staticPage(lang, key) {
   const ld = [{ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
     { "@type": "ListItem", position: 1, name: "betizzi", item: `${SITE}/${lang}/` },
     { "@type": "ListItem", position: 2, name: pg.title[L], item: canonical }] }];
+  // 07/11: «Πώς δουλεύουμε» με FAQ (FAQPage schema)
+  const faq = pg.faq && pg.faq[L];
+  if (faq) ld.push({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) });
+  const body = pg.body[L].replace(/\{REC\}/g, `/${lang}/${REC[lang].slug}`).replace(/\{CONTACT\}/g, pgPath("contact", lang));
   if (key === "about") ld.push({ "@context": "https://schema.org", "@type": "Organization", name: "betizzi", url: SITE, logo: `${SITE}/og/en.png`,
     description: pg.desc.en, email: OP.hello, founder: { "@type": "Person", name: OP.name },
     address: { "@type": "PostalAddress", addressLocality: "Paphos", addressCountry: "CY" },
@@ -1081,7 +1085,8 @@ ${own ? alt : '<meta name="robots" content="noindex,follow">'}
 <main class="doc">
 <nav class="bc"><a href="/${lang}/">betizzi</a> › ${esc(pg.title[L])}</nav>
 <h1>${esc(pg.title[L])}</h1>
-${md(pg.body[L])}
+${md(body)}
+${faq ? `<h2>${esc(pg.faqH[L])}</h2>` + faq.map(([q, a]) => `<h3>${esc(q)}</h3><p>${esc(a)}</p>`).join("") : ""}
 <p class="how" style="font-size:13px;margin-top:24px"><time datetime="${upd}">${esc(dUpd)}</time></p>
 <p><a href="/${lang}/">← ${esc(t.back)}</a></p>
 </main>
