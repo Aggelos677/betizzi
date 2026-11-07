@@ -313,6 +313,7 @@ export const UI = {
   "Day": ["Ημέρα", "Día", "Dia", "Jour", "Tag", "Zi", "Dan", "Ден"],
   "⚽ Goal": ["⚽ Γκολ", "⚽ Gol", "⚽ Golo", "⚽ But", "⚽ Tor", "⚽ Gol", "⚽ Gol", "⚽ Гол"],
   "💰 Goal lands tip": ["💰 Γκολ που περνάει το tip", "💰 Gol que cumple el tip", "💰 Golo que cumpre o palpite", "💰 But qui valide le tip", "💰 Tor bringt den Tipp durch", "💰 Gol care trece pontul", "💰 Gol koji donosi tip", "💰 Гол, който печели прогнозата"],
+  "Lost parlays": ["Χάθηκαν", "Perdidas", "Perdidas", "Perdus", "Verloren", "Pierdute", "Izgubljeni", "Загубени"],
   "See analysis": ["Δες ανάλυση", "Ver análisis", "Ver análise", "Voir l'analyse", "Analyse ansehen", "Vezi analiza", "Pogledaj analizu", "Виж анализа"],
   "No tip": ["Χωρίς tip", "Sin tip", "Sem palpite", "Pas de tip", "Kein Tipp", "Fără pont", "Bez tipa", "Без прогноза"],
   "Free tips": ["Δωρεάν tips", "Tips gratis", "Palpites grátis", "Tips gratuits", "Gratis-Tipps", "Ponturi gratuite", "Besplatni tipovi", "Безплатни прогнози"],
