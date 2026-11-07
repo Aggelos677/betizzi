@@ -165,7 +165,7 @@ const handle = async (req, env, ctx) => {
     if (p === "/sitemap.xml" || /^\/sitemap-[a-z]{2}\.xml$/.test(p)) {
       const sl = p === "/sitemap.xml" ? "" : p.slice(9, 11);
       if (sl && !LANGS.includes(sl)) return new Response("not found", { status: 404 });
-      const ck = new Request("https://betizzi.com/__sm/" + (sl || "index"));
+      const ck = new Request("https://betizzi.com/__sm/" + (sl || "index") + "?x=" + NOINDEX_LANGS.join("-")); // αλλάζει όταν αλλάζουν οι κλειστές γλώσσες
       try { const c = await caches.default.match(ck); if (c) return c; } catch (e) {}
       const body = sl ? await sitemapLang(env, sl) : sitemapIndex();
       const r = new Response(body, { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } });
