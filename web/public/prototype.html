@@ -2241,7 +2241,8 @@ function renderPicks(){
     var td=typeof DAYNAV!=="undefined"&&DAYNAV.today?DAYNAV.today:"",tm=td?new Date(Date.parse(td+"T12:00:00Z")+864e5).toISOString().slice(0,10):"";
     /* 06/11 (δοκιμή παικτών): το βράδυ, όταν κανένα σημερινό παρολί δεν παίζεται πια (όλα ξεκίνησαν/κρίθηκαν), τα αυριανά πάνε ΠΡΩΤΑ */
     var playable=L.some(function(c){return c.result==null&&!parlayLost(c)&&!c.legs.some(function(l){return (l.status&&l.status!=="NS"&&l.status!=="TBD")||(l.ts&&l.ts*1000<=Date.now());});});
-    var zm=$("zMain"),first=!playable;if(zm&&zm.parentNode)zm.parentNode.insertBefore(bx,first?zm:zm.nextSibling);bx.style.marginTop=first?"0":"14px";if(first)bx.style.marginBottom="14px";else bx.style.marginBottom="";
+    var athH=+new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Athens",hour:"2-digit",hourCycle:"h23"}).format(new Date());
+    var zm=$("zMain"),first=!playable&&athH>=18;if(zm&&zm.parentNode)zm.parentNode.insertBefore(bx,first?zm:zm.nextSibling);bx.style.marginTop=first?"0":"14px";if(first)bx.style.marginBottom="14px";else bx.style.marginBottom="";
     var lnk=tm?'<a class="m-url" href="?d='+tm+'"><span>See tomorrow\'s matches and parlays</span> →</a>':'';
     bx.hidden=false;bx.innerHTML='<h3 class="zsec"><span>Tomorrow</span> <small>'+N.length+'</small></h3>'
       +(first?'<p class="ztmr-note"><span>Today\'s parlays have all started. Tomorrow\'s are ready to play.</span></p>'+(tm?'<a class="pc-take ztmr-go" href="?d='+tm+'">🎟️ <span>See tomorrow\'s parlays</span> →</a>':''):'')
