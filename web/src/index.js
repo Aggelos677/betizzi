@@ -1135,11 +1135,11 @@ const SCSS = `
 .chips{display:flex;gap:6px;overflow-x:auto;margin:4px -14px 6px;padding:2px 14px 6px;position:sticky;top:51px;background:var(--bg);z-index:1;scrollbar-width:none}
 .chips a{flex:none;border:1px solid var(--ln);border-radius:999px;padding:8px 12px;text-decoration:none;font-weight:700;font-size:13px;background:var(--c1);min-height:36px}
 .st{scroll-margin-top:60px}.st h2{margin:22px 0 2px}.st .sub{color:var(--mu);font-size:13px;margin:0 0 8px}
-.doc ul.sl{list-style:none;padding:0;margin:0;background:var(--c1);border:1px solid var(--ln);border-radius:12px;overflow:hidden}
-.doc ul.sl li{padding:10px 12px;margin:0;border-top:1px solid var(--ln);color:inherit;list-style:none}.doc ul.sl li::before,.doc ul.sl li::marker{content:none}.sl li:first-child{border-top:0}
+.doc ul.sl{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px} /* 08/11: κάθε ομάδα δική της κάρτα */
+.doc ul.sl li{padding:12px;margin:0;background:var(--c1);border:1px solid var(--ln);border-radius:12px;color:inherit;list-style:none}.doc ul.sl li::before,.doc ul.sl li::marker{content:none}
 .sr{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center} /* 08/11 Owner: χωρίς αριθμό σειράς (μπέρδευε με τη θέση βαθμολογίας) */
 .sr .n{color:var(--mu);font:500 12px "JetBrains Mono",monospace}.sr b{font-weight:700;font-size:15px}.sr small{display:block;color:var(--mu);font-size:12px;margin-top:1px}
-.mt{text-align:right}.mt .bg{display:inline-block;font:700 17px "JetBrains Mono",monospace;color:#ffb547}.mt em{display:block;font-style:normal;color:var(--mu);font-size:11px;margin-top:2px}
+.mt{text-align:right}.mt .bg{display:inline-block;font:700 17px "JetBrains Mono",monospace;color:#ffb547}.mt .bg{background:rgba(255,181,71,.1);border-radius:8px;padding:2px 8px} /* 08/11: σε κουτάκι, πορτοκαλί (στατιστικό) */.mt em{display:block;font-style:normal;color:var(--mu);font-size:11px;margin-top:2px}
 .run{display:inline-block;color:#ffb547;font-size:11px;font-weight:700;margin-left:8px;white-space:nowrap;border:1px solid rgba(255,181,71,.45);background:rgba(255,181,71,.08);border-radius:999px;padding:1px 8px;vertical-align:2px} /* 08/11: pill */
 .sr .fm{display:inline-flex;gap:2px;vertical-align:middle;margin-left:6px}.sr .fm i{width:12px;height:5px;border-radius:2px;display:inline-block}.sr .fm .W{background:#3ccf6e}.sr .fm .D{background:#ffb547}.sr .fm .L{background:#ff6b6b}
 .nx{display:flex;align-items:center;gap:8px;margin:8px 0 0;color:var(--tx)!important;padding:7px 10px;border-radius:10px;background:var(--c2);text-decoration:none;min-height:40px}
@@ -1150,6 +1150,9 @@ const SCSS = `
 .lk .nx .od{background:var(--lime);border-color:var(--lime);color:#0c0f0d}.lk .nx .od small{color:#2b3a0c!important}
 .lkt{display:none}.lk .lkt{display:block;order:3;flex-basis:100%;color:var(--lime);font-size:12px;font-weight:700}.lk .nx{flex-wrap:wrap}
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
+.mo{display:block;width:100%;margin:10px 0 0;min-height:44px;border:1px solid var(--ln);border-radius:12px;background:var(--c2);color:var(--tx);font:700 14px Manrope,sans-serif;cursor:pointer}
+@media (max-width:767px){.sl li.x{display:none}.st.all .sl li.x{display:block}.st.all .mo{display:none}} /* 08/11 Owner: κινητό, 5 πρώτες ανοιχτές */
+@media (min-width:768px){.mo{display:none}.izt .st{display:none}.izt .st.on{display:block}.izt .grid9 a.on{border-color:#e9f2ec;background:var(--c2);color:#fff;box-shadow:inset 0 0 0 1px #e9f2ec}.izt .up{display:none}} /* 08/11 Owner: PC, tabs */
 .sl details>summary{list-style:none;cursor:pointer}.sl details>summary::-webkit-details-marker{display:none}
 .nx .cv{color:var(--mu);font-size:14px;transition:transform .15s}.sl details[open] .nx .cv{transform:rotate(180deg)}
 .gx{margin:10px 0 0}.gxt{margin:18px 0 8px;font-size:15px;line-height:1.3}.gx>.gxt:first-child{margin-top:12px}.gxt b{font-weight:600;color:#cfd8d1}.gxt.me b{font-weight:800;color:var(--tx)}.gxt small{color:var(--mu);font-size:12px;margin-left:6px} /* 08/11 Owner: μεγαλύτερα ονόματα, πιο πολύς αέρας */.rkp{display:inline-block;min-width:18px;padding:0 4px;border-radius:5px;background:rgba(126,190,255,.14);color:#8fc7ff;font:700 11px/16px "JetBrains Mono",monospace;text-align:center;vertical-align:1px;margin-right:4px}.gs{display:flex;gap:4px;flex-wrap:wrap;padding:0 0 6px}
@@ -1179,7 +1182,7 @@ function matchFrag(lang, x) {
 function izziFrag(b) {
   let m = (b.match(/<main class="doc">([\s\S]*?)<\/main>/) || [, ""])[1];
   m = m.replace(/<nav class="bc">[\s\S]*?<\/nav>/, "").replace(/<a class="cta"[^>]*>[\s\S]*?<\/a>/, "");
-  const css = (SCSS + `.ans{background:var(--c1);border:1px solid var(--ln);border-radius:12px;padding:12px;margin:0 0 10px;color:#cfd8d1;line-height:1.55}
+  const css = (SCSS.replace(/\/\*[\s\S]*?\*\//g, "") + `.ans{background:var(--c1);border:1px solid var(--ln);border-radius:12px;padding:12px;margin:0 0 10px;color:#cfd8d1;line-height:1.55}
 h1{font:800 28px/1.1 "Fira Sans Extra Condensed",sans-serif;margin:4px 0 8px;text-transform:uppercase}h2{font:800 20px "Fira Sans Extra Condensed",sans-serif;margin:18px 0 4px}
 .how,.note{color:var(--mu);font-size:13px}a{color:inherit}.soon{border:0;border-radius:0;padding:0}.sub{display:block}`)
     .replace(/([^{}]+)\{/g, (_, sel) => sel.split(",").map((x) => (x.trim().startsWith("@") ? x : ".izz " + x.trim())).join(",") + "{")
@@ -1224,6 +1227,17 @@ function izzClient() {
     if (G) squares(d); else { var p = data(); if (p) p.then(function () { squares(d); }); }
     var b = d.querySelector(".mzb"); if (!b || b.dataset.l) return; b.dataset.l = 1; b.innerHTML = '<span class="ld">…</span>';
     frag(b).then(function (h) { if (!h) { b.dataset.l = ""; b.innerHTML = ""; return; } if (document.getElementById("mzcss")) h = h.replace(/<style id="mzcss">[\s\S]*?<\/style>/, ""); b.innerHTML = h; }); }, true);
+  // 08/11 (Owner): PC → tabs (μία κατηγορία τη φορά)· κινητό → κοινό scroll με τις 5 πρώτες και «Δες όλες»
+  function tabs() { Array.prototype.forEach.call(document.querySelectorAll("#cats"), function (nav) { var root = nav.parentNode; if (root.classList.contains("izt")) return;
+    root.classList.add("izt"); var a = nav.querySelector("a"); if (a) show(root, a.getAttribute("href").slice(1)); }); }
+  function show(root, id) { Array.prototype.forEach.call(root.querySelectorAll(".st"), function (s) { s.classList.toggle("on", s.id === id); });
+    Array.prototype.forEach.call(root.querySelectorAll("#cats a"), function (x) { x.classList.toggle("on", x.getAttribute("href") === "#" + id); }); }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("#cats a");
+    if (a && innerWidth >= 768) { e.preventDefault(); e.stopPropagation(); show(a.closest(".izt") || a.closest("#cats").parentNode, a.getAttribute("href").slice(1)); return; }
+    var m = e.target.closest && e.target.closest(".mo"); if (m) { m.closest(".st").classList.add("all"); }
+  }, true);
+  tabs();
   if (document.readyState === "complete") setTimeout(data, 300); else window.addEventListener("load", function () { setTimeout(data, 300); });
 }
 // 08/11: το build του Cloudflare (esbuild, keepNames) βάζει μέσα στη συνάρτηση κλήσεις __name(...)· στον browser δεν υπάρχει → μικρό shim
@@ -1263,14 +1277,14 @@ async function streaksPage(env, lang) {
       const [rT, rO] = r.home ? [r.fixture.hr, r.fixture.ar] : [r.fixture.ar, r.fixture.hr]; // θέσεις (BTFStats), «9 Brighton»
       if ((r.games || []).length) D.r[dk] = r.home ? [[r.team, r.games, rT, 1], [opp, r.oppGames || [], rO, 0]] : [[opp, r.oppGames || [], rO, 0], [r.team, r.games, rT, 1]]; // [όνομα, παιχνίδια, θέση, ομάδα της κάρτας]
       const sq = `<div class="gx"></div>`;
-      return `<li${look ? ' class="lk"' : ""}><details data-k="${dk}"><summary><div class="sr"><div><b>${(r.home ? r.fixture.hr : r.fixture.ar) ? `<span class="rkp">${r.home ? r.fixture.hr : r.fixture.ar}</span> ` : ""}${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
+      return `<li class="${look ? "lk" : ""}${i >= 5 ? " x" : ""}"><details data-k="${dk}"><summary><div class="sr"><div><b>${(r.home ? r.fixture.hr : r.fixture.ar) ? `<span class="rkp">${r.home ? r.fixture.hr : r.fixture.ar}</span> ` : ""}${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
         + `<div class="nx"><span><i>${esc(S.nx)} · ${esc(when(r.fixture.ts))}</i><b class="tms"><span${r.home ? ' class="me"' : ""}>${r.fixture.hr ? `<span class="rkp">${r.fixture.hr}</span>` : ""}${esc(r.fixture.home)}</span><em> – </em><span${r.home ? "" : ' class="me"'}>${r.fixture.ar ? `<span class="rkp">${r.fixture.ar}</span>` : ""}${esc(r.fixture.away)}</span></b></span>`
-        + (look ? `<span class="lkt">${esc(S.look)}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `<span class="cv" aria-hidden="true">▾</span></div></summary>`
+        + (look ? `<span class="lkt" title="${esc(S.look)}">${esc(S.look.split(":")[0].trim())}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `<span class="cv" aria-hidden="true">▾</span></div></summary>`
         + sq + `<div class="mzb" data-u="${href}"></div><a class="full" href="${href}">${esc(S.full)}</a></details></li>`;
     }).join("");
     return `<section class="st" id="${k}"><h2>${esc(S.cats[k])} <a class="up" href="#cats" aria-label="${esc(S.catH)}">↑</a></h2><p class="sub">${esc(S.sub[k])}</p>`
-      + (rows ? `<ul class="sl">${rows}</ul>` : `<p class="note">${esc(S.none)}</p>`) + `</section>`;
+      + (rows ? `<ul class="sl">${rows}</ul>` + (L.length > 5 ? `<button type="button" class="mo" data-n="${L.length}">${esc(S.more.replace("{n}", L.length))} ▾</button>` : "") : `<p class="note">${esc(S.none)}</p>`) + `</section>`;
   };
   const secsHtml = KEYS.map(sec).join("");
   STKD[lang] = JSON.stringify(D);
