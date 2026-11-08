@@ -53,7 +53,7 @@ ul{list-style:none;margin:0;padding:0}
 .tipc small{color:var(--mu);display:block}.add{font:700 13px Manrope,sans-serif;background:var(--c2);color:var(--lime);border:1px solid var(--lime);border-radius:10px;padding:10px 12px;min-height:44px}
 table{width:100%;border-collapse:collapse;font:500 14px "JetBrains Mono",monospace}td,th{padding:7px 4px;text-align:center;border-top:1px solid var(--ln)}th{color:var(--mu);font:600 12px Manrope,sans-serif}
 .fm{display:flex;gap:3px;flex-wrap:wrap}.fm span{min-width:30px;height:22px;padding:0 3px;border-radius:5px;display:grid;place-items:center;font:700 11px "JetBrains Mono",monospace;color:#0c0f0d}
-.fm span i{font-style:normal}.fm span u{display:none;text-decoration:none}.fm{padding-bottom:4px}.fm span.h{box-shadow:0 3px 0 #e9f2ec}
+.fm span i{font-style:normal}.fm span u{display:none;text-decoration:none}.fm{padding-bottom:4px}.fm span.h{box-shadow:0 3px 0 #e9f2ec}.fm span{position:relative;cursor:default}.fm span:hover::after,.fm span:focus::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#1b231e;color:#e9f2ec;border:1px solid #2a352e;border-radius:6px;padding:4px 8px;font:600 12px Manrope,sans-serif;z-index:5;pointer-events:none}.fm span:focus{outline:none}.fm span:first-child::after{left:0;transform:none}.fm span:last-child::after{left:auto;right:0;transform:none}
 @media (max-width:480px){.fm span{min-width:18px}.fm span i{display:none}.fm span u{display:inline}}
 .fleg{font-size:12px;color:var(--mut,#9aa59e);margin:6px 0 0}
 .fm .W{background:#3ccf6e}.fm .D{background:#ffb547}.fm .L{background:#ff6b6b}
@@ -778,8 +778,11 @@ function matchPage(lang, x) {
     : `<p class="how">${esc(t.noTipM)}${live || done || off ? "" : " " + esc(t.noTipF)}${(x.home.form || []).length || (x.away.form || []).length ? " " + esc(t.noTipA) : ""}</p><p><a href="/${lang}/">${esc(t.noTipL)} →</a></p>`;
 
   // 04/11 (Owner): χωρίς λογότυπα· σκορ σε χρωματιστό κουτί (W/D/L στο στενό κινητό), γραμμή από κάτω = εντός έδρας
+  // 08/11 (Owner): mouse over / πάτημα στο κουτάκι → «1-5 · Panathinaikos (εκτός) · 1/11»
+  const fTip = (g) => [`${g.gf}-${g.ga}`, g.opp ? `${g.opp} (${g.home ? t.fHome : t.fAway})` : (g.home ? t.fHome : t.fAway),
+    g.ts ? new Date(g.ts * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "numeric", timeZone: tz }) : ""].filter(Boolean).join(" · ");
   const formRow = (team) => `<div class="frow"><span class="tm">${esc(team.name)}</span>
-    <span class="fm">${team.form.slice(0, 10).reverse().map((g) => `<span class="${g.res}${g.home ? " h" : ""}" title="${g.gf}-${g.ga}"><i>${g.gf}-${g.ga}</i><u>${t[g.res]}</u></span>`).join("")}</span></div>`;
+    <span class="fm">${team.form.slice(0, 10).reverse().map((g) => `<span class="${g.res}${g.home ? " h" : ""}" tabindex="0" data-tip="${esc(fTip(g))}" aria-label="${esc(fTip(g))}"><i>${g.gf}-${g.ga}</i><u>${t[g.res]}</u></span>`).join("")}</span></div>`;
   const oddsRow = ["1", "X", "2", "O25", "U25", "GG", "NG"].filter((k) => x.odds[k]);
   const oddsHtml = oddsRow.length ? `<table><tr>${oddsRow.map((k) => `<th>${SEL[k]}</th>`).join("")}</tr><tr>${oddsRow.map((k) => `<td>${x.odds[k].toFixed(2)}</td>`).join("")}</tr></table>` : "";
   const modelHtml = md ? `<table><tr><th>1</th><th>X</th><th>2</th><th>Over 2.5</th><th>${esc(t.score)}</th></tr>
