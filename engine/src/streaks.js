@@ -70,6 +70,9 @@ export async function apiStreaks(env, leagueIds, top = 15) {
         form: all.slice(0, 5).map((x) => (x.gf > x.ga ? "W" : x.gf < x.ga ? "L" : "D")).join(""),
         // 08/11 (Owner): τα παιχνίδια της κατηγορίας για το άνοιγμα προς τα κάτω: [gf, ga, εντός, αντίπαλος, ts], νέο → παλιό
         games: (C.only ? side.slice(0, 5) : all).map((x) => [x.gf, x.ga, x.is_home, x.opp || "", x.ts]),
+        // 08/11 (Owner): και ο αντίπαλος, με τον ίδιο κανόνα (στις κατηγορίες έδρας: τα παιχνίδια του στη δική του πλευρά)
+        oppGames: (() => { const op = (res[home ? f.away_id : f.home_id] || []).filter((r) => r.ts < f.ts);
+          return (C.only ? op.filter((r) => (home ? !r.is_home : r.is_home)).slice(0, 5) : op.slice(0, 10)).map((x) => [x.gf, x.ga, x.is_home, x.opp || "", x.ts]); })(),
         fixture: { id: f.id, ts: f.ts, home: f.home, away: f.away }, sel, price: (odds[f.id] || {})[sel] || null });
     }
     rows.sort((a, b) => (b.key ?? b.c) - (a.key ?? a.c) || b.run - a.run || a.fixture.ts - b.fixture.ts);
