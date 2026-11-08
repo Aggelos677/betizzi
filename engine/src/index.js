@@ -126,8 +126,8 @@ async function syncForm(env, batch = 40) {
     let games;
     try { games = await src.lastResults(r.team, 10); calls++; } catch (e) { break; } // όριο API: συνεχίζει στο επόμενο λεπτό
 
-    const st = games.map((g) => env.DB.prepare("INSERT OR REPLACE INTO results(team_id,fixture_id,ts,is_home,gf,ga,ht_gf,ht_ga) VALUES(?,?,?,?,?,?,?,?)")
-      .bind(r.team, g.id, g.ts, g.is_home, g.gf, g.ga, g.ht_gf, g.ht_ga));
+    const st = games.map((g) => env.DB.prepare("INSERT OR REPLACE INTO results(team_id,fixture_id,ts,is_home,gf,ga,ht_gf,ht_ga,opp) VALUES(?,?,?,?,?,?,?,?,?)")
+      .bind(r.team, g.id, g.ts, g.is_home, g.gf, g.ga, g.ht_gf, g.ht_ga, g.opp ?? null)); // 08/11: + αντίπαλος (tooltip φόρμας)
     st.push(env.DB.prepare("INSERT OR REPLACE INTO form_fetch(team_id,fetched) VALUES(?,?)").bind(r.team, now()));
     await env.DB.batch(st);
   }
@@ -302,7 +302,10 @@ async function apiMatch(env, id) {
     .map((t) => (t.tier === "vip" && f.ts + VIP_OPEN > now() && !sk.includes(t.fixture_id + ":" + t.sel) ? { fixture_id: id, tier: "vip", status: t.status, locked: true } : t));
   const odds = {};
   for (const o of (await env.DB.prepare("SELECT market, sel, price FROM odds WHERE fixture_id=?").bind(id).all()).results) odds[o.sel] = o.price;
-  const form = async (team) => (await env.DB.prepare("SELECT fixture_id, ts, is_home, gf, ga FROM results WHERE team_id=? AND ts < ? ORDER BY ts DESC LIMIT 10").bind(team, f.ts).all()).results;
+  // 08/11: + αντίπαλος· από results.opp (API) ή από τους δικούς μας αγώνες (fixtures/teams)
+  const form = async (team) => (await env.DB.prepare(`SELECT r.fixture_id, r.ts, r.is_home, r.gf, r.ga, COALESCE(r.opp, tm.name) opp FROM results r
+    LEFT JOIN fixtures x ON x.id=r.fixture_id LEFT JOIN teams tm ON tm.id = CASE WHEN r.is_home=1 THEN x.away_id ELSE x.home_id END
+    WHERE r.team_id=? AND r.ts < ? ORDER BY r.ts DESC LIMIT 10`).bind(team, f.ts).all()).results;
   const model = scoreModel(odds, tips.filter((t) => t.sel));
   if (model) { const fz = await frozenScores(env, [f], (await env.DB.prepare("SELECT * FROM tips WHERE fixture_id=? AND status='active'").bind(id).all()).results, { [id]: odds }); if (fz[id]) model.score = fz[id]; }
   return { fixture: f, tips, odds, form: { home: await form(f.home_id), away: await form(f.away_id) }, model, strong: sk.filter((k) => k.startsWith(f.id + ":")).map((k) => k.split(":")[1]) };
