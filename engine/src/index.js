@@ -254,7 +254,8 @@ async function apiDay(env, date) {
     }
   } catch (e) { /* ο πίνακας μπορεί να λείπει σε παλιά βάση */ }
   const res = {};
-  for (const r of (await env.DB.prepare(`SELECT r.team_id, r.ts, r.is_home, r.gf, r.ga FROM results r WHERE r.team_id IN
+  for (const r of (await env.DB.prepare(`SELECT r.team_id, r.ts, r.is_home, r.gf, r.ga, COALESCE(r.opp, tm.name) opp FROM results r LEFT JOIN fixtures x ON x.id=r.fixture_id
+      LEFT JOIN teams tm ON tm.id = CASE WHEN r.is_home=1 THEN x.away_id ELSE x.home_id END WHERE r.team_id IN
       (SELECT home_id FROM fixtures WHERE ts BETWEEN ?1 AND ?2 UNION SELECT away_id FROM fixtures WHERE ts BETWEEN ?1 AND ?2) ORDER BY r.ts DESC`).bind(from, to).all()).results)
     (res[r.team_id] ||= []).push(r);
   const tipsBy = {};
@@ -267,7 +268,7 @@ async function apiDay(env, date) {
     if (f.model && frozen[f.id]) f.model.score = frozen[f.id];
     for (const side of ["home", "away"]) {
       const list = (res[f[side + "_id"]] || []).filter((r) => r.ts < f.ts).slice(0, 10);
-      f[side + "_form"] = list.slice(0, 5).map((r) => [r.gf > r.ga ? "W" : r.gf < r.ga ? "L" : "D", r.gf + "-" + r.ga, r.is_home]);
+      f[side + "_form"] = list.slice(0, 5).map((r) => [r.gf > r.ga ? "W" : r.gf < r.ga ? "L" : "D", r.gf + "-" + r.ga, r.is_home, r.opp || "", r.ts]); // 08/11: + αντίπαλος, ημερομηνία (tooltip)
       f[side + "_gg"] = list.length ? list.filter((r) => r.gf > 0 && r.ga > 0).length / list.length : null;
     }
   }
