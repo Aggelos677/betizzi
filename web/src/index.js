@@ -1140,7 +1140,7 @@ const SCSS = `
 .sr{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center} /* 08/11 Owner: χωρίς αριθμό σειράς (μπέρδευε με τη θέση βαθμολογίας) */
 .sr .n{color:var(--mu);font:500 12px "JetBrains Mono",monospace}.sr b{font-weight:700;font-size:15px}.sr small{display:block;color:var(--mu);font-size:12px;margin-top:1px}
 .mt{text-align:right}.mt .bg{display:inline-block;font:700 17px "JetBrains Mono",monospace;color:#ffb547}.mt em{display:block;font-style:normal;color:var(--mu);font-size:11px;margin-top:2px}
-.run{color:#ffb547;opacity:.85;font-size:11px;font-weight:700;margin-left:6px;white-space:nowrap}
+.run{display:inline-block;color:#ffb547;font-size:11px;font-weight:700;margin-left:8px;white-space:nowrap;border:1px solid rgba(255,181,71,.45);background:rgba(255,181,71,.08);border-radius:999px;padding:1px 8px;vertical-align:2px} /* 08/11: pill */
 .sr .fm{display:inline-flex;gap:2px;vertical-align:middle;margin-left:6px}.sr .fm i{width:12px;height:5px;border-radius:2px;display:inline-block}.sr .fm .W{background:#3ccf6e}.sr .fm .D{background:#ffb547}.sr .fm .L{background:#ff6b6b}
 .nx{display:flex;align-items:center;gap:8px;margin:8px 0 0;color:var(--tx)!important;padding:7px 10px;border-radius:10px;background:var(--c2);text-decoration:none;min-height:40px}
 .nx>span:first-child{flex:1;min-width:0;font-size:13px;line-height:1.35}.nx>span:first-child b{font-weight:700;color:var(--tx)}.nx span small{color:var(--mu)}.nx i{display:block;font-style:normal;color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
@@ -1155,6 +1155,7 @@ const SCSS = `
 .gx{margin:10px 0 0}.gxt{margin:18px 0 8px;font-size:15px;line-height:1.3}.gx>.gxt:first-child{margin-top:12px}.gxt b{font-weight:600;color:#cfd8d1}.gxt.me b{font-weight:800;color:var(--tx)}.gxt small{color:var(--mu);font-size:12px;margin-left:6px} /* 08/11 Owner: μεγαλύτερα ονόματα, πιο πολύς αέρας */.rkp{display:inline-block;min-width:18px;padding:0 4px;border-radius:5px;background:rgba(126,190,255,.14);color:#8fc7ff;font:700 11px/16px "JetBrains Mono",monospace;text-align:center;vertical-align:1px;margin-right:4px}.gs{display:flex;gap:4px;flex-wrap:wrap;padding:0 0 6px}
 .gs .g{position:relative;min-width:44px;height:26px;padding:0 4px;border-radius:6px;display:grid;place-items:center;font:700 12px "JetBrains Mono",monospace;color:#0c0f0d;cursor:default}
 .gs .g i{font-style:normal}.gs .g u{display:none;text-decoration:none;font:800 13px Manrope,sans-serif}.gs .g.h{box-shadow:0 3px 0 #e9f2ec}
+.glg{display:flex;flex-wrap:wrap;gap:4px 14px;margin:8px 0 0;color:var(--mu);font-size:12px}.glg i{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:4px;font:800 11px Manrope,sans-serif;font-style:normal;color:#0c0f0d;margin-right:3px}.glg .y,.glg .W{background:#3ccf6e}.glg .n,.glg .L{background:#ff6b6b}.glg .D{background:#ffb547}
 .gs .y,.gs .W{background:#3ccf6e}.gs .n,.gs .L{background:#ff6b6b}.gs .D{background:#ffb547}
 .gs .g:hover::before,.gs .g:focus::before{content:attr(aria-label);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#1b231e;color:#e9f2ec;border:1px solid #2a352e;border-radius:6px;padding:4px 8px;font:600 12px Manrope,sans-serif;z-index:5;pointer-events:none}
 .gs .g:focus{outline:none}.gs .g:first-child::before{left:0;transform:none}.gs .g:last-child::before{left:auto;right:0;transform:none}
@@ -1170,7 +1171,7 @@ const scopeCss = (css, sc) => css.replace(/([^{}]+)\{/g, (_, sel) => sel.split("
 const MZCSS = scopeCss(CSS.replace(/:root\{[^}]*\}/, "").replace(/\*\{box-sizing:border-box\}body\{[^}]*\}/, ""), ".mz");
 function matchFrag(lang, x) {
   let m = (matchPage(lang, x).match(/<main>([\s\S]*?)<\/main>/) || [, ""])[1];
-  m = m.replace(/<nav class="bc">[\s\S]*?<\/nav>/, "").replace(/<h1>[\s\S]*?<\/h1>/, "").replace(/<p><a href="\/[a-z]{2}\/">←[\s\S]*?<\/p>/, "")
+  m = m.replace(/<nav class="bc">[\s\S]*?<\/nav>/, "").replace(/<h1>[\s\S]*?<\/h1>/, "").replace(/<div class="vs">.*\n/, "") /* 08/11: ομάδες και ώρα υπάρχουν ήδη στην κάρτα */.replace(/<p><a href="\/[a-z]{2}\/">←[\s\S]*?<\/p>/, "")
     .replace(/<button class="add"[^>]*>[\s\S]*?<\/button>/g, "");
   return `<style id="mzcss">.mz{--bg:#0c0f0d;--c1:#141a16;--c2:#1b231e;--ln:#2a352e;--lime:#b6f23a;--gold:#e8b931;--tx:#e9efe9;--mu:#8b9a90;margin:10px 0 0;font:14px/1.45 Manrope,system-ui,sans-serif}${MZCSS}.mz h2{font-size:17px;margin:14px 0 6px}.mz .ans{margin:0 0 10px}</style><div class="mz">${m}</div>`;
 }
@@ -1204,10 +1205,14 @@ function izzClient() {
     var r = g[0] > g[1] ? "W" : g[0] < g[1] ? "L" : "D"; return [G.t[r], r]; }
   function squares(d) { var gx = d.querySelector(".gx"); if (!gx || gx.dataset.ok || !G) return; var key = d.getAttribute("data-k"), rows = G.r[key]; if (!rows) return;
     var k = key.split(":")[0], T = G.t; gx.dataset.ok = 1;
+    // 08/11 (Owner): υπόμνημα κάτω από τα κουτάκια
+    var lg = k === "over" || k === "goals" || k === "under" ? [["y", k === "under" ? "U" : "O", k === "under" ? "Under 2.5" : "Over 2.5"], ["n", k === "under" ? "O" : "U", k === "under" ? "Over 2.5" : "Under 2.5"]]
+      : k === "gg" ? [["y", "Y", "GG"], ["n", "N", "NG"]] : [["W", T.W, T.wdl[0]], ["D", T.D, T.wdl[1]], ["L", T.L, T.wdl[2]]];
+    var leg = '<p class="glg">' + lg.map(function (x) { return '<span><i class="' + x[0] + '">' + esc(x[1]) + "</i> " + esc(x[2]) + "</span>"; }).join("") + "</p>";
     gx.innerHTML = rows.map(function (rw) { var gm = rw[1]; if (!gm || !gm.length) return "";
       return '<p class="gxt' + (rw[3] ? " me" : "") + '"><b>' + (rw[2] ? '<span class="rkp">' + rw[2] + '</span> ' : "") + esc(rw[0]) + '</b> <small>' + esc((innerWidth < 600 ? T.lastS : T.lastG).replace("{n}", gm.length)) + '</small></p><div class="gs">' + gm.slice().reverse().map(function (g) {
         var m = mark(k, g), ha = g[2] ? T.h : T.a, tip = [g[0] + "-" + g[1], g[3] ? g[3] + " (" + ha + ")" : ha, g[4] ? new Date(g[4] * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "numeric" }) : ""].filter(Boolean).join(" · ");
-        return '<span class="g ' + m[1] + (g[2] ? " h" : "") + '" tabindex="0" aria-label="' + esc(m[0] + " · " + tip) + '"><i>' + g[0] + "-" + g[1] + "</i><u>" + esc(m[0]) + "</u></span>"; }).join("") + "</div>"; }).join(""); }
+        return '<span class="g ' + m[1] + (g[2] ? " h" : "") + '" tabindex="0" aria-label="' + esc(m[0] + " · " + tip) + '"><i>' + g[0] + "-" + g[1] + "</i><u>" + esc(m[0]) + "</u></span>"; }).join("") + "</div>"; }).join("") + leg; }
   function frag(b) { if (!b._p) b._p = fetch(b.dataset.u + "?frag=1").then(function (r) { if (!r.ok) throw 0; return r.text(); }).catch(function () { b._p = null; return ""; }); return b._p; }
   function pre(e) { var d = e.target.closest && e.target.closest("details[data-k]"); if (!d) return; data(); var b = d.querySelector(".mzb"); if (b) frag(b); }
   document.addEventListener("pointerdown", pre, true); document.addEventListener("mouseover", pre, true);
@@ -1228,7 +1233,9 @@ async function streaksPage(env, lang) {
   const data = await getStreaks(env);
   const [y0, m0, d0] = today.split("-").map(Number), noon = Date.UTC(y0, m0 - 1, d0, 12);
   const dLong = new Intl.DateTimeFormat(LOCALE[lang], { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }).format(noon);
-  const when = (ts) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(ts * 1000);
+  // 08/11 (Owner): με ημερομηνία, γιατί το Izzistats δείχνει 3 μέρες («Δευ 9/11, 03:30»)
+  const when = (ts) => { const d = ts * 1000, F = (o) => new Intl.DateTimeFormat(LOCALE[lang], { timeZone: tz, ...o }).format(d);
+    return `${F({ weekday: "short" })} ${F({ day: "numeric", month: "numeric" })}, ${F({ hour: "2-digit", minute: "2-digit", hourCycle: "h23" })}`; };
   const KEYS = ["over", "goals", "gg", "form", "home", "away", "under", "draws", "bad"]; // 3 τριάδες (απόφαση Owner 06/11): πρώτα τα γκολ που αγαπά ο κόσμος, μετά φόρμα/έδρα, τέλος Under/X/κακή φόρμα
   const SL = (r) => (r.sel === "1" || r.sel === "2" ? r.sel : SELNAME[r.sel] || r.sel);
   // ο δείκτης κάθε κατηγορίας, με απλά λόγια (π.χ. «8/10 νίκες», «3.6 γκολ/αγώνα», «6 στη σειρά»)
@@ -1237,7 +1244,7 @@ async function streaksPage(env, lang) {
     : [`${r.c}/${r.n}`, k === "form" ? S.u.w : k === "home" ? S.u.h : k === "away" ? S.u.a : k === "draws" ? S.u.d : k === "bad" ? S.u.l : "", r.c / r.n];
   // χρώμα: πιο πράσινο = πιο δυνατό (όπως το FootyStats)
   // 08/11: δεδομένα για τα κουτάκια (?data=1). Κείμενα στη γλώσσα της σελίδας, παιχνίδια [gf, ga, εντός, αντίπαλος, ts] νέο → παλιό
-  const D = { t: { lastG: S.lastG, lastS: S.lastS, h: t.fHome, a: t.fAway, W: t.W, D: t.D, L: t.L }, r: {} };
+  const D = { t: { wdl: S.wdl, lastG: S.lastG, lastS: S.lastS, h: t.fHome, a: t.fAway, W: t.W, D: t.D, L: t.L }, r: {} };
   const sec = (k) => {
     const L = (data.cats && data.cats[k]) || [];
     const rows = L.map((r, i) => {
