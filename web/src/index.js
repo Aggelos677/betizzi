@@ -1137,7 +1137,7 @@ const SCSS = `
 .st{scroll-margin-top:60px}.st h2{margin:22px 0 2px}.st .sub{color:var(--mu);font-size:13px;margin:0 0 8px}
 .doc ul.sl{list-style:none;padding:0;margin:0;background:var(--c1);border:1px solid var(--ln);border-radius:12px;overflow:hidden}
 .doc ul.sl li{padding:10px 12px;margin:0;border-top:1px solid var(--ln);color:inherit;list-style:none}.doc ul.sl li::before,.doc ul.sl li::marker{content:none}.sl li:first-child{border-top:0}
-.sr{display:grid;grid-template-columns:20px 1fr auto;gap:8px;align-items:center}
+.sr{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center} /* 08/11 Owner: χωρίς αριθμό σειράς (μπέρδευε με τη θέση βαθμολογίας) */
 .sr .n{color:var(--mu);font:500 12px "JetBrains Mono",monospace}.sr b{font-weight:700;font-size:15px}.sr small{display:block;color:var(--mu);font-size:12px;margin-top:1px}
 .mt{text-align:right}.mt .bg{display:inline-block;font:700 17px "JetBrains Mono",monospace;color:#ffb547}.mt em{display:block;font-style:normal;color:var(--mu);font-size:11px;margin-top:2px}
 .run{color:#ffb547;opacity:.85;font-size:11px;font-weight:700;margin-left:6px;white-space:nowrap}
@@ -1254,7 +1254,7 @@ async function streaksPage(env, lang) {
       const [rT, rO] = r.home ? [r.fixture.hr, r.fixture.ar] : [r.fixture.ar, r.fixture.hr]; // θέσεις (BTFStats), «9 Brighton»
       if ((r.games || []).length) D.r[dk] = r.home ? [[r.team, r.games, rT], [opp, r.oppGames || [], rO]] : [[opp, r.oppGames || [], rO], [r.team, r.games, rT]];
       const sq = `<div class="gx"></div>`;
-      return `<li${look ? ' class="lk"' : ""}><details data-k="${dk}"><summary><div class="sr"><span class="n">${i + 1}</span><div><b>${(r.home ? r.fixture.hr : r.fixture.ar) ? `<span class="rkp">${r.home ? r.fixture.hr : r.fixture.ar}</span> ` : ""}${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
+      return `<li${look ? ' class="lk"' : ""}><details data-k="${dk}"><summary><div class="sr"><div><b>${(r.home ? r.fixture.hr : r.fixture.ar) ? `<span class="rkp">${r.home ? r.fixture.hr : r.fixture.ar}</span> ` : ""}${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
         + `<div class="nx"><span><i>${esc(S.nx)}</i><b>${r.fixture.hr ? `<span class="rkp">${r.fixture.hr}</span> ` : ""}${esc(r.fixture.home)} – ${r.fixture.ar ? `<span class="rkp">${r.fixture.ar}</span> ` : ""}${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
         + (look ? `<span class="lkt">${esc(S.look)}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `<span class="cv" aria-hidden="true">▾</span></div></summary>`
