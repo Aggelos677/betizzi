@@ -57,6 +57,7 @@ table{width:100%;border-collapse:collapse;font:500 14px "JetBrains Mono",monospa
 @media (max-width:480px){.fm span{min-width:18px}.fm span i{display:none}.fm span u{display:inline}}
 .fleg{font-size:12px;color:var(--mut,#9aa59e);margin:6px 0 0}
 .fm .W{background:#3ccf6e}.fm .D{background:#ffb547}.fm .L{background:#ff6b6b}
+.rkp{color:var(--mu);font-weight:600} /* 08/11 Owner: θέση βαθμολογίας μπροστά από το όνομα */
 .fl a{margin:0 6px;white-space:nowrap}
 .doc h2{margin-top:22px}.doc p,.doc li{color:#cfd8d1;line-height:1.6}.doc ul{list-style:disc;padding-left:20px}.doc li{margin:4px 0}.doc a{color:var(--lime)}
 .recl{text-align:center;margin:10px 0}.recl a{color:var(--lime);font-weight:700;text-decoration:none}
@@ -789,7 +790,7 @@ function matchPage(lang, x) {
   // 08/11 (Owner): mouse over / πάτημα στο κουτάκι → «1-5 · Panathinaikos (εκτός) · 1/11»
   const fTip = (g) => [`${g.gf}-${g.ga}`, g.opp ? `${g.opp} (${g.home ? t.fHome : t.fAway})` : (g.home ? t.fHome : t.fAway),
     g.ts ? new Date(g.ts * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "numeric", timeZone: tz }) : ""].filter(Boolean).join(" · ");
-  const formRow = (team) => `<div class="frow"><span class="tm">${esc(team.name)}</span>
+  const formRow = (team) => `<div class="frow"><span class="tm">${team.rank ? `<span class="rkp">${team.rank}</span> ` : ""}${esc(team.name)}</span>
     <span class="fm">${team.form.slice(0, 10).reverse().map((g) => `<span class="${g.res}${g.home ? " h" : ""}" tabindex="0" data-tip="${esc(fTip(g))}" aria-label="${esc(fTip(g))}"><i>${g.gf}-${g.ga}</i><u>${t[g.res]}</u></span>`).join("")}</span></div>`;
   const oddsRow = ["1", "X", "2", "O25", "U25", "GG", "NG"].filter((k) => x.odds[k]);
   const oddsHtml = oddsRow.length ? `<table><tr>${oddsRow.map((k) => `<th>${SEL[k]}</th>`).join("")}</tr><tr>${oddsRow.map((k) => `<td>${x.odds[k].toFixed(2)}</td>`).join("")}</tr></table>` : "";
@@ -833,7 +834,7 @@ ${indexable(x) ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
 <nav class="bc"><a href="/${lang}/">betizzi</a> › ${esc(x.league.country)} · ${esc(x.league.name)}</nav>
 <h1>${esc(x.home.name)} – ${esc(x.away.name)}: ${esc(t.word)}</h1>
 ${off ? `<p class="ans"><b>${esc(off)}</b> · <span>${esc(ui("Our tips for this match are void."))}</span></p>` : `<p class="ans">${esc(answer)}</p>`}
-<div class="vs"><div><b>${esc(x.home.name)}</b></div><div class="mid"${!off && !(x.score && (live || done)) ? ` data-ts="${x.ts}" data-d="${ymdIn(DAYTZ, x.ts * 1000)}"` : ""}>${mid}${live ? `<div class="min">${esc(x.minute)}'</div>` : ""}</div><div><b>${esc(x.away.name)}</b></div></div>
+<div class="vs"><div><b>${x.home.rank ? `<span class="rkp">${x.home.rank}</span> ` : ""}${esc(x.home.name)}</b></div><div class="mid"${!off && !(x.score && (live || done)) ? ` data-ts="${x.ts}" data-d="${ymdIn(DAYTZ, x.ts * 1000)}"` : ""}>${mid}${live ? `<div class="min">${esc(x.minute)}'</div>` : ""}</div><div><b>${x.away.rank ? `<span class="rkp">${x.away.rank}</span> ` : ""}${esc(x.away.name)}</b></div></div>
 ${anTxt ? `<h2>${esc(t.anH)}</h2><p class="an">${esc(anTxt)}</p>` : ""}
 <h2>${esc(t.tips)}</h2><div class="card">${tipsHtml}</div>
 ${md ? `<h2>${esc(t.model)}</h2><div class="card">${modelHtml}</div>` : ""}
@@ -1150,7 +1151,7 @@ const SCSS = `
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
 .sl details>summary{list-style:none;cursor:pointer}.sl details>summary::-webkit-details-marker{display:none}
 .nx .cv{color:var(--mu);font-size:14px;transition:transform .15s}.sl details[open] .nx .cv{transform:rotate(180deg)}
-.gx{margin:10px 0 0}.gxt{margin:10px 0 4px;font-size:13px}.gxt b{font-weight:700}.gxt small{color:var(--mu);font-size:11px;margin-left:4px}.gs{display:flex;gap:3px;flex-wrap:wrap;padding:30px 0 6px;margin-top:-30px}
+.gx{margin:10px 0 0}.gxt{margin:10px 0 4px;font-size:13px}.gxt b{font-weight:700}.gxt small{color:var(--mu);font-size:11px;margin-left:4px}.rkp{color:var(--mu);font-weight:600}.gs{display:flex;gap:3px;flex-wrap:wrap;padding:30px 0 6px;margin-top:-30px}
 .gs .g{position:relative;min-width:44px;height:26px;padding:0 4px;border-radius:6px;display:grid;place-items:center;font:700 12px "JetBrains Mono",monospace;color:#0c0f0d;cursor:default}
 .gs .g i{font-style:normal}.gs .g u{display:none;text-decoration:none;font:800 13px Manrope,sans-serif}.gs .g.h{box-shadow:0 3px 0 #e9f2ec}
 .gs .y,.gs .W{background:#3ccf6e}.gs .n,.gs .L{background:#ff6b6b}.gs .D{background:#ffb547}
@@ -1202,7 +1203,7 @@ function izzClient() {
   function squares(d) { var gx = d.querySelector(".gx"); if (!gx || gx.dataset.ok || !G) return; var key = d.getAttribute("data-k"), rows = G.r[key]; if (!rows) return;
     var k = key.split(":")[0], T = G.t; gx.dataset.ok = 1;
     gx.innerHTML = rows.map(function (rw) { var gm = rw[1]; if (!gm || !gm.length) return "";
-      return '<p class="gxt"><b>' + esc(rw[0]) + '</b> <small>' + esc(T.lastG.replace("{n}", gm.length)) + '</small></p><div class="gs">' + gm.slice().reverse().map(function (g) {
+      return '<p class="gxt"><b>' + (rw[2] ? '<span class="rkp">' + rw[2] + '</span> ' : "") + esc(rw[0]) + '</b> <small>' + esc((innerWidth < 600 ? T.lastS : T.lastG).replace("{n}", gm.length)) + '</small></p><div class="gs">' + gm.slice().reverse().map(function (g) {
         var m = mark(k, g), ha = g[2] ? T.h : T.a, tip = [g[0] + "-" + g[1], g[3] ? g[3] + " (" + ha + ")" : ha, g[4] ? new Date(g[4] * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "numeric" }) : ""].filter(Boolean).join(" · ");
         return '<span class="g ' + m[1] + (g[2] ? " h" : "") + '" tabindex="0" aria-label="' + esc(m[0] + " · " + tip) + '"><i>' + g[0] + "-" + g[1] + "</i><u>" + esc(m[0]) + "</u></span>"; }).join("") + "</div>"; }).join(""); }
   function frag(b) { if (!b._p) b._p = fetch(b.dataset.u + "?frag=1").then(function (r) { if (!r.ok) throw 0; return r.text(); }).catch(function () { b._p = null; return ""; }); return b._p; }
@@ -1234,7 +1235,7 @@ async function streaksPage(env, lang) {
     : [`${r.c}/${r.n}`, k === "form" ? S.u.w : k === "home" ? S.u.h : k === "away" ? S.u.a : k === "draws" ? S.u.d : k === "bad" ? S.u.l : "", r.c / r.n];
   // χρώμα: πιο πράσινο = πιο δυνατό (όπως το FootyStats)
   // 08/11: δεδομένα για τα κουτάκια (?data=1). Κείμενα στη γλώσσα της σελίδας, παιχνίδια [gf, ga, εντός, αντίπαλος, ts] νέο → παλιό
-  const D = { t: { lastG: S.lastG, h: t.fHome, a: t.fAway, W: t.W, D: t.D, L: t.L }, r: {} };
+  const D = { t: { lastG: S.lastG, lastS: S.lastS, h: t.fHome, a: t.fAway, W: t.W, D: t.D, L: t.L }, r: {} };
   const sec = (k) => {
     const L = (data.cats && data.cats[k]) || [];
     const rows = L.map((r, i) => {
@@ -1250,11 +1251,12 @@ async function streaksPage(env, lang) {
       // έρχονται στο παρασκήνιο από ?data=1 (μικρό JSON) και φτιάχνονται στον browser τη στιγμή που ανοίγει η γραμμή (IZZ_JS).
       const dk = `${k}:${r.fixture.id}:${r.home ? 1 : 0}`;
       const opp = r.home ? r.fixture.away : r.fixture.home;
-      if ((r.games || []).length) D.r[dk] = r.home ? [[r.team, r.games], [opp, r.oppGames || []]] : [[opp, r.oppGames || []], [r.team, r.games]];
+      const [rT, rO] = r.home ? [r.fixture.hr, r.fixture.ar] : [r.fixture.ar, r.fixture.hr]; // θέσεις (BTFStats), «9 Brighton»
+      if ((r.games || []).length) D.r[dk] = r.home ? [[r.team, r.games, rT], [opp, r.oppGames || [], rO]] : [[opp, r.oppGames || [], rO], [r.team, r.games, rT]];
       const sq = `<div class="gx"></div>`;
-      return `<li${look ? ' class="lk"' : ""}><details data-k="${dk}"><summary><div class="sr"><span class="n">${i + 1}</span><div><b>${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
+      return `<li${look ? ' class="lk"' : ""}><details data-k="${dk}"><summary><div class="sr"><span class="n">${i + 1}</span><div><b>${(r.home ? r.fixture.hr : r.fixture.ar) ? `<span class="rkp">${r.home ? r.fixture.hr : r.fixture.ar}</span> ` : ""}${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
-        + `<div class="nx"><span><i>${esc(S.nx)}</i><b>${esc(r.fixture.home)} – ${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
+        + `<div class="nx"><span><i>${esc(S.nx)}</i><b>${r.fixture.hr ? `<span class="rkp">${r.fixture.hr}</span> ` : ""}${esc(r.fixture.home)} – ${r.fixture.ar ? `<span class="rkp">${r.fixture.ar}</span> ` : ""}${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
         + (look ? `<span class="lkt">${esc(S.look)}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `<span class="cv" aria-hidden="true">▾</span></div></summary>`
         + sq + `<div class="mzb" data-u="${href}"></div><a class="full" href="${href}">${esc(S.full)}</a></details></li>`;
     }).join("");
