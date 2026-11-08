@@ -1144,6 +1144,7 @@ const SCSS = `
 .sr .fm{display:inline-flex;gap:2px;vertical-align:middle;margin-left:6px}.sr .fm i{width:12px;height:5px;border-radius:2px;display:inline-block}.sr .fm .W{background:#3ccf6e}.sr .fm .D{background:#ffb547}.sr .fm .L{background:#ff6b6b}
 .nx{display:flex;align-items:center;gap:8px;margin:8px 0 0;color:var(--tx)!important;padding:7px 10px;border-radius:10px;background:var(--c2);text-decoration:none;min-height:40px}
 .nx>span:first-child{flex:1;min-width:0;font-size:13px;line-height:1.35}.nx>span:first-child b{font-weight:700;color:var(--tx)}.nx span small{color:var(--mu)}.nx i{display:block;font-style:normal;color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
+.tms{display:block}.tms>span{white-space:nowrap}.tms>em{font-style:normal}.tms.st>span{display:block}.tms.st>em{display:none} /* 08/11 Owner: σε μία γραμμή αν χωράνε, αλλιώς η μία κάτω από την άλλη (izzClient → .st) */
 .nx .od{font:700 14px "JetBrains Mono",monospace;border:1px solid rgba(182,242,58,.5);color:var(--lime);border-radius:8px;padding:3px 7px;white-space:nowrap}
 .doc ul.sl li.lk{background:linear-gradient(90deg,rgba(182,242,58,.08),transparent 70%);box-shadow:inset 3px 0 0 var(--lime)}
 .lk .nx .od{background:var(--lime);border-color:var(--lime);color:#0c0f0d}.lk .nx .od small{color:#2b3a0c!important}
@@ -1217,7 +1218,12 @@ function izzClient() {
     if (G) squares(d); else { var p = data(); if (p) p.then(function () { squares(d); }); }
     var b = d.querySelector(".mzb"); if (!b || b.dataset.l) return; b.dataset.l = 1; b.innerHTML = '<span class="ld">…</span>';
     frag(b).then(function (h) { if (!h) { b.dataset.l = ""; b.innerHTML = ""; return; } if (document.getElementById("mzcss")) h = h.replace(/<style id="mzcss">[\s\S]*?<\/style>/, ""); b.innerHTML = h; }); }, true);
-  if (document.readyState === "complete") setTimeout(data, 300); else window.addEventListener("load", function () { setTimeout(data, 300); });
+  // 08/11: οι δύο ομάδες του επόμενου αγώνα σε μία γραμμή αν χωράνε, αλλιώς η μία κάτω από την άλλη
+  function fit() { Array.prototype.forEach.call(document.querySelectorAll(".tms"), function (b) { b.classList.remove("st"); var s = b.children; if (s.length > 2 && s[2].offsetTop > s[0].offsetTop + 2) b.classList.add("st"); }); }
+  fit(); var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(fit, 150); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  document.addEventListener("click", function (e) { if (e.target.closest && e.target.closest("#tab-izzi")) setTimeout(fit, 50); }, true);
+  if (document.readyState === "complete") setTimeout(data, 300); else window.addEventListener("load", function () { fit(); setTimeout(data, 300); });
 }
 // 08/11: το build του Cloudflare (esbuild, keepNames) βάζει μέσα στη συνάρτηση κλήσεις __name(...)· στον browser δεν υπάρχει → μικρό shim
 const IZZ_JS = "(function(){var __name=function(f){return f;};(" + izzClient.toString() + ")();})();";
@@ -1256,7 +1262,7 @@ async function streaksPage(env, lang) {
       const sq = `<div class="gx"></div>`;
       return `<li${look ? ' class="lk"' : ""}><details data-k="${dk}"><summary><div class="sr"><div><b>${(r.home ? r.fixture.hr : r.fixture.ar) ? `<span class="rkp">${r.home ? r.fixture.hr : r.fixture.ar}</span> ` : ""}${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
-        + `<div class="nx"><span><i>${esc(S.nx)}</i><b>${r.fixture.hr ? `<span class="rkp">${r.fixture.hr}</span> ` : ""}${esc(r.fixture.home)} – ${r.fixture.ar ? `<span class="rkp">${r.fixture.ar}</span> ` : ""}${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
+        + `<div class="nx"><span><i>${esc(S.nx)} · ${esc(when(r.fixture.ts))}</i><b class="tms"><span>${r.fixture.hr ? `<span class="rkp">${r.fixture.hr}</span>` : ""}${esc(r.fixture.home)}</span><em> – </em><span>${r.fixture.ar ? `<span class="rkp">${r.fixture.ar}</span>` : ""}${esc(r.fixture.away)}</span></b></span>`
         + (look ? `<span class="lkt">${esc(S.look)}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `<span class="cv" aria-hidden="true">▾</span></div></summary>`
         + sq + `<div class="mzb" data-u="${href}"></div><a class="full" href="${href}">${esc(S.full)}</a></details></li>`;
     }).join("");
