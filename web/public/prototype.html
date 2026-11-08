@@ -1590,7 +1590,8 @@ function shareParlay(c,won){
       if(ev.target===ov||(t.dataset&&t.dataset.x))ov.remove();});}
   var touch=matchMedia("(pointer:coarse)").matches;
   if(touch&&navigator.share){
-    var data=file&&navigator.canShare&&navigator.canShare({files:[file]})?{files:[file],text:txt+foot}:{title:"betizzi",text:txt+foot};
+    /* 08/11 (Owner): με εικόνα, από κάτω ΜΟΝΟ η γραμμή με το link (η λίστα των αγώνων είναι ήδη στην εικόνα) */
+    var data=file&&navigator.canShare&&navigator.canShare({files:[file]})?{files:[file],text:foot.trim()}:{title:"betizzi",text:txt+foot};
     navigator.share(data).catch(function(er){if(er&&er.name!=="AbortError")box();});return;}
   box();
 }
