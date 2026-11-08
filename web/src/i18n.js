@@ -549,6 +549,8 @@ export const UI = {
   "Issued at": ["Δόθηκε στο", "Publicado a", "Publicado a", "Publié à", "Veröffentlicht bei", "Publicat la", "Objavljeno na", "Публикувано при"],
   "Free account required to view this pick": ["Δες την επιλογή με δωρεάν εγγραφή", "Regístrate gratis para ver este pick", "Cadastre-se grátis para ver este palpite", "Inscription gratuite pour voir ce choix", "Kostenlos registrieren, um den Tipp zu sehen", "Înregistrează-te gratuit ca să vezi pontul", "Besplatna registracija da vidiš tip", "Безплатна регистрация, за да видиш прогнозата"],
   "Our next tips": ["Τα επόμενα tips μας", "Nuestros próximos tips", "Nossos próximos palpites", "Nos prochains tips", "Unsere nächsten Tipps", "Următoarele noastre ponturi", "Naši sledeći tipovi", "Следващите ни прогнози"],
+  "(home game)": ["(εντός)", "(en casa)", "(em casa)", "(à domicile)", "(Heimspiel)", "(acasă)", "(kod kuće)", "(домакин)"],
+  "(away game)": ["(εκτός)", "(fuera)", "(fora)", "(à l'extérieur)", "(auswärts)", "(deplasare)", "(u gostima)", "(гост)"],
   "Underlined = home game": ["Με γραμμή = εντός έδρας", "Subrayado = en casa", "Sublinhado = em casa", "Souligné = à domicile", "Unterstrichen = Heimspiel", "Subliniat = acasă", "Podvučeno = kod kuće", "Подчертано = домакин"],
   "Ended": ["Έληξαν", "Terminados", "Encerrados", "Terminés", "Beendet", "Încheiate", "Završeni", "Приключили"],
   "Today's parlays are settled": ["Τα σημερινά παρολί κρίθηκαν", "Las combinadas de hoy ya están resueltas", "As múltiplas de hoje já foram decididas", "Les combinés du jour sont réglés", "Die heutigen Kombis sind entschieden", "Biletele de azi s-au decis", "Današnji tiketi su odlučeni", "Днешните комбинации са решени"],
