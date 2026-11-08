@@ -75,7 +75,8 @@ export async function apiStreaks(env, leagueIds, top = 15) {
           return (C.only ? op.filter((r) => (home ? !r.is_home : r.is_home)).slice(0, 5) : op.slice(0, 10)).map((x) => [x.gf, x.ga, x.is_home, x.opp || "", x.ts]); })(),
         fixture: { id: f.id, ts: f.ts, home: f.home, away: f.away }, sel, price: (odds[f.id] || {})[sel] || null });
     }
-    rows.sort((a, b) => (b.key ?? b.c) - (a.key ?? a.c) || b.run - a.run || a.fixture.ts - b.fixture.ts);
+    // 08/11 (Owner): σε κάθε κατηγορία πρώτα η δύναμη (10/10, 9/10…), και μέσα στην ίδια δύναμη από τη ΜΕΓΑΛΥΤΕΡΗ απόδοση (χωρίς τιμή στο τέλος)
+    rows.sort((a, b) => (b.key ?? b.c) - (a.key ?? a.c) || (b.price || 0) - (a.price || 0) || b.run - a.run || a.fixture.ts - b.fixture.ts);
     out.cats[key] = rows.slice(0, top);
   }
   return out;
