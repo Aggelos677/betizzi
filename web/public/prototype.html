@@ -1529,9 +1529,6 @@ function cpWon(c){return c.result===1||(c.legs.length>0&&c.legs.every(legWon));}
 /* αναβολή = void (1.00): η απόδοση που πληρώνεται είναι το odds_now του server */
 function cpX(c){return c.odds_now||c.odds;}
 function cpVoid(l){return l.result===2;}
-/* 08/11 (Owner: «το share δεν δουλεύει»): το ↗ του παρολί. Κινητό → το share του κινητού· PC (ή αν αποτύχει) → κουτί με
-   WhatsApp / Telegram / Facebook / X / Αντιγραφή. Το link πάει στη σελίδα «Παρολί σήμερα» της γλώσσας (όχι στο location.href). */
-var PSLUG={en:"accumulator-tips-today",el:"paroli-simera",es:"combinadas-hoy",pt:"apostas-multiplas-hoje",fr:"combines-du-jour",de:"kombiwetten-heute",ro:"biletul-zilei",sr:"tiket-dana",bg:"fish-za-dnes"};
 /* 08/11 (Owner): share παρολί = ΕΙΚΟΝΑ του παρολί πάνω + κείμενο με «Δες τα παρολί σήμερα» και link από κάτω.
    Κινητό: το share του κινητού με αρχείο εικόνας (WhatsApp, Messenger, Viber…). PC (ή αν δεν γίνεται): κουτί με κουμπιά + «Αποθήκευση εικόνας».
    Το link πάει στη σελίδα «Παρολί σήμερα» της γλώσσας. Το ίδιο και για το WINNER (shareBz). */
