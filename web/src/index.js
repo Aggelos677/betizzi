@@ -1143,7 +1143,7 @@ const SCSS = `
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
 .sl details>summary{list-style:none;cursor:pointer}.sl details>summary::-webkit-details-marker{display:none}
 .nx .cv{color:var(--mu);font-size:14px;transition:transform .15s}.sl details[open] .nx .cv{transform:rotate(180deg)}
-.gx{margin:10px 0 0}.gxh{margin:0 0 6px;color:var(--mu);font-size:12px}.gs{display:flex;gap:3px;flex-wrap:wrap;padding:30px 0 6px;margin-top:-30px}
+.gx{margin:10px 0 0}.gxt{margin:10px 0 4px;font-size:13px}.gxt b{font-weight:700}.gxt small{color:var(--mu);font-size:11px;margin-left:4px}.gs{display:flex;gap:3px;flex-wrap:wrap;padding:30px 0 6px;margin-top:-30px}
 .gs .g{position:relative;min-width:44px;height:26px;padding:0 4px;border-radius:6px;display:grid;place-items:center;font:700 12px "JetBrains Mono",monospace;color:#0c0f0d;cursor:default}
 .gs .g i{font-style:normal}.gs .g u{display:none;text-decoration:none;font:800 13px Manrope,sans-serif}.gs .g.h{box-shadow:0 3px 0 #e9f2ec}
 .gs .y,.gs .W{background:#3ccf6e}.gs .n,.gs .L{background:#ff6b6b}.gs .D{background:#ffb547}
@@ -1210,10 +1210,13 @@ async function streaksPage(env, lang) {
       const run = k !== "gg" && k !== "goals" && r.run >= 3 ? `<span class="run">🔥 ${r.run} ${esc(S.run)}</span>` : "";
       const fm = `<span class="fm" aria-label="${esc(r.form)}">${[...r.form].reverse().map((x) => `<i class="${x}"></i>`).join("")}</span>`;
       // 08/11 (Owner): πάτημα → ανοίγει προς τα κάτω (όχι νέα σελίδα, για να μη χάνει τη θέση του)· τα παιχνίδια με το «γράμμα» της κατηγορίας
-      const gm = r.games || [];
-      const sq = gm.length ? `<div class="gx"><p class="gxh">${esc(S.lastG.replace("{n}", gm.length))}</p><div class="gs">${[...gm].reverse().map((g) => { const [l, ok] = mark(k, g);
+      // 08/11 (Owner): η ομάδα ΚΑΙ ο αντίπαλος, γηπεδούχος πάνω· αμέσως (από τον server), ο υπόλοιπος αγώνας φορτώνει μετά
+      const sqRow = (name, gm) => !gm || !gm.length ? "" : `<p class="gxt"><b>${esc(name)}</b> <small>${esc(S.lastG.replace("{n}", gm.length))}</small></p><div class="gs">${[...gm].reverse().map((g) => { const [l, ok] = mark(k, g);
         const tip = [`${g[0]}-${g[1]}`, g[3] ? `${g[3]} (${g[2] ? t.fHome : t.fAway})` : (g[2] ? t.fHome : t.fAway), g[4] ? new Date(g[4] * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "numeric", timeZone: tz }) : ""].filter(Boolean).join(" · ");
-        return `<span class="g ${ok}${g[2] ? " h" : ""}" tabindex="0" aria-label="${esc(l + " · " + tip)}"><i>${g[0]}-${g[1]}</i><u>${esc(l)}</u></span>`; }).join("")}</div></div>` : "";
+        return `<span class="g ${ok}${g[2] ? " h" : ""}" tabindex="0" aria-label="${esc(l + " · " + tip)}"><i>${g[0]}-${g[1]}</i><u>${esc(l)}</u></span>`; }).join("")}</div>`;
+      const opp = r.home ? r.fixture.away : r.fixture.home;
+      const rowsHA = r.home ? [[r.team, r.games], [opp, r.oppGames]] : [[opp, r.oppGames], [r.team, r.games]];
+      const sq = (r.games || []).length ? `<div class="gx">${rowsHA.map(([n, g]) => sqRow(n, g)).join("")}</div>` : "";
       return `<li${look ? ' class="lk"' : ""}><details><summary><div class="sr"><span class="n">${i + 1}</span><div><b>${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
         + `<div class="nx"><span><i>${esc(S.nx)}</i><b>${esc(r.fixture.home)} – ${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
