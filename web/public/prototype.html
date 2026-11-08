@@ -182,7 +182,10 @@ input:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visib
 .stb-pk{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;display:flex;flex-direction:column;gap:4px}
 .stb-lb{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .stb-pr{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.stb-sel{font:800 18px/1.2 "Fira Sans Extra Condensed",sans-serif;color:var(--lime)}.stb-o{font:800 18px/1 var(--f-mono);color:#fff}
-.stb-v{font-size:.8rem;font-weight:700}.stb-v.w,.stb-l .w{color:var(--win)}.stb-v.l,.stb-l .l{color:var(--bad)}
+.stb-v{font-size:.8rem;font-weight:700}.stb-v.w,.stb-l .w{color:var(--win)}
+/* 07/11 (Owner): η επιλογή που κέρδισε να φαίνεται: ✓ σε κύκλο, φωτεινό πράσινο, ελαφρύ πράσινο φόντο (τριάδα + παρολί) */
+.stb-l li.won,.pc-legs li.won{background:rgba(77,255,138,.07);border-radius:10px;padding-left:8px;padding-right:8px;margin:0 -8px}
+.stb-l li.won .w{color:#4dff8a;font-weight:800}.stb-l li .pc-r{flex:none}.stb-v.l,.stb-l .l{color:var(--bad)}
 .stb-why{margin:0;font-size:.82rem;line-height:1.5;color:#cfd8d0}
 .stb-warn{font-size:.8rem;color:var(--gold)}.stb-now{font-size:.8rem;color:var(--muted)}.stb-wait{color:var(--muted);font-size:.9rem;padding:12px;border:1px dashed var(--line);border-radius:12px}
 .stb-ft{margin-top:auto;padding-top:2px}.stb-ft .stb-add,.stb-ft .pc-take,.stb-btn{width:100%;min-height:40px;border-radius:10px;font-weight:800;font-size:.88rem;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -232,7 +235,7 @@ body{padding-top:env(safe-area-inset-top,0px)}
 .fW{background:var(--win)} .fD{background:var(--warn)} .fL{background:var(--bad)}
 .r-teams .tl{display:flex;align-items:center;gap:6px;min-width:0}
 .r-teams .tl span.nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
-.rk{font:600 .7rem var(--f-mono);color:var(--muted);flex:none}
+.rk{font:600 .7rem var(--f-mono);color:var(--muted);flex:none} .rkp{color:var(--muted);font-weight:600;margin-right:2px} /* 08/11 Owner: θέση μπροστά από το όνομα, «9 Brighton» */
 .r-score.live{color:#e9f7ee;font-weight:600;background:rgba(60,207,110,.08);border-color:rgba(60,207,110,.6);animation:livepulse 2.4s ease-in-out infinite}
 @keyframes livepulse{0%,100%{box-shadow:0 0 0 0 rgba(60,207,110,0)}50%{box-shadow:0 0 0 2px rgba(60,207,110,.15)}}
 .r-score.empty{border-color:transparent;color:var(--muted);font-size:.8rem}.r-score.pst{font-size:1rem;opacity:.7}
@@ -1464,6 +1467,8 @@ function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-s
 var IZZ=0;function loadIzzi(){if(IZZ)return;IZZ=1;var lg=(location.pathname.split("/")[1]||"en");
   $("izziBox").innerHTML='<div class="empty"><span class="ldot"></span> <span>Loading…</span></div>';
   fetch("/"+encodeURIComponent(lg)+"/izzistats?frag=1").then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(h){$("izziBox").innerHTML=h;
+    /* 08/11: το <script> του Izzistats (izzClient στο web/src/index.js) δεν τρέχει μέσω innerHTML· το τρέχουμε εδώ */
+    Array.prototype.forEach.call($("izziBox").querySelectorAll("script"),function(o){var n=document.createElement("script");n.textContent=o.textContent;o.parentNode.replaceChild(n,o);});
     Array.prototype.forEach.call($("izziBox").querySelectorAll('a[href^="#"]'),function(a){a.addEventListener("click",function(e){var t=document.getElementById(a.getAttribute("href").slice(1));if(!t)return;e.preventDefault();var y=t.getBoundingClientRect().top+window.pageYOffset-70;window.scrollTo({top:y,behavior:"smooth"});});});})
     .catch(function(){IZZ=0;$("izziBox").innerHTML='<div class="empty"><span>Could not load. Tap Izzistats again.</span></div>';});}
 /* προφόρτωση του Izzistats στο παρασκήνιο (μικρό, ~13 KB), ώστε το πρώτο πάτημα να ανοίγει αμέσως· όχι σε saveData/2G */
@@ -1715,8 +1720,8 @@ function rowHTML(m){
   var sc = (m.live||m.done) ? '<span class="r-score'+(m.live?' live':'')+(m.hit?' hit':'')+'"'+(m.hit?' title="We called this score"':'')+'>'+esc(m.score||"–")+(m.hit?'<em>🎯</em>':'')+'</span>' : (m.type==="postponed"||m.type==="cancelled"?'<span class="r-score empty pst" aria-hidden="true">⏸</span>':(m.bz?'<span class="r-score pred" title="Our score"><small>likely</small>'+m.bz+'</span>':'<span class="r-score empty">v</span>'));
   var mn=m.min||"";var time = m.live?'<b style="color:var(--win)">LIVE</b><span class="lmin">'+(mn==="HT"?"HT":mn+'<i>\'</i>')+'</span>':m.done?'<b>FT</b><span>'+m.time+'</span>':'<b>'+m.time+'</b>';
   return '<details class="mrow'+(m.hit?' hitrow':'')+'" data-mid="'+m.id+'"><summary><span class="r-time">'+time+'<button type="button" class="fav'+(FAV.has(String(m.id))?' on':'')+'" data-fav="'+m.id+'" aria-label="Follow this match">'+(FAV.has(String(m.id))?'★':'☆')+'</button></span>'
-    +'<span class="r-teams"><span class="tl"><span class="nm">'+esc(m.home)+'</span>'+(m.hr?'<span class="rk">'+m.hr+'</span>':'')+fbars(m.hf,m.home)+'</span>'
-    +'<span class="tl"><span class="nm">'+esc(m.away)+'</span>'+(m.ar?'<span class="rk">'+m.ar+'</span>':'')+fbars(m.af,m.away)+'</span></span>'
+    +'<span class="r-teams"><span class="tl">'+(m.hr?'<span class="rk">'+m.hr+'</span>':'')+'<span class="nm">'+esc(m.home)+'</span>'+fbars(m.hf,m.home)+'</span>'
+    +'<span class="tl">'+(m.ar?'<span class="rk">'+m.ar+'</span>':'')+'<span class="nm">'+esc(m.away)+'</span>'+fbars(m.af,m.away)+'</span></span>'
     +sc+pickBtn(m)+'</summary><div class="mdet"></div></details>';
 }
 function obtn(k){var s=SEL[k];if(!s)return '';return '<button type="button" class="ob" data-key="'+esc(k)+'" aria-pressed="false"'+(s.m.open?'':' disabled')+'><span>'+esc(s.short)+'</span><b>'+s.odd.toFixed(2)+'</b></button>';}
@@ -1735,8 +1740,8 @@ function detailHTML(m){
   var ss=sigs(m,H,A);
   if(ss.length)h+='<div class="mgroup"><span class="mo-h">What our analysis shows</span><div class="mo-sig">'+ss.map(function(x){return '<div class="sg mo-'+x[0]+'"><i aria-hidden="true">'+x[1]+'</i><span>'+(x[2]?'<b>'+esc(x[2])+'</b> ':'')+'<span>'+x[3]+'</span></span></div>';}).join("")+'</div></div>';
   /* απόφαση Owner 05/11: φόρμα (σκορ) και στατιστικά σε ΞΕΧΩΡΙΣΤΟΥΣ πίνακες */
-  h+='<div class="mgroup"><span class="glabel">Form</span><div class="tm2"><div class="tbox"><div class="nm">'+esc(m.home)+'</div><div class="pos">'+(m.hr||"–")+'<small>'+(m.nt?'of '+m.nt:'')+'</small></div>'+squares(m.hfd)+'</div>'
-    +'<div class="tbox"><div class="nm">'+esc(m.away)+'</div><div class="pos">'+(m.ar||"–")+'<small>'+(m.nt?'of '+m.nt:'')+'</small></div>'+squares(m.afd)+'</div></div>'
+  h+='<div class="mgroup"><span class="glabel">Form</span><div class="tm2"><div class="tbox"><div class="nm">'+(m.hr?'<span class="rkp">'+m.hr+'</span> ':'')+esc(m.home)+'</div>'+squares(m.hfd)+'</div>'
+    +'<div class="tbox"><div class="nm">'+(m.ar?'<span class="rkp">'+m.ar+'</span> ':'')+esc(m.away)+'</div>'+squares(m.afd)+'</div></div>'
     +'<span class="hint">Table position · last 5, older → newer · line under = home game</span></div>';
   if(H||A){
     var cl=function(c){return c?' class="mo-'+c+'"':'';};
@@ -2104,7 +2109,7 @@ function parlayHTML(c,feat){
       if(es==="won")r='<span class="pc-r w">✓</span>';else if(es==="lost")r='<span class="pc-r l">✗</span>';}
     var tm=lv?'<span class="pc-live"><i class="ldot2"></i><b>'+esc(sc||"0-0")+'</b><small>'+esc(mn||"LIVE")+'</small></span>':dn?'<span class="pc-ft"><b>'+esc(sc)+'</b><small>FT</small></span>':esc(l.time||"");
     if(l.result===2)tm='<span class="pc-ft"><b>–</b><small>'+(l.status==="PST"||!l.status?'<span>Postponed</span>':'<span>Cancelled</span>')+' · <span>Void</span></small></span>';
-    return '<li'+(lv?' class="lv"':'')+'><span class="pc-tm">'+tm+'</span><span class="pc-m"><span class="pc-mt">'+esc(l.home||"")+' – '+esc(l.away||"")+'</span><b class="pc-pk">'+legPick(l)+(l.vip?'<span class="vipt">VIP</span>':'')+'</b></span>'+r+'<span class="pc-o">'+(l.result===2?'<s>'+fx2(l.price)+'</s> 1.00':l.price?fx2(l.price):"")+'</span></li>';}).join("");
+    return '<li'+(lv?' class="lv"':l.result===1?' class="won"':'')+'><span class="pc-tm">'+tm+'</span><span class="pc-m"><span class="pc-mt">'+esc(l.home||"")+' – '+esc(l.away||"")+'</span><b class="pc-pk">'+legPick(l)+(l.vip?'<span class="vipt">VIP</span>':'')+'</b></span>'+r+'<span class="pc-o">'+(l.result===2?'<s>'+fx2(l.price)+'</s> 1.00':l.price?fx2(l.price):"")+'</span></li>';}).join("");
   var keys=c.legs.map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});
   /* απόφαση Owner 02/11: το είδος μεγάλο με δικό του χρώμα (Γκολ πορτοκαλοκίτρινο, 1X2 γαλάζιο), το στυλ μικρό */
   var name='<span class="pv pv-'+esc(c.variant)+'">'+esc(BZC_VAR[c.variant]||c.variant)+'</span>'+(/\|extra/.test(c.slot||"")?' <small class="pc-new">🆕 <span>New</span></small>':'')+(c.style?' <small class="pc-sty">· <span>'+esc(STY[c.style]||c.style)+'</span></small>':'');
@@ -2213,7 +2218,7 @@ function renderStrong(){var box=$("strongBox");if(!box)return;
         /* γραμμή 2: λίγκα · ώρα (ή λεπτό · σκορ, ή ✓/✗ · τελικό) */
         var sub=r===1?'<span class="w">✓ <span>Won</span></span> · <span>Full time</span> '+sc2(L.sc):r===0?'<span class="l">✗ <span>Lost</span></span> · '+sc2(L.sc)
           :L.lv?esc(c.league||"")+' · <span class="on">'+esc(L.mn||"LIVE")+'</span> · <b class="mono on">'+sc2(L.sc||"0-0")+'</b>':L.dn?esc(c.league||"")+' · FT '+sc2(L.sc):esc(c.league||"")+' · '+esc(c.time||"");
-        return '<li><div class="stb-lg"><span class="stb-lm">'+esc(c.home)+' – '+esc(c.away)+'</span><small>'+sub+'</small></div><div class="stb-tp"><b>'+esc(BZC_SEL[c.sel]||c.sel)+(c.tier==="vip"?' <span class="vipt">VIP</span>':'')+'</b><span class="mono">'+Number(c.price).toFixed(2)+'</span></div></li>';}).join("")+'</ul>'
+        return '<li'+(r===1?' class="won"':r===0?' class="lost"':'')+'><div class="stb-lg"><span class="stb-lm">'+esc(c.home)+' – '+esc(c.away)+'</span><small>'+sub+'</small></div><div class="stb-tp"><b>'+esc(BZC_SEL[c.sel]||c.sel)+(c.tier==="vip"?' <span class="vipt">VIP</span>':'')+'</b><span class="mono">'+Number(c.price).toFixed(2)+'</span></div>'+(r===1?'<span class="pc-r w">✓</span>':r===0?'<span class="pc-r l">✗</span>':'')+'</li>';}).join("")+'</ul>'
       +'<div class="stb-tot"><span>Total odds</span><b class="mono">'+Number(tr.odds).toFixed(2)+'</b></div>'
       +'<div class="stb-ft">'+(tr.result==null&&tres==null&&!Ls.some(function(L){return L.lv||L.dn;})&&keys.length===3?'<button type="button" class="pc-take" id="stbTake">+ <span>Treble to my slip</span></button>':'<div class="stb-btn off">'+(allDn||tres!=null?'<span>Match over</span>':'<span>In progress</span>')+'</div>')+'</div></article>';}
   h+='</div>';box.innerHTML=h;bindButtons(box);syncPressed();

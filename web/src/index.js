@@ -57,6 +57,7 @@ table{width:100%;border-collapse:collapse;font:500 14px "JetBrains Mono",monospa
 @media (max-width:480px){.fm span{min-width:18px}.fm span i{display:none}.fm span u{display:inline}}
 .fleg{font-size:12px;color:var(--mut,#9aa59e);margin:6px 0 0}
 .fm .W{background:#3ccf6e}.fm .D{background:#ffb547}.fm .L{background:#ff6b6b}
+.rkp{color:var(--mu);font-weight:600} /* 08/11 Owner: θέση βαθμολογίας μπροστά από το όνομα */
 .fl a{margin:0 6px;white-space:nowrap}
 .doc h2{margin-top:22px}.doc p,.doc li{color:#cfd8d1;line-height:1.6}.doc ul{list-style:disc;padding-left:20px}.doc li{margin:4px 0}.doc a{color:var(--lime)}
 .recl{text-align:center;margin:10px 0}.recl a{color:var(--lime);font-weight:700;text-decoration:none}
@@ -214,6 +215,7 @@ const handle = async (req, env, ctx) => {
       if (!x) return html("<!doctype html><title>404</title>", 404);
       const want = matchPath(mm[1], x);
       if (want !== p) return Response.redirect(url.origin + want, 301); // σταθερό id, το slug διορθώνεται
+      if (url.searchParams.has("frag")) return new Response(matchFrag(mm[1], x), { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=120", "x-robots-tag": "noindex" } });
       return html(matchPage(mm[1], x), 200, age21(req, mm[1]));
     }
     const rm = p.match(/^\/([a-z]{2})\/([a-z-]+)(?:\/(\d{4}-\d{2}|all))?$/);
@@ -243,15 +245,22 @@ const handle = async (req, env, ctx) => {
     if (pr && LANGS.includes(pr[1]) && LANGS.some((l) => STK[l].slug === pr[2] || STK[l].oldSlug === pr[2])) {
       const lang = pr[1];
       if (STK[lang].slug !== pr[2]) return Response.redirect(url.origin + stkPath(lang), 301);
-      const key = "stk|" + lang;
+      // 08/11: η έκδοση του κώδικα μέσα στο κλειδί → μετά από κάθε αλλαγή η σελίδα ξαναφτιάχνεται αμέσως (όχι η παλιά για 5–30΄)
+      STKV ||= h32(String(streaksPage) + SCSS + IZZ_JS + String(izziFrag)).toString(36);
+      const key = "stk|" + lang + "|" + STKV;
       // 06/11 (QA): εκτός από τη μνήμη του isolate, και στη μνήμη του Cloudflare (κοινή), ώστε το πρώτο άνοιγμα να μην αργεί 2–4΄΄
-      const eck = new Request("https://betizzi.com/__stk/" + lang);
+      const eck = new Request("https://betizzi.com/__stk/" + lang + "/" + STKV);
       if (!PAGES.get(key)) { const m = await caches.default.match(eck).catch(() => null); if (m) PAGES.set(key, { t: +(m.headers.get("x-built") || 0), b: await m.text() }); }
       const hit = PAGES.get(key), age = hit ? Date.now() - hit.t : Infinity;
       const build = () => streaksPage(env, lang).then((b) => { const t = Date.now(); PAGES.set(key, { t, b });
         ctx.waitUntil(caches.default.put(eck, new Response(b, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600", "x-built": String(t) } })).catch(() => {})); return b; });
       // ?frag=1: μόνο το περιεχόμενο, για την καρτέλα μέσα στην εφαρμογή (απόφαση Owner 06/11)
       const out = (b) => (url.searchParams.has("frag") ? new Response(izziFrag(b), { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=120", "x-robots-tag": "noindex" } }) : html(b, 200, age21(req, lang)));
+      // 08/11: ?data=1 → τα κουτάκια (JSON), από την ίδια έκδοση της σελίδας
+      if (url.searchParams.has("data")) {
+        if (!STKD[lang] || !hit || age >= 30 * 60000) { try { await build(); } catch (e) { return new Response("{}", { status: 503 }); } }
+        return new Response(STKD[lang], { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=120", "x-robots-tag": "noindex" } });
+      }
       if (hit && age < 5 * 60000) return out(hit.b);
       if (hit && age < 30 * 60000) { ctx.waitUntil(build().catch(() => {})); return out(hit.b); }
       try { return out(await build()); }
@@ -781,7 +790,7 @@ function matchPage(lang, x) {
   // 08/11 (Owner): mouse over / πάτημα στο κουτάκι → «1-5 · Panathinaikos (εκτός) · 1/11»
   const fTip = (g) => [`${g.gf}-${g.ga}`, g.opp ? `${g.opp} (${g.home ? t.fHome : t.fAway})` : (g.home ? t.fHome : t.fAway),
     g.ts ? new Date(g.ts * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "numeric", timeZone: tz }) : ""].filter(Boolean).join(" · ");
-  const formRow = (team) => `<div class="frow"><span class="tm">${esc(team.name)}</span>
+  const formRow = (team) => `<div class="frow"><span class="tm">${team.rank ? `<span class="rkp">${team.rank}</span> ` : ""}${esc(team.name)}</span>
     <span class="fm">${team.form.slice(0, 10).reverse().map((g) => `<span class="${g.res}${g.home ? " h" : ""}" tabindex="0" data-tip="${esc(fTip(g))}" aria-label="${esc(fTip(g))}"><i>${g.gf}-${g.ga}</i><u>${t[g.res]}</u></span>`).join("")}</span></div>`;
   const oddsRow = ["1", "X", "2", "O25", "U25", "GG", "NG"].filter((k) => x.odds[k]);
   const oddsHtml = oddsRow.length ? `<table><tr>${oddsRow.map((k) => `<th>${SEL[k]}</th>`).join("")}</tr><tr>${oddsRow.map((k) => `<td>${x.odds[k].toFixed(2)}</td>`).join("")}</tr></table>` : "";
@@ -825,7 +834,7 @@ ${indexable(x) ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
 <nav class="bc"><a href="/${lang}/">betizzi</a> › ${esc(x.league.country)} · ${esc(x.league.name)}</nav>
 <h1>${esc(x.home.name)} – ${esc(x.away.name)}: ${esc(t.word)}</h1>
 ${off ? `<p class="ans"><b>${esc(off)}</b> · <span>${esc(ui("Our tips for this match are void."))}</span></p>` : `<p class="ans">${esc(answer)}</p>`}
-<div class="vs"><div><b>${esc(x.home.name)}</b></div><div class="mid"${!off && !(x.score && (live || done)) ? ` data-ts="${x.ts}" data-d="${ymdIn(DAYTZ, x.ts * 1000)}"` : ""}>${mid}${live ? `<div class="min">${esc(x.minute)}'</div>` : ""}</div><div><b>${esc(x.away.name)}</b></div></div>
+<div class="vs"><div><b>${x.home.rank ? `<span class="rkp">${x.home.rank}</span> ` : ""}${esc(x.home.name)}</b></div><div class="mid"${!off && !(x.score && (live || done)) ? ` data-ts="${x.ts}" data-d="${ymdIn(DAYTZ, x.ts * 1000)}"` : ""}>${mid}${live ? `<div class="min">${esc(x.minute)}'</div>` : ""}</div><div><b>${x.away.rank ? `<span class="rkp">${x.away.rank}</span> ` : ""}${esc(x.away.name)}</b></div></div>
 ${anTxt ? `<h2>${esc(t.anH)}</h2><p class="an">${esc(anTxt)}</p>` : ""}
 <h2>${esc(t.tips)}</h2><div class="card">${tipsHtml}</div>
 ${md ? `<h2>${esc(t.model)}</h2><div class="card">${modelHtml}</div>` : ""}
@@ -1132,7 +1141,7 @@ const SCSS = `
 .sr .n{color:var(--mu);font:500 12px "JetBrains Mono",monospace}.sr b{font-weight:700;font-size:15px}.sr small{display:block;color:var(--mu);font-size:12px;margin-top:1px}
 .mt{text-align:right}.mt .bg{display:inline-block;font:700 17px "JetBrains Mono",monospace;color:#ffb547}.mt em{display:block;font-style:normal;color:var(--mu);font-size:11px;margin-top:2px}
 .run{color:#ffb547;opacity:.85;font-size:11px;font-weight:700;margin-left:6px;white-space:nowrap}
-.fm{display:inline-flex;gap:2px;vertical-align:middle;margin-left:6px}.fm i{width:12px;height:5px;border-radius:2px;display:inline-block}.fm .W{background:#3ccf6e}.fm .D{background:#ffb547}.fm .L{background:#ff6b6b}
+.sr .fm{display:inline-flex;gap:2px;vertical-align:middle;margin-left:6px}.sr .fm i{width:12px;height:5px;border-radius:2px;display:inline-block}.sr .fm .W{background:#3ccf6e}.sr .fm .D{background:#ffb547}.sr .fm .L{background:#ff6b6b}
 .nx{display:flex;align-items:center;gap:8px;margin:8px 0 0;color:var(--tx)!important;padding:7px 10px;border-radius:10px;background:var(--c2);text-decoration:none;min-height:40px}
 .nx>span:first-child{flex:1;min-width:0;font-size:13px;line-height:1.35}.nx>span:first-child b{font-weight:700;color:var(--tx)}.nx span small{color:var(--mu)}.nx i{display:block;font-style:normal;color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
 .nx .od{font:700 14px "JetBrains Mono",monospace;border:1px solid rgba(182,242,58,.5);color:var(--lime);border-radius:8px;padding:3px 7px;white-space:nowrap}
@@ -1140,7 +1149,29 @@ const SCSS = `
 .lk .nx .od{background:var(--lime);border-color:var(--lime);color:#0c0f0d}.lk .nx .od small{color:#2b3a0c!important}
 .lkt{display:none}.lk .lkt{display:block;order:3;flex-basis:100%;color:var(--lime);font-size:12px;font-weight:700}.lk .nx{flex-wrap:wrap}
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
+.sl details>summary{list-style:none;cursor:pointer}.sl details>summary::-webkit-details-marker{display:none}
+.nx .cv{color:var(--mu);font-size:14px;transition:transform .15s}.sl details[open] .nx .cv{transform:rotate(180deg)}
+.gx{margin:10px 0 0}.gxt{margin:10px 0 4px;font-size:13px}.gxt b{font-weight:700}.gxt small{color:var(--mu);font-size:11px;margin-left:4px}.rkp{color:var(--mu);font-weight:600}.gs{display:flex;gap:3px;flex-wrap:wrap;padding:30px 0 6px;margin-top:-30px}
+.gs .g{position:relative;min-width:44px;height:26px;padding:0 4px;border-radius:6px;display:grid;place-items:center;font:700 12px "JetBrains Mono",monospace;color:#0c0f0d;cursor:default}
+.gs .g i{font-style:normal}.gs .g u{display:none;text-decoration:none;font:800 13px Manrope,sans-serif}.gs .g.h{box-shadow:0 3px 0 #e9f2ec}
+.gs .y,.gs .W{background:#3ccf6e}.gs .n,.gs .L{background:#ff6b6b}.gs .D{background:#ffb547}
+.gs .g:hover::before,.gs .g:focus::before{content:attr(aria-label);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#1b231e;color:#e9f2ec;border:1px solid #2a352e;border-radius:6px;padding:4px 8px;font:600 12px Manrope,sans-serif;z-index:5;pointer-events:none}
+.gs .g:focus{outline:none}.gs .g:first-child::before{left:0;transform:none}.gs .g:last-child::before{left:auto;right:0;transform:none}
+.full{display:inline-block;margin:6px 0 0;color:var(--mu)!important;font-size:12px;text-decoration:none;min-height:32px;line-height:32px}.mzb:empty{display:none}.mzb .ld{display:block;color:var(--mu);font-size:13px;padding:12px 0}
+@media (max-width:600px){.gs .g{min-width:26px;padding:0}.gs .g i{display:none}.gs .g u{display:inline}}
 `;
+// CSS μόνο μέσα σε ένα κουτί (π.χ. ".izz", ".mz")
+const scopeCss = (css, sc) => css.replace(/([^{}]+)\{/g, (_, sel) => sel.split(",").map((x) => (x.trim().startsWith("@") ? x : sc + " " + x.trim())).join(",") + "{")
+  .replace(new RegExp("\\" + sc + " @media", "g"), "@media");
+// 08/11 (Owner): ο αγώνας ανοίγει ΟΛΟΣ προς τα κάτω μέσα στο Izzistats (όχι νέα σελίδα). ?frag=1 στη σελίδα αγώνα → μόνο το περιεχόμενο,
+// χωρίς τίτλο/breadcrumb/«πίσω» και χωρίς κουμπιά δελτίου. Φορτώνει μόνο όταν ανοίγει η γραμμή (για να μένει ελαφριά η σελίδα).
+const MZCSS = scopeCss(CSS.replace(/:root\{[^}]*\}/, "").replace(/\*\{box-sizing:border-box\}body\{[^}]*\}/, ""), ".mz");
+function matchFrag(lang, x) {
+  let m = (matchPage(lang, x).match(/<main>([\s\S]*?)<\/main>/) || [, ""])[1];
+  m = m.replace(/<nav class="bc">[\s\S]*?<\/nav>/, "").replace(/<h1>[\s\S]*?<\/h1>/, "").replace(/<p><a href="\/[a-z]{2}\/">←[\s\S]*?<\/p>/, "")
+    .replace(/<button class="add"[^>]*>[\s\S]*?<\/button>/g, "");
+  return `<style id="mzcss">.mz{--bg:#0c0f0d;--c1:#141a16;--c2:#1b231e;--ln:#2a352e;--lime:#b6f23a;--gold:#e8b931;--tx:#e9efe9;--mu:#8b9a90;margin:10px 0 0;font:14px/1.45 Manrope,system-ui,sans-serif}${MZCSS}.mz h2{font-size:17px;margin:14px 0 6px}.mz .ans{margin:0 0 10px}</style><div class="mz">${m}</div>`;
+}
 // Κομμάτι για την καρτέλα της εφαρμογής: το <main> χωρίς breadcrumb και link «εφαρμογή», με CSS μόνο μέσα στο .izz
 function izziFrag(b) {
   let m = (b.match(/<main class="doc">([\s\S]*?)<\/main>/) || [, ""])[1];
@@ -1152,6 +1183,44 @@ h1{font:800 28px/1.1 "Fira Sans Extra Condensed",sans-serif;margin:4px 0 8px;tex
     .replace(/\.izz @media/g, "@media");
   return `<style>.izz{--c1:#141a16;--c2:#1b231e;--ln:#2a352e;--tx:#eef3ee;--mu:#9aa89f;--lime:#b6f23a;--bg:#0c0f0d}${css}</style><div class="izz"><div class="doc">${m}</div></div>`;
 }
+// 08/11: όταν ανοίγει μια γραμμή του Izzistats, φορτώνει τον αγώνα από κάτω (ίδιος κώδικας και μέσα στην εφαρμογή, prototype.html)
+let STKV = "";
+const STKD = {}; // JSON κουτακιών ανά γλώσσα (φτιάχνεται μαζί με τη σελίδα)
+// 08/11 (Owner): Izzistats στον browser (σελίδα ΚΑΙ καρτέλα της εφαρμογής· το prototype.html τρέχει αυτό το <script> μετά το innerHTML)
+//  · μόλις φορτώσει: κατεβάζει στο παρασκήνιο τα κουτάκια (?data=1)
+//  · ανοίγει μία κάρτα τη φορά, χωρίς να «πηδάει» η σελίδα
+//  · ο αγώνας (?frag=1) ξεκινά να φορτώνει με το άγγιγμα/ποντίκι πάνω στη γραμμή και μπαίνει από κάτω όταν ανοίξει
+function izzClient() {
+  if (window.__izz) return; window.__izz = 1;
+  var lang = (location.pathname.split("/")[1] || "en"), G = null, GP = null;
+  function data() { if (!GP) GP = fetch("/" + lang + "/izzistats?data=1").then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (j) { G = j; return j; }).catch(function () { GP = null; }); return GP; }
+  function esc(x) { return String(x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function mark(k, g) { var s = g[0] + g[1];
+    if (k === "over" || k === "goals") return s >= 3 ? ["O", "y"] : ["U", "n"];
+    if (k === "under") return s <= 2 ? ["U", "y"] : ["O", "n"];
+    if (k === "gg") return g[0] > 0 && g[1] > 0 ? ["Y", "y"] : ["N", "n"];
+    var r = g[0] > g[1] ? "W" : g[0] < g[1] ? "L" : "D"; return [G.t[r], r]; }
+  function squares(d) { var gx = d.querySelector(".gx"); if (!gx || gx.dataset.ok || !G) return; var key = d.getAttribute("data-k"), rows = G.r[key]; if (!rows) return;
+    var k = key.split(":")[0], T = G.t; gx.dataset.ok = 1;
+    gx.innerHTML = rows.map(function (rw) { var gm = rw[1]; if (!gm || !gm.length) return "";
+      return '<p class="gxt"><b>' + (rw[2] ? '<span class="rkp">' + rw[2] + '</span> ' : "") + esc(rw[0]) + '</b> <small>' + esc((innerWidth < 600 ? T.lastS : T.lastG).replace("{n}", gm.length)) + '</small></p><div class="gs">' + gm.slice().reverse().map(function (g) {
+        var m = mark(k, g), ha = g[2] ? T.h : T.a, tip = [g[0] + "-" + g[1], g[3] ? g[3] + " (" + ha + ")" : ha, g[4] ? new Date(g[4] * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "numeric" }) : ""].filter(Boolean).join(" · ");
+        return '<span class="g ' + m[1] + (g[2] ? " h" : "") + '" tabindex="0" aria-label="' + esc(m[0] + " · " + tip) + '"><i>' + g[0] + "-" + g[1] + "</i><u>" + esc(m[0]) + "</u></span>"; }).join("") + "</div>"; }).join(""); }
+  function frag(b) { if (!b._p) b._p = fetch(b.dataset.u + "?frag=1").then(function (r) { if (!r.ok) throw 0; return r.text(); }).catch(function () { b._p = null; return ""; }); return b._p; }
+  function pre(e) { var d = e.target.closest && e.target.closest("details[data-k]"); if (!d) return; data(); var b = d.querySelector(".mzb"); if (b) frag(b); }
+  document.addEventListener("pointerdown", pre, true); document.addEventListener("mouseover", pre, true);
+  document.addEventListener("toggle", function (e) { var d = e.target; if (!d || !d.open || !d.getAttribute || !d.getAttribute("data-k")) return;
+    // μία κάρτα τη φορά· κρατάμε την κάρτα που πάτησε στο ίδιο σημείο της οθόνης
+    var y0 = d.getBoundingClientRect().top;
+    Array.prototype.forEach.call(document.querySelectorAll("details[data-k][open]"), function (o) { if (o !== d) o.open = false; });
+    var dy = d.getBoundingClientRect().top - y0; if (dy) window.scrollBy(0, dy);
+    if (G) squares(d); else { var p = data(); if (p) p.then(function () { squares(d); }); }
+    var b = d.querySelector(".mzb"); if (!b || b.dataset.l) return; b.dataset.l = 1; b.innerHTML = '<span class="ld">…</span>';
+    frag(b).then(function (h) { if (!h) { b.dataset.l = ""; b.innerHTML = ""; return; } if (document.getElementById("mzcss")) h = h.replace(/<style id="mzcss">[\s\S]*?<\/style>/, ""); b.innerHTML = h; }); }, true);
+  if (document.readyState === "complete") setTimeout(data, 300); else window.addEventListener("load", function () { setTimeout(data, 300); });
+}
+// 08/11: το build του Cloudflare (esbuild, keepNames) βάζει μέσα στη συνάρτηση κλήσεις __name(...)· στον browser δεν υπάρχει → μικρό shim
+const IZZ_JS = "(function(){var __name=function(f){return f;};(" + izzClient.toString() + ")();})();";
 async function streaksPage(env, lang) {
   const S = STK[lang], t = T[lang], tz = TZ[lang], today = ymdIn(DAYTZ);
   const data = await getStreaks(env);
@@ -1165,6 +1234,8 @@ async function streaksPage(env, lang) {
     : k === "gg" ? [String(r.run), S.u.gg + ` · ${r.c}/${r.n}`, Math.min(1, r.run / 8)]
     : [`${r.c}/${r.n}`, k === "form" ? S.u.w : k === "home" ? S.u.h : k === "away" ? S.u.a : k === "draws" ? S.u.d : k === "bad" ? S.u.l : "", r.c / r.n];
   // χρώμα: πιο πράσινο = πιο δυνατό (όπως το FootyStats)
+  // 08/11: δεδομένα για τα κουτάκια (?data=1). Κείμενα στη γλώσσα της σελίδας, παιχνίδια [gf, ga, εντός, αντίπαλος, ts] νέο → παλιό
+  const D = { t: { lastG: S.lastG, lastS: S.lastS, h: t.fHome, a: t.fAway, W: t.W, D: t.D, L: t.L }, r: {} };
   const sec = (k) => {
     const L = (data.cats && data.cats[k]) || [];
     const rows = L.map((r, i) => {
@@ -1176,14 +1247,24 @@ async function streaksPage(env, lang) {
       const look = r.price >= 1.6 && (rate == null || rate - 1 / r.price >= 0.2);
       const run = k !== "gg" && k !== "goals" && r.run >= 3 ? `<span class="run">🔥 ${r.run} ${esc(S.run)}</span>` : "";
       const fm = `<span class="fm" aria-label="${esc(r.form)}">${[...r.form].reverse().map((x) => `<i class="${x}"></i>`).join("")}</span>`;
-      return `<li${look ? ' class="lk"' : ""}><div class="sr"><span class="n">${i + 1}</span><div><b>${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
+      // 08/11 (Owner): πάτημα → ανοίγει προς τα κάτω (όχι νέα σελίδα). Τα κουτάκια (ομάδα + αντίπαλος, γηπεδούχος πάνω) ΔΕΝ είναι στο HTML:
+      // έρχονται στο παρασκήνιο από ?data=1 (μικρό JSON) και φτιάχνονται στον browser τη στιγμή που ανοίγει η γραμμή (IZZ_JS).
+      const dk = `${k}:${r.fixture.id}:${r.home ? 1 : 0}`;
+      const opp = r.home ? r.fixture.away : r.fixture.home;
+      const [rT, rO] = r.home ? [r.fixture.hr, r.fixture.ar] : [r.fixture.ar, r.fixture.hr]; // θέσεις (BTFStats), «9 Brighton»
+      if ((r.games || []).length) D.r[dk] = r.home ? [[r.team, r.games, rT], [opp, r.oppGames || [], rO]] : [[opp, r.oppGames || [], rO], [r.team, r.games, rT]];
+      const sq = `<div class="gx"></div>`;
+      return `<li${look ? ' class="lk"' : ""}><details data-k="${dk}"><summary><div class="sr"><span class="n">${i + 1}</span><div><b>${(r.home ? r.fixture.hr : r.fixture.ar) ? `<span class="rkp">${r.home ? r.fixture.hr : r.fixture.ar}</span> ` : ""}${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
-        + `<a class="nx" href="${href}"><span><i>${esc(S.nx)}</i><b>${esc(r.fixture.home)} – ${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
-        + (look ? `<span class="lkt">${esc(S.look)}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `</a></li>`;
+        + `<div class="nx"><span><i>${esc(S.nx)}</i><b>${r.fixture.hr ? `<span class="rkp">${r.fixture.hr}</span> ` : ""}${esc(r.fixture.home)} – ${r.fixture.ar ? `<span class="rkp">${r.fixture.ar}</span> ` : ""}${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
+        + (look ? `<span class="lkt">${esc(S.look)}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `<span class="cv" aria-hidden="true">▾</span></div></summary>`
+        + sq + `<div class="mzb" data-u="${href}"></div><a class="full" href="${href}">${esc(S.full)}</a></details></li>`;
     }).join("");
     return `<section class="st" id="${k}"><h2>${esc(S.cats[k])} <a class="up" href="#cats" aria-label="${esc(S.catH)}">↑</a></h2><p class="sub">${esc(S.sub[k])}</p>`
       + (rows ? `<ul class="sl">${rows}</ul>` : `<p class="note">${esc(S.none)}</p>`) + `</section>`;
   };
+  const secsHtml = KEYS.map(sec).join("");
+  STKD[lang] = JSON.stringify(D);
   const any = KEYS.some((k) => ((data.cats || {})[k] || []).length);
   const ans = S.ans(dLong, data.teams || 0);
   const mod = new Date((data.updated || Math.floor(noon / 1000)) * 1000).toISOString();
@@ -1219,10 +1300,11 @@ ${any ? "" : '<meta name="robots" content="noindex,follow">'}
 <h1>${esc(S.h1)}</h1>
 <p class="ans">${esc(ans)}</p>
 <nav class="grid9" id="cats" aria-label="${esc(S.catH)}">${KEYS.map((k) => `<a href="#${k}">${esc(S.cats[k])}</a>`).join("")}</nav>
-${KEYS.map(sec).join("")}
+${secsHtml}
 <p class="soon">${esc(S.soon)}</p>
 <p class="how" style="font-size:13px">${esc(S.note)}</p>
 <a class="cta" href="/${lang}/">${esc(S.app)}</a>
+<script>${IZZ_JS}</script>
 <p class="how" style="font-size:13px;margin-top:18px">${esc(S.upd)}: <time datetime="${mod}">${esc(new Intl.DateTimeFormat(LOCALE[lang], { timeZone: DAYTZ, day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(Date.parse(mod)))}</time></p>
 </main>
 <footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi</p></footer>
