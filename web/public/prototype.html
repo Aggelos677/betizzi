@@ -280,7 +280,7 @@ body{padding-top:env(safe-area-inset-top,0px)}
 .tbox .nm{font:800 .95rem var(--f-display);text-transform:uppercase;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pos{font:800 1.6rem/1 var(--f-display);color:var(--fg)}
 .pos small{font:600 .72rem var(--f-mono);color:var(--muted);margin-left:4px}
-.sqs{display:flex;gap:3px;margin-top:8px}
+.sqs{display:flex;gap:3px;margin-top:8px}.sqx{position:relative;cursor:default}.sqx:hover::after,.sqx:focus::after{content:attr(aria-label);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#1b231e;color:#e9f2ec;border:1px solid #2a352e;border-radius:6px;padding:4px 8px;font:600 12px var(--f-body,Manrope),sans-serif;z-index:20;pointer-events:none}.sqx:focus{outline:none}.sqx:first-child::after{left:0;transform:none}.sqx:last-child::after{left:auto;right:0;transform:none}
 .sq{width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font:800 .72rem var(--f-mono);color:#0c0f0d}
 .sqW{background:var(--win)} .sqD{background:var(--warn)} .sqL{background:var(--bad)}
 .tipbox{border:1px solid rgba(182,242,58,.45);background:var(--lime-soft);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
@@ -1625,7 +1625,7 @@ if(window.matchMedia){var _sm=window.matchMedia("(min-width:1100px)");var _sf=fu
 
 /* ---------- helpers ---------- */
 function fbars(s,who){return '<span class="fb" role="img" aria-label="'+esc(who)+' last 5, older to newer: '+(s||"no data")+'">'+(s||"").split("").map(function(c){return '<i class="f'+c+'"></i>';}).join("")+'</span>';}
-function squares(f){return f&&f.length?'<div class="sqs">'+f.map(function(g){var c=g[0],sc=g[1],home=g[2]===1,lab=({W:"Win",D:"Draw",L:"Loss"})[c]+" "+sc+(home?", at home":", away");return '<span class="sq sqx sq'+c+(home?' home':'')+'" title="'+lab+'" aria-label="'+lab+'">'+sc+'</span>';}).join("")+'</div>':'<div class="hint">No recent games</div>';}
+function squares(f){return f&&f.length?'<div class="sqs">'+f.map(function(g){var c=g[0],sc=g[1],home=g[2]===1,lab=[sc+" · "+(g[3]?esc(g[3])+" ":"")+(home?"(home game)":"(away game)"),g[4]?new Date(g[4]*1000).toLocaleDateString("en-GB",{day:"numeric",month:"numeric"}):""].filter(Boolean).join(" · ");/* 08/11 Owner: αντίπαλος στο mouse over / πάτημα */return '<span class="sq sqx sq'+c+(home?' home':'')+'" tabindex="0" aria-label="'+lab+'">'+sc+'</span>';}).join("")+'</div>':'<div class="hint">No recent games</div>';}
 function resTag(t,m){ if((m.type==="cancelled"||m.type==="postponed"))return '<span class="res p">Void</span>'; if(m.done&&t.r===1)return '<span class="res w">Won</span>'; if(m.done&&t.r===0)return '<span class="res l">Lost</span>'; return '<span class="res p">'+(m.live?'Live':'Pending')+'</span>'; }
 function tierTag(t){return t.tier==="vip"?'<span class="tag vip">VIP</span>':'<span class="tag free">Free</span>';}
 
