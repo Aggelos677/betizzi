@@ -1534,7 +1534,9 @@ function cpVoid(l){return l.result===2;}
 var PSLUG={en:"accumulator-tips-today",el:"paroli-simera",es:"combinadas-hoy",pt:"apostas-multiplas-hoje",fr:"combines-du-jour",de:"kombiwetten-heute",ro:"biletul-zilei",sr:"tiket-dana",bg:"fish-za-dnes"};
 function shareParlay(c){
   var lg=(location.pathname.split("/")[1]||"en"),url="https://betizzi.com/"+lg+"/"+(PSLUG[lg]||PSLUG.en);
-  var txt="betizzi x"+fx2(cpX(c))+" · "+c.legs.map(function(l){return (l.home||"")+"–"+(l.away||"")+" "+(BZC_SEL[l.sel]||l.sel);}).join(" · ");
+  /* ένας αγώνας ανά γραμμή, με τη σειρά της ώρας (όπως η κάρτα) */
+  var lg2=c.legs.slice().sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+  var txt="⚽ betizzi x"+fx2(cpX(c))+"\n"+lg2.map(function(l){return "• "+(l.home||"")+" – "+(l.away||"")+": "+(l.locked?"VIP":(BZC_SEL[l.sel]||l.sel))+(l.price?" ("+fx2(l.price)+")":"");}).join("\n")+"\n";
   function box(){var ov=document.createElement("div");ov.className="sharebox";var e=encodeURIComponent;
     ov.innerHTML='<div class="sharebox-in"><p style="margin:0 0 10px;font-weight:800"><span>Share this parlay</span></p><div class="sharebtns">'
       +'<a class="btn sec" target="_blank" rel="noopener" href="https://wa.me/?text='+e(txt+" "+url)+'">WhatsApp</a>'
@@ -1550,7 +1552,7 @@ function shareParlay(c){
   if(touch&&navigator.share){navigator.share({title:"betizzi",text:txt,url:url}).catch(function(er){if(er&&er.name!=="AbortError")box();});return;}
   box();
 }
-function shareBz(c){var txt="🏆 betizzi "+zk(c.kind)+" x"+cpX(c).toFixed(2)+" WINNER! ",url="https://betizzi.com";
+function shareBz(c){var lg=(location.pathname.split("/")[1]||"en"),txt="🏆 betizzi "+zk(c.kind)+" x"+cpX(c).toFixed(2)+" WINNER! ",url="https://betizzi.com/"+lg+"/"+(PSLUG[lg]||PSLUG.en); /* 08/11: στη σελίδα παρολί της γλώσσας, όχι στην αγγλική αρχική */
   if(navigator.share){navigator.share({text:txt,url:url}).catch(function(){});return;}
   var ov=document.createElement("div");ov.className="sharebox";
   ov.innerHTML='<div class="sharebox-in"><div class="sharebtns"><a class="btn sec" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url)+'&quote='+encodeURIComponent(txt)+'">Facebook</a><a class="btn sec" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(txt+url)+'">WhatsApp</a><a class="btn sec" target="_blank" rel="noopener" href="https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(txt)+'">Telegram</a><button type="button" class="btn quiet" data-x="1">Close</button></div></div>';
