@@ -410,6 +410,7 @@ export const UI = {
   "One match per pick": ["Ένας αγώνας ανά επιλογή", "Un partido por pronóstico", "Um jogo por palpite", "Un match par pronostic", "Ein Spiel pro Tipp", "Un meci pe pont", "Jedna utakmica po tipu", "Един мач на прогноза"],
   "Add parlay to my slip": ["Βάλε το παρολί στο δελτίο", "Añadir la combinada a mi boleto", "Adicionar a múltipla ao boletim", "Ajouter le combiné à mon ticket", "Kombi auf meinen Schein", "Adaugă biletul pe biletul meu", "Dodaj tiket u moj listić", "Добави комбинацията във фиша"],
   "Share this parlay": ["Μοιράσου αυτό το παρολί", "Comparte esta combinada", "Partilhe esta múltipla", "Partage ce combiné", "Diese Kombi teilen", "Distribuie acest bilet", "Podeli ovaj tiket", "Сподели тази комбинация"],
+  "Save image": ["Αποθήκευση εικόνας", "Guardar imagen", "Guardar imagem", "Enregistrer l'image", "Bild speichern", "Salvează imaginea", "Sačuvaj sliku", "Запази снимката"],
   "Copy link": ["Αντιγραφή link", "Copiar enlace", "Copiar link", "Copier le lien", "Link kopieren", "Copiază linkul", "Kopiraj link", "Копирай линка"],
   "Link copied": ["Το link αντιγράφηκε", "Enlace copiado", "Link copiado", "Lien copié", "Link kopiert", "Link copiat", "Link kopiran", "Линкът е копиран"],
   "Parlays": ["Παρολί", "Combinadas", "Múltiplas", "Combinés", "Kombiwetten", "Bilete combinate", "Tiketi", "Комбинации"],
