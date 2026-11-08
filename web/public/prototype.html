@@ -1529,11 +1529,70 @@ function cpWon(c){return c.result===1||(c.legs.length>0&&c.legs.every(legWon));}
 /* αναβολή = void (1.00): η απόδοση που πληρώνεται είναι το odds_now του server */
 function cpX(c){return c.odds_now||c.odds;}
 function cpVoid(l){return l.result===2;}
-function shareBz(c){var txt="🏆 betizzi "+zk(c.kind)+" x"+cpX(c).toFixed(2)+" WINNER! ",url="https://betizzi.com";
-  if(navigator.share){navigator.share({text:txt,url:url}).catch(function(){});return;}
-  var ov=document.createElement("div");ov.className="sharebox";
-  ov.innerHTML='<div class="sharebox-in"><div class="sharebtns"><a class="btn sec" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url)+'&quote='+encodeURIComponent(txt)+'">Facebook</a><a class="btn sec" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(txt+url)+'">WhatsApp</a><a class="btn sec" target="_blank" rel="noopener" href="https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(txt)+'">Telegram</a><button type="button" class="btn quiet" data-x="1">Close</button></div></div>';
-  document.body.appendChild(ov);ov.addEventListener("click",function(e){if(e.target===ov||e.target.dataset.x)ov.remove();});}
+/* 08/11 (Owner): share παρολί = ΕΙΚΟΝΑ του παρολί πάνω + κείμενο με «Δες τα παρολί σήμερα» και link από κάτω.
+   Κινητό: το share του κινητού με αρχείο εικόνας (WhatsApp, Messenger, Viber…). PC (ή αν δεν γίνεται): κουτί με κουμπιά + «Αποθήκευση εικόνας».
+   Το link πάει στη σελίδα «Παρολί σήμερα» της γλώσσας. Το ίδιο και για το WINNER (shareBz). */
+var PSLUG={en:"accumulator-tips-today",el:"paroli-simera",es:"combinadas-hoy",pt:"apostas-multiplas-hoje",fr:"combines-du-jour",de:"kombiwetten-heute",ro:"biletul-zilei",sr:"tiket-dana",bg:"fish-za-dnes"};
+var PSEE={en:"See today's parlays",el:"Δες τα παρολί σήμερα",es:"Mira las combinadas de hoy",pt:"Veja as múltiplas de hoje",fr:"Voir les combinés du jour",de:"Heutige Kombis ansehen",ro:"Vezi biletele zilei",sr:"Pogledaj današnje tikete",bg:"Виж днешните комбинации"};
+function parlayImage(c,won,lg,url){
+  var W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;var x=cv.getContext("2d");
+  var legs=c.legs.slice().sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+  var g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,"#121a14");g.addColorStop(1,"#0c0f0d");x.fillStyle=g;x.fillRect(0,0,W,H);
+  if(won){var rg=x.createRadialGradient(W/2,300,40,W/2,300,700);rg.addColorStop(0,"rgba(182,242,58,.30)");rg.addColorStop(1,"rgba(182,242,58,0)");x.fillStyle=rg;x.fillRect(0,0,W,H);}
+  var D='800 VAR "Fira Sans Extra Condensed","Arial Narrow",sans-serif',B='700 VAR Manrope,Arial,sans-serif',M='700 VAR "JetBrains Mono",monospace';
+  function f(t,s){return t.replace("VAR",s+"px");}
+  x.textBaseline="alphabetic";x.font=f(D,92);x.fillStyle="#eef3ee";x.fillText("bet",80,140);var bw=x.measureText("bet").width;
+  x.save();x.translate(80+bw+2,140);x.transform(1,0,-.22,1,0,0);x.fillStyle="#b6f23a";x.fillText("izzi",0,0);x.restore();
+  x.textAlign="center";
+  if(won){x.font=f(D,150);x.fillStyle="#b6f23a";x.shadowColor="rgba(182,242,58,.6)";x.shadowBlur=40;x.fillText("🏆 WINNER",W/2,320);x.shadowBlur=0;}
+  else{x.font=f(D,72);x.fillStyle="#9aa89f";x.fillText(zk(c.kind),W/2,300);}
+  x.font=f(M,won?120:130);x.fillStyle=won?"#ffffff":"#b6f23a";x.fillText("x"+fx2(cpX(c)),W/2,won?450:440);
+  x.textAlign="left";var show=legs.slice(0,7),st=Math.min(104,Math.floor((H-270-530)/Math.max(1,show.length))),y=Math.max(565,Math.round((520+(H-250))/2-show.length*st/2)+60);
+  show.forEach(function(l){var r=l.result!=null?l.result:(won?1:null); /* WINNER: όλες οι επιλογές ✓ */
+    x.fillStyle="#141a16";x.strokeStyle=r===1?"#3ccf6e":r===0?"#ff6b6b":"#2a352e";x.lineWidth=3;
+    var bh=Math.min(94,st-10),tp=y-56+(94-bh)/2;if(x.roundRect){x.beginPath();x.roundRect(70,tp,W-140,bh,16);x.fill();x.stroke();}else x.fillRect(70,tp,W-140,bh);
+    x.beginPath();x.arc(115,y-10,22,0,7);x.fillStyle=r===1?"#3ccf6e":r===0?"#ff6b6b":"#1b231e";x.fill();
+    x.font=f(B,28);x.fillStyle=r===1||r===0?"#0c0f0d":"#9aa89f";x.textAlign="center";x.fillText(r===1?"✓":r===0?"✗":"•",115,y);x.textAlign="left";
+    var mt=(l.home||"")+" – "+(l.away||"");if(mt.length>30)mt=mt.slice(0,29)+"…";x.font=f(B,bh<90?30:32);x.fillStyle="#eef3ee";x.fillText(mt,160,y-(bh<90?12:8));
+    var sl=l.locked?"VIP":(BZC_SEL[l.sel]||l.sel);x.font=f(B,bh<90?24:26);x.fillStyle="#b6f23a";x.fillText(sl.length>30?sl.slice(0,29)+"…":sl,160,y+(bh<90?16:24));
+    if(l.price){x.textAlign="right";x.font=f(M,36);x.fillStyle="#eef3ee";x.fillText(fx2(l.price),W-100,y+8);x.textAlign="left";}
+    y+=st;});
+  if(legs.length>7){x.font=f(B,28);x.fillStyle="#9aa89f";x.fillText("+ "+(legs.length-7),90,y);}
+  x.textAlign="center";
+  x.fillStyle="#b6f23a";if(x.roundRect){x.beginPath();x.roundRect(160,H-210,W-320,86,43);x.fill();}else x.fillRect(160,H-210,W-320,86);
+  x.font=f(B,38);x.fillStyle="#0c0f0d";x.fillText("👉 "+(PSEE[lg]||PSEE.en),W/2,H-155);
+  x.font=f(B,28);x.fillStyle="#cfd8d1";x.fillText(url.replace("https://",""),W/2,H-80);
+  x.font=f(B,22);x.fillStyle="#7f8c84";x.fillText("18+ · Play responsibly",W/2,H-40);
+  var du=cv.toDataURL("image/png"),bin=atob(du.split(",")[1]),arr=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+  return {du:du,blob:new Blob([arr],{type:"image/png"})};
+}
+function shareParlay(c,won){
+  won=won||c.result===1;
+  var lg=(location.pathname.split("/")[1]||"en"),url="https://betizzi.com/"+lg+"/"+(PSLUG[lg]||PSLUG.en);
+  var lg2=c.legs.slice().sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+  var txt=(won?"🏆 betizzi x"+fx2(cpX(c))+" WINNER!":"⚽ betizzi x"+fx2(cpX(c)))+"\n"+lg2.map(function(l){return (l.result===1?"✅ ":"• ")+(l.home||"")+" – "+(l.away||"")+": "+(l.locked?"VIP":(BZC_SEL[l.sel]||l.sel))+(l.price?" ("+fx2(l.price)+")":"");}).join("\n");
+  var foot="\n\n👉 "+(PSEE[lg]||PSEE.en)+": "+url,img=null,file=null,name=won?"betizzi-winner.png":"betizzi-parlay.png";
+  try{img=parlayImage(c,won,lg,url);file=new File([img.blob],name,{type:"image/png"});}catch(er){}
+  function box(){var ov=document.createElement("div");ov.className="sharebox";var e=encodeURIComponent;
+    ov.innerHTML='<div class="sharebox-in">'+(img?'<img alt="" src="'+img.du+'" style="width:100%;max-width:260px;display:block;margin:0 auto 10px;border-radius:12px">':'')+'<p style="margin:0 0 10px;font-weight:800"><span>Share this parlay</span></p><div class="sharebtns">'
+      +'<a class="btn sec" target="_blank" rel="noopener" href="https://wa.me/?text='+e(txt+foot)+'">WhatsApp</a>'
+      +'<a class="btn sec" target="_blank" rel="noopener" href="https://t.me/share/url?url='+e(url)+'&text='+e(txt)+'">Telegram</a>'
+      +'<a class="btn sec" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u='+e(url)+'">Facebook</a>'
+      +'<a class="btn sec" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text='+e(txt)+'&url='+e(url)+'">X</a>'
+      +(img?'<a class="btn sec" download="'+name+'" href="'+img.du+'">⬇️ <span>Save image</span></a>':'')
+      +'<button type="button" class="btn" data-cp="1"><span>Copy link</span></button><button type="button" class="btn quiet" data-x="1"><span>Close</span></button></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener("click",function(ev){var t=ev.target.closest("button,a")||ev.target;
+      if(t.dataset&&t.dataset.cp){var done=function(){toast("Link copied");};try{navigator.clipboard.writeText(txt+foot).then(done,function(){prompt("",txt+foot);});}catch(er){prompt("",txt+foot);}return;}
+      if(ev.target===ov||(t.dataset&&t.dataset.x))ov.remove();});}
+  var touch=matchMedia("(pointer:coarse)").matches;
+  if(touch&&navigator.share){
+    /* 08/11 (Owner): με εικόνα, από κάτω ΜΟΝΟ η γραμμή με το link (η λίστα των αγώνων είναι ήδη στην εικόνα) */
+    var data=file&&navigator.canShare&&navigator.canShare({files:[file]})?{files:[file],text:foot.trim()}:{title:"betizzi",text:txt+foot};
+    navigator.share(data).catch(function(er){if(er&&er.name!=="AbortError")box();});return;}
+  box();
+}
+function shareBz(c){shareParlay(c,true);}
 /* ένα πάρτι τη φορά: αν κερδίσουν πολλά μαζί, μπαίνουν στη σειρά */
 var CBQ=[],CBON=false;
 function couponBig(c){CBQ.push(c);CBQ.sort(function(a,b){return b.odds-a.odds;});if(!CBON)cbNext();}
@@ -2281,8 +2340,7 @@ function renderPicks(){
   Array.prototype.forEach.call($("zMain").querySelectorAll("[data-bztrk]"),function(b){b.addEventListener("click",function(){var c=L.filter(function(x){return String(x.n)===b.dataset.bztrk;})[0];if(!c)return;
     var keys=c.legs.map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});if(!keys.length||tracked(keys))return;saveCoupon(keys,stake);toast("Added to My coupons");renderPicks();});});
   Array.prototype.forEach.call($("zMain").querySelectorAll("[data-bzsh]"),function(b){b.addEventListener("click",function(){var c=L.filter(function(x){return String(x.n)===b.dataset.bzsh;})[0];if(!c)return;
-    var txt="betizzi "+zk(c.kind)+" x"+fx2(c.odds)+": "+c.legs.map(function(l){return (l.home||"")+"–"+(l.away||"")+" "+(BZC_SEL[l.sel]||l.sel)+" "+(l.price?fx2(l.price):"");}).join(" · ");
-    if(navigator.share)navigator.share({text:txt,url:location.href}).catch(function(){});else{try{navigator.clipboard.writeText(txt+" "+location.href);toast("Copied");}catch(e){}}});});
+    shareParlay(c);});});
   /* μονά */
   var all=[];MATCHES.forEach(function(m){m.tips.forEach(function(x){all.push({m:m,t:x});});});
   var ord=function(x){return x.m.open?0:x.m.live?1:2;};
