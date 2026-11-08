@@ -789,12 +789,12 @@ header{position:relative}
 .authx{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:0;background:transparent;color:var(--muted);font-size:1rem;cursor:pointer}
 .autherr{margin:0;color:#ff6b6b;font-size:.85rem}
 .acccr{margin:0;font-size:1rem}.acccr b{font-size:2rem;color:#b6f23a}
-.opsub{display:flex;background:var(--panel);border-radius:14px;padding:4px}
-.opsb{flex:1;height:42px;border:0;border-radius:10px;background:transparent;color:var(--muted);font:700 .9rem var(--f-body);cursor:pointer}
-.opsb[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.opsub{display:flex;gap:8px} /* 08/11 Owner: με υπότιτλο, επιλεγμένο με λίγο φως (όχι γεμάτο) */
+.opsb{flex:1;min-height:52px;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--muted);font:700 .95rem var(--f-body);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px} .opsb b{font-weight:800} .opsb small{font:500 .74rem var(--f-body);opacity:.85}
+.opsb[aria-pressed="true"]{background:rgba(233,242,236,.1);border-color:var(--fg);color:var(--fg)}
 .ztabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .ztab{height:48px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--fg);font:700 .95rem var(--f-mono);cursor:pointer}
-.ztab[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);color:var(--lime-ink)}
+.ztab[aria-pressed="true"]{background:rgba(182,242,58,.08);border-color:var(--lime);color:var(--fg)} .ztab .zn{font:600 .8rem var(--f-body);color:var(--muted);white-space:nowrap}.ztab .zn i{font-style:normal} @media (max-width:520px){.ztab{height:52px;line-height:1.1}.ztab .zn{display:block;font-size:.72rem;margin-top:2px}.ztab .zn i{display:none}} .zlab{font:700 .72rem var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:2px 0 -4px}
 .ztab[disabled]{opacity:.4;cursor:default}
 .ztab sup{font:700 .62rem var(--f-body);margin-left:4px;opacity:.75;vertical-align:super}
 .pc{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;animation:oprise .45s ease-out both}
@@ -962,9 +962,9 @@ header{position:relative}
     <section class="stb" id="strongBox" aria-label="Today's strongest picks" hidden></section>
     <section class="bw10" id="bigWin" hidden></section>
     <section class="ys" id="yStrip" aria-label="Our results" hidden></section>
-    <div class="opsub" role="group" aria-label="Show"><button type="button" class="opsb" data-op="parlays" aria-pressed="true"><span>Parlays</span> <span class="mono" id="pkN"></span></button><button type="button" class="opsb" data-op="singles" aria-pressed="false"><span>Singles</span> <span class="mono" id="sgN"></span></button></div>
+    <div class="opsub" role="group" aria-label="Show"><button type="button" class="opsb" data-op="parlays" aria-pressed="true"><b><span>Parlays</span> <span class="mono" id="pkN"></span></b><small>Ready-made combinations</small></button><button type="button" class="opsb" data-op="singles" aria-pressed="false"><b><span>Singles</span> <span class="mono" id="sgN"></span></b><small>One match per pick</small></button></div>
     <div id="opParlays">
-      <div class="ztabs" id="zTabs" role="group" aria-label="Total odds"></div>
+      <div class="zlab">Total odds</div><div class="ztabs" id="zTabs" role="group" aria-label="Total odds"></div>
       <div id="zMain" style="display:flex;flex-direction:column;gap:12px"></div>
       <div id="zTmr" style="display:flex;flex-direction:column;gap:12px;margin-top:14px" hidden></div>
       <h3 class="opalt-h" id="zAltH" hidden><span>Not your style? Other</span> <span id="zAltK"></span></h3>
@@ -2115,7 +2115,7 @@ function parlayHTML(c,feat){
   var name='<span class="pv pv-'+esc(c.variant)+'">'+esc(BZC_VAR[c.variant]||c.variant)+'</span>'+(/\|extra/.test(c.slot||"")?' <small class="pc-new">🆕 <span>New</span></small>':'')+(c.style?' <small class="pc-sty">· <span>'+esc(STY[c.style]||c.style)+'</span></small>':'');
   var tl=c.legs.filter(function(l){return l.time;}).slice().sort(function(a,b){return (a.ts||0)-(b.ts||0);}),first=tl.length?tl[0].time:"",last=tl.length?tl[tl.length-1].time:"";
   var btns=st==="won"?'<span class="pc-res w">✓ <span>Won</span> · x'+fx2(c.odds_now||c.odds)+'</span>':st==="lost"?'<span class="pc-res l">✗ <span>Lost</span></span>':st==="live"?'<span class="pc-res lv"><i class="ldot2"></i> LIVE</span>'
-    :(keys.length?'<button type="button" class="pc-take" data-take="'+c.n+'">🎟️ <span>Take it</span> → <span>My slip</span></button>':'');
+    :(keys.length?'<button type="button" class="pc-take" data-take="'+c.n+'">+ <span>Add parlay to my slip</span></button>':'');
   return '<article class="pc'+(feat?' feat':'')+(st==="won"?' won':st==="lost"?' lost':'')+'">'
     +'<div class="pc-top"><div>'
     +'<h3 class="pc-t">'+name+'</h3><p class="pc-s">'+c.legs.length+' <span>picks</span>'+(first?' · <span class="pc-tr">⏱ '+esc(first)+(last&&last!==first?'–'+esc(last):'')+'</span>':'')+'</p></div>'
@@ -2243,7 +2243,7 @@ function renderPicks(){
   L.forEach(function(c){if(zones.indexOf(c.kind)<0)zones.push(c.kind);});
   var plEndH=endH(plEnded.filter(function(c){return zones.indexOf(c.kind)<0;})); /* μόνο ζώνες που δεν έχουν πια ζωντανό παρολί */
   if(zones.indexOf(opZone)<0)opZone=zones[0]||"";
-  $("zTabs").innerHTML=zones.map(function(z){return '<button type="button" class="ztab" data-z="'+esc(z)+'" aria-pressed="'+(z===opZone)+'">'+esc(zk(z))+'<sup>'+L.filter(function(c){return c.kind===z;}).length+'</sup></button>';}).join("");
+  $("zTabs").innerHTML=zones.map(function(z){return '<button type="button" class="ztab" data-z="'+esc(z)+'" aria-pressed="'+(z===opZone)+'">'+esc(zk(z))+'<span class="zn"><i> · </i>'+L.filter(function(c){return c.kind===z;}).length+'</span></button>';}).join("");
   $("zTabs").style.gridTemplateColumns="repeat("+Math.max(1,Math.min(4,zones.length))+",1fr)";
   var inZ=L.filter(function(c){return c.kind===opZone;}).sort(function(a,b){return a.odds-b.odds;}),main=inZ[0],alts=inZ.filter(function(c){return c!==main;});
   // απόφαση Owner 02/11: όλα τα παρολί της ζώνης το ένα κάτω από το άλλο (πρώτα τα πριν τις 17:00, μετά από τη μικρότερη απόδοση)
