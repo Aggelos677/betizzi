@@ -41,7 +41,7 @@ export function apifStats(env) {
       const list = await get(`fixtures?team=${teamId}&last=${n}&status=FT-AET-PEN`);
       return list.map((f) => {
         const home = f.teams.home.id === teamId;
-        return { id: f.fixture.id, ts: f.fixture.timestamp, is_home: home ? 1 : 0,
+        return { id: f.fixture.id, ts: f.fixture.timestamp, is_home: home ? 1 : 0, opp: (home ? f.teams.away.name : f.teams.home.name) || null,
           gf: home ? f.goals.home : f.goals.away, ga: home ? f.goals.away : f.goals.home,
           ht_gf: home ? f.score.halftime.home : f.score.halftime.away, ht_ga: home ? f.score.halftime.away : f.score.halftime.home };
       });
