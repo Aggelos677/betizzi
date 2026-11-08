@@ -1218,7 +1218,8 @@ function izzClient() {
     frag(b).then(function (h) { if (!h) { b.dataset.l = ""; b.innerHTML = ""; return; } if (document.getElementById("mzcss")) h = h.replace(/<style id="mzcss">[\s\S]*?<\/style>/, ""); b.innerHTML = h; }); }, true);
   if (document.readyState === "complete") setTimeout(data, 300); else window.addEventListener("load", function () { setTimeout(data, 300); });
 }
-const IZZ_JS = "(" + izzClient.toString() + ")();";
+// 08/11: το build του Cloudflare (esbuild, keepNames) βάζει μέσα στη συνάρτηση κλήσεις __name(...)· στον browser δεν υπάρχει → μικρό shim
+const IZZ_JS = "(function(){var __name=function(f){return f;};(" + izzClient.toString() + ")();})();";
 async function streaksPage(env, lang) {
   const S = STK[lang], t = T[lang], tz = TZ[lang], today = ymdIn(DAYTZ);
   const data = await getStreaks(env);
