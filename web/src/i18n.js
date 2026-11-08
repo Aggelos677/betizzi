@@ -26,6 +26,7 @@ export const T = {
     W: "W",
     D: "D",
     L: "L",
+    fHome: "home", fAway: "away", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} vs {a} ({lg}) kicks off on {d} at {t}. {tip} Model: home {p1}%, draw {px}%, away {p2}%, Over 2.5 {o}%. Likely score {s}.",
     mTip: "Tip: {sel} at {pr}.",
     name: "English", title: "Football predictions today", desc: "Free football tips for today, with stats and odds. Free and VIP tips, ready-made parlays every day, likely scores and a public record. 18+.",
@@ -54,6 +55,7 @@ export const T = {
     W: "Ν",
     D: "Ι",
     L: "Η",
+    fHome: "εντός", fAway: "εκτός", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) παίζεται στις {d}, ώρα {t}. {tip} Μοντέλο: άσσος {p1}%, Χ {px}%, διπλό {p2}%, Over 2.5 {o}%. Πιθανό σκορ {s}.",
     mTip: "Tip: {sel} σε απόδοση {pr}.",
     name: "Ελληνικά", title: "Προγνωστικά ποδοσφαίρου σήμερα", desc: "Δωρεάν προγνωστικά ποδοσφαίρου για σήμερα με στατιστικά και αποδόσεις. Free και VIP tips, έτοιμα παρολί κάθε μέρα, πιθανό σκορ και δημόσιο ιστορικό. 18+.",
@@ -82,6 +84,7 @@ export const T = {
     W: "G",
     D: "E",
     L: "P",
+    fHome: "local", fAway: "visitante", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} vs {a} ({lg}) se juega el {d} a las {t}. {tip} Modelo: local {p1}%, empate {px}%, visitante {p2}%, Over 2.5 {o}%. Marcador probable {s}.",
     mTip: "Tip: {sel} a cuota {pr}.",
     name: "Español", title: "Pronósticos de fútbol hoy", desc: "Pronósticos de fútbol gratis para hoy con estadísticas y cuotas. Tips gratis y VIP, combinadas listas cada día, marcador probable e historial público. 18+.",
@@ -110,6 +113,7 @@ export const T = {
     W: "V",
     D: "E",
     L: "D",
+    fHome: "em casa", fAway: "fora", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} x {a} ({lg}) será em {d} às {t}. {tip} Modelo: mandante {p1}%, empate {px}%, visitante {p2}%, Over 2.5 {o}%. Placar provável {s}.",
     mTip: "Palpite: {sel} com odd {pr}.",
     name: "Português", title: "Palpites de futebol hoje", desc: "Palpites de futebol grátis para hoje com estatísticas e odds. Palpites grátis e VIP, múltiplas prontas todos os dias, placar provável e histórico público. 18+.",
@@ -138,6 +142,7 @@ export const T = {
     W: "V",
     D: "N",
     L: "D",
+    fHome: "domicile", fAway: "extérieur", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) se joue le {d} à {t}. {tip} Modèle : domicile {p1} %, nul {px} %, extérieur {p2} %, Over 2.5 {o} %. Score probable {s}.",
     mTip: "Tip : {sel} à {pr}.",
     name: "Français", title: "Pronostics foot aujourd'hui", desc: "Pronostics foot gratuits du jour avec statistiques et cotes. Tips Free et VIP, combinés prêts chaque jour, score probable et historique public. 18+.",
@@ -166,6 +171,7 @@ export const T = {
     W: "S",
     D: "U",
     L: "N",
+    fHome: "heim", fAway: "auswärts", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) wird am {d} um {t} angepfiffen. {tip} Modell: Heim {p1} %, Remis {px} %, Gast {p2} %, Over 2.5 {o} %. Wahrscheinliches Ergebnis {s}.",
     mTip: "Tipp: {sel} zur Quote {pr}.",
     name: "Deutsch", title: "Fußball-Tipps heute", desc: "Kostenlose Fußball-Tipps für heute mit Statistiken und Quoten. Gratis- und VIP-Tipps, fertige Kombis jeden Tag, wahrscheinliches Ergebnis und öffentliche Bilanz. 18+.",
@@ -194,6 +200,7 @@ export const T = {
     W: "V",
     D: "E",
     L: "Î",
+    fHome: "acasă", fAway: "deplasare", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) se joacă pe {d}, ora {t}. {tip} Model: gazde {p1}%, egal {px}%, oaspeți {p2}%, Over 2.5 {o}%. Scor probabil {s}.",
     mTip: "Pont: {sel} la cota {pr}.",
     name: "Română", title: "Ponturi fotbal azi", desc: "Ponturi fotbal gratuite pentru azi, cu statistici și cote. Ponturi Free și VIP, bilete gata făcute zilnic, scor probabil și istoric public. 18+.",
@@ -222,6 +229,7 @@ export const T = {
     W: "P",
     D: "N",
     L: "I",
+    fHome: "kod kuće", fAway: "u gostima", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) igra se {d} u {t}. {tip} Model: domaćin {p1}%, nerešeno {px}%, gost {p2}%, Over 2.5 {o}%. Verovatan rezultat {s}.",
     mTip: "Tip: {sel} po kvoti {pr}.",
     name: "Srpski", title: "Fudbalske prognoze danas", desc: "Besplatne fudbalske prognoze za danas sa statistikom i kvotama. Besplatni i VIP tipovi, gotovi tiketi svaki dan, verovatan rezultat i javna istorija. 18+.",
@@ -250,6 +258,7 @@ export const T = {
     W: "П",
     D: "Р",
     L: "З",
+    fHome: "домакин", fAway: "гост", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) се играе на {d} от {t}. {tip} Модел: домакин {p1}%, равен {px}%, гост {p2}%, Over 2.5 {o}%. Вероятен резултат {s}.",
     mTip: "Прогноза: {sel} при коефициент {pr}.",
     name: "Български", title: "Футболни прогнози днес", desc: "Безплатни футболни прогнози за днес със статистика и коефициенти. Free и VIP прогнози, готови комбинации всеки ден, вероятен резултат и публична история. 18+.",

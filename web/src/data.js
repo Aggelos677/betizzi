@@ -32,7 +32,7 @@ export async function getMatch(env, id) {
   const d = await r.json();
   if (d.error) return null;
   const f = d.fixture;
-  const form = (list) => list.map((g) => ({ ts: g.ts, home: !!g.is_home, gf: g.gf, ga: g.ga, res: g.gf > g.ga ? "W" : g.gf < g.ga ? "L" : "D" }));
+  const form = (list) => list.map((g) => ({ ts: g.ts, home: !!g.is_home, opp: g.opp || "", gf: g.gf, ga: g.ga, res: g.gf > g.ga ? "W" : g.gf < g.ga ? "L" : "D" }));
   return {
     id: f.id, ts: f.ts, status: f.status, minute: f.elapsed, score: f.gh == null ? null : [f.gh, f.ga], round: f.round || "",
     league: { id: f.league_id, name: f.league, country: f.country },
