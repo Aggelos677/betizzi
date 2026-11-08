@@ -244,9 +244,11 @@ const handle = async (req, env, ctx) => {
     if (pr && LANGS.includes(pr[1]) && LANGS.some((l) => STK[l].slug === pr[2] || STK[l].oldSlug === pr[2])) {
       const lang = pr[1];
       if (STK[lang].slug !== pr[2]) return Response.redirect(url.origin + stkPath(lang), 301);
-      const key = "stk|" + lang;
+      // 08/11: η έκδοση του κώδικα μέσα στο κλειδί → μετά από κάθε αλλαγή η σελίδα ξαναφτιάχνεται αμέσως (όχι η παλιά για 5–30΄)
+      STKV ||= h32(String(streaksPage) + SCSS + IZZ_JS + String(izziFrag)).toString(36);
+      const key = "stk|" + lang + "|" + STKV;
       // 06/11 (QA): εκτός από τη μνήμη του isolate, και στη μνήμη του Cloudflare (κοινή), ώστε το πρώτο άνοιγμα να μην αργεί 2–4΄΄
-      const eck = new Request("https://betizzi.com/__stk/" + lang);
+      const eck = new Request("https://betizzi.com/__stk/" + lang + "/" + STKV);
       if (!PAGES.get(key)) { const m = await caches.default.match(eck).catch(() => null); if (m) PAGES.set(key, { t: +(m.headers.get("x-built") || 0), b: await m.text() }); }
       const hit = PAGES.get(key), age = hit ? Date.now() - hit.t : Infinity;
       const build = () => streaksPage(env, lang).then((b) => { const t = Date.now(); PAGES.set(key, { t, b });
@@ -1176,6 +1178,7 @@ h1{font:800 28px/1.1 "Fira Sans Extra Condensed",sans-serif;margin:4px 0 8px;tex
   return `<style>.izz{--c1:#141a16;--c2:#1b231e;--ln:#2a352e;--tx:#eef3ee;--mu:#9aa89f;--lime:#b6f23a;--bg:#0c0f0d}${css}</style><div class="izz"><div class="doc">${m}</div></div>`;
 }
 // 08/11: όταν ανοίγει μια γραμμή του Izzistats, φορτώνει τον αγώνα από κάτω (ίδιος κώδικας και μέσα στην εφαρμογή, prototype.html)
+let STKV = "";
 const IZZ_JS = `document.addEventListener("toggle",function(e){var d=e.target;if(!d||!d.open||!d.querySelector)return;var b=d.querySelector(".mzb");if(!b||b.dataset.l)return;b.dataset.l=1;b.innerHTML='<span class="ld">…</span>';
 fetch(b.dataset.u+"?frag=1").then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(h){if(document.getElementById("mzcss"))h=h.replace(/<style id="mzcss">[\\s\\S]*?<\\/style>/,"");b.innerHTML=h;}).catch(function(){b.dataset.l="";b.innerHTML="";});},true);`;
 async function streaksPage(env, lang) {
