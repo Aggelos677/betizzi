@@ -1140,6 +1140,16 @@ const SCSS = `
 .lk .nx .od{background:var(--lime);border-color:var(--lime);color:#0c0f0d}.lk .nx .od small{color:#2b3a0c!important}
 .lkt{display:none}.lk .lkt{display:block;order:3;flex-basis:100%;color:var(--lime);font-size:12px;font-weight:700}.lk .nx{flex-wrap:wrap}
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
+.sl details>summary{list-style:none;cursor:pointer}.sl details>summary::-webkit-details-marker{display:none}
+.nx .cv{color:var(--mu);font-size:14px;transition:transform .15s}.sl details[open] .nx .cv{transform:rotate(180deg)}
+.gx{margin:10px 0 0}.gxh{margin:0 0 6px;color:var(--mu);font-size:12px}.gs{display:flex;gap:3px;flex-wrap:wrap;padding:30px 0 6px;margin-top:-30px}
+.gs .g{position:relative;min-width:44px;height:26px;padding:0 4px;border-radius:6px;display:grid;place-items:center;font:700 12px "JetBrains Mono",monospace;color:#0c0f0d;cursor:default}
+.gs .g i{font-style:normal}.gs .g u{display:none;text-decoration:none;font:800 13px Manrope,sans-serif}.gs .g.h{box-shadow:0 3px 0 #e9f2ec}
+.gs .y,.gs .W{background:#3ccf6e}.gs .n,.gs .L{background:#ff6b6b}.gs .D{background:#ffb547}
+.gs .g:hover::before,.gs .g:focus::before{content:attr(aria-label);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#1b231e;color:#e9f2ec;border:1px solid #2a352e;border-radius:6px;padding:4px 8px;font:600 12px Manrope,sans-serif;z-index:5;pointer-events:none}
+.gs .g:focus{outline:none}.gs .g:first-child::before{left:0;transform:none}.gs .g:last-child::before{left:auto;right:0;transform:none}
+.full{display:inline-block;margin:8px 0 2px;color:var(--lime)!important;font-weight:700;font-size:13px;text-decoration:none;min-height:32px;line-height:32px}
+@media (max-width:600px){.gs .g{min-width:26px;padding:0}.gs .g i{display:none}.gs .g u{display:inline}}
 `;
 // Κομμάτι για την καρτέλα της εφαρμογής: το <main> χωρίς breadcrumb και link «εφαρμογή», με CSS μόνο μέσα στο .izz
 function izziFrag(b) {
@@ -1164,6 +1174,13 @@ async function streaksPage(env, lang) {
   const metric = (k, r) => k === "goals" ? [r.avg.toFixed(1), S.u.g, Math.min(1, (r.avg - 2.6) / 1.4)]
     : k === "gg" ? [String(r.run), S.u.gg + ` · ${r.c}/${r.n}`, Math.min(1, r.run / 8)]
     : [`${r.c}/${r.n}`, k === "form" ? S.u.w : k === "home" ? S.u.h : k === "away" ? S.u.a : k === "draws" ? S.u.d : k === "bad" ? S.u.l : "", r.c / r.n];
+  // 08/11 (Owner): κάθε παιχνίδι με το γράμμα της κατηγορίας. Over/πολλά γκολ: O/U · Under: U/O · GG: Y/N · τα υπόλοιπα: Ν/Ι/Η (W/D/L).
+  // ok = «y» όταν το παιχνίδι είναι υπέρ της κατηγορίας (πράσινο), «n» όταν όχι (κόκκινο)· στο Ν/Ι/Η τα συνηθισμένα χρώματα.
+  const mark = (k, g) => { const s = g[0] + g[1];
+    if (k === "over" || k === "goals") return s >= 3 ? ["O", "y"] : ["U", "n"];
+    if (k === "under") return s <= 2 ? ["U", "y"] : ["O", "n"];
+    if (k === "gg") return g[0] > 0 && g[1] > 0 ? ["Y", "y"] : ["N", "n"];
+    const r = g[0] > g[1] ? "W" : g[0] < g[1] ? "L" : "D"; return [t[r], r]; };
   // χρώμα: πιο πράσινο = πιο δυνατό (όπως το FootyStats)
   const sec = (k) => {
     const L = (data.cats && data.cats[k]) || [];
@@ -1176,10 +1193,16 @@ async function streaksPage(env, lang) {
       const look = r.price >= 1.6 && (rate == null || rate - 1 / r.price >= 0.2);
       const run = k !== "gg" && k !== "goals" && r.run >= 3 ? `<span class="run">🔥 ${r.run} ${esc(S.run)}</span>` : "";
       const fm = `<span class="fm" aria-label="${esc(r.form)}">${[...r.form].reverse().map((x) => `<i class="${x}"></i>`).join("")}</span>`;
-      return `<li${look ? ' class="lk"' : ""}><div class="sr"><span class="n">${i + 1}</span><div><b>${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
+      // 08/11 (Owner): πάτημα → ανοίγει προς τα κάτω (όχι νέα σελίδα, για να μη χάνει τη θέση του)· τα παιχνίδια με το «γράμμα» της κατηγορίας
+      const gm = r.games || [];
+      const sq = gm.length ? `<div class="gx"><p class="gxh">${esc(S.lastG.replace("{n}", gm.length))}</p><div class="gs">${[...gm].reverse().map((g) => { const [l, ok] = mark(k, g);
+        const tip = [`${g[0]}-${g[1]}`, g[3] ? `${g[3]} (${g[2] ? t.fHome : t.fAway})` : (g[2] ? t.fHome : t.fAway), g[4] ? new Date(g[4] * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "numeric", timeZone: tz }) : ""].filter(Boolean).join(" · ");
+        return `<span class="g ${ok}${g[2] ? " h" : ""}" tabindex="0" aria-label="${esc(l + " · " + tip)}"><i>${g[0]}-${g[1]}</i><u>${esc(l)}</u></span>`; }).join("")}</div></div>` : "";
+      return `<li${look ? ' class="lk"' : ""}><details><summary><div class="sr"><span class="n">${i + 1}</span><div><b>${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
-        + `<a class="nx" href="${href}"><span><i>${esc(S.nx)}</i><b>${esc(r.fixture.home)} – ${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
-        + (look ? `<span class="lkt">${esc(S.look)}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `</a></li>`;
+        + `<div class="nx"><span><i>${esc(S.nx)}</i><b>${esc(r.fixture.home)} – ${esc(r.fixture.away)}</b> <small>· ${esc(when(r.fixture.ts))}</small></span>`
+        + (look ? `<span class="lkt">${esc(S.look)}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `<span class="cv" aria-hidden="true">▾</span></div></summary>`
+        + sq + `<a class="full" href="${href}">${esc(S.full)}</a></details></li>`;
     }).join("");
     return `<section class="st" id="${k}"><h2>${esc(S.cats[k])} <a class="up" href="#cats" aria-label="${esc(S.catH)}">↑</a></h2><p class="sub">${esc(S.sub[k])}</p>`
       + (rows ? `<ul class="sl">${rows}</ul>` : `<p class="note">${esc(S.none)}</p>`) + `</section>`;
