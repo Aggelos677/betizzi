@@ -506,7 +506,7 @@ export default {
     if (m === 40 && h % 3 === 0) tasks.push(runTips(env));
     if (h === 3 && m === 50) tasks.push(runTips(env));
     if (m % 2 === 0) tasks.push(cacheDays(env));
-    if (m === 20 || m === 50) tasks.push(syncRanks(env)); // 08/11: θέση βαθμολογίας από το BTFStats (όχι API-Football), κάθε 30΄
+    if (h === 4 && m === 20) tasks.push(syncRanks(env)); // 08/11 (Owner): θέση βαθμολογίας από το BTFStats, μία φορά τη μέρα (06:20 Κύπρου, μετά το syncFixtures των 03:05 UTC)
     if (h === 6 && m === 50) tasks.push(makeCoupons(env)); // μετά τα tips των 06:40 UTC
     if (h >= 7 && h < 21 && m % 10 === 5) tasks.push(makeCoupons(env)); // συμπληρώνει όσα παρολί λείπουν (νέα tips)
     if (m % 10 === 8) tasks.push(ensureCoupons(env)); // 06/11: πάντα το ελάχιστο ενεργών παρολί (αλλιώς τα πρώτα της αύριο)
