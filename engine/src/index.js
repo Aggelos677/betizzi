@@ -364,7 +364,15 @@ function scoreModel(o, tips) {
     "1": i > j, X: i === j, "2": i < j, "1X": i >= j, X2: i <= j, "12": i !== j,
     O15: i + j > 1, O25: i + j > 2, O35: i + j > 3, U25: i + j < 3, U35: i + j < 4, GG: i > 0 && j > 0, NG: i === 0 || j === 0,
   })[t.sel] !== false);
-  const best = g.filter(ok).sort((a, b) => b[2] - a[2])[0] || g.sort((a, b) => b[2] - a[2])[0];
+  // ΚΑΝΟΝΑΣ ΣΚΟΡ (απόφαση Owner 08/11/2026 — ΔΕΝ αλλάζει χωρίς έγκριση Owner, βλ. CLAUDE.md «Πιθανό σκορ»):
+  // όχι απλά το πιο πιθανό σκορ (έβγαζε 1-1 στο ~55%). Πρώτα ποιος κερδίζει κατά την αγορά (ισοπαλία μόνο σε ισορροπημένο ματς),
+  // μετά πόσα γκολ (Over 2.5 ≥55% → 3+ γκολ, ≤45% → έως 2), και μέσα σε αυτά το πιο πιθανό σκορ. Πάντα συμβατό με τα tips του αγώνα.
+  const fav = Math.max(p1, p2), res = fav - px < 0.04 || Math.abs(p1 - p2) < 0.06 ? "X" : p1 >= p2 ? "1" : "2";
+  const pOv = pO ?? over(g);
+  const R = ([i, j]) => (res === "1" ? i > j : res === "2" ? i < j : i === j);
+  const T = ([i, j]) => (pOv >= 0.55 ? i + j >= 3 : pOv <= 0.45 ? i + j <= 2 : true);
+  const by = (f) => g.filter(f).sort((a, b) => b[2] - a[2])[0];
+  const best = by((c) => ok(c) && R(c) && T(c)) || by((c) => ok(c) && R(c)) || by(ok) || g.slice().sort((a, b) => b[2] - a[2])[0];
   return { p1, px, p2, over25: pO ?? over(g), score: [best[0], best[1]] };
 }
 
