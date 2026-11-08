@@ -1151,8 +1151,8 @@ const SCSS = `
 .lkt{display:none}.lk .lkt{display:block;order:3;flex-basis:100%;color:var(--lime);font-size:12px;font-weight:700}.lk .nx{flex-wrap:wrap}
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
 .mo{display:block;width:100%;margin:10px 0 0;min-height:44px;border:1px solid var(--ln);border-radius:12px;background:var(--c2);color:var(--tx);font:700 14px Manrope,sans-serif;cursor:pointer}
-@media (max-width:767px){.sl li.x{display:none}.st.all .sl li.x{display:block}.st.all .mo{display:none}} /* 08/11 Owner: κινητό, 5 πρώτες ανοιχτές */
-@media (min-width:768px){.mo{display:none}.izt .st{display:none}.izt .st.on{display:block}.izt .grid9 a.on{border-color:#e9f2ec!important;background:#e9f2ec;color:#0c0f0d!important;font-weight:800}.izt .up{display:none}} /* 08/11 Owner: PC, tabs */
+@media (max-width:767px){.sl li.x{display:none}.st.all .sl li.x{display:block}.st.all .mo{display:none}.st h2{position:sticky;top:var(--stt,51px);z-index:1;background:var(--c2);border:1px solid var(--ln);border-radius:10px;padding:9px 12px;margin:28px 0 6px;font-size:18px;box-shadow:0 6px 12px rgba(0,0,0,.35)}.st .sub{padding:0 2px}} /* 08/11 Owner: κινητό, 5 πρώτες ανοιχτές */
+@media (min-width:768px){.mo{display:none}.izt .st{display:none}.izt .st.on{display:block}.izt .grid9 a.on{border-color:#e9f2ec!important;background:rgba(233,242,236,.12);color:#fff!important}.izt .up{display:none}} /* 08/11 Owner: PC, tabs */
 .sl details>summary{list-style:none;cursor:pointer}.sl details>summary::-webkit-details-marker{display:none}
 .nx .cv{color:var(--mu);font-size:14px;transition:transform .15s}.sl details[open] .nx .cv{transform:rotate(180deg)}
 .gx{margin:10px 0 0}.gxt{margin:18px 0 8px;font-size:15px;line-height:1.3}.gx>.gxt:first-child{margin-top:12px}.gxt b{font-weight:600;color:#cfd8d1}.gxt.me b{font-weight:800;color:var(--tx)}.gxt small{color:var(--mu);font-size:12px;margin-left:6px} /* 08/11 Owner: μεγαλύτερα ονόματα, πιο πολύς αέρας */.rkp{display:inline-block;min-width:18px;padding:0 4px;border-radius:5px;background:rgba(126,190,255,.14);color:#8fc7ff;font:700 11px/16px "JetBrains Mono",monospace;text-align:center;vertical-align:1px;margin-right:4px}.gs{display:flex;gap:4px;flex-wrap:wrap;padding:0 0 6px}
@@ -1187,7 +1187,7 @@ h1{font:800 28px/1.1 "Fira Sans Extra Condensed",sans-serif;margin:4px 0 8px;tex
 .how,.note{color:var(--mu);font-size:13px}a{color:inherit}.soon{border:0;border-radius:0;padding:0}.sub{display:block}`)
     .replace(/([^{}]+)\{/g, (_, sel) => sel.split(",").map((x) => (x.trim().startsWith("@") ? x : ".izz " + x.trim())).join(",") + "{")
     .replace(/\.izz @media/g, "@media");
-  return `<style>.izz{--c1:#141a16;--c2:#1b231e;--ln:#2a352e;--tx:#eef3ee;--mu:#9aa89f;--lime:#b6f23a;--bg:#0c0f0d}${css}</style><div class="izz"><div class="doc">${m}</div></div>`;
+  return `<style>.izz{--stt:0px;--c1:#141a16;--c2:#1b231e;--ln:#2a352e;--tx:#eef3ee;--mu:#9aa89f;--lime:#b6f23a;--bg:#0c0f0d}${css}</style><div class="izz"><div class="doc">${m}</div></div>`;
 }
 // 08/11: όταν ανοίγει μια γραμμή του Izzistats, φορτώνει τον αγώνα από κάτω (ίδιος κώδικας και μέσα στην εφαρμογή, prototype.html)
 let STKV = "";
