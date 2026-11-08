@@ -1152,7 +1152,7 @@ const SCSS = `
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
 .mo{display:block;width:100%;margin:10px 0 0;min-height:44px;border:1px solid var(--ln);border-radius:12px;background:var(--c2);color:var(--tx);font:700 14px Manrope,sans-serif;cursor:pointer}
 @media (max-width:767px){.sl li.x{display:none}.st.all .sl li.x{display:block}.st.all .mo{display:none}} /* 08/11 Owner: κινητό, 5 πρώτες ανοιχτές */
-@media (min-width:768px){.mo{display:none}.izt .st{display:none}.izt .st.on{display:block}.izt .grid9 a.on{border-color:#e9f2ec;background:var(--c2);color:#fff;box-shadow:inset 0 0 0 1px #e9f2ec}.izt .up{display:none}} /* 08/11 Owner: PC, tabs */
+@media (min-width:768px){.mo{display:none}.izt .st{display:none}.izt .st.on{display:block}.izt .grid9 a.on{border-color:#e9f2ec!important;background:#e9f2ec;color:#0c0f0d!important;font-weight:800}.izt .up{display:none}} /* 08/11 Owner: PC, tabs */
 .sl details>summary{list-style:none;cursor:pointer}.sl details>summary::-webkit-details-marker{display:none}
 .nx .cv{color:var(--mu);font-size:14px;transition:transform .15s}.sl details[open] .nx .cv{transform:rotate(180deg)}
 .gx{margin:10px 0 0}.gxt{margin:18px 0 8px;font-size:15px;line-height:1.3}.gx>.gxt:first-child{margin-top:12px}.gxt b{font-weight:600;color:#cfd8d1}.gxt.me b{font-weight:800;color:var(--tx)}.gxt small{color:var(--mu);font-size:12px;margin-left:6px} /* 08/11 Owner: μεγαλύτερα ονόματα, πιο πολύς αέρας */.rkp{display:inline-block;min-width:18px;padding:0 4px;border-radius:5px;background:rgba(126,190,255,.14);color:#8fc7ff;font:700 11px/16px "JetBrains Mono",monospace;text-align:center;vertical-align:1px;margin-right:4px}.gs{display:flex;gap:4px;flex-wrap:wrap;padding:0 0 6px}
