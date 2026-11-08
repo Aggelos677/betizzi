@@ -1568,7 +1568,7 @@ function renderClose(){var box=$("closeBox");if(!box)return;var it=[],now=Date.n
     it.push({m:m,t:t,s:s,k:k});});});
   var BL=(typeof BZC!=="undefined"&&BZC)||[];
   BL.forEach(function(c){var k="cp"+c.n,s=cpWon(c)?"won":"wait";
-    if(s==="won"&&CLPREV[k]&&CLPREV[k]!=="won"&&!WONAT[k]){WONAT[k]=now;fresh.push(k);setTimeout(function(){couponBig(c);},400);}
+    if(s==="won"&&CLPREV[k]&&CLPREV[k]!=="won"&&!WONAT[k]){WONAT[k]=now;fresh.push(k);/* απόφαση Owner 08/11: πανηγύρι σε όλη την οθόνη μόνο για παρολί x8+ · τα μικρότερα μόνο στο «Πάμε ταμείο!» */if(cpX(c)>=8)setTimeout(function(){couponBig(c);},400);}
     CLPREV[k]=s;
     if(s==="won"&&WONAT[k]&&now-WONAT[k]<120000)it.push({cp:c,s:"won",k:k});});
   if(!it.length){box.hidden=true;return;}
@@ -1906,7 +1906,7 @@ function calledBig(m){
   setTimeout(function(){o.remove();document.body.classList.remove("cshake");},3000);
 }
 function calledIt(m){
-  calledBig(m);
+  /* απόφαση Owner 08/11: το σωστό σκορ ΔΕΝ ανοίγει πανηγύρι σε όλη την οθόνη· μόνο σφραγίδα «🎯» στη γραμμή του αγώνα */
   var row=document.querySelector('details.mrow[data-mid="'+m.id+'"]');if(!row)return;
   var sc=row.querySelector(".r-score");if(!sc)return;
   fanfare();
