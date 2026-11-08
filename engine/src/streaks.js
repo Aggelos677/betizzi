@@ -34,8 +34,8 @@ const CATS = {
 
 export async function apiStreaks(env, leagueIds, top = 15) {
   const LID = await leagueIds(env);
-  const fx = (await env.DB.prepare(`SELECT f.id, f.ts, f.league_id, f.home_id, f.away_id, h.name home, a.name away, l.name league, l.country
-      FROM fixtures f JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id JOIN leagues l ON l.id=f.league_id
+  const fx = (await env.DB.prepare(`SELECT f.id, f.ts, f.league_id, f.home_id, f.away_id, h.name home, a.name away, l.name league, l.country, rk.h hr, rk.a ar
+      FROM fixtures f JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id JOIN leagues l ON l.id=f.league_id LEFT JOIN rank rk ON rk.fixture_id=f.id
       WHERE f.ts BETWEEN ? AND ? AND f.status IN ('NS','TBD') ORDER BY f.ts`).bind(now() + 5 * 60, athEndTomorrow()).all()).results
     .filter((f) => LID.has(f.league_id) && !NOT_FIRST_TEAM.test(f.home) && !NOT_FIRST_TEAM.test(f.away));
   // ο πρώτος επόμενος αγώνας κάθε ομάδας
@@ -73,7 +73,8 @@ export async function apiStreaks(env, leagueIds, top = 15) {
         // 08/11 (Owner): και ο αντίπαλος, με τον ίδιο κανόνα (στις κατηγορίες έδρας: τα παιχνίδια του στη δική του πλευρά)
         oppGames: (() => { const op = (res[home ? f.away_id : f.home_id] || []).filter((r) => r.ts < f.ts);
           return (C.only ? op.filter((r) => (home ? !r.is_home : r.is_home)).slice(0, 5) : op.slice(0, 10)).map((x) => [x.gf, x.ga, x.is_home, x.opp || "", x.ts]); })(),
-        fixture: { id: f.id, ts: f.ts, home: f.home, away: f.away }, sel, price: (odds[f.id] || {})[sel] || null });
+        // 08/11: θέσεις βαθμολογίας (BTFStats)
+        fixture: { id: f.id, ts: f.ts, home: f.home, away: f.away, hr: f.hr || null, ar: f.ar || null }, sel, price: (odds[f.id] || {})[sel] || null });
     }
     // 08/11 (Owner): σε κάθε κατηγορία πρώτα η δύναμη (10/10, 9/10…), και μέσα στην ίδια δύναμη από τη ΜΕΓΑΛΥΤΕΡΗ απόδοση (χωρίς τιμή στο τέλος)
     rows.sort((a, b) => (b.key ?? b.c) - (a.key ?? a.c) || (b.price || 0) - (a.price || 0) || b.run - a.run || a.fixture.ts - b.fixture.ts);

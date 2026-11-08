@@ -5,6 +5,7 @@ import { makeStrong, apiStrong, strongKeys } from "./strong.js";
 import { aiStrong } from "./ai.js";
 import { makeCoupons, ensureCoupons, apiCoupons, parlayRecord } from "./coupons.js";
 import { apiStreaks } from "./streaks.js";
+import { syncRanks } from "./adapters/ranks-btf.js";
 import { authStart, authVerify, authMe, authLogout, authVip, authApp, userFrom } from "./auth.js";
 import { tgPoll, tgJoin, tgExpire, tgPostStrong, tgStatus } from "./tg.js";
 import { hit, isAdmin, aToday, aUsers, aUserAct, aExport, aPartners, aPartnerSave, aHealth, aAudit, aLeagues, aLeagueSave, aMkt } from "./admin.js";
@@ -224,8 +225,8 @@ async function apiDay(env, date) {
   const from = Math.floor(Date.parse(date + "T00:00:00Z") / 1000) - 3 * 3600;
   const to = from + DAY + 6 * 3600; // καλύπτει ζώνες ώρας από UTC−3 έως UTC+3
   const fx = await env.DB.prepare(`SELECT f.*, l.name league, l.country, l.type ltype, l.tier,
-      h.name home, h.logo home_logo, a.name away, a.logo away_logo
-      FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id
+      h.name home, h.logo home_logo, a.name away, a.logo away_logo, rk.h home_rank, rk.a away_rank, rk.n nteams
+      FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id LEFT JOIN rank rk ON rk.fixture_id=f.id
       WHERE f.ts BETWEEN ? AND ? ORDER BY l.tier, l.country, f.ts`).bind(from, to).all();
   const tips = await env.DB.prepare(`SELECT t.* FROM tips t JOIN fixtures f ON f.id=t.fixture_id WHERE f.ts BETWEEN ? AND ? ORDER BY t.rowid`).bind(from, to).all();
   // μόνο οι λίγκες που διάλεξε ο Owner (data/leagues.json, 01/11: 135)
@@ -294,8 +295,8 @@ async function apiRecord(env) {
 }
 
 async function apiMatch(env, id) {
-  const f = await env.DB.prepare(`SELECT f.*, l.name league, l.country, h.name home, h.logo home_logo, a.name away, a.logo away_logo
-    FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id WHERE f.id=?`).bind(id).first();
+  const f = await env.DB.prepare(`SELECT f.*, l.name league, l.country, h.name home, h.logo home_logo, a.name away, a.logo away_logo, rk.h home_rank, rk.a away_rank, rk.n nteams
+    FROM fixtures f JOIN leagues l ON l.id=f.league_id JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id LEFT JOIN rank rk ON rk.fixture_id=f.id WHERE f.id=?`).bind(id).first();
   if (!f) return { error: "not found" };
   // «Τα δυνατά της ημέρας»: τα VIP τους είναι ανοιχτά για όλους (απόφαση Owner 03/11)
   const sk = await strongKeys(env, new Date(f.ts * 1000).toISOString().slice(0, 10));
@@ -505,6 +506,7 @@ export default {
     if (m === 40 && h % 3 === 0) tasks.push(runTips(env));
     if (h === 3 && m === 50) tasks.push(runTips(env));
     if (m % 2 === 0) tasks.push(cacheDays(env));
+    if (m === 20 || m === 50) tasks.push(syncRanks(env)); // 08/11: θέση βαθμολογίας από το BTFStats (όχι API-Football), κάθε 30΄
     if (h === 6 && m === 50) tasks.push(makeCoupons(env)); // μετά τα tips των 06:40 UTC
     if (h >= 7 && h < 21 && m % 10 === 5) tasks.push(makeCoupons(env)); // συμπληρώνει όσα παρολί λείπουν (νέα tips)
     if (m % 10 === 8) tasks.push(ensureCoupons(env)); // 06/11: πάντα το ελάχιστο ενεργών παρολί (αλλιώς τα πρώτα της αύριο)
