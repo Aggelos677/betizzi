@@ -57,7 +57,7 @@ table{width:100%;border-collapse:collapse;font:500 14px "JetBrains Mono",monospa
 @media (max-width:480px){.fm span{min-width:18px}.fm span i{display:none}.fm span u{display:inline}}
 .fleg{font-size:12px;color:var(--mut,#9aa59e);margin:6px 0 0}
 .fm .W{background:#3ccf6e}.fm .D{background:#ffb547}.fm .L{background:#ff6b6b}
-.rkp{color:var(--mu);font-weight:600} /* 08/11 Owner: θέση βαθμολογίας μπροστά από το όνομα */
+.rkp{display:inline-block;min-width:18px;padding:0 4px;border-radius:5px;background:rgba(126,190,255,.14);color:#8fc7ff;font:700 11px/16px "JetBrains Mono",monospace;text-align:center;vertical-align:1px;margin-right:4px} /* 08/11 Owner: θέση βαθμολογίας μπροστά από το όνομα, σε γαλάζιο κουτάκι (εκτός παλέτας lime/πορτοκαλί/πράσινο/κόκκινο/χρυσό) */
 .fl a{margin:0 6px;white-space:nowrap}
 .doc h2{margin-top:22px}.doc p,.doc li{color:#cfd8d1;line-height:1.6}.doc ul{list-style:disc;padding-left:20px}.doc li{margin:4px 0}.doc a{color:var(--lime)}
 .recl{text-align:center;margin:10px 0}.recl a{color:var(--lime);font-weight:700;text-decoration:none}
@@ -1151,7 +1151,7 @@ const SCSS = `
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
 .sl details>summary{list-style:none;cursor:pointer}.sl details>summary::-webkit-details-marker{display:none}
 .nx .cv{color:var(--mu);font-size:14px;transition:transform .15s}.sl details[open] .nx .cv{transform:rotate(180deg)}
-.gx{margin:10px 0 0}.gxt{margin:10px 0 4px;font-size:13px}.gxt b{font-weight:700}.gxt small{color:var(--mu);font-size:11px;margin-left:4px}.rkp{color:var(--mu);font-weight:600}.gs{display:flex;gap:3px;flex-wrap:wrap;padding:30px 0 6px;margin-top:-30px}
+.gx{margin:10px 0 0}.gxt{margin:10px 0 4px;font-size:13px}.gxt b{font-weight:700}.gxt small{color:var(--mu);font-size:11px;margin-left:4px}.rkp{display:inline-block;min-width:18px;padding:0 4px;border-radius:5px;background:rgba(126,190,255,.14);color:#8fc7ff;font:700 11px/16px "JetBrains Mono",monospace;text-align:center;vertical-align:1px;margin-right:4px}.gs{display:flex;gap:3px;flex-wrap:wrap;padding:30px 0 6px;margin-top:-30px}
 .gs .g{position:relative;min-width:44px;height:26px;padding:0 4px;border-radius:6px;display:grid;place-items:center;font:700 12px "JetBrains Mono",monospace;color:#0c0f0d;cursor:default}
 .gs .g i{font-style:normal}.gs .g u{display:none;text-decoration:none;font:800 13px Manrope,sans-serif}.gs .g.h{box-shadow:0 3px 0 #e9f2ec}
 .gs .y,.gs .W{background:#3ccf6e}.gs .n,.gs .L{background:#ff6b6b}.gs .D{background:#ffb547}
