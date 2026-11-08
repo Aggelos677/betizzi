@@ -1529,6 +1529,27 @@ function cpWon(c){return c.result===1||(c.legs.length>0&&c.legs.every(legWon));}
 /* αναβολή = void (1.00): η απόδοση που πληρώνεται είναι το odds_now του server */
 function cpX(c){return c.odds_now||c.odds;}
 function cpVoid(l){return l.result===2;}
+/* 08/11 (Owner: «το share δεν δουλεύει»): το ↗ του παρολί. Κινητό → το share του κινητού· PC (ή αν αποτύχει) → κουτί με
+   WhatsApp / Telegram / Facebook / X / Αντιγραφή. Το link πάει στη σελίδα «Παρολί σήμερα» της γλώσσας (όχι στο location.href). */
+var PSLUG={en:"accumulator-tips-today",el:"paroli-simera",es:"combinadas-hoy",pt:"apostas-multiplas-hoje",fr:"combines-du-jour",de:"kombiwetten-heute",ro:"biletul-zilei",sr:"tiket-dana",bg:"fish-za-dnes"};
+function shareParlay(c){
+  var lg=(location.pathname.split("/")[1]||"en"),url="https://betizzi.com/"+lg+"/"+(PSLUG[lg]||PSLUG.en);
+  var txt="betizzi x"+fx2(cpX(c))+" · "+c.legs.map(function(l){return (l.home||"")+"–"+(l.away||"")+" "+(BZC_SEL[l.sel]||l.sel);}).join(" · ");
+  function box(){var ov=document.createElement("div");ov.className="sharebox";var e=encodeURIComponent;
+    ov.innerHTML='<div class="sharebox-in"><p style="margin:0 0 10px;font-weight:800"><span>Share this parlay</span></p><div class="sharebtns">'
+      +'<a class="btn sec" target="_blank" rel="noopener" href="https://wa.me/?text='+e(txt+" "+url)+'">WhatsApp</a>'
+      +'<a class="btn sec" target="_blank" rel="noopener" href="https://t.me/share/url?url='+e(url)+'&text='+e(txt)+'">Telegram</a>'
+      +'<a class="btn sec" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u='+e(url)+'">Facebook</a>'
+      +'<a class="btn sec" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text='+e(txt)+'&url='+e(url)+'">X</a>'
+      +'<button type="button" class="btn" data-cp="1"><span>Copy link</span></button><button type="button" class="btn quiet" data-x="1"><span>Close</span></button></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener("click",function(ev){var t=ev.target.closest("button,a")||ev.target;
+      if(t.dataset&&t.dataset.cp){var done=function(){toast("Link copied");};try{navigator.clipboard.writeText(txt+" "+url).then(done,function(){prompt("",txt+" "+url);});}catch(er){prompt("",txt+" "+url);}return;}
+      if(ev.target===ov||(t.dataset&&t.dataset.x))ov.remove();});}
+  var touch=matchMedia("(pointer:coarse)").matches;
+  if(touch&&navigator.share){navigator.share({title:"betizzi",text:txt,url:url}).catch(function(er){if(er&&er.name!=="AbortError")box();});return;}
+  box();
+}
 function shareBz(c){var txt="🏆 betizzi "+zk(c.kind)+" x"+cpX(c).toFixed(2)+" WINNER! ",url="https://betizzi.com";
   if(navigator.share){navigator.share({text:txt,url:url}).catch(function(){});return;}
   var ov=document.createElement("div");ov.className="sharebox";
@@ -2281,8 +2302,7 @@ function renderPicks(){
   Array.prototype.forEach.call($("zMain").querySelectorAll("[data-bztrk]"),function(b){b.addEventListener("click",function(){var c=L.filter(function(x){return String(x.n)===b.dataset.bztrk;})[0];if(!c)return;
     var keys=c.legs.map(function(l){return l.fixture_id+":"+l.sel;}).filter(function(k){return SEL[k];});if(!keys.length||tracked(keys))return;saveCoupon(keys,stake);toast("Added to My coupons");renderPicks();});});
   Array.prototype.forEach.call($("zMain").querySelectorAll("[data-bzsh]"),function(b){b.addEventListener("click",function(){var c=L.filter(function(x){return String(x.n)===b.dataset.bzsh;})[0];if(!c)return;
-    var txt="betizzi "+zk(c.kind)+" x"+fx2(c.odds)+": "+c.legs.map(function(l){return (l.home||"")+"–"+(l.away||"")+" "+(BZC_SEL[l.sel]||l.sel)+" "+(l.price?fx2(l.price):"");}).join(" · ");
-    if(navigator.share)navigator.share({text:txt,url:location.href}).catch(function(){});else{try{navigator.clipboard.writeText(txt+" "+location.href);toast("Copied");}catch(e){}}});});
+    shareParlay(c);});});
   /* μονά */
   var all=[];MATCHES.forEach(function(m){m.tips.forEach(function(x){all.push({m:m,t:x});});});
   var ord=function(x){return x.m.open?0:x.m.live?1:2;};
