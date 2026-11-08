@@ -1152,7 +1152,7 @@ const SCSS = `
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
 .sl details>summary{list-style:none;cursor:pointer}.sl details>summary::-webkit-details-marker{display:none}
 .nx .cv{color:var(--mu);font-size:14px;transition:transform .15s}.sl details[open] .nx .cv{transform:rotate(180deg)}
-.gx{margin:10px 0 0}.gxt{margin:10px 0 4px;font-size:13px}.gxt b{font-weight:700}.gxt small{color:var(--mu);font-size:11px;margin-left:4px}.rkp{display:inline-block;min-width:18px;padding:0 4px;border-radius:5px;background:rgba(126,190,255,.14);color:#8fc7ff;font:700 11px/16px "JetBrains Mono",monospace;text-align:center;vertical-align:1px;margin-right:4px}.gs{display:flex;gap:3px;flex-wrap:wrap;padding:30px 0 6px;margin-top:-30px}
+.gx{margin:10px 0 0}.gxt{margin:18px 0 8px;font-size:15px;line-height:1.3}.gx>.gxt:first-child{margin-top:12px}.gxt b{font-weight:700}.gxt small{color:var(--mu);font-size:12px;margin-left:6px} /* 08/11 Owner: μεγαλύτερα ονόματα, πιο πολύς αέρας */.rkp{display:inline-block;min-width:18px;padding:0 4px;border-radius:5px;background:rgba(126,190,255,.14);color:#8fc7ff;font:700 11px/16px "JetBrains Mono",monospace;text-align:center;vertical-align:1px;margin-right:4px}.gs{display:flex;gap:4px;flex-wrap:wrap;padding:0 0 6px}
 .gs .g{position:relative;min-width:44px;height:26px;padding:0 4px;border-radius:6px;display:grid;place-items:center;font:700 12px "JetBrains Mono",monospace;color:#0c0f0d;cursor:default}
 .gs .g i{font-style:normal}.gs .g u{display:none;text-decoration:none;font:800 13px Manrope,sans-serif}.gs .g.h{box-shadow:0 3px 0 #e9f2ec}
 .gs .y,.gs .W{background:#3ccf6e}.gs .n,.gs .L{background:#ff6b6b}.gs .D{background:#ffb547}
