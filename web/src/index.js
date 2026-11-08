@@ -1152,7 +1152,7 @@ const SCSS = `
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
 .sl details>summary{list-style:none;cursor:pointer}.sl details>summary::-webkit-details-marker{display:none}
 .nx .cv{color:var(--mu);font-size:14px;transition:transform .15s}.sl details[open] .nx .cv{transform:rotate(180deg)}
-.gx{margin:10px 0 0}.gxt{margin:18px 0 8px;font-size:15px;line-height:1.3}.gx>.gxt:first-child{margin-top:12px}.gxt b{font-weight:700}.gxt small{color:var(--mu);font-size:12px;margin-left:6px} /* 08/11 Owner: μεγαλύτερα ονόματα, πιο πολύς αέρας */.rkp{display:inline-block;min-width:18px;padding:0 4px;border-radius:5px;background:rgba(126,190,255,.14);color:#8fc7ff;font:700 11px/16px "JetBrains Mono",monospace;text-align:center;vertical-align:1px;margin-right:4px}.gs{display:flex;gap:4px;flex-wrap:wrap;padding:0 0 6px}
+.gx{margin:10px 0 0}.gxt{margin:18px 0 8px;font-size:15px;line-height:1.3}.gx>.gxt:first-child{margin-top:12px}.gxt b{font-weight:600;color:#cfd8d1}.gxt.me b{font-weight:800;color:var(--tx)}.gxt small{color:var(--mu);font-size:12px;margin-left:6px} /* 08/11 Owner: μεγαλύτερα ονόματα, πιο πολύς αέρας */.rkp{display:inline-block;min-width:18px;padding:0 4px;border-radius:5px;background:rgba(126,190,255,.14);color:#8fc7ff;font:700 11px/16px "JetBrains Mono",monospace;text-align:center;vertical-align:1px;margin-right:4px}.gs{display:flex;gap:4px;flex-wrap:wrap;padding:0 0 6px}
 .gs .g{position:relative;min-width:44px;height:26px;padding:0 4px;border-radius:6px;display:grid;place-items:center;font:700 12px "JetBrains Mono",monospace;color:#0c0f0d;cursor:default}
 .gs .g i{font-style:normal}.gs .g u{display:none;text-decoration:none;font:800 13px Manrope,sans-serif}.gs .g.h{box-shadow:0 3px 0 #e9f2ec}
 .gs .y,.gs .W{background:#3ccf6e}.gs .n,.gs .L{background:#ff6b6b}.gs .D{background:#ffb547}
@@ -1205,7 +1205,7 @@ function izzClient() {
   function squares(d) { var gx = d.querySelector(".gx"); if (!gx || gx.dataset.ok || !G) return; var key = d.getAttribute("data-k"), rows = G.r[key]; if (!rows) return;
     var k = key.split(":")[0], T = G.t; gx.dataset.ok = 1;
     gx.innerHTML = rows.map(function (rw) { var gm = rw[1]; if (!gm || !gm.length) return "";
-      return '<p class="gxt"><b>' + (rw[2] ? '<span class="rkp">' + rw[2] + '</span> ' : "") + esc(rw[0]) + '</b> <small>' + esc((innerWidth < 600 ? T.lastS : T.lastG).replace("{n}", gm.length)) + '</small></p><div class="gs">' + gm.slice().reverse().map(function (g) {
+      return '<p class="gxt' + (rw[3] ? " me" : "") + '"><b>' + (rw[2] ? '<span class="rkp">' + rw[2] + '</span> ' : "") + esc(rw[0]) + '</b> <small>' + esc((innerWidth < 600 ? T.lastS : T.lastG).replace("{n}", gm.length)) + '</small></p><div class="gs">' + gm.slice().reverse().map(function (g) {
         var m = mark(k, g), ha = g[2] ? T.h : T.a, tip = [g[0] + "-" + g[1], g[3] ? g[3] + " (" + ha + ")" : ha, g[4] ? new Date(g[4] * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "numeric" }) : ""].filter(Boolean).join(" · ");
         return '<span class="g ' + m[1] + (g[2] ? " h" : "") + '" tabindex="0" aria-label="' + esc(m[0] + " · " + tip) + '"><i>' + g[0] + "-" + g[1] + "</i><u>" + esc(m[0]) + "</u></span>"; }).join("") + "</div>"; }).join(""); }
   function frag(b) { if (!b._p) b._p = fetch(b.dataset.u + "?frag=1").then(function (r) { if (!r.ok) throw 0; return r.text(); }).catch(function () { b._p = null; return ""; }); return b._p; }
@@ -1254,7 +1254,7 @@ async function streaksPage(env, lang) {
       const dk = `${k}:${r.fixture.id}:${r.home ? 1 : 0}`;
       const opp = r.home ? r.fixture.away : r.fixture.home;
       const [rT, rO] = r.home ? [r.fixture.hr, r.fixture.ar] : [r.fixture.ar, r.fixture.hr]; // θέσεις (BTFStats), «9 Brighton»
-      if ((r.games || []).length) D.r[dk] = r.home ? [[r.team, r.games, rT], [opp, r.oppGames || [], rO]] : [[opp, r.oppGames || [], rO], [r.team, r.games, rT]];
+      if ((r.games || []).length) D.r[dk] = r.home ? [[r.team, r.games, rT, 1], [opp, r.oppGames || [], rO, 0]] : [[opp, r.oppGames || [], rO, 0], [r.team, r.games, rT, 1]]; // [όνομα, παιχνίδια, θέση, ομάδα της κάρτας]
       const sq = `<div class="gx"></div>`;
       return `<li${look ? ' class="lk"' : ""}><details data-k="${dk}"><summary><div class="sr"><div><b>${(r.home ? r.fixture.hr : r.fixture.ar) ? `<span class="rkp">${r.home ? r.fixture.hr : r.fixture.ar}</span> ` : ""}${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
