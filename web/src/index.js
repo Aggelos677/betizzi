@@ -1160,6 +1160,7 @@ const SCSS = `
 .gs .g:focus{outline:none}.gs .g:first-child::before{left:0;transform:none}.gs .g:last-child::before{left:auto;right:0;transform:none}
 .full{display:inline-block;margin:6px 0 0;color:var(--mu)!important;font-size:12px;text-decoration:none;min-height:32px;line-height:32px}.mzb:empty{display:none}.mzb .ld{display:block;color:var(--mu);font-size:13px;padding:12px 0}
 @media (max-width:600px){.gs .g{min-width:26px;padding:0}.gs .g i{display:none}.gs .g u{display:inline}}
+@media (min-width:601px){.sr b{font-size:19px}.gxt{font-size:16px;margin:20px 0 10px}.gxt small{font-size:13px}.gs{gap:6px}.gs .g{min-width:52px;height:32px;border-radius:8px;font-size:15px}} /* 08/11 Owner: μόνο PC, όπως η εικόνα του (κύριο όνομα 19 > ονόματα κουτακιών 16) */
 `;
 // CSS μόνο μέσα σε ένα κουτί (π.χ. ".izz", ".mz")
 const scopeCss = (css, sc) => css.replace(/([^{}]+)\{/g, (_, sel) => sel.split(",").map((x) => (x.trim().startsWith("@") ? x : sc + " " + x.trim())).join(",") + "{")
