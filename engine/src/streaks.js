@@ -44,7 +44,8 @@ export async function apiStreaks(env, leagueIds, top = 15) {
   const ids = [...next.keys()], res = {};
   for (let i = 0; i < ids.length; i += 90) {
     const part = ids.slice(i, i + 90);
-    for (const r of (await env.DB.prepare(`SELECT team_id, ts, is_home, gf, ga FROM results WHERE team_id IN (${part.map(() => "?").join(",")}) ORDER BY ts DESC`).bind(...part).all()).results)
+    for (const r of (await env.DB.prepare(`SELECT r.team_id, r.ts, r.is_home, r.gf, r.ga, COALESCE(r.opp, tm.name) opp FROM results r LEFT JOIN fixtures x ON x.id=r.fixture_id
+      LEFT JOIN teams tm ON tm.id = CASE WHEN r.is_home=1 THEN x.away_id ELSE x.home_id END WHERE r.team_id IN (${part.map(() => "?").join(",")}) ORDER BY r.ts DESC`).bind(...part).all()).results)
       (res[r.team_id] ||= []).push(r);
   }
   const odds = {}, fids = [...new Set(fx.map((f) => f.id))];
@@ -67,6 +68,8 @@ export async function apiStreaks(env, leagueIds, top = 15) {
       const sel = C.sel(home);
       rows.push({ team: home ? f.home : f.away, home, league: f.league, country: f.country, ...v,
         form: all.slice(0, 5).map((x) => (x.gf > x.ga ? "W" : x.gf < x.ga ? "L" : "D")).join(""),
+        // 08/11 (Owner): τα παιχνίδια της κατηγορίας για το άνοιγμα προς τα κάτω: [gf, ga, εντός, αντίπαλος, ts], νέο → παλιό
+        games: (C.only ? side.slice(0, 5) : all).map((x) => [x.gf, x.ga, x.is_home, x.opp || "", x.ts]),
         fixture: { id: f.id, ts: f.ts, home: f.home, away: f.away }, sel, price: (odds[f.id] || {})[sel] || null });
     }
     rows.sort((a, b) => (b.key ?? b.c) - (a.key ?? a.c) || b.run - a.run || a.fixture.ts - b.fixture.ts);
