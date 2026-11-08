@@ -1467,11 +1467,10 @@ function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-s
 var IZZ=0;function loadIzzi(){if(IZZ)return;IZZ=1;var lg=(location.pathname.split("/")[1]||"en");
   $("izziBox").innerHTML='<div class="empty"><span class="ldot"></span> <span>Loading…</span></div>';
   fetch("/"+encodeURIComponent(lg)+"/izzistats?frag=1").then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(h){$("izziBox").innerHTML=h;
+    /* 08/11: το <script> του Izzistats (izzClient στο web/src/index.js) δεν τρέχει μέσω innerHTML· το τρέχουμε εδώ */
+    Array.prototype.forEach.call($("izziBox").querySelectorAll("script"),function(o){var n=document.createElement("script");n.textContent=o.textContent;o.parentNode.replaceChild(n,o);});
     Array.prototype.forEach.call($("izziBox").querySelectorAll('a[href^="#"]'),function(a){a.addEventListener("click",function(e){var t=document.getElementById(a.getAttribute("href").slice(1));if(!t)return;e.preventDefault();var y=t.getBoundingClientRect().top+window.pageYOffset-70;window.scrollTo({top:y,behavior:"smooth"});});});})
     .catch(function(){IZZ=0;$("izziBox").innerHTML='<div class="empty"><span>Could not load. Tap Izzistats again.</span></div>';});}
-/* 08/11 (Owner): γραμμή Izzistats που ανοίγει → φορτώνει ΟΛΟ τον αγώνα από κάτω (ίδιος κώδικας με IZZ_JS στο web/src/index.js) */
-document.addEventListener("toggle",function(e){var d=e.target;if(!d||!d.open||!d.querySelector)return;var b=d.querySelector(".mzb");if(!b||b.dataset.l)return;b.dataset.l=1;b.innerHTML='<span class="ld">…</span>';
-  fetch(b.dataset.u+"?frag=1").then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(h){if(document.getElementById("mzcss"))h=h.replace(/<style id="mzcss">[\s\S]*?<\/style>/,"");b.innerHTML=h;}).catch(function(){b.dataset.l="";b.innerHTML="";});},true);
 /* προφόρτωση του Izzistats στο παρασκήνιο (μικρό, ~13 KB), ώστε το πρώτο πάτημα να ανοίγει αμέσως· όχι σε saveData/2G */
 window.addEventListener("load",function(){var c=navigator.connection||{};if(c.saveData||/(^|-)2g$/.test(c.effectiveType||""))return;setTimeout(function(){(window.requestIdleCallback||setTimeout)(function(){if(!IZZ&&$("view-izzi").hidden){var lg=(location.pathname.split("/")[1]||"en");fetch("/"+encodeURIComponent(lg)+"/izzistats?frag=1").catch(function(){});}});},5000);});
 /* απόφαση Owner 06/11 (αργό internet: Κένυα, Νιγηρία κ.λπ.): η σελίδα του «Αύριο» κατεβαίνει ήσυχα στο παρασκήνιο όσο ο επισκέπτης κοιτάει τη σημερινή,
