@@ -1196,6 +1196,9 @@ const STKD = {}; // JSON κουτακιών ανά γλώσσα (φτιάχνε�
 //  · μόλις φορτώσει: κατεβάζει στο παρασκήνιο τα κουτάκια (?data=1)
 //  · ανοίγει μία κάρτα τη φορά, χωρίς να «πηδάει» η σελίδα
 //  · ο αγώνας (?frag=1) ξεκινά να φορτώνει με το άγγιγμα/ποντίκι πάνω στη γραμμή και μπαίνει από κάτω όταν ανοίξει
+// 09/11: ώρες σέντρας στην ώρα της συσκευής (απόφαση Owner 04/11)· ίδιος κώδικας στο Izzistats (σελίδα + καρτέλα) και στο «Παρολί σήμερα».
+//  <time class="lt" data-ts data-l data-f="w|h">: w = «Δευ 9/11, 19:00» · h = «19:00» (ημέρα μπροστά αν δεν είναι σήμερα)
+const LT_JS = "(function(){try{var n=new Date(),k=function(d){return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();};Array.prototype.forEach.call(document.querySelectorAll('time.lt[data-ts]:not([data-ok])'),function(e){var d=new Date(e.getAttribute('data-ts')*1000),L=e.getAttribute('data-l')||undefined,F=function(o){return new Intl.DateTimeFormat(L,o).format(d);},h=F({hour:'2-digit',minute:'2-digit',hourCycle:'h23'});e.textContent=e.getAttribute('data-f')==='w'?F({weekday:'short'})+' '+F({day:'numeric',month:'numeric'})+', '+h:(k(d)===k(n)?'':F({weekday:'short'})+' ')+h;e.setAttribute('data-ok','1');});}catch(x){}})();";
 function izzClient() {
   if (window.__izz) return; window.__izz = 1;
   var lang = (location.pathname.split("/")[1] || "en"), G = null, GP = null;
@@ -1241,7 +1244,7 @@ function izzClient() {
   if (document.readyState === "complete") setTimeout(data, 300); else window.addEventListener("load", function () { setTimeout(data, 300); });
 }
 // 08/11: το build του Cloudflare (esbuild, keepNames) βάζει μέσα στη συνάρτηση κλήσεις __name(...)· στον browser δεν υπάρχει → μικρό shim
-const IZZ_JS = "(function(){var __name=function(f){return f;};(" + izzClient.toString() + ")();})();";
+const IZZ_JS = LT_JS + "(function(){var __name=function(f){return f;};(" + izzClient.toString() + ")();})();";
 async function streaksPage(env, lang) {
   const S = STK[lang], t = T[lang], tz = TZ[lang], today = ymdIn(DAYTZ);
   const data = await getStreaks(env);
@@ -1279,7 +1282,7 @@ async function streaksPage(env, lang) {
       const sq = `<div class="gx"></div>`;
       return `<li class="${look ? "lk" : ""}${i >= 5 ? " x" : ""}"><details data-k="${dk}"><summary><div class="sr"><div><b>${(r.home ? r.fixture.hr : r.fixture.ar) ? `<span class="rkp">${r.home ? r.fixture.hr : r.fixture.ar}</span> ` : ""}${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
-        + `<div class="nx"><span><i>${esc(S.nx)} · ${esc(when(r.fixture.ts))}</i><b class="tms"><span${r.home ? ' class="me"' : ""}>${r.fixture.hr ? `<span class="rkp">${r.fixture.hr}</span>` : ""}${esc(r.fixture.home)}</span><em> – </em><span${r.home ? "" : ' class="me"'}>${r.fixture.ar ? `<span class="rkp">${r.fixture.ar}</span>` : ""}${esc(r.fixture.away)}</span></b></span>`
+        + `<div class="nx"><span><i>${esc(S.nx)} · <time class="lt" data-f="w" data-l="${LOCALE[lang]}" data-ts="${r.fixture.ts}" datetime="${new Date(r.fixture.ts * 1000).toISOString()}">${esc(when(r.fixture.ts))}</time></i><b class="tms"><span${r.home ? ' class="me"' : ""}>${r.fixture.hr ? `<span class="rkp">${r.fixture.hr}</span>` : ""}${esc(r.fixture.home)}</span><em> – </em><span${r.home ? "" : ' class="me"'}>${r.fixture.ar ? `<span class="rkp">${r.fixture.ar}</span>` : ""}${esc(r.fixture.away)}</span></b></span>`
         + (look ? `<span class="lkt" title="${esc(S.look)}">${esc(S.look.split(":")[0].trim())}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `<span class="cv" aria-hidden="true">▾</span></div></summary>`
         + sq + `<div class="mzb" data-u="${href}"></div><a class="full" href="${href}">${esc(S.full)}</a></details></li>`;
     }).join("");
@@ -1366,7 +1369,7 @@ async function paroliPage(env, lang) {
     const href = l.home && l.away && l.ts ? matchPath(lang, { home: { name: l.home }, away: { name: l.away }, ts: l.ts, id: l.fixture_id }) : "";
     const r = l.result === 1 ? '<span class="r w" aria-label="✓">✓</span>' : l.result === 0 ? '<span class="r l" aria-label="✗">✗</span>' : l.result === 2 ? '<span class="r">–</span>' : '<span class="r"></span>';
     const nm = `<b>${esc(l.home || "")} – ${esc(l.away || "")}</b><small>${esc(selTxt(l))}</small>`;
-    return `<li><span class="tm0">${l.ts ? esc(hm(l.ts)) : ""}</span>${href ? `<a href="${href}">${nm}</a>` : `<span>${nm}</span>`}<span class="pr">${l.price ? Number(l.price).toFixed(2) : ""}</span>${r}</li>`;
+    return `<li><span class="tm0">${l.ts ? `<time class="lt" data-f="h" data-l="${LOCALE[lang]}" data-ts="${l.ts}" datetime="${new Date(l.ts * 1000).toISOString()}">${esc(hm(l.ts))}</time>` : ""}</span>${href ? `<a href="${href}">${nm}</a>` : `<span>${nm}</span>`}<span class="pr">${l.price ? Number(l.price).toFixed(2) : ""}</span>${r}</li>`;
   };
   const st = (c) => c.result === 1 ? ["w", P.st.w] : c.result === 0 ? ["l", P.st.l] : (c.legs || []).some((l) => LIVE.has(l.status) || l.result != null) ? ["lv", P.st.lv] : ["o", P.st.o];
   const card = (c) => { const [k, lbl] = st(c);
@@ -1421,6 +1424,7 @@ ${last ? `<p>${esc(P.last(last.o, last.d))} <a href="/${lang}/${REC[lang].slug}"
 <p class="how" style="font-size:13px;margin-top:24px">${esc(P.upd)}: <time datetime="${mod}">${esc(new Intl.DateTimeFormat(LOCALE[lang], { timeZone: DAYTZ, day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(Date.parse(mod)))}</time></p>
 </main>
 <footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi</p></footer>
+<script>${LT_JS}</script>
 </body>
 </html>`;
 }
