@@ -1100,7 +1100,8 @@ MATCHES.forEach(function(m){
 
 /* ---------- ο bookmaker μου: τιμές ενός bookmaker, σύγκριση με Pinnacle, καλύτερο σύνολο παρολί ---------- */
 var BOOKS=["Bet365","Betano","Pinnacle","1xBet","William Hill"],BKC=["1","X","2","O25","U25","GG","NG"],LOWBK=0.94;
-var myBook=load("ko-book","best");if(myBook!=="best"&&BOOKS.indexOf(myBook)<0)myBook="best";
+var NOBK=!!window.__NOBK; /* 10/11 (απόφαση Owner): Βραζιλία → κανένα όνομα bookmaker, μόνο η καλύτερη τιμή */
+var myBook=NOBK?"best":load("ko-book","best");if(myBook!=="best"&&BOOKS.indexOf(myBook)<0)myBook="best";
 /* απόφαση Owner 04/11: ο παίκτης διαλέγει σε ποιους bookmakers παίζει (⚙). Μονό: η καλύτερη τιμή από αυτούς.
    Παρολί: ο bookmaker με το καλύτερο ΣΥΝΟΛΟ (ένα παρολί παίζεται σε έναν bookmaker), όχι η καλύτερη τιμή από τον καθένα. */
 var ENBK=(load("ko-bks",null)||BOOKS.slice()).filter(function(b){return BOOKS.indexOf(b)>=0;});if(!ENBK.length)ENBK=BOOKS.slice();
@@ -1125,7 +1126,7 @@ function priceNote(t){var ip=t.best!=null?t.best:t.odds;if(!ip)return "";
   if(t.min&&t.odds&&t.odds<t.min)h+='<br>'+belowTxt(t.odds); /* 06/11 (δοκιμή παικτών): ουδέτερο, όχι ⚠ */
   return h+'</div>';}
 function oddTxt(t){return t.odds?t.odds.toFixed(2)+(t.low?' <i class="lowbk" title="Low price at your bookmaker">⚠</i>':''):"🔒";}
-function bookRowHTML(){return '<div class="bkrow"><span class="label">My bookmaker</span><div class="hscroll bkchips">'
+function bookRowHTML(){if(NOBK)return "";return '<div class="bkrow"><span class="label">My bookmaker</span><div class="hscroll bkchips">'
   +[["best","Best price"]].concat(ENBK.map(function(b){return [b,b];})).map(function(x){return '<button type="button" class="chip" data-book="'+esc(x[0])+'" aria-pressed="'+(myBook===x[0])+'">'+(x[0]==="best"?'<span>'+esc(x[1])+'</span>':esc(x[1]))+'</button>';}).join("")+'</div></div>';}
 function bindBookRow(root){Array.prototype.forEach.call(root.querySelectorAll("[data-book]"),function(b){if(b._b)return;b._b=1;b.addEventListener("click",function(){setBook(b.getAttribute("data-book"));});});}
 function setBook(b){if(b===myBook)return;myBook=b;store("ko-book",b);applyBook();
@@ -1135,7 +1136,7 @@ function setBook(b){if(b===myBook)return;myBook=b;store("ko-book",b);applyBook()
 /* λίστα στο δελτίο: κάθε ενεργός bookmaker με την τιμή (μονό) ή το σύνολο (παρολί), από τον καλύτερο στον χειρότερο,
    χρώμα από πράσινο σε κόκκινο. Πάτημα → παίζεις εκεί (ο πρώτος = αυτόματα ο καλύτερος). ⚙ = ποιους bookmakers παίζω */
 var bkSet=false;
-function bkListHTML(){var rows=bkRank(slip),sb=slipBook()||(rows[0]&&rows[0].b),n=rows.length,multi=slip.length>1;
+function bkListHTML(){if(NOBK)return "";var rows=bkRank(slip),sb=slipBook()||(rows[0]&&rows[0].b),n=rows.length,multi=slip.length>1;
   var h='<div class="bkl"><div class="bkl-h"><span class="label">'+(multi?'<span>Total per bookmaker</span>':'<span>Price per bookmaker</span>')+'</span><button type="button" class="bkl-set" id="bkSetBtn" aria-expanded="'+(bkSet?'true':'false')+'">⚙ <span>My bookmakers</span></button></div>';
   if(bkSet)h+='<div class="bkl-cfg"><p><span>Tick the bookmakers you play at. We show prices only from these.</span></p>'+BOOKS.map(function(b){return '<label class="authc"><input type="checkbox" data-enbk="'+esc(b)+'"'+(ENBK.indexOf(b)>=0?' checked':'')+'> <span>'+esc(b)+'</span></label>';}).join("")+'</div>';
   if(!n)return h+'<div class="bkl-none"><span>No single bookmaker offers all these picks.</span></div></div>';
@@ -1153,7 +1154,7 @@ function bindBkList(root){
     applyBook();try{renderMatches();renderTips();renderBuilder();}catch(e){}renderBar();renderSlipAny();});});}
 function renderSlipAny(){if(!$("sheet").hidden)renderMySlip();else renderSide();}
 /* σε ποιον bookmaker βγαίνει το καλύτερο σύνολο για όλο το παρολί (ένα παρολί παίζεται σε έναν bookmaker) */
-function bookTotalsHTML(keys){if(keys.length<2)return "";var rows=[];
+function bookTotalsHTML(keys){if(NOBK||keys.length<2)return "";var rows=[];
   ENBK.forEach(function(b){var tot=1,ok=true;keys.forEach(function(k){var c=k.split(":")[1],p=bkP(SEL[k].m,c,b);if(!p)ok=false;else tot*=p;});if(ok)rows.push([b,tot]);});
   if(!rows.length)return "";rows.sort(function(a,c){return c[1]-a[1];});
   return '<div class="bktot"><span class="label">Total per bookmaker</span>'+rows.map(function(r,i){return '<div class="bkt'+(i===0?' top':'')+(r[0]===myBook?' mine':'')+'"><span>'+(i===0?'★ ':'')+esc(r[0])+'</span><b class="mono">x'+r[1].toFixed(2)+'</b></div>';}).join("")+'</div>';}
@@ -1262,7 +1263,7 @@ function bkRank(keys){var rows=[];ENBK.forEach(function(b){var tot=1,ok=keys.len
   rows.sort(function(a,c){return c.t-a.t;});return rows;}
 function slipBook(){return legsBook(slip);}
 /* 06/11 (δοκιμή παικτών, κάρτα x4.01 / δελτίο x4.48 / κουπόνι €45.90): ένας κανόνας για δελτίο ΚΑΙ αποθηκευμένο κουπόνι */
-function legsBook(keys){if(myBook!=="best")return myBook;if(keys.length<2)return null;var r=bkRank(keys);return r.length?r[0].b:null;}
+function legsBook(keys){if(NOBK)return null;if(myBook!=="best")return myBook;if(keys.length<2)return null;var r=bkRank(keys);return r.length?r[0].b:null;}
 function legOdd(k,sb){var s=SEL[k];if(sb===undefined)sb=slipBook();var p=sb?bkP(s.m,k.split(":")[1],sb):0;return p||s.odd;}
 function totals(){var o=1,p=1,known=true,sb=slipBook();slip.forEach(function(k){o*=legOdd(k,sb);if(SEL[k].p==null)known=false;else p*=SEL[k].p;});return {odds:o,prob:known?p:null};}
 function renderBar(){var b=$("slipBarBtn"),t=totals();$("sbCount").textContent=slip.length;b.dataset.empty=slip.length?"false":"true";
@@ -1845,7 +1846,7 @@ function sigs(m,H,A){var r=tsig(m.home,H).concat(tsig(m.away,A)),pr={up:0,dn:1,g
   /* σήματα αγώνα (μοντέλο/αγορά): τα γκολ μόνο αν δεν το λέει ήδη η φόρμα */
   (m.badges||[]).forEach(function(k){if(!BADGE[k])return;if(gl&&(k==="goals"||k==="btts"||k==="tight"))return;if(k==="form"&&r.length)return;r.push(["mt",BADGE[k][0],"",BADGE[k][1]]);});
   return r.slice(0,5);}
-function bkTable(m){if(!m.bk||!m.bk.length)return "";var cols=["1","X","2","O25","GG"],lab={"1":"1",X:"X","2":"2",O25:"O2.5",GG:"GG"},best={};
+function bkTable(m){if(NOBK||!m.bk||!m.bk.length)return "";var cols=["1","X","2","O25","GG"],lab={"1":"1",X:"X","2":"2",O25:"O2.5",GG:"GG"},best={};
   cols.forEach(function(c){BOOKS.forEach(function(bn){var v=bkP(m,c,bn);if(v>(best[c]||0))best[c]=v;});});
   var rows=BOOKS.map(function(bn){var any=0,t='<tr><td>'+esc(bn)+'</td>'+cols.map(function(c){var v=bkP(m,c,bn);if(v)any=1;return '<td'+(v&&v===best[c]?' class="mo-best"':'')+'>'+(v?v.toFixed(2):'–')+'</td>';}).join("")+'</tr>';return any?t:"";}).join("");
   return rows?'<div class="mgroup"><span class="glabel">Price per bookmaker</span><div class="mo-tw"><table class="mo-t mo-bk"><thead><tr><th></th>'+cols.map(function(c){return '<th>'+lab[c]+'</th>';}).join("")+'</tr></thead><tbody>'+rows+'</tbody></table></div></div>':"";}
