@@ -12,6 +12,8 @@ function txt(n){if(n.__bz===n.nodeValue)return; /* δικό μας κείμεν�
 function attrs(e){for(var i=0;i<A.length;i++){var x=e.getAttribute(A[i]);if(x){var y=tr(x);if(y!==x)e.setAttribute(A[i],y);}}}
 function walk(r){if(r.nodeType===3)return txt(r);if(r.nodeType!==1)return;attrs(r);
   var w=document.createTreeWalker(r,5),c;while((c=w.nextNode()))c.nodeType===3?txt(c):attrs(c);}
+/* 10/11 (Owner: ταχύτητα): η εφαρμογή το καλεί ΠΡΙΝ δείξει την πρώτη καρτέλα, ώστε το κείμενο να είναι ήδη μεταφρασμένο/χωρίς τόνους στα κεφαλαία (αλλιώς ο τίτλος άλλαζε από 2 σε 1 γραμμή και η σελίδα «πηδούσε»). */
+window.__bzTrNow=function(){try{walk(document.body);}catch(e){}};
 function go(){walk(document.body);new MutationObserver(function(ms){ms.forEach(function(m){
   if(m.type==="characterData")txt(m.target);else m.addedNodes.forEach(walk);});}).observe(document.body,{childList:true,subtree:true,characterData:true});}
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",go):go();})();`;
