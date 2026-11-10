@@ -109,7 +109,7 @@ export default {
     const url0 = new URL("https://" + PROD_HOST + "/"), today = ymdIn(DAYTZ);
     const tmr = new Date(Date.parse(today + "T12:00:00Z") + 864e5).toISOString().slice(0, 10);
     await template(env, url0); const ver = TPL_VER;
-    for (const lang of LANGS) for (const d of ["", tmr, "all"]) {
+    for (const lang of LANGS) for (const d of ["", tmr]) {
       try {
         const u = new URL(`https://${PROD_HOST}/${lang}/${d ? "?d=" + d : ""}`);
         const b = await todayPage(env, lang, u), key = lang + (d ? "|" + d : "");
@@ -191,6 +191,8 @@ const handle = async (req, env, ctx) => {
       // Γρήγορη φόρτωση: έτοιμη σελίδα από τη μνήμη (έως 60΄΄), ανανέωση στο παρασκήνιο.
       // Τα live σκορ έρχονται έτσι κι αλλιώς από το /live.json κάθε 30΄΄.
       const dq = url.searchParams.get("d") || "";
+      // 10/11 (απόφαση Owner): η προβολή «Όλες οι μέρες» καταργήθηκε· παλιά links ?d=all → σήμερα
+      if (dq === "all") return Response.redirect(url.origin + p, 302);
       const key = m[1] + (url.searchParams.has("demo") ? "?demo" : "") + (dq ? "|" + dq : "");
       // 2ο επίπεδο (03/11): κοινή cache του Cloudflare, για να μη χτίζεται η σελίδα από την αρχή σε κάθε νέο «αντίγραφο» του worker (αργή πρώτη φόρτωση)
       // 06/11: η έκδοση της σελίδας (μήκος του template) μπαίνει στο κλειδί, ώστε μετά από κάθε ανέβασμα να μη σερβίρεται η παλιά
