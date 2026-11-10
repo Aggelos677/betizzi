@@ -74,11 +74,13 @@ function ymdIn(tz, ts = Date.now()) {
 
 // Launch (SEO): indexable ΜΟΝΟ στο betizzi.com. Test/preview (*.workers.dev) μένουν noindex.
 // Ιδιωτικά (admin, auth, me/vip.json, ?demo) πάντα noindex.
-// /pt/: ΠΡΟΣΩΡΙΝΑ noindex (απόφαση Owner 05/11, προληπτικά): τα πορτογαλικά στοχεύουν τώρα Βραζιλία.
-// Δεν είναι επιβεβαιωμένη νομική υποχρέωση· φεύγει όταν τα /pt/ γίνουν Πορτογαλίας (ή μετά από νομικό έλεγχο).
+// /pt/: ανοιχτό στη Google από 10/11 (απόφαση Owner). Για επισκέπτες από Βραζιλία: κανένα όνομα bookmaker
+// και κανένα affiliate (NOBK_COUNTRIES)· αν η Βραζιλία μας μπλοκάρει, το δέχεται ο Owner.
 const PROD_HOST = "betizzi.com";
 // /de/: ανοιχτό από 07/11 (μπήκε το Impressum /de/impressum).
-const NOINDEX_LANGS = ["pt"];
+const NOINDEX_LANGS = [];
+// 10/11 (απόφαση Owner): χώρες όπου η σελίδα δεν δείχνει ονόματα bookmakers (η εφαρμογή διαβάζει window.__NOBK)
+const NOBK_COUNTRIES = new Set(["BR"]);
 function isPrivate(url) {
   const p = url.pathname;
   return p === "/admin" || p.startsWith("/admin/") || p.startsWith("/auth/") || p === "/me.json" || p === "/vip.json" || p === "/h" || url.searchParams.has("demo")
@@ -89,7 +91,9 @@ export default {
     const url = new URL(req.url);
     // 07/11 (έλεγχος SEO): http → https (αλλιώς δεύτερο αντίγραφο του site)
     if (url.protocol === "http:" && (url.hostname === PROD_HOST || url.hostname === "www." + PROD_HOST)) { url.protocol = "https:"; return Response.redirect(url.toString(), 301); }
-    const res0 = await handle(req, env, ctx);
+    let res0 = await handle(req, env, ctx);
+    if (NOBK_COUNTRIES.has(req.cf?.country) && (res0.headers.get("content-type") || "").startsWith("text/html"))
+      res0 = new HTMLRewriter().on("head", { element(e) { e.prepend("<script>window.__NOBK=1</script>", { html: true }); } }).transform(res0);
     let res = res0;
     if (url.hostname === PROD_HOST) { res = new Response(res0.body, res0); res.headers.set("strict-transport-security", "max-age=31536000"); }
     if (url.hostname === PROD_HOST && !isPrivate(url)) return res;
