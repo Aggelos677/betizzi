@@ -1698,7 +1698,7 @@ var mFilter="all", q="";
 var DN=(typeof DAYNAV!=="undefined"&&DAYNAV)||{date:"",today:"",nav:[]},IS_TODAY=!DN.date||DN.date===DN.today;
 /* απόφαση Owner 02/11: δύο κουμπιά, «⭐ Τα πρωταθλήματά μου» (ξεκινάει με τα 50 σημαντικά) και «Όλα».
    Αλλαγή της λίστας μόνο με λογαριασμό (αλλιώς → εγγραφή). */
-var lFil=load("ko-lfil2","mine");if(["all","mine"].indexOf(lFil)<0)lFil="mine"; /* 06/11 (αργό internet): οι «Όλες οι μέρες» ανοίγουν πάντα στα «Τα πρωταθλήματά μου» (900+ αγώνες αλλιώς) */ if(typeof DAYNAV!=="undefined"&&DAYNAV&&DAYNAV.all)lFil="mine"; /* απόφαση Owner 02/11: προεπιλογή «Τα πρωταθλήματά μου» (50 λίγκες) */
+var lFil=load("ko-lfil3","all");if(["all","mine"].indexOf(lFil)<0)lFil="all"; /* απόφαση Owner 10/11 (αντικαθιστά 02/11): προεπιλογή «Όλα»· κρατάμε ό,τι διάλεξε μόνος του ο παίκτης (νέο κλειδί ko-lfil3, ώστε όλοι να ξεκινούν από «Όλα») */
 var MYL=load("ko-myl",null); /* null = τα 50 σημαντικά */
 function inMyL(k){return MYL&&ACC?MYL.indexOf(k)>=0:topIx(k)<999;}
 var tipF=false,calF=false,favF=false,stripOpen=false,FAV=new Set(load("ko-fav",[])||[]);
@@ -1728,9 +1728,7 @@ function renderFilters(){
     var el=chipEl('<span>'+esc(d.lbl)+'</span>'+(n!=null?' <span class="c">'+n+'</span>':'')+lv,on,cur?function(e){e.preventDefault();if(e.target.closest&&e.target.closest(".lvb")){goLive();return;}if(mFilter==="all")return;mFilter="all";renderFilters();renderMatches();}:null,lv?"daylv":"",cur?null:d.href);
     var lvEl=el.querySelector(".lvb");if(lvEl)lvEl.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();e.stopPropagation();goLive();}});
     box.appendChild(el);});
-  /* απόφαση Owner 03/11: «Όλες οι μέρες» = σήμερα έως μεθαύριο σε μία λίστα */
-  var na=DN.all?cnt({t:"all",f:false}):dayN(DC.a);
-  box.appendChild(chipEl('<span>All days</span>'+(na!=null?' <span class="c">'+na+'</span>':''),!!DN.all&&!liveOn,DN.all?function(e){e.preventDefault();mFilter="all";renderFilters();renderMatches();}:null,"",DN.all?null:"?d=all"));
+  /* 10/11 (απόφαση Owner): η προβολή «Όλες οι μέρες» καταργήθηκε· μένουν Σήμερα · Αύριο · 📅 */
   var other=DN.all?null:DN.nav.filter(function(d){return d.d===DN.date&&d.n!==0&&d.n!==1;})[0];
   if(other)box.appendChild(chipEl('<span>'+esc(other.lbl)+'</span> <span class="c">'+cnt({t:"all",f:false})+'</span>',true,null,""));
   box.appendChild(chipEl("📅",stripOpen,function(){stripOpen=!stripOpen;renderFilters();},"calchip"));
@@ -1741,7 +1739,7 @@ function renderFilters(){
   /* απόφαση Owner 02/11: πρώτα «Τα πρωταθλήματά μου» (προεπιλογή), μετά «Όλα» */
   [["mine","My leagues"],["all","All"]].forEach(function(f){
     lb2.appendChild(chipEl((f[0]==="mine"?"⭐ ":"")+'<span>'+esc(f[1])+'</span> <span class="c">'+cnt({l:f[0],f:false})+'</span>',lFil===f[0]&&!favF,function(){
-      lFil=f[0];favF=false;store("ko-lfil2",lFil);renderFilters();renderMatches();}));});
+      lFil=f[0];favF=false;store("ko-lfil3",lFil);renderFilters();renderMatches();}));});
   lb2.appendChild(chipEl('✎',false,function(){openMyL();},"tog"));
   var sep=document.createElement("span");sep.className="fsep";sep.setAttribute("aria-hidden","true");lb2.appendChild(sep);
   lb2.appendChild(chipEl('<span>With tip</span> <span class="c">'+cnt({tip:true})+'</span>',tipF,function(){tipF=!tipF;renderFilters();renderMatches();},"tog"));
@@ -2569,7 +2567,7 @@ function openMyL(){if(!ACC){toast("Sign up free to pick your own leagues");openA
     +'<button type="button" class="btn authgo" id="mylOk"><span>Save</span></button><button type="button" class="btn quiet" id="mylReset"><span>Back to the 50 main leagues</span></button>';
   $("authBg").hidden=false;box.hidden=false;
   $("mylOk").onclick=function(){var sel=Array.prototype.map.call(d.querySelectorAll("input:checked"),function(i){return i.value;});var keep=(MYL||[]).filter(function(k){return keys.indexOf(k)<0;});
-    MYL=keep.concat(sel);store("ko-myl",MYL);lFil="mine";store("ko-lfil2",lFil);d.hidden=true;closeAuth();renderFilters();renderMatches();toast("Saved");};
+    MYL=keep.concat(sel);store("ko-myl",MYL);lFil="mine";store("ko-lfil3",lFil);d.hidden=true;closeAuth();renderFilters();renderMatches();toast("Saved");};
   $("mylReset").onclick=function(){MYL=null;store("ko-myl",null);d.hidden=true;closeAuth();renderFilters();renderMatches();};}
 /* ---------- λογαριασμός (εγγραφή με κωδικό στο email) ---------- */
 var ACC=null,authMail="";
