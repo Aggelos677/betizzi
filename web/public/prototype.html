@@ -1736,8 +1736,8 @@ function renderFilters(){
   st.innerHTML=DN.nav.map(function(d){return '<a class="dayb'+(d.d===DN.date?' on':'')+'" href="'+(d.d===DN.date?'#':esc(d.href))+'"'+(d.d===DN.date?' data-cur="1"':'')+'><span>'+esc(d.lbl)+'</span><small class="mono">'+esc(d.d.slice(8,10)+"/"+d.d.slice(5,7))+'</small></a>';}).join("");
   var cur=st.querySelector("[data-cur]");if(cur)cur.addEventListener("click",function(e){e.preventDefault();stripOpen=false;renderFilters();});
   var lb2=$("lFilter");lb2.innerHTML="";
-  /* απόφαση Owner 02/11: πρώτα «Τα πρωταθλήματά μου» (προεπιλογή), μετά «Όλα» */
-  [["mine","My leagues"],["all","All"]].forEach(function(f){
+  /* απόφαση Owner 10/11 (αντικαθιστά 02/11): πρώτα «Όλα» (προεπιλογή, αριστερά), μετά «Τα πρωταθλήματά μου» */
+  [["all","All"],["mine","My leagues"]].forEach(function(f){
     lb2.appendChild(chipEl((f[0]==="mine"?"⭐ ":"")+'<span>'+esc(f[1])+'</span> <span class="c">'+cnt({l:f[0],f:false})+'</span>',lFil===f[0]&&!favF,function(){
       lFil=f[0];favF=false;store("ko-lfil3",lFil);renderFilters();renderMatches();}));});
   lb2.appendChild(chipEl('✎',false,function(){openMyL();},"tog"));
