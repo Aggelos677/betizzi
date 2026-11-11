@@ -304,6 +304,7 @@ body{padding-top:env(safe-area-inset-top,0px)}
 .sw input{width:20px;height:20px;accent-color:var(--lime)}
 .sub{display:flex;gap:8px;flex-wrap:wrap}
 .linkb{appearance:none;background:none;border:0;color:var(--lime);font:700 .85rem var(--f-body);padding:6px 2px;cursor:pointer}
+.cp-foot .linkb[data-del]{color:#ff6b6b} /* 11/11 (Owner): «Αφαίρεση» σε κόκκινο */
 .seg.c5{grid-template-columns:repeat(5,1fr)}
 .cnt-line{font-size:.8rem;color:var(--muted)}
 
@@ -722,6 +723,7 @@ header{position:relative}
 .pc-trk{display:flex;margin-top:8px}
 @media (min-width:900px){.sg-row{flex-wrap:nowrap}.sg-pick{flex:1}.sg-row .sg-btns{order:0;flex-basis:auto;margin:0 0 0 12px}.sg-btns .spb,.sg-btns .trk{flex:0 0 auto;min-height:40px;padding:0 14px}.pc-btns{justify-content:flex-end}.pc-btns .spb{flex:0 0 190px}.pc-trk{justify-content:flex-end}.pc-trk .trk{flex:0 0 250px}}
 .tag:empty{display:none}
+.cpbdg.idle{background:#2a352e;color:var(--fg)}
 .cpbdg.new{background:var(--lime)!important;color:var(--lime-ink)!important}
 .cpbdg.bump{animation:oppop .45s ease-out}
 @media (min-width:900px){.op .sg-row{flex-wrap:nowrap}.op .sg-row .sg-pick{flex:1}.op .sg-row .sg-btns{order:0;flex-basis:auto;margin:0 0 0 12px}.op .sg-row .sg-btns .spb,.op .sg-row .sg-btns .trk{flex:0 0 auto;min-height:40px;padding:0 14px}}
@@ -1389,7 +1391,9 @@ function renderCoupons(){
   $("cpCount").textContent=coupons.length?coupons.length+" tracked":"";
   var lv=coupons.filter(function(c){return cpState(c)==="live";}).length,b=$("cpBdg");
   /* νέα κουπόνια που δεν έχει δει ακόμα: «+N» μέχρι να ανοίξει τα Κουπόνια μου */
-  if(cpNew>0){b.hidden=false;b.textContent="+"+cpNew;b.classList.add("new");}else{b.classList.remove("new");b.hidden=!lv;b.textContent=lv;}
+  /* 11/11 (Owner): ο αριθμός δείχνει πόσα ανοιχτά κουπόνια έχει μέσα (όχι «+N»)· τονισμένος όσο υπάρχουν νέα που δεν έχει δει */
+  var opn=coupons.filter(function(c){var s=cpState(c);return s!=="won"&&s!=="lost";}).length;
+  b.hidden=!opn;b.textContent=opn;b.classList.toggle("new",cpNew>0&&opn>0);b.classList.toggle("idle",!lv&&!(cpNew>0)); /* κόκκινο μόνο όταν παίζεται κάτι live, όπως πριν */
   var isDone=function(c){var s=cpState(c);return s==="won"||s==="lost";},OPEN=coupons.filter(function(c){return !isDone(c);}),DONE=coupons.filter(isDone);
   $("cpOpenN").textContent=OPEN.length?OPEN.length:"";$("cpDoneN").textContent=DONE.length?DONE.length:"";
   Array.prototype.forEach.call(document.querySelectorAll("[data-cpt]"),function(x){x.setAttribute("aria-pressed",x.dataset.cpt===cpTab?"true":"false");});
