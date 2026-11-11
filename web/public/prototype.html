@@ -1467,7 +1467,7 @@ function couponWin(c){
   setTimeout(function(){w.classList.add("out");},3200);setTimeout(function(){w.remove();},3700);
 }
 var TABS=["matches","tips","build","coupons","izzi"];
-function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-selected",t===name?"true":"false");$("view-"+t).hidden=t!==name;});store("ko-tab2",name);if(name==="izzi")loadIzzi();if(name==="coupons"&&cpNew){cpNew=0;store("ko-cpnew",0);try{renderCoupons();}catch(e){}}renderSide();
+function showTab(name){TABS.forEach(function(t){$("tab-"+t).setAttribute("aria-selected",t===name?"true":"false");$("view-"+t).hidden=t!==name;});store("ko-tab2",name);if(name==="izzi")loadIzzi();if(name==="coupons"&&cpNew){cpNew=0;store("ko-cpnew",0);try{renderCoupons();}catch(e){}}if(name==="coupons"&&sideOn()&&typeof sideView!=="undefined"&&sideView!=="goals"){sideView="goals";try{renderSideView();}catch(e){}}/* 11/11 (Owner): στο PC τα Κουπόνια μου φαίνονται ήδη στη μέση· δεξιά «Τελευταία γκολ» */renderSide();
   /* χωρίς πήδημα: αν έχεις κατέβει, η νέα καρτέλα ξεκινά ακριβώς κάτω από το μενού· αλλιώς η σελίδα μένει όπου είναι */
   var hd=document.querySelector(".wrap.app>header"),top=hd?hd.offsetTop+hd.offsetHeight:0;if(window.scrollY>top)window.scrollTo(0,top);}
 /* απόφαση Owner 04/11: «Οι προτάσεις μας» είναι πάντα οι σημερινές. Αν βλέπεις άλλη μέρα (π.χ. Αύριο στους Αγώνες), το tab σε γυρίζει στη σημερινή σελίδα */
