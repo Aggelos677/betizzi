@@ -1146,7 +1146,7 @@ function bkListHTML(){if(NOBK)return "";var rows=bkRank(slip),sb=slipBook()||(ro
   var top=rows[0].t;
   h+=rows.map(function(r,i){var hue=n>1?Math.round(120-120*i/(n-1)):120,on=r.b===sb,diff=i?Math.round((r.t/top-1)*1000)/10:0;
     return '<button type="button" class="bkr'+(on?' on':'')+'" data-bkpick="'+esc(r.b)+'" aria-pressed="'+(on?'true':'false')+'" style="--h:'+hue+'"><span class="bkr-n">'+(i===0?'★ ':'')+esc(r.b)+(i===0&&myBook==="best"?' <small>· <span>best</span></small>':'')+'</span>'
-      +'<span class="bkr-d mono">'+(i?diff.toFixed(1)+'%':'')+'</span><b class="mono">'+(multi?'x':'')+r.t.toFixed(2)+'</b></button>';}).join("");
+      +'<b class="mono">'+(multi?'x':'')+r.t.toFixed(2)+'</b></button>';}).join("");
   return h+'</div>';}
 function bindBkList(root){
   Array.prototype.forEach.call(root.querySelectorAll("[data-bkpick]"),function(b){b.addEventListener("click",function(){var r=bkRank(slip),v=b.dataset.bkpick;setBook(r.length&&r[0].b===v?"best":v);});});
