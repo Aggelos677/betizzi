@@ -29,7 +29,7 @@ export const T = {
     fHome: "home", fAway: "away", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} vs {a} ({lg}) kicks off on {d} at {t}. {tip} Model: home {p1}%, draw {px}%, away {p2}%, Over 2.5 {o}%. Likely score {s}.",
     mTip: "Tip: {sel} at {pr}.",
-    name: "English", vp: "[100% free] football tips · ready-made coupons · build your own slip", title: "Football predictions today", desc: "Free football tips for today, with stats and odds. Free and VIP tips, ready-made parlays every day, likely scores and a public record. 18+.",
+    name: "English", vp: "[100% free] football predictions · ready-made coupons · build your own slip", title: "Football predictions today", desc: "Free football tips for today, with stats and odds. Free and VIP tips, ready-made parlays every day, likely scores and a public record. 18+.",
     short: (d, n, t, v) => `${d}: ${n} matches · ${t} free + ${v} VIP tips.`,
     strongK: "Strongest:",
     answer: (d, n, t, v) => `On ${d} betizzi lists ${n} football matches with ${t} free tips and ${v} VIP tips, chosen from team form over the last 10 games and bookmaker odds.`,
@@ -58,7 +58,7 @@ export const T = {
     fHome: "εντός", fAway: "εκτός", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) παίζεται στις {d}, ώρα {t}. {tip} Μοντέλο: άσσος {p1}%, Χ {px}%, διπλό {p2}%, Over 2.5 {o}%. Πιθανό σκορ {s}.",
     mTip: "Tip: {sel} σε απόδοση {pr}.",
-    name: "Ελληνικά", vp: "[100% δωρεάν] tips ποδοσφαίρου · έτοιμα κουπόνια · φτιάξε το δελτίο σου", title: "Προγνωστικά ποδοσφαίρου σήμερα", desc: "Δωρεάν προγνωστικά ποδοσφαίρου για σήμερα με στατιστικά και αποδόσεις. Free και VIP tips, έτοιμα παρολί κάθε μέρα, πιθανό σκορ και δημόσιο ιστορικό. 18+.",
+    name: "Ελληνικά", vp: "[100% δωρεάν] προγνωστικά ποδοσφαίρου · έτοιμα κουπόνια · φτιάξε το δελτίο σου", title: "Προγνωστικά ποδοσφαίρου σήμερα", desc: "Δωρεάν προγνωστικά ποδοσφαίρου για σήμερα με στατιστικά και αποδόσεις. Free και VIP tips, έτοιμα παρολί κάθε μέρα, πιθανό σκορ και δημόσιο ιστορικό. 18+.",
     short: (d, n, t, v) => `${d}: ${n} αγώνες · ${t} δωρεάν + ${v} VIP tips.`,
     strongK: "Δυνατά:",
     answer: (d, n, t, v) => `Στις ${d} το betizzi έχει ${n} αγώνες ποδοσφαίρου με ${t} δωρεάν tips και ${v} VIP tips, από τη φόρμα των ομάδων στα τελευταία 10 παιχνίδια και τις αποδόσεις.`,
@@ -87,7 +87,7 @@ export const T = {
     fHome: "local", fAway: "visitante", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} vs {a} ({lg}) se juega el {d} a las {t}. {tip} Modelo: local {p1}%, empate {px}%, visitante {p2}%, Over 2.5 {o}%. Marcador probable {s}.",
     mTip: "Tip: {sel} a cuota {pr}.",
-    name: "Español", vp: "Tips de fútbol [100 % gratis] · cupones listos · crea tu boleto", title: "Pronósticos de fútbol hoy", desc: "Pronósticos de fútbol gratis para hoy con estadísticas y cuotas. Tips gratis y VIP, combinadas listas cada día, marcador probable e historial público. 18+.",
+    name: "Español", vp: "Pronósticos de fútbol [100 % gratis] · cupones listos · crea tu boleto", title: "Pronósticos de fútbol hoy", desc: "Pronósticos de fútbol gratis para hoy con estadísticas y cuotas. Tips gratis y VIP, combinadas listas cada día, marcador probable e historial público. 18+.",
     short: (d, n, t, v) => `${d}: ${n} partidos · ${t} tips gratis + ${v} VIP.`,
     strongK: "Más fuertes:",
     answer: (d, n, t, v) => `El ${d} betizzi recoge ${n} partidos de fútbol con ${t} tips gratis y ${v} tips VIP, elegidos por la forma de los equipos en los últimos 10 partidos y las cuotas.`,
@@ -145,7 +145,7 @@ export const T = {
     fHome: "domicile", fAway: "extérieur", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) se joue le {d} à {t}. {tip} Modèle : domicile {p1} %, nul {px} %, extérieur {p2} %, Over 2.5 {o} %. Score probable {s}.",
     mTip: "Tip : {sel} à {pr}.",
-    name: "Français", vp: "Tips foot [100 % gratuits] · tickets prêts · crée ton ticket", title: "Pronostics foot aujourd'hui", desc: "Pronostics foot gratuits du jour avec statistiques et cotes. Tips Free et VIP, combinés prêts chaque jour, score probable et historique public. 18+.",
+    name: "Français", vp: "Pronostics foot [100 % gratuits] · tickets prêts · crée ton ticket", title: "Pronostic foot aujourd'hui", desc: "Pronostics foot gratuits du jour avec statistiques et cotes. Tips Free et VIP, combinés prêts chaque jour, score probable et historique public. 18+.",
     short: (d, n, t, v) => `${d} : ${n} matchs · ${t} tips gratuits + ${v} VIP.`,
     strongK: "Les plus forts :",
     answer: (d, n, t, v) => `Le ${d}, betizzi présente ${n} matchs de foot avec ${t} tips gratuits et ${v} tips VIP, choisis selon la forme des équipes sur les 10 derniers matchs et les cotes.`,
@@ -232,7 +232,7 @@ export const T = {
     fHome: "kod kuće", fAway: "u gostima", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) igra se {d} u {t}. {tip} Model: domaćin {p1}%, nerešeno {px}%, gost {p2}%, Over 2.5 {o}%. Verovatan rezultat {s}.",
     mTip: "Tip: {sel} po kvoti {pr}.",
-    name: "Srpski", vp: "[100% besplatni] fudbalski tipovi · gotovi tiketi · napravi svoj tiket", title: "Fudbalske prognoze danas", desc: "Besplatne fudbalske prognoze za danas sa statistikom i kvotama. Besplatni i VIP tipovi, gotovi tiketi svaki dan, verovatan rezultat i javna istorija. 18+.",
+    name: "Srpski", vp: "[100% besplatni] fudbalski tipovi · gotovi tiketi · napravi svoj tiket", title: "Fudbalski tipovi danas", desc: "Besplatne fudbalske prognoze za danas sa statistikom i kvotama. Besplatni i VIP tipovi, gotovi tiketi svaki dan, verovatan rezultat i javna istorija. 18+.",
     short: (d, n, t, v) => `${d}: ${n} utakmica · ${t} besplatnih + ${v} VIP tipova.`,
     strongK: "Najjači:",
     answer: (d, n, t, v) => `Dana ${d} betizzi ima ${n} fudbalskih utakmica sa ${t} besplatnih tipova i ${v} VIP tipova, izabranih prema formi timova u poslednjih 10 utakmica i kvotama.`,
