@@ -1146,7 +1146,7 @@ function bkListHTML(){if(NOBK)return "";var rows=bkRank(slip),sb=slipBook()||(ro
   var top=rows[0].t;
   h+=rows.map(function(r,i){var hue=n>1?Math.round(120-120*i/(n-1)):120,on=r.b===sb,diff=i?Math.round((r.t/top-1)*1000)/10:0;
     return '<button type="button" class="bkr'+(on?' on':'')+'" data-bkpick="'+esc(r.b)+'" aria-pressed="'+(on?'true':'false')+'" style="--h:'+hue+'"><span class="bkr-n">'+(i===0?'★ ':'')+esc(r.b)+(i===0&&myBook==="best"?' <small>· <span>best</span></small>':'')+'</span>'
-      +'<span class="bkr-d mono">'+(i?diff.toFixed(1)+'%':'')+'</span><b class="mono">'+(multi?'x':'')+r.t.toFixed(2)+'</b></button>';}).join("");
+      +'<b class="mono">'+(multi?'x':'')+r.t.toFixed(2)+'</b></button>';}).join("");
   return h+'</div>';}
 function bindBkList(root){
   Array.prototype.forEach.call(root.querySelectorAll("[data-bkpick]"),function(b){b.addEventListener("click",function(){var r=bkRank(slip),v=b.dataset.bkpick;setBook(r.length&&r[0].b===v?"best":v);});});
@@ -1328,7 +1328,7 @@ function renderMySlip(target){
   h+='<div class="sb-sum"><span><span>Total stake</span> <b class="mono" id="sbTot"></b></span><span><span>Potential return</span> <b class="mono" id="retOut"></b></span></div>';
   /* κουμπί χορηγού: μόνο όταν υπάρχει συνεργάτης (SPONSOR = {name, url}). Μέχρι τότε δεν φαίνεται (03/11) */
   h+=(window.SPONSOR?'<a class="ss-sp" href="'+esc(SPONSOR.url||"#")+'" role="button" id="playSlip" rel="sponsored nofollow" target="_blank"><span>Play it at</span> <b>'+esc(SPONSOR.name)+'</b> →</a>':'')
-    +'<button type="button" class="sb-else" id="playElse">🎟️ <span>I played it elsewhere · save to My coupons</span></button>'
+    +'<button type="button" class="sb-else" id="playElse">📌 <span>Add to My coupons</span></button>'
     +'<p class="ss-aff">18+ · <span>Bet only what you can afford to lose.</span></p>';
   h+=bkListHTML()+'<div class="sb-ft"><button type="button" id="copySlip" aria-label="Copy">⧉ <span>Copy</span></button><button type="button" id="clearSlip" aria-label="Clear">🗑</button></div></div>';
   box.innerHTML=h;
