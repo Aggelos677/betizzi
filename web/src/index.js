@@ -599,7 +599,7 @@ async function todayPage(env, lang, url) {
   // απόφαση Owner 04/11: ένα σύντομο κείμενο (ημερομηνία, αριθμοί, δυνατά) αντί για δύο· το πλήρες «answer» μένει στο schema
   const ssr = `<h1 class="ssrh">${esc(title)}</h1>`;
   const head = `<title>${esc(title)} — ${esc(dLong)} | betizzi</title>
-<meta name="description" content="${esc(noAge(t.desc))}">
+<meta name="description" content="${esc(vpText(t.vp) + ". " + noAge(t.desc))}">
 <link rel="canonical" href="${canonical}">
 ${matches.length && !allDays && isToday ? "" : '<meta name="robots" content="noindex,follow">'}${alt}
 <meta property="og:type" content="website"><meta property="og:site_name" content="betizzi"><meta property="og:locale" content="${OGLOC[lang]}"><meta name="twitter:card" content="summary_large_image">
@@ -650,6 +650,8 @@ ${matches.length && !allDays && isToday ? "" : '<meta name="robots" content="noi
     .replace(/var TOP30 = \[[\s\S]*?\];/, () => "var TOP30 = " + JSON.stringify(top) + ";var DAYNAV = " + JSON.stringify({ date, today, nav, all: allDays, cnt: dayCnt }) + ";var BZC = " + JSON.stringify(coupons).replace(/</g, "\\u003c") + ";var BZN = " + JSON.stringify(nextC).replace(/</g, "\\u003c") + ";var STKURL = " + JSON.stringify([stkPath(lang), STK[lang].link]).replace(/</g, "\\u003c") + ";var YREC = " + JSON.stringify(strip).replace(/</g, "\\u003c") + ";var BZS = " + JSON.stringify(BZS).replace(/</g, "\\u003c") + ";")
     .replace('<div class="hscroll" id="mFilter"', () => ssr + `<p class="ssra">${esc(t.short(dLong, matches.length, tipsFree, tipsVip) + (sLine ? " " + sLine : ""))}</p>` + '<div class="hscroll" id="mFilter"')
     .replace('<div class="mlist" id="matchList">', () => '<div class="mlist" id="matchList">' + leaguesHtml)
+    // 11/11 (TASKS #24, απόφαση Owner): γραμμή κάτω από το logo με «100% δωρεάν» μπροστά, σε lime/bold, σε κάθε γλώσσα
+    .replace(/<p class="vp">[^<]*<\/p>/, () => `<p class="vp">${vpHtml(t.vp)}</p>`)
     .replace("<!--datanote-->", "")
     // απόφαση Owner 04/11: γλώσσες σε κουμπί «EN ▾» πάνω δεξιά (οι σύνδεσμοι μένουν στο HTML για τη Google)
     .replace('<div class="hdrbtns">', () => `<div class="hdrbtns"><details class="langdd" translate="no"><summary aria-label="Language">${lang.toUpperCase()} ▾</summary><nav class="langs" aria-label="Language">${langNav}</nav></details>`)
@@ -733,6 +735,9 @@ export function matchPath(lang, x) {
 // Πριν: και κάθε αγώνας Tier 1 (TOP). Οι υπόλοιποι: noindex,follow (ο επισκέπτης τους βλέπει κανονικά).
 const indexable = (x) => !!(x.tips && x.tips.length > 0);
 // 07/11 (έλεγχος SEO): χωρίς «18+/21+» σε meta/schema (η Google διαβάζει από ΗΠΑ → 21+ παντού). Η ειδοποίηση ηλικίας μένει ορατή στη σελίδα.
+// 11/11 (TASKS #24): T[lang].vp = γραμμή κάτω από το logo· το [..] είναι το «100% δωρεάν» (lime/bold)
+const vpText = (s) => String(s).replace(/[\[\]]/g, "");
+const vpHtml = (s) => esc(s).replace(/\[([^\]]+)\]/, '<b class="vp1">$1</b>');
 const noAge = (s) => String(s).replace(/\s*(18|21)\+\.?\s*$/, "").trim();
 const OGLOC = { en: "en_GB", el: "el_GR", es: "es_ES", pt: "pt_PT", fr: "fr_FR", de: "de_DE", ro: "ro_RO", sr: "sr_RS", bg: "bg_BG" };
 const SM_START = "2026-11-02"; // επίσημο record
