@@ -1328,7 +1328,7 @@ function renderMySlip(target){
   h+='<div class="sb-sum"><span><span>Total stake</span> <b class="mono" id="sbTot"></b></span><span><span>Potential return</span> <b class="mono" id="retOut"></b></span></div>';
   /* κουμπί χορηγού: μόνο όταν υπάρχει συνεργάτης (SPONSOR = {name, url}). Μέχρι τότε δεν φαίνεται (03/11) */
   h+=(window.SPONSOR?'<a class="ss-sp" href="'+esc(SPONSOR.url||"#")+'" role="button" id="playSlip" rel="sponsored nofollow" target="_blank"><span>Play it at</span> <b>'+esc(SPONSOR.name)+'</b> →</a>':'')
-    +'<button type="button" class="sb-else" id="playElse">🎟️ <span>I played it elsewhere · save to My coupons</span></button>'
+    +'<button type="button" class="sb-else" id="playElse">📌 <span>Add to My coupons</span></button>'
     +'<p class="ss-aff">18+ · <span>Bet only what you can afford to lose.</span></p>';
   h+=bkListHTML()+'<div class="sb-ft"><button type="button" id="copySlip" aria-label="Copy">⧉ <span>Copy</span></button><button type="button" id="clearSlip" aria-label="Clear">🗑</button></div></div>';
   box.innerHTML=h;
