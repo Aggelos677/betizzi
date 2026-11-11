@@ -497,6 +497,7 @@ details.mrow.calledrow>summary{background:radial-gradient(circle at 78% 50%,rgba
 /* --- αλλαγές μετά την αξιολόγηση UX (01/11/2026) --- */
 :root{--muted:#b3c0b7}
 .vp{margin:2px 0 6px;color:var(--muted);font-size:.9rem}
+.vp b.vp1{color:var(--lime);font-weight:800} /* 11/11 (TASKS #24): «100% δωρεάν» */
 @media (max-width:767px){
 .lghead,.dayhead{top:env(safe-area-inset-top,0px)} /* 04/11: στο κινητό τα tabs είναι κάτω· η κεφαλίδα λίγκας κολλάει τέρμα πάνω, χωρίς κενό */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;top:auto;margin:0;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);border-bottom:0;z-index:31;background:var(--bg)}
@@ -602,7 +603,7 @@ header{position:relative}
 .langdd>summary::-webkit-details-marker{display:none}.langdd[open]>summary{border-color:var(--lime);color:var(--lime)}
 .langdd .langs{position:absolute!important;top:calc(100% + 6px)!important;right:0!important;z-index:45;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);width:max-content}
 .langdd .langs a{min-height:40px;justify-content:center;padding:0 12px}
-@media (max-width:767px){header .vp{display:none}.hdrbtns .langdd{position:absolute;top:-50px;right:0}.langdd>summary{min-height:36px;padding:0 12px}}
+@media (max-width:767px){header .vp{margin:-4px 0 2px;font-size:.8rem;line-height:1.35}.hdrbtns .langdd{position:absolute;top:-50px;right:0}.langdd>summary{min-height:36px;padding:0 12px}}
 .legend .lg-tap{color:var(--muted)}
 @media (min-width:768px){.langs{position:absolute;top:20px;right:0}}
 /* Κοντά στη νίκη (πάνω δεξιά) */

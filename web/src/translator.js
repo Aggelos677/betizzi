@@ -7,7 +7,7 @@ function strip(s){return s.normalize("NFD").replace(/[\\u0301\\u0308]/g,"").norm
 function tr(s){var t=s.trim();if(!t)return s;if(Object.prototype.hasOwnProperty.call(D,t))return s.replace(t,D[t]);
   var o=s;for(var i=0;i<M.length;i++){if(o.indexOf(M[i])>=0)o=o.split(M[i]).join(D[M[i]]);}return o;}
 function txt(n){if(n.__bz===n.nodeValue)return; /* δικό μας κείμενο: όχι ξανά (αλλιώς «· model» → «· modelo» → «· modeloo»… κολλάει) */
-  var p=n.parentElement;if(!p||p.closest("script,style,.ssrh,.ssra"))return;var v=tr(n.nodeValue);
+  var p=n.parentElement;if(!p||p.closest("script,style,.ssrh,.ssra,.vp"))return;var v=tr(n.nodeValue);
   if(EL&&/[άέήίόύώΐΰ]/.test(v)&&getComputedStyle(p).textTransform==="uppercase")v=strip(v);if(v!==n.nodeValue){n.__bz=v;n.nodeValue=v;}}
 function attrs(e){for(var i=0;i<A.length;i++){var x=e.getAttribute(A[i]);if(x){var y=tr(x);if(y!==x)e.setAttribute(A[i],y);}}}
 function walk(r){if(r.nodeType===3)return txt(r);if(r.nodeType!==1)return;attrs(r);
