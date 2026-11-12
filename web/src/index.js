@@ -43,7 +43,7 @@ ul{list-style:none;margin:0;padding:0}
 .teams{text-decoration:none;display:flex;flex-direction:column;gap:3px;min-width:0}.tm{display:flex;gap:6px;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm img{flex:none;border-radius:3px}
 .tips{display:flex;gap:4px;align-items:center}.more{font:700 11px "JetBrains Mono",monospace;color:var(--lime);border:1px solid var(--ln);border-radius:6px;padding:3px 5px}
 .tip{display:inline-block;margin-bottom:6px;font:700 12px "JetBrains Mono",monospace;padding:6px 8px;border-radius:8px;white-space:nowrap}.tip.free{background:var(--lime);color:#0c0f0d}.tip.vip{background:var(--gold);color:#0c0f0d}.tip i{font-style:normal;opacity:.75}
-/* 12/11 ΑΣΤΕΡΙΑ: ένα αστέρι με αριθμό — ③ χρυσό, ②/① ουδέτερα */.st{display:inline-grid;place-items:center;width:24px;height:24px;padding-top:4px;box-sizing:border-box;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);font:800 11px/1 Manrope,system-ui,sans-serif;vertical-align:-6px}.st3{background:#e8b931;color:#0c0f0d}.st2{background:#cfd6d1;color:#0c0f0d}.st1{background:#6b766f;color:#fff}.tip.vip .st3{background:#0c0f0d;color:#e8b931}
+/* 12/11 τελική: σήμα μόνο στα ③ */.st3b{color:inherit}
 .how{color:var(--mu)}.strongb{display:block;font:800 12px Manrope,sans-serif;color:var(--lime);margin:0 0 6px}.an{line-height:1.6;margin:0 0 12px}footer{color:var(--mu);font-size:13px;text-align:center;padding:22px 14px 40px;border-top:1px solid var(--ln);margin-top:20px}
 
 .bc{font-size:13px;color:var(--mu);margin:4px 0}.bc a{text-decoration:none}
@@ -79,8 +79,8 @@ async function withStars(env, x) {
   for (const t of x.tips) t.star ||= t.tier === "vip" ? 3 : 0;
   return x;
 }
-// Σήμα αστεριού: ΕΝΑ αστέρι με αριθμό (③ χρυσό, ②/① ουδέτερα).
-const starB = (n) => (n ? `<span class="st st${n}" aria-label="${n}★">${n}</span>` : "");
+// Σήμα: μόνο τα ③ (VIP) παίρνουν ★ (απόφαση Owner 12/11 10:29)· ②/① μένουν μόνο στα δεδομένα.
+const starB = (n) => (n === 3 ? `<span class="st3b">★</span>` : ""); // 12/11 τελική: σήμα μόνο στα ③
 function ymdIn(tz, ts = Date.now()) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(ts);
 }
@@ -978,7 +978,7 @@ function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) 
   const wins = S.filter((x) => x.result === 1).sort((a, b) => b.price - a.price).slice(0, 3);
   const bigHtml = wins.length ? `<h2>${esc(mo === "all" ? r.big : r.top3)}</h2><div class="big">${wins.map((x, i) => `<a class="bw" href="${mp(x)}" style="text-decoration:none">
     <div class="x">${["🥇", "🥈", "🥉"][i]} ${x.price.toFixed(2)}</div><div class="mt">${esc(x.home)} – ${esc(x.away)}${x.score ? ` · ${x.score[0]}–${x.score[1]}` : ""}</div>
-    <small><span class="tg ${x.tier}">${x.tier === "vip" ? "③" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} · ${esc(x.league)} · ${fD(x.ts, { day: "numeric", month: "short" })}</small></a>`).join("")}</div>` : "";
+    <small><span class="tg ${x.tier}">${x.tier === "vip" ? "★" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} · ${esc(x.league)} · ${fD(x.ts, { day: "numeric", month: "short" })}</small></a>`).join("")}</div>` : "";
   const by = (a, f) => { const m = new Map(); for (const x of a) { const k = f(x); (m.get(k) || m.set(k, []).get(k)).push(x); } return m; };
   // Απόφαση Owner 02/11: «πού πάμε καλά / πού όχι» ανά λίγκα, εύρος απόδοσης, είδος tip, με ΟΛΑ τα νούμερα
   // (tips, W/L, μέση απόδοση, %, ROI). Μπαίνει μόνο κατηγορία με αρκετά tips: 10 στον μήνα, 30 σε όλους τους μήνες.
@@ -1013,7 +1013,7 @@ function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) 
   const monthsTable = mo === "all" ? table(r.byMonth, r.month, new Map(months.map((k) => [mName(k), ALL.filter((x) => inM(x, k) && tierOk(x))]))) : "";
   const li = (x, wd) => `<li class="${wd ? "l" : x.result === 1 ? "w" : "l"}"><span class="d">${fD(x.ts, { day: "2-digit", month: "2-digit" })}<br>${fD(x.ts, { hour: "2-digit", minute: "2-digit", hourCycle: "h23" })}</span>
     <span><a href="${mp(x)}">${esc(x.home)} – ${esc(x.away)}</a><small>${esc(x.league)}${x.score && !wd ? ` · ${x.score[0]}–${x.score[1]}` : ""}</small></span>
-    <span class="r"><span class="tg ${x.tier}">${x.tier === "vip" ? "③" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} @${x.price.toFixed(2)} ${wd ? "↩" : x.result === 1 ? '<span class="ok">✓</span>' : '<span class="ko">✗</span>'}</span></li>`;
+    <span class="r"><span class="tg ${x.tier}">${x.tier === "vip" ? "★" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} @${x.price.toFixed(2)} ${wd ? "↩" : x.result === 1 ? '<span class="ok">✓</span>' : '<span class="ko">✗</span>'}</span></li>`;
   const LF = fq === "w" ? S.filter((x) => x.result === 1) : fq === "l" ? S.filter((x) => x.result !== 1) : S;
   const PER = 10, pages = Math.max(1, Math.ceil(LF.length / PER)), pg = Math.min(pq, pages);
   const lq = (f, p) => base + mPath(mo) + "?" + [tq ? "t=" + tq : "", f ? "f=" + f : "", p > 1 ? "p=" + p : ""].filter(Boolean).join("&") + "#all";
