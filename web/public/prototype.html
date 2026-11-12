@@ -116,6 +116,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .r-pick{appearance:none;border:1px solid rgba(182,242,58,.45);background:var(--lime-soft);color:var(--fg);border-radius:9px;padding:5px 7px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;min-height:44px;justify-content:center;touch-action:manipulation;min-width:0}
 .r-pick span{font-size:.7rem;font-weight:700;color:var(--lime);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .r-pick b{font:700 .95rem var(--f-mono)}
+.r-pick .st{width:18px;height:18px;padding-top:3px;font-size:9px;vertical-align:-4px}.r-pick .rp-st{overflow:visible}.r-pick small.rp-lk{font-size:.66rem;font-weight:700;color:var(--fg);white-space:normal;text-align:right;line-height:1.1;margin-top:2px} /* 12/11 ΑΣΤΕΡΙΑ */
 .r-pick[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);color:var(--lime-ink)}
 .r-pick[aria-pressed="true"] span{color:var(--lime-ink)}
 .r-pick.none{border-color:var(--line);background:transparent;color:var(--muted);cursor:default}
@@ -1781,12 +1782,12 @@ function pickBtn(m){
   if(!m.tips.length){var hasAn=!!(m.an||(m.hfd&&m.hfd.length)||(m.afd&&m.afd.length));
     return '<span class="r-pick none'+(hasAn&&!offT?' an':'')+'">'+(offT?'<span>'+offT+'</span>':hasAn?'<span>See analysis</span> ▾':'<span>No tip</span>')+'</span>';}
   var t=m.tips[0], locked=t.tier==="vip"&&!vipMember&&!t.sel;
-  if(locked) return '<button type="button" class="r-pick vip locked" data-unlock="1" aria-label="Strong pick, free with sign-up">'+starB(3)+'<span>Free with sign-up</span></button>';
+  if(locked) return '<button type="button" class="r-pick vip locked" data-unlock="1" aria-label="Strong pick, free with sign-up"><span class="rp-st">'+starB(3)+' 🔒</span><small class="rp-lk">Free with sign-up</small></button>';
   if(m.type==="postponed"||m.type==="cancelled") return '<span class="r-pick none"><span>'+offT+'</span><small style="white-space:nowrap">'+esc(t.sel)+' · <span>Void</span></small></span>'; /* 03/11: αναβολή/ακύρωση = άκυρο, χωρίς κουμπί */
   var st=m._hold?null:tipState(t,m);
   if(st==="won") return '<span class="r-pick paid'+(m._justPaid?' pop':'')+'" role="status" aria-label="'+esc(t.sel)+' landed"><span>✓ '+esc(t.sel)+'</span><b class="mono">'+(t.odds?(+t.odds).toFixed(2):'')+'</b></span>';
   if(st==="lost") return '<span class="r-pick lost"><span>✗ '+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></span>';
-  return '<button type="button" class="r-pick'+(t.tier==="vip"?' vip':'')+'" data-key="'+esc(t.key)+'" aria-pressed="false" aria-label="'+esc(t.sel+" "+t.odds)+'">'+(starOf(t)?starB(starOf(t)):'')+'<span>'+(STRONG_IDS[t.key]?'⚡ ':'')+(starOf(t)?"":"TIP · ")+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></button>';
+  return '<button type="button" class="r-pick'+(t.tier==="vip"?' vip':'')+'" data-key="'+esc(t.key)+'" aria-pressed="false" aria-label="'+esc(t.sel+" "+t.odds)+'"><span>'+(STRONG_IDS[t.key]?'⚡ ':'')+(starOf(t)?starB(starOf(t))+' ':"TIP · ")+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></button>';
 }
 function rowHTML(m){
   var sc = (m.live||m.done) ? '<span class="r-score'+(m.live?' live':'')+(m.hit?' hit':'')+'"'+(m.hit?' title="We called this score"':'')+'>'+esc(m.score||"–")+(m.hit?'<em>🎯</em>':'')+'</span>' : (m.type==="postponed"||m.type==="cancelled"?'<span class="r-score empty pst" aria-hidden="true">⏸</span>':(m.bz?'<span class="r-score pred" title="Our score"><small>likely</small>'+m.bz+'</span>':'<span class="r-score empty">v</span>'));
