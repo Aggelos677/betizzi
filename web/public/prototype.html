@@ -844,7 +844,7 @@ header{position:relative}
 .sg.in{border-color:rgba(182,242,58,.6)}
 .sg-meta{display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:var(--muted)}
 .stb-next{display:flex;flex-direction:column;gap:10px;margin:8px 0}.sg2{display:grid;grid-template-columns:1fr auto;column-gap:12px;align-items:center;padding:14px 16px}
-.sg2 .sg-meta{grid-column:1/-1;font-size:.74rem}
+.sg2 .sg-meta{grid-column:1/-1;font-size:.74rem;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .sg2 .sg-mt{grid-column:1/-1;font:500 1rem/1.3 var(--f-body);margin:4px 0 0}
 .sg2 .sg-pl{grid-column:1;display:flex;align-items:center;gap:12px;margin-top:10px;min-width:0}
 .sg2 .sg-pick{flex:0 1 auto;font:700 1.3rem/1.15 var(--f-body);text-transform:none;letter-spacing:-.01em;min-width:0}
@@ -2380,15 +2380,15 @@ function singleHTML(m,x){
   var pick=c==="1"?'<span>Win</span>: '+esc(m.home):c==="2"?'<span>Win</span>: '+esc(m.away):c==="X"?'<span>Draw</span>':esc(x.sel);
   var res=off?' · <b><span>Void</span></b>':x.r===1?' · <b style="color:#3ccf6e">✓ <span>Won</span></b>':x.r===0?' · <b style="color:var(--bad)">✗ <span>Lost</span></b>':'';
   var when=off?'<span>'+off+'</span>':m.done?'FT '+esc(m.score||""):m.live?'<b style="color:var(--win)">LIVE</b> '+esc(m.score||""):esc(m.time);
-  var meta='<div class="sg-meta"><span>'+when+' · '+esc(m.league)+res+'</span></div><p class="sg-mt">'+esc(m.home)+' – '+esc(m.away)+'</p>';
-  if(locked)return '<article class="sg sg2 sg-lk" data-sg="">'+meta+'<div class="sg-badge">'+strongBadge()+'</div><p class="sg-lkt">🔒 <span>Free with sign-up</span></p><div class="sg-btns"><button type="button" class="sg-lock" data-unlock="1">Sign up free</button></div></article>';
+  var meta='<div class="sg-meta"><span>'+when+' · '+esc(m.league)+res+'</span>'+(starOf(x)===3?strongBadge():'')+'</div><p class="sg-mt">'+esc(m.home)+' – '+esc(m.away)+'</p>';
+  if(locked)return '<article class="sg sg2 sg-lk" data-sg="">'+meta+'<p class="sg-lkt">🔒 <span>Free with sign-up</span></p><div class="sg-btns"><button type="button" class="sg-lock" data-unlock="1">Sign up free</button></div></article>';
   var btn=m.open&&SEL[k]&&!off?'<div class="sg-btns"><button type="button" class="sg-add" data-add="'+esc(k)+'">+ Add to slip</button></div>':'';
   var ip=x.best!=null?x.best:x.odds,foot='';
   if(!off&&(x.min||ip))foot='<div class="sg-foot"><span>'+(x.min?'<span>Minimum odds</span> <b class="mono">'+x.min.toFixed(2)+'</b>':'')+'</span>'
     +'<span>'+(ip?'<span>Issued at</span> <b class="mono">'+ip.toFixed(2)+'</b>'+(x.at?' · '+esc(x.at):''):'')+'</span>'
     +(x.min&&x.odds&&x.odds<x.min?belowTxt(x.odds):'')+'</div>';
   return '<article class="sg sg2" data-sg="'+esc(k)+'">'+meta
-    +(starOf(x)===3?'<div class="sg-badge">'+strongBadge()+'</div>':'')+'<div class="sg-pl"><span class="sg-pick">'+pick+'</span><span class="sg-sep" aria-hidden="true"></span><span class="sg-odd">'+oddTxt(x)+'</span></div>'+btn
+    +'<div class="sg-pl"><span class="sg-pick">'+pick+'</span><span class="sg-sep" aria-hidden="true"></span><span class="sg-odd">'+oddTxt(x)+'</span></div>'+btn
     +(x.why?'<p class="sg-why"><small>Why this pick</small> '+esc(x.why)+'</p>':'')+foot+'</article>';}
 Array.prototype.forEach.call(document.querySelectorAll("[data-op]"),function(b){b.addEventListener("click",function(){opView=b.dataset.op;opAlt=0;store("ko-op",opView);renderPicks();});});
 function setVip(v){vipMember=v;$("vipMember").checked=v;renderTips();renderMatches();renderBuilder();try{renderPicks();renderSide();}catch(e){}}
