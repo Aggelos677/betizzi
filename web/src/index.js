@@ -43,6 +43,7 @@ ul{list-style:none;margin:0;padding:0}
 .teams{text-decoration:none;display:flex;flex-direction:column;gap:3px;min-width:0}.tm{display:flex;gap:6px;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm img{flex:none;border-radius:3px}
 .tips{display:flex;gap:4px;align-items:center}.more{font:700 11px "JetBrains Mono",monospace;color:var(--lime);border:1px solid var(--ln);border-radius:6px;padding:3px 5px}
 .tip{display:inline-block;margin-bottom:6px;font:700 12px "JetBrains Mono",monospace;padding:6px 8px;border-radius:8px;white-space:nowrap}.tip.free{background:var(--lime);color:#0c0f0d}.tip.vip{background:var(--gold);color:#0c0f0d}.tip i{font-style:normal;opacity:.75}
+/* 12/11 τελική: σήμα μόνο στα ③ */.st3b{color:inherit}
 .how{color:var(--mu)}.strongb{display:block;font:800 12px Manrope,sans-serif;color:var(--lime);margin:0 0 6px}.an{line-height:1.6;margin:0 0 12px}footer{color:var(--mu);font-size:13px;text-align:center;padding:22px 14px 40px;border-top:1px solid var(--ln);margin-top:20px}
 
 .bc{font-size:13px;color:var(--mu);margin:4px 0}.bc a{text-decoration:none}
@@ -68,6 +69,18 @@ table{width:100%;border-collapse:collapse;font:500 14px "JetBrains Mono",monospa
 // Οι ώρες των αγώνων φαίνονται στην ώρα της χώρας της γλώσσας (TZ[lang]), με ένδειξη (TZNOTE).
 const DAYTZ = "Europe/Athens";
 const TZNOTE = { en: "UK time", el: "ώρα Ελλάδας/Κύπρου", es: "hora de España", pt: "horário de Brasília", fr: "heure de Paris", de: "deutsche Zeit", ro: "ora României", sr: "vreme u Srbiji", bg: "българско време" };
+// 12/11 (ΑΣΤΕΡΙΑ): η σελίδα αγώνα παίρνει το ίδιο αστέρι με τη λίστα της ημέρας (η σειρά βγαίνει από όλα τα tips της μέρας).
+async function withStars(env, x) {
+  try {
+    const d = await getDay(env, ymdIn(DAYTZ, x.ts * 1000));
+    const mx = d.matches.find((m) => m.id === x.id);
+    if (mx) for (const t of x.tips) { const y = mx.tips.find((z) => z.sel === t.sel && z.tier === t.tier); if (y) t.star = y.star; }
+  } catch (e) { /* χωρίς αστέρι αν δεν βρεθεί η μέρα */ }
+  for (const t of x.tips) t.star ||= t.tier === "vip" ? 3 : 0;
+  return x;
+}
+// Σήμα: μόνο τα ③ (VIP) παίρνουν ★ (απόφαση Owner 12/11 10:29)· ②/① μένουν μόνο στα δεδομένα.
+const starB = (n) => (n === 3 ? `<span class="st3b">★</span>` : ""); // 12/11 τελική: σήμα μόνο στα ③
 function ymdIn(tz, ts = Date.now()) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(ts);
 }
@@ -219,6 +232,7 @@ const handle = async (req, env, ctx) => {
     if (mm && LANGS.includes(mm[1])) {
       const x = await getMatch(env, +mm[4]);
       if (!x) return html("<!doctype html><title>404</title>", 404);
+      await withStars(env, x); // 12/11: αστέρι ③②① όπως στη λίστα της ημέρας
       const want = matchPath(mm[1], x);
       if (want !== p) return Response.redirect(url.origin + want, 301); // σταθερό id, το slug διορθώνεται
       if (url.searchParams.has("frag")) return new Response(matchFrag(mm[1], x), { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=120", "x-robots-tag": "noindex" } });
@@ -332,7 +346,7 @@ async function authRoute(req, env, url) {
     for (const q of rs) for (const tp of q.tips || []) if (!seen.has(tp.rid)) { seen.add(tp.rid); r.tips.push(tp); }
     r.tips.sort((a, b) => a.rid - b.rid);
     // ίδια μορφή με τα tips της σελίδας (RAW[15])
-    return J({ tips: r.tips.map((tp) => [tp.fixture_id, [SELNAME[tp.sel] || tp.sel, tp.price, "vip", tp.reason, 0, tp.result == null ? -1 : tp.result, 0, "best price", "A", tp.min_price || 0, tp.created_at || 0]]) });
+    return J({ tips: r.tips.map((tp) => [tp.fixture_id, [SELNAME[tp.sel] || tp.sel, tp.price, "vip", tp.reason, 0, tp.result == null ? -1 : tp.result, 0, "best price", "A", tp.min_price || 0, tp.created_at || 0, 3]]) });
   }
   return J({ error: "not found" });
 }
@@ -540,8 +554,8 @@ async function todayPage(env, lang, url) {
   });
 
   const tipHtml = (tp) => tp.locked
-    ? `<span class="tip vip" title="${esc(t.vipLock)}">VIP 🔒</span>`
-    : `<span class="tip ${tp.tier}">${tp.tier === "vip" ? "VIP " : "TIP "}<b>${esc(SEL[tp.sel] || tp.sel)}</b> <i>${tp.price ? tp.price.toFixed(2) : ""}</i>${tp.result === 1 ? " ✓" : tp.result === 0 ? " ✗" : ""}</span>`;
+    ? `<span class="tip vip" title="${esc(t.vipLock)}">${starB(3)} 🔒</span>`
+    : `<span class="tip ${tp.tier}">${starB(tp.star || (tp.tier === "vip" ? 3 : 0)) || "TIP"} <b>${esc(SEL[tp.sel] || tp.sel)}</b> <i>${tp.price ? tp.price.toFixed(2) : ""}</i>${tp.result === 1 ? " ✓" : tp.result === 0 ? " ✗" : ""}</span>`;
 
   // Στη γραμμή: μόνο το πιο δυνατό tip + σήμα «+N». Όλα φαίνονται στη σελίδα του αγώνα.
   const topTip = (tips) => {
@@ -711,8 +725,8 @@ function rawRow(x, hm, lang) {
     x.home.rank || 0, x.away.rank || 0, 0, fs(x.home.form), fs(x.away.form),
     [o["1"] || null, o.X || null, o["2"] || null, o.O25 || null, o.U25 || null, o.GG || null, o.NG || null],
     md ? [pc(md.p1), pc(md.px), 100 - pc(md.p1) - pc(md.px), pc(md.over25), md.score.join("-")] : [null, null, null, null, ""],
-    x.tips.map((tp) => tp.locked ? ["", 0, "vip", "", 0, -1, 0, "", "A"]
-      : [SELNAME[tp.sel] || tp.sel, tp.price, tp.tier, tp.reason, 0, tp.result == null ? -1 : tp.result, 0, "best price", "A", tp.min || 0, tp.at ? hm(tp.at) : ""]),
+    x.tips.map((tp) => tp.locked ? ["", 0, "vip", "", 0, -1, 0, "", "A", 0, "", 3]
+      : [SELNAME[tp.sel] || tp.sel, tp.price, tp.tier, tp.reason, 0, tp.result == null ? -1 : tp.result, 0, "best price", "A", tp.min || 0, tp.at ? hm(tp.at) : "", tp.star || (tp.tier === "vip" ? 3 : 0)]), // [11] αστέρι ③②① (12/11)
     x.status, x.minute || 0, x.home.form, x.away.form,
     { cr: null, yc: null, bts: gg.length ? Math.round((gg.reduce((a, b) => a + b, 0) / gg.length) * 100) : null },
     BOOKS.map((b) => (x.books && x.books[b]) || 0), // [1,X,2,O25,U25,GG,NG] ανά bookmaker, σειρά BOOKS
@@ -797,8 +811,8 @@ function matchPage(lang, x) {
 
   const anTxt = analysis(lang, x, SEL);
   const tipsHtml = x.tips.length ? x.tips.map((y) => y.locked
-    ? `<div class="tipc"><div><span class="tip vip">VIP 🔒</span><small>${esc(t.vipLock)}</small></div></div>`
-    : `<div class="tipc"><div>${(x.strong || []).includes(y.sel) ? `<span class="strongb">⚡ ${esc(t.strongB)}</span>` : ""}<span class="tip ${y.tier}">${y.tier === "vip" ? "VIP" : "TIP"} <b>${esc(SEL[y.sel] || y.sel)}</b> <i>${y.price.toFixed(2)}</i>${y.result === 1 ? " ✓" : y.result === 0 ? " ✗" : ""}</span>${off || y.result === 2 ? ` · <span>${esc(ui("Void"))}</span>` : ""}
+    ? `<div class="tipc"><div><span class="tip vip">${starB(3)} 🔒</span><small>${esc(t.vipLock)}</small></div></div>`
+    : `<div class="tipc"><div>${(x.strong || []).includes(y.sel) ? `<span class="strongb">⚡ ${esc(t.strongB)}</span>` : ""}<span class="tip ${y.tier}">${starB(y.star || (y.tier === "vip" ? 3 : 0)) || "TIP"} <b>${esc(SEL[y.sel] || y.sel)}</b> <i>${y.price.toFixed(2)}</i>${y.result === 1 ? " ✓" : y.result === 0 ? " ✗" : ""}</span>${off || y.result === 2 ? ` · <span>${esc(ui("Void"))}</span>` : ""}
        <small>${esc(t.why)}: ${esc(y.reason)}</small></div>
        ${off || live || done ? "" : `<button class="add" data-fx="${x.id}" data-sel="${esc(y.sel)}" data-price="${y.price}">${esc(t.add)}</button>`}</div>`).join("")
     : `<p class="how">${esc(t.noTipM)}${live || done || off ? "" : " " + esc(t.noTipF)}${(x.home.form || []).length || (x.away.form || []).length ? " " + esc(t.noTipA) : ""}</p><p><a href="/${lang}/">${esc(t.noTipL)} →</a></p>`;
@@ -964,7 +978,7 @@ function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) 
   const wins = S.filter((x) => x.result === 1).sort((a, b) => b.price - a.price).slice(0, 3);
   const bigHtml = wins.length ? `<h2>${esc(mo === "all" ? r.big : r.top3)}</h2><div class="big">${wins.map((x, i) => `<a class="bw" href="${mp(x)}" style="text-decoration:none">
     <div class="x">${["🥇", "🥈", "🥉"][i]} ${x.price.toFixed(2)}</div><div class="mt">${esc(x.home)} – ${esc(x.away)}${x.score ? ` · ${x.score[0]}–${x.score[1]}` : ""}</div>
-    <small><span class="tg ${x.tier}">${x.tier === "vip" ? "VIP" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} · ${esc(x.league)} · ${fD(x.ts, { day: "numeric", month: "short" })}</small></a>`).join("")}</div>` : "";
+    <small><span class="tg ${x.tier}">${x.tier === "vip" ? "★" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} · ${esc(x.league)} · ${fD(x.ts, { day: "numeric", month: "short" })}</small></a>`).join("")}</div>` : "";
   const by = (a, f) => { const m = new Map(); for (const x of a) { const k = f(x); (m.get(k) || m.set(k, []).get(k)).push(x); } return m; };
   // Απόφαση Owner 02/11: «πού πάμε καλά / πού όχι» ανά λίγκα, εύρος απόδοσης, είδος tip, με ΟΛΑ τα νούμερα
   // (tips, W/L, μέση απόδοση, %, ROI). Μπαίνει μόνο κατηγορία με αρκετά tips: 10 στον μήνα, 30 σε όλους τους μήνες.
@@ -999,7 +1013,7 @@ function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) 
   const monthsTable = mo === "all" ? table(r.byMonth, r.month, new Map(months.map((k) => [mName(k), ALL.filter((x) => inM(x, k) && tierOk(x))]))) : "";
   const li = (x, wd) => `<li class="${wd ? "l" : x.result === 1 ? "w" : "l"}"><span class="d">${fD(x.ts, { day: "2-digit", month: "2-digit" })}<br>${fD(x.ts, { hour: "2-digit", minute: "2-digit", hourCycle: "h23" })}</span>
     <span><a href="${mp(x)}">${esc(x.home)} – ${esc(x.away)}</a><small>${esc(x.league)}${x.score && !wd ? ` · ${x.score[0]}–${x.score[1]}` : ""}</small></span>
-    <span class="r"><span class="tg ${x.tier}">${x.tier === "vip" ? "VIP" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} @${x.price.toFixed(2)} ${wd ? "↩" : x.result === 1 ? '<span class="ok">✓</span>' : '<span class="ko">✗</span>'}</span></li>`;
+    <span class="r"><span class="tg ${x.tier}">${x.tier === "vip" ? "★" : "TIP"}</span>${esc(SEL[x.sel] || x.sel)} @${x.price.toFixed(2)} ${wd ? "↩" : x.result === 1 ? '<span class="ok">✓</span>' : '<span class="ko">✗</span>'}</span></li>`;
   const LF = fq === "w" ? S.filter((x) => x.result === 1) : fq === "l" ? S.filter((x) => x.result !== 1) : S;
   const PER = 10, pages = Math.max(1, Math.ceil(LF.length / PER)), pg = Math.min(pq, pages);
   const lq = (f, p) => base + mPath(mo) + "?" + [tq ? "t=" + tq : "", f ? "f=" + f : "", p > 1 ? "p=" + p : ""].filter(Boolean).join("&") + "#all";

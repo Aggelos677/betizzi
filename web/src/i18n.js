@@ -29,11 +29,11 @@ export const T = {
     fHome: "home", fAway: "away", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} vs {a} ({lg}) kicks off on {d} at {t}. {tip} Model: home {p1}%, draw {px}%, away {p2}%, Over 2.5 {o}%. Likely score {s}.",
     mTip: "Tip: {sel} at {pr}.",
-    name: "English", vp: "[100% free] football predictions · ready-made coupons · build your own slip", title: "Football predictions today", desc: "Free football tips for today, with stats and odds. Free and VIP tips, ready-made parlays every day, likely scores and a public record. 18+.",
-    short: (d, n, t, v) => `${d}: ${n} matches · ${t} free + ${v} VIP tips.`,
+    name: "English", vp: "[100% free] football predictions · ready-made coupons · build your own slip", title: "Football predictions today", desc: "Free football tips for today, with stats and odds. Strong picks (★), ready-made parlays every day, likely scores and a public record. 18+.",
+    short: (d, n, t, v) => `${d}: ${n} matches · ${t} tips + ${v} strong picks (★).`,
     strongK: "Strongest:",
-    answer: (d, n, t, v) => `On ${d} betizzi lists ${n} football matches with ${t} free tips and ${v} VIP tips, chosen from team form over the last 10 games and bookmaker odds.`,
-    matches: "Matches", tips: "Our tips", vipLock: "VIP tip — sign up free to see it", noTip: "",
+    answer: (d, n, t, v) => `On ${d} betizzi lists ${n} football matches with ${t} tips and ${v} strong picks (★), chosen from team form over the last 10 games and bookmaker odds.`,
+    matches: "Matches", tips: "Our tips", vipLock: "Strong pick (★) — free with sign-up", noTip: "",
     ko: "Kick-off", live: "LIVE", ft: "FT", rg: "18+ · Play for fun, set a limit. Tips are not a guarantee.", why: "Why", chance: "chance",
     how: "How it works", howText: "We check each team's last 10 games and the bookmaker price. A tip appears only when both point the same way — about 1 in 4 matches.",
   },
@@ -58,11 +58,11 @@ export const T = {
     fHome: "εντός", fAway: "εκτός", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) παίζεται στις {d}, ώρα {t}. {tip} Μοντέλο: άσσος {p1}%, Χ {px}%, διπλό {p2}%, Over 2.5 {o}%. Πιθανό σκορ {s}.",
     mTip: "Tip: {sel} σε απόδοση {pr}.",
-    name: "Ελληνικά", vp: "[100% δωρεάν] προγνωστικά ποδοσφαίρου · έτοιμα κουπόνια · φτιάξε το δελτίο σου", title: "Προγνωστικά ποδοσφαίρου σήμερα", desc: "Δωρεάν προγνωστικά ποδοσφαίρου για σήμερα με στατιστικά και αποδόσεις. Free και VIP tips, έτοιμα παρολί κάθε μέρα, πιθανό σκορ και δημόσιο ιστορικό. 18+.",
-    short: (d, n, t, v) => `${d}: ${n} αγώνες · ${t} δωρεάν + ${v} VIP tips.`,
+    name: "Ελληνικά", vp: "[100% δωρεάν] προγνωστικά ποδοσφαίρου · έτοιμα κουπόνια · φτιάξε το δελτίο σου", title: "Προγνωστικά ποδοσφαίρου σήμερα", desc: "Δωρεάν προγνωστικά ποδοσφαίρου για σήμερα με στατιστικά και αποδόσεις. Δυνατές επιλογές (★), έτοιμα παρολί κάθε μέρα, πιθανό σκορ και δημόσιο ιστορικό. 18+.",
+    short: (d, n, t, v) => `${d}: ${n} αγώνες · ${t} tips + ${v} δυνατές επιλογές (★).`,
     strongK: "Δυνατά:",
-    answer: (d, n, t, v) => `Στις ${d} το betizzi έχει ${n} αγώνες ποδοσφαίρου με ${t} δωρεάν tips και ${v} VIP tips, από τη φόρμα των ομάδων στα τελευταία 10 παιχνίδια και τις αποδόσεις.`,
-    matches: "Αγώνες", tips: "Τα tips μας", vipLock: "VIP tip — δες το με δωρεάν εγγραφή", noTip: "",
+    answer: (d, n, t, v) => `Στις ${d} το betizzi έχει ${n} αγώνες ποδοσφαίρου με ${t} tips και ${v} δυνατές επιλογές (★), από τη φόρμα των ομάδων στα τελευταία 10 παιχνίδια και τις αποδόσεις.`,
+    matches: "Αγώνες", tips: "Τα tips μας", vipLock: "Δυνατή επιλογή (★) — δωρεάν με εγγραφή", noTip: "",
     ko: "Ώρα", live: "LIVE", ft: "Τελ.", rg: "18+ · Παίξε για διασκέδαση, με όριο. Τα tips δεν είναι εγγύηση.", why: "Γιατί", chance: "πιθανότητα",
     how: "Πώς δουλεύει", howText: "Κοιτάμε τα τελευταία 10 παιχνίδια κάθε ομάδας και την απόδοση. Tip βγαίνει μόνο όταν συμφωνούν — περίπου σε 1 στους 4 αγώνες.",
   },
@@ -87,11 +87,11 @@ export const T = {
     fHome: "local", fAway: "visitante", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} vs {a} ({lg}) se juega el {d} a las {t}. {tip} Modelo: local {p1}%, empate {px}%, visitante {p2}%, Over 2.5 {o}%. Marcador probable {s}.",
     mTip: "Tip: {sel} a cuota {pr}.",
-    name: "Español", vp: "Pronósticos de fútbol [100 % gratis] · cupones listos · crea tu boleto", title: "Pronósticos de fútbol hoy", desc: "Pronósticos de fútbol gratis para hoy con estadísticas y cuotas. Tips gratis y VIP, combinadas listas cada día, marcador probable e historial público. 18+.",
-    short: (d, n, t, v) => `${d}: ${n} partidos · ${t} tips gratis + ${v} VIP.`,
+    name: "Español", vp: "Pronósticos de fútbol [100 % gratis] · cupones listos · crea tu boleto", title: "Pronósticos de fútbol hoy", desc: "Pronósticos de fútbol gratis para hoy con estadísticas y cuotas. Selecciones fuertes (★), combinadas listas cada día, marcador probable e historial público. 18+.",
+    short: (d, n, t, v) => `${d}: ${n} partidos · ${t} tips + ${v} selecciones fuertes (★).`,
     strongK: "Más fuertes:",
-    answer: (d, n, t, v) => `El ${d} betizzi recoge ${n} partidos de fútbol con ${t} tips gratis y ${v} tips VIP, elegidos por la forma de los equipos en los últimos 10 partidos y las cuotas.`,
-    matches: "Partidos", tips: "Nuestros tips", vipLock: "Tip VIP — regístrate gratis para verlo", noTip: "",
+    answer: (d, n, t, v) => `El ${d} betizzi recoge ${n} partidos de fútbol con ${t} tips y ${v} selecciones fuertes (★), elegidos por la forma de los equipos en los últimos 10 partidos y las cuotas.`,
+    matches: "Partidos", tips: "Nuestros tips", vipLock: "Selección fuerte (★) — gratis con registro", noTip: "",
     ko: "Hora", live: "EN VIVO", ft: "Final", rg: "18+ · Juega por diversión y con límite. Los tips no son una garantía.", why: "Por qué", chance: "probabilidad",
     how: "Cómo funciona", howText: "Miramos los últimos 10 partidos de cada equipo y la cuota. Solo damos tip cuando ambos coinciden: en 1 de cada 4 partidos aprox.",
   },
@@ -116,11 +116,11 @@ export const T = {
     fHome: "em casa", fAway: "fora", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} x {a} ({lg}) será em {d} às {t}. {tip} Modelo: mandante {p1}%, empate {px}%, visitante {p2}%, Over 2.5 {o}%. Placar provável {s}.",
     mTip: "Palpite: {sel} com odd {pr}.",
-    name: "Português", vp: "Palpites de futebol [100% grátis] · bilhetes prontos · monte o seu", title: "Palpites de futebol hoje", desc: "Palpites de futebol grátis para hoje com estatísticas e odds. Palpites grátis e VIP, múltiplas prontas todos os dias, placar provável e histórico público. 18+.",
-    short: (d, n, t, v) => `${d}: ${n} jogos · ${t} tips grátis + ${v} VIP.`,
+    name: "Português", vp: "Palpites de futebol [100% grátis] · bilhetes prontos · monte o seu", title: "Palpites de futebol hoje", desc: "Palpites de futebol grátis para hoje com estatísticas e odds. Escolhas fortes (★), múltiplas prontas todos os dias, placar provável e histórico público. 18+.",
+    short: (d, n, t, v) => `${d}: ${n} jogos · ${t} tips + ${v} escolhas fortes (★).`,
     strongK: "Mais fortes:",
-    answer: (d, n, t, v) => `Em ${d} o betizzi traz ${n} jogos de futebol com ${t} tips grátis e ${v} tips VIP, escolhidos pela forma dos times nos últimos 10 jogos e pelas odds.`,
-    matches: "Jogos", tips: "Nossos palpites", vipLock: "Palpite VIP — cadastre-se grátis para ver", noTip: "",
+    answer: (d, n, t, v) => `Em ${d} o betizzi traz ${n} jogos de futebol com ${t} tips e ${v} escolhas fortes (★), escolhidos pela forma dos times nos últimos 10 jogos e pelas odds.`,
+    matches: "Jogos", tips: "Nossos palpites", vipLock: "Escolha forte (★) — grátis com cadastro", noTip: "",
     ko: "Horário", live: "AO VIVO", ft: "Fim", rg: "18+ · Jogue por diversão e com limite. Palpites não são garantia.", why: "Por quê", chance: "chance",
     how: "Como funciona", howText: "Olhamos os últimos 10 jogos de cada time e a odd. Só damos palpite quando os dois concordam — cerca de 1 em cada 4 jogos.",
   },
@@ -145,11 +145,11 @@ export const T = {
     fHome: "domicile", fAway: "extérieur", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) se joue le {d} à {t}. {tip} Modèle : domicile {p1} %, nul {px} %, extérieur {p2} %, Over 2.5 {o} %. Score probable {s}.",
     mTip: "Tip : {sel} à {pr}.",
-    name: "Français", vp: "Pronostics foot [100 % gratuits] · tickets prêts · crée ton ticket", title: "Pronostic foot aujourd'hui", desc: "Pronostics foot gratuits du jour avec statistiques et cotes. Tips Free et VIP, combinés prêts chaque jour, score probable et historique public. 18+.",
-    short: (d, n, t, v) => `${d} : ${n} matchs · ${t} tips gratuits + ${v} VIP.`,
+    name: "Français", vp: "Pronostics foot [100 % gratuits] · tickets prêts · crée ton ticket", title: "Pronostic foot aujourd'hui", desc: "Pronostics foot gratuits du jour avec statistiques et cotes. Choix forts (★), combinés prêts chaque jour, score probable et historique public. 18+.",
+    short: (d, n, t, v) => `${d} : ${n} matchs · ${t} tips + ${v} choix forts (★).`,
     strongK: "Les plus forts :",
-    answer: (d, n, t, v) => `Le ${d}, betizzi présente ${n} matchs de foot avec ${t} tips gratuits et ${v} tips VIP, choisis selon la forme des équipes sur les 10 derniers matchs et les cotes.`,
-    matches: "Matchs", tips: "Nos tips", vipLock: "Tip VIP — inscris-toi gratuitement pour le voir", noTip: "",
+    answer: (d, n, t, v) => `Le ${d}, betizzi présente ${n} matchs de foot avec ${t} tips et ${v} choix forts (★), choisis selon la forme des équipes sur les 10 derniers matchs et les cotes.`,
+    matches: "Matchs", tips: "Nos tips", vipLock: "Choix fort (★) — gratuit avec inscription", noTip: "",
     ko: "Heure", live: "EN DIRECT", ft: "Fin", rg: "18+ · Joue pour le plaisir, avec une limite. Les tips ne sont pas une garantie.", why: "Pourquoi", chance: "probabilité",
     how: "Comment ça marche", howText: "On regarde les 10 derniers matchs de chaque équipe et la cote. Un tip n'apparaît que si les deux vont dans le même sens — environ 1 match sur 4.",
   },
@@ -174,11 +174,11 @@ export const T = {
     fHome: "heim", fAway: "auswärts", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) wird am {d} um {t} angepfiffen. {tip} Modell: Heim {p1} %, Remis {px} %, Gast {p2} %, Over 2.5 {o} %. Wahrscheinliches Ergebnis {s}.",
     mTip: "Tipp: {sel} zur Quote {pr}.",
-    name: "Deutsch", vp: "[100 % kostenlose] Fußball-Tipps · fertige Scheine · bau deinen eigenen Schein", title: "Fußball-Tipps heute", desc: "Kostenlose Fußball-Tipps für heute mit Statistiken und Quoten. Gratis- und VIP-Tipps, fertige Kombis jeden Tag, wahrscheinliches Ergebnis und öffentliche Bilanz. 18+.",
-    short: (d, n, t, v) => `${d}: ${n} Spiele · ${t} Gratis- + ${v} VIP-Tipps.`,
+    name: "Deutsch", vp: "[100 % kostenlose] Fußball-Tipps · fertige Scheine · bau deinen eigenen Schein", title: "Fußball-Tipps heute", desc: "Kostenlose Fußball-Tipps für heute mit Statistiken und Quoten. Starke Tipps (★), fertige Kombis jeden Tag, wahrscheinliches Ergebnis und öffentliche Bilanz. 18+.",
+    short: (d, n, t, v) => `${d}: ${n} Spiele · ${t} Tipps + ${v} starke Tipps (★).`,
     strongK: "Am stärksten:",
-    answer: (d, n, t, v) => `Am ${d} zeigt betizzi ${n} Fußballspiele mit ${t} kostenlosen Tipps und ${v} VIP-Tipps, ausgewählt nach der Form der Teams in den letzten 10 Spielen und den Quoten.`,
-    matches: "Spiele", tips: "Unsere Tipps", vipLock: "VIP-Tipp — kostenlos registrieren und ansehen", noTip: "",
+    answer: (d, n, t, v) => `Am ${d} zeigt betizzi ${n} Fußballspiele mit ${t} Tipps und ${v} starken Tipps (★), ausgewählt nach der Form der Teams in den letzten 10 Spielen und den Quoten.`,
+    matches: "Spiele", tips: "Unsere Tipps", vipLock: "Starker Tipp (★) — kostenlos mit Anmeldung", noTip: "",
     ko: "Anstoß", live: "LIVE", ft: "Ende", rg: "18+ · Spiel zum Spaß und mit Limit. Tipps sind keine Garantie.", why: "Warum", chance: "Chance",
     how: "So funktioniert's", howText: "Wir prüfen die letzten 10 Spiele jedes Teams und die Quote. Ein Tipp kommt nur, wenn beides übereinstimmt — bei etwa 1 von 4 Spielen.",
   },
@@ -203,11 +203,11 @@ export const T = {
     fHome: "acasă", fAway: "deplasare", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) se joacă pe {d}, ora {t}. {tip} Model: gazde {p1}%, egal {px}%, oaspeți {p2}%, Over 2.5 {o}%. Scor probabil {s}.",
     mTip: "Pont: {sel} la cota {pr}.",
-    name: "Română", vp: "Ponturi fotbal [100% gratuite] · bilete gata făcute · creează-ți biletul", title: "Ponturi fotbal azi", desc: "Ponturi fotbal gratuite pentru azi, cu statistici și cote. Ponturi Free și VIP, bilete gata făcute zilnic, scor probabil și istoric public. 18+.",
-    short: (d, n, t, v) => `${d}: ${n} meciuri · ${t} ponturi gratuite + ${v} VIP.`,
+    name: "Română", vp: "Ponturi fotbal [100% gratuite] · bilete gata făcute · creează-ți biletul", title: "Ponturi fotbal azi", desc: "Ponturi fotbal gratuite pentru azi, cu statistici și cote. Alegeri puternice (★), bilete gata făcute zilnic, scor probabil și istoric public. 18+.",
+    short: (d, n, t, v) => `${d}: ${n} meciuri · ${t} ponturi + ${v} alegeri puternice (★).`,
     strongK: "Cele mai tari:",
-    answer: (d, n, t, v) => `Pe ${d}, betizzi are ${n} meciuri de fotbal cu ${t} ponturi gratuite și ${v} ponturi VIP, alese după forma echipelor în ultimele 10 meciuri și după cote.`,
-    matches: "Meciuri", tips: "Ponturile noastre", vipLock: "Pont VIP — înregistrează-te gratuit ca să-l vezi", noTip: "",
+    answer: (d, n, t, v) => `Pe ${d}, betizzi are ${n} meciuri de fotbal cu ${t} ponturi și ${v} alegeri puternice (★), alese după forma echipelor în ultimele 10 meciuri și după cote.`,
+    matches: "Meciuri", tips: "Ponturile noastre", vipLock: "Alegere puternică (★) — gratuit cu înregistrare", noTip: "",
     ko: "Ora", live: "LIVE", ft: "Final", rg: "18+ · Joacă pentru distracție, cu limită. Ponturile nu sunt o garanție.", why: "De ce", chance: "șansă",
     how: "Cum funcționează", howText: "Verificăm ultimele 10 meciuri ale fiecărei echipe și cota. Dăm pont doar când ambele arată la fel — cam la 1 din 4 meciuri.",
   },
@@ -232,11 +232,11 @@ export const T = {
     fHome: "kod kuće", fAway: "u gostima", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) igra se {d} u {t}. {tip} Model: domaćin {p1}%, nerešeno {px}%, gost {p2}%, Over 2.5 {o}%. Verovatan rezultat {s}.",
     mTip: "Tip: {sel} po kvoti {pr}.",
-    name: "Srpski", vp: "[100% besplatni] fudbalski tipovi · gotovi tiketi · napravi svoj tiket", title: "Fudbalski tipovi danas", desc: "Besplatne fudbalske prognoze za danas sa statistikom i kvotama. Besplatni i VIP tipovi, gotovi tiketi svaki dan, verovatan rezultat i javna istorija. 18+.",
-    short: (d, n, t, v) => `${d}: ${n} utakmica · ${t} besplatnih + ${v} VIP tipova.`,
+    name: "Srpski", vp: "[100% besplatni] fudbalski tipovi · gotovi tiketi · napravi svoj tiket", title: "Fudbalski tipovi danas", desc: "Besplatne fudbalske prognoze za danas sa statistikom i kvotama. Jaki izbori (★), gotovi tiketi svaki dan, verovatan rezultat i javna istorija. 18+.",
+    short: (d, n, t, v) => `${d}: ${n} utakmica · ${t} tipova + ${v} jakih izbora (★).`,
     strongK: "Najjači:",
-    answer: (d, n, t, v) => `Dana ${d} betizzi ima ${n} fudbalskih utakmica sa ${t} besplatnih tipova i ${v} VIP tipova, izabranih prema formi timova u poslednjih 10 utakmica i kvotama.`,
-    matches: "Utakmice", tips: "Naši tipovi", vipLock: "VIP tip — registruj se besplatno da ga vidiš", noTip: "",
+    answer: (d, n, t, v) => `Dana ${d} betizzi ima ${n} fudbalskih utakmica sa ${t} tipova i ${v} jakih izbora (★), izabranih prema formi timova u poslednjih 10 utakmica i kvotama.`,
+    matches: "Utakmice", tips: "Naši tipovi", vipLock: "Jak izbor (★) — besplatno uz registraciju", noTip: "",
     ko: "Vreme", live: "UŽIVO", ft: "Kraj", rg: "18+ · Igraj iz zabave, sa limitom. Tipovi nisu garancija.", why: "Zašto", chance: "šansa",
     how: "Kako radi", howText: "Gledamo poslednjih 10 utakmica svakog tima i kvotu kladionice. Tip dajemo samo kad i forma i kvota pokazuju isto — otprilike na 1 od 4 utakmice.",
   },
@@ -261,11 +261,11 @@ export const T = {
     fHome: "домакин", fAway: "гост", // 08/11: tooltip φόρμας (αντίπαλος · εντός/εκτός · ημερομηνία)
     mAnswer: "{h} – {a} ({lg}) се играе на {d} от {t}. {tip} Модел: домакин {p1}%, равен {px}%, гост {p2}%, Over 2.5 {o}%. Вероятен резултат {s}.",
     mTip: "Прогноза: {sel} при коефициент {pr}.",
-    name: "Български", vp: "[100% безплатни] футболни прогнози · готови фишове · създай свой фиш", title: "Футболни прогнози днес", desc: "Безплатни футболни прогнози за днес със статистика и коефициенти. Free и VIP прогнози, готови комбинации всеки ден, вероятен резултат и публична история. 18+.",
-    short: (d, n, t, v) => `${d}: ${n} мача · ${t} безплатни + ${v} VIP прогнози.`,
+    name: "Български", vp: "[100% безплатни] футболни прогнози · готови фишове · създай свой фиш", title: "Футболни прогнози днес", desc: "Безплатни футболни прогнози за днес със статистика и коефициенти. Силни избори (★), готови комбинации всеки ден, вероятен резултат и публична история. 18+.",
+    short: (d, n, t, v) => `${d}: ${n} мача · ${t} прогнози + ${v} силни избора (★).`,
     strongK: "Най-силни:",
-    answer: (d, n, t, v) => `На ${d} betizzi има ${n} футболни мача с ${t} безплатни и ${v} VIP прогнози, избрани по формата на отборите в последните 10 мача и коефициентите.`,
-    matches: "Мачове", tips: "Нашите прогнози", vipLock: "VIP прогноза — безплатна регистрация, за да я видиш", noTip: "",
+    answer: (d, n, t, v) => `На ${d} betizzi има ${n} футболни мача с ${t} прогнози и ${v} силни избора (★), избрани по формата на отборите в последните 10 мача и коефициентите.`,
+    matches: "Мачове", tips: "Нашите прогнози", vipLock: "Силен избор (★) — безплатно с регистрация", noTip: "",
     ko: "Час", live: "НА ЖИВО", ft: "Край", rg: "18+ · Играй за забавление и с лимит. Прогнозите не са гаранция.", why: "Защо", chance: "шанс",
     how: "Как работи", howText: "Гледаме последните 10 мача на всеки отбор и коефициента. Прогноза има само когато двете съвпадат — около 1 на 4 мача.",
   },
@@ -326,22 +326,22 @@ export const UI = {
   "See analysis": ["Δες ανάλυση", "Ver análisis", "Ver análise", "Voir l'analyse", "Analyse ansehen", "Vezi analiza", "Pogledaj analizu", "Виж анализа"],
   "No tip": ["Χωρίς tip", "Sin tip", "Sem palpite", "Pas de tip", "Kein Tipp", "Fără pont", "Bez tipa", "Без прогноза"],
   "Free tips": ["Δωρεάν tips", "Tips gratis", "Palpites grátis", "Tips gratuits", "Gratis-Tipps", "Ponturi gratuite", "Besplatni tipovi", "Безплатни прогнози"],
-  "VIP tips": ["VIP tips", "Palpites VIP", "Tips VIP", "Tips VIP", "VIP-Tipps", "Ponturi VIP", "VIP tipovi", "VIP прогнози"],
+  "★ Strong picks": ["★ Δυνατές επιλογές", "★ Selecciones fuertes", "★ Escolhas fortes", "★ Choix forts", "★ Starke Tipps", "★ Alegeri puternice", "★ Jaki izbori", "★ Силни избори"], // 12/11 τελική ★
   "Free": ["Free", "Gratis", "Grátis", "Gratuit", "Gratis", "Gratuit", "Besplatno", "Безплатно"],
   "Sign up free": ["Δωρεάν εγγραφή", "Regístrate gratis", "Cadastre-se grátis", "Inscription gratuite", "Kostenlos registrieren", "Înregistrare gratuită", "Besplatna registracija", "Безплатна регистрация"],
-  "VIP tips need a free sign-up.": ["Τα VIP tips θέλουν δωρεάν εγγραφή.", "Los tips VIP requieren registro gratis.", "Os palpites VIP exigem cadastro grátis.", "Les tips VIP demandent une inscription gratuite.", "VIP-Tipps brauchen eine kostenlose Registrierung.", "Ponturile VIP cer înregistrare gratuită.", "VIP tipovi traže besplatnu registraciju.", "VIP прогнозите изискват безплатна регистрация."],
+  "Strong picks (★) need a free sign-up.": ["Οι δυνατές επιλογές (★) θέλουν δωρεάν εγγραφή.", "Las selecciones fuertes (★) requieren registro gratis.", "As escolhas fortes (★) exigem cadastro grátis.", "Les choix forts (★) demandent une inscription gratuite.", "Starke Tipps (★) brauchen eine kostenlose Registrierung.", "Alegerile puternice (★) cer înregistrare gratuită.", "Jaki izbori (★) traže besplatnu registraciju.", "Силните избори (★) изискват безплатна регистрация."], // 12/11 τελική ★
   "Free sign-up to see the pick and the reason.": ["Δωρεάν εγγραφή για να δεις την επιλογή και το γιατί.", "Regístrate gratis para ver la selección y el motivo.", "Cadastre-se grátis para ver a escolha e o motivo.", "Inscris-toi gratuitement pour voir le choix et la raison.", "Kostenlos registrieren, um Tipp und Begründung zu sehen.", "Înregistrare gratuită ca să vezi alegerea și motivul.", "Registruj se besplatno da vidiš tip i razlog.", "Безплатна регистрация, за да видиш избора и причината."],
-  "This is a VIP tip.": ["Αυτό είναι VIP tip.", "Este es un tip VIP.", "Este é um palpite VIP.", "C'est un tip VIP.", "Das ist ein VIP-Tipp.", "Acesta este un pont VIP.", "Ovo je VIP tip.", "Това е VIP прогноза."],
-  "VIP tip, sign up free to see": ["VIP tip, δες το με δωρεάν εγγραφή", "Tip VIP, regístrate gratis para verlo", "Palpite VIP, cadastre-se grátis para ver", "Tip VIP, inscris-toi gratuitement pour le voir", "VIP-Tipp, kostenlos registrieren zum Ansehen", "Pont VIP, înregistrează-te gratuit ca să-l vezi", "VIP tip, registruj se besplatno da ga vidiš", "VIP прогноза, регистрирай се безплатно, за да я видиш"],
+  "This is one of our strong picks.": ["Είναι μία από τις δυνατές επιλογές μας.", "Es una de nuestras selecciones fuertes.", "É uma das nossas escolhas fortes.", "C'est l'un de nos choix forts.", "Das ist einer unserer starken Tipps.", "Este una dintre alegerile noastre puternice.", "Ovo je jedan od naših jakih izbora.", "Това е един от силните ни избори."], // 12/11 ΑΣΤΕΡΙΑ (πριν: This is a VIP tip.)
+  "Strong pick, free with sign-up": ["Δυνατή επιλογή, δωρεάν με εγγραφή", "Selección fuerte, gratis con registro", "Escolha forte, grátis com cadastro", "Choix fort, gratuit avec inscription", "Starker Tipp, kostenlos mit Anmeldung", "Alegere puternică, gratuit cu înregistrare", "Jak izbor, besplatno uz registraciju", "Силен избор, безплатно с регистрация"], // 12/11 ΑΣΤΕΡΙΑ (πριν: VIP tip, sign up free to see)
   "No free tips today.": ["Δεν υπάρχουν δωρεάν tips σήμερα.", "Hoy no hay tips gratis.", "Hoje não há palpites grátis.", "Pas de tips gratuits aujourd'hui.", "Heute keine Gratis-Tipps.", "Azi nu sunt ponturi gratuite.", "Danas nema besplatnih tipova.", "Днес няма безплатни прогнози."],
-  "No VIP tips today.": ["Δεν υπάρχουν VIP tips σήμερα.", "Hoy no hay tips VIP.", "Hoje não há palpites VIP.", "Pas de tips VIP aujourd'hui.", "Heute keine VIP-Tipps.", "Azi nu sunt ponturi VIP.", "Danas nema VIP tipova.", "Днес няма VIP прогнози."],
+  "No strong picks (★) today.": ["Σήμερα δεν υπάρχουν δυνατές επιλογές (★).", "Hoy no hay selecciones fuertes (★).", "Hoje não há escolhas fortes (★).", "Pas de choix forts (★) aujourd'hui.", "Heute keine starken Tipps (★).", "Azi nu sunt alegeri puternice (★).", "Danas nema jakih izbora (★).", "Днес няма силни избори (★)."], // 12/11 τελική ★
   "No matches for this filter.": ["Δεν υπάρχουν αγώνες με αυτό το φίλτρο.", "No hay partidos con este filtro.", "Nenhum jogo com este filtro.", "Aucun match pour ce filtre.", "Keine Spiele für diesen Filter.", "Niciun meci pentru acest filtru.", "Nema utakmica za ovaj filter.", "Няма мачове за този филтър."],
   "Build your slip": ["Φτιάξε το δελτίο σου", "Crea tu boleto", "Monte seu bilhete", "Crée ton ticket", "Bau deinen Wettschein", "Creează-ți biletul", "Napravi svoj tiket", "Създай своя фиш"],
   "Build from": ["Φτιάξε από", "Crear desde", "Montar a partir de", "Créer à partir de", "Bauen aus", "Creează din", "Napravi od", "Създай от"],
   "Both": ["Και τα δύο", "Ambos", "Ambos", "Les deux", "Beides", "Ambele", "Oba", "И двете"],
-  "Only from today's free tips.": ["Μόνο από τα σημερινά δωρεάν tips.", "Solo con los tips gratis de hoy.", "Só com os palpites grátis de hoje.", "Uniquement avec les tips gratuits du jour.", "Nur aus den heutigen Gratis-Tipps.", "Doar din ponturile gratuite de azi.", "Samo od današnjih besplatnih tipova.", "Само от днешните безплатни прогнози."],
-  "Only from today's VIP tips.": ["Μόνο από τα σημερινά VIP tips.", "Solo con los tips VIP de hoy.", "Só com os palpites VIP de hoje.", "Uniquement avec les tips VIP du jour.", "Nur aus den heutigen VIP-Tipps.", "Doar din ponturile VIP de azi.", "Samo od današnjih VIP tipova.", "Само от днешните VIP прогнози."],
-  "Only from today's free and VIP tips.": ["Μόνο από τα σημερινά δωρεάν και VIP tips.", "Solo con los tips gratis y VIP de hoy.", "Só com os palpites grátis e VIP de hoje.", "Uniquement avec les tips gratuits et VIP du jour.", "Nur aus den heutigen Gratis- und VIP-Tipps.", "Doar din ponturile gratuite și VIP de azi.", "Samo od današnjih besplatnih i VIP tipova.", "Само от днешните безплатни и VIP прогнози."],
+  "Only from today's other picks.": ["Μόνο από τις υπόλοιπες σημερινές επιλογές.", "Solo con las demás selecciones de hoy.", "Só com as demais escolhas de hoje.", "Uniquement avec les autres choix du jour.", "Nur aus den übrigen Tipps von heute.", "Doar din celelalte alegeri de azi.", "Samo od ostalih današnjih izbora.", "Само от останалите днешни избори."], // 12/11 τελική ★
+  "Only from today's strong picks (★).": ["Μόνο από τις σημερινές δυνατές επιλογές (★).", "Solo con las selecciones fuertes (★) de hoy.", "Só com as escolhas fortes (★) de hoje.", "Uniquement avec les choix forts (★) du jour.", "Nur aus den heutigen starken Tipps (★).", "Doar din alegerile puternice (★) de azi.", "Samo od današnjih jakih izbora (★).", "Само от днешните силни избори (★)."], // 12/11 τελική ★
+  "Only from today's picks.": ["Μόνο από τις σημερινές επιλογές.", "Solo con las selecciones de hoy.", "Só com as escolhas de hoje.", "Uniquement avec les choix du jour.", "Nur aus den heutigen Tipps.", "Doar din alegerile de azi.", "Samo od današnjih izbora.", "Само от днешните избори."], // 12/11 τελική ★
   "Or build from Free": ["Ή φτιάξε από τα Free", "O crea desde Gratis", "Ou monte a partir dos Grátis", "Ou crée avec les tips gratuits", "Oder aus Gratis bauen", "Sau creează din Gratuite", "Ili napravi od besplatnih", "Или създай от безплатните"],
   "How many picks": ["Πόσες επιλογές", "Cuántas selecciones", "Quantas seleções", "Combien de sélections", "Wie viele Tipps", "Câte selecții", "Koliko parova", "Колко избора"],
   "Number of picks, up to 10": ["Αριθμός επιλογών, έως 10", "Número de selecciones, hasta 10", "Número de seleções, até 10", "Nombre de sélections, jusqu'à 10", "Anzahl Tipps, bis 10", "Număr de selecții, până la 10", "Broj parova, do 10", "Брой избори, до 10"],
@@ -426,7 +426,7 @@ export const UI = {
   "counted in our public record": ["μετράει στο δημόσιο record μας", "cuenta en nuestro historial público", "conta no nosso histórico público", "compté dans notre historique public", "zählt in unserer öffentlichen Bilanz", "contează în istoricul nostru public", "ulazi u našu javnu istoriju", "влиза в публичната ни история"],
   "of our tips won": ["των tips μας κέρδισαν", "de nuestros tips acertaron", "dos nossos palpites acertaram", "de nos tips ont gagné", "unserer Tipps gewonnen", "dintre ponturile noastre au ieșit", "naših tipova prošlo", "от нашите прогнози спечелиха"],
   "Biggest win": ["Μεγαλύτερη νίκη", "Mayor acierto", "Maior acerto", "Plus gros gain", "Größter Treffer", "Cel mai mare câștig", "Najveći pogodak", "Най-голяма печалба"],
-  "VIP · free with sign-up": ["VIP · δωρεάν με εγγραφή", "VIP · gratis con registro", "VIP · grátis com cadastro", "VIP · gratuit avec inscription", "VIP · gratis mit Anmeldung", "VIP · gratuit cu înregistrare", "VIP · besplatno uz registraciju", "VIP · безплатно с регистрация"],
+  "★ · Free with sign-up": ["★ · Δωρεάν με εγγραφή", "★ · Gratis con registro", "★ · Grátis com cadastro", "★ · Gratuit avec inscription", "★ · Kostenlos mit Anmeldung", "★ · Gratuit cu înregistrare", "★ · Besplatno uz registraciju", "★ · Безплатно с регистрация"], // 12/11 τελική ★
   "See tomorrow's matches and parlays": ["Δες τους αυριανούς αγώνες και τα παρολί", "Ver los partidos y las combinadas de mañana", "Ver os jogos e as múltiplas de amanhã", "Voir les matchs et les combinés de demain", "Die Spiele und Kombis von morgen ansehen", "Vezi meciurile și biletele de mâine", "Pogledaj sutrašnje utakmice i tikete", "Виж утрешните мачове и комбинации"],
   "Loading…": ["Φόρτωση…", "Cargando…", "A carregar…", "Chargement…", "Wird geladen…", "Se încarcă…", "Učitavanje…", "Зареждане…"],
   "Could not load. Tap Izzistats again.": ["Δεν φόρτωσε. Πάτα ξανά το Izzistats.", "No se pudo cargar. Pulsa Izzistats otra vez.", "Não foi possível carregar. Toca outra vez em Izzistats.", "Chargement impossible. Appuie à nouveau sur Izzistats.", "Laden fehlgeschlagen. Tippe erneut auf Izzistats.", "Nu s-a putut încărca. Apasă din nou pe Izzistats.", "Nije učitano. Pritisni ponovo Izzistats.", "Не се зареди. Натисни отново Izzistats."],
@@ -467,6 +467,16 @@ export const UI = {
   "Parlay stake": ["Ποντάρισμα παρολί", "Importe combinada", "Valor da múltipla", "Mise du combiné", "Kombi-Einsatz", "Miză bilet combinat", "Ulog na tiket", "Залог за комбинацията"],
   "Take it": ["Πάρ' το", "Lo quiero", "Pegar", "Je le prends", "Nehmen", "Ia-l", "Uzmi ga", "Вземи"],
   "In your slip": ["Μπήκε στο δελτίο σου", "En tu boleto", "No seu bilhete", "Dans ton ticket", "Auf deinem Schein", "Pe biletul tău", "Na tvom tiketu", "Във фиша ти"],
+  "Free with sign-up": ["Δωρεάν με εγγραφή", "Gratis con registro", "Grátis com cadastro", "Gratuit avec inscription", "Kostenlos mit Anmeldung", "Gratuit cu înregistrare", "Besplatno uz registraciju", "Безплатно с регистрация"], // 12/11 ΑΣΤΕΡΙΑ
+  "Strong picks": ["Δυνατές επιλογές", "Selecciones fuertes", "Escolhas fortes", "Choix forts", "Starke Tipps", "Alegeri puternice", "Jaki izbori", "Силни избори"], // 12/11 ΑΣΤΕΡΙΑ
+  "Very good picks": ["Πολύ καλές επιλογές", "Selecciones muy buenas", "Escolhas muito boas", "Très bons choix", "Sehr gute Tipps", "Alegeri foarte bune", "Veoma dobri izbori", "Много добри избори"], // 12/11 ΑΣΤΕΡΙΑ
+  "Good picks": ["Καλές επιλογές", "Buenas selecciones", "Boas escolhas", "Bons choix", "Gute Tipps", "Alegeri bune", "Dobri izbori", "Добри избори"], // 12/11 ΑΣΤΕΡΙΑ
+  "Stars show the model's strength, not a guarantee.": ["Τα αστέρια δείχνουν τη δύναμη του μοντέλου, όχι εγγύηση.", "Las estrellas muestran la fuerza del modelo, no una garantía.", "As estrelas mostram a força do modelo, não uma garantia.", "Les étoiles montrent la force du modèle, pas une garantie.", "Die Sterne zeigen die Stärke des Modells, keine Garantie.", "Stelele arată puterea modelului, nu o garanție.", "Zvezdice pokazuju snagu modela, ne garanciju.", "Звездите показват силата на модела, не гаранция."], // 12/11 ΑΣΤΕΡΙΑ
+  "Strong pick": ["Δυνατή επιλογή", "Selección fuerte", "Escolha forte", "Choix fort", "Starker Tipp", "Alegere puternică", "Jak izbor", "Силен избор"], // 12/11 τελική ★
+  "All picks are free.": ["Όλες οι προτάσεις είναι δωρεάν.", "Todas las selecciones son gratis.", "Todas as escolhas são grátis.", "Tous les choix sont gratuits.", "Alle Tipps sind kostenlos.", "Toate alegerile sunt gratuite.", "Svi izbori su besplatni.", "Всички избори са безплатни."], // 12/11 τελική ★
+  "★ = the model's strongest picks, not a guarantee.": ["★ = οι πιο δυνατές επιλογές του μοντέλου, όχι εγγύηση.", "★ = las selecciones más fuertes del modelo, no una garantía.", "★ = as escolhas mais fortes do modelo, não uma garantia.", "★ = les choix les plus forts du modèle, pas une garantie.", "★ = die stärksten Tipps des Modells, keine Garantie.", "★ = cele mai puternice alegeri ale modelului, nu o garanție.", "★ = najjači izbori modela, ne garancija.", "★ = най-силните избори на модела, не гаранция."], // 12/11 τελική ★
+  "Minimum odds": ["Ελάχιστη απόδοση", "Cuota mínima", "Odd mínima", "Cote minimale", "Mindestquote", "Cota minimă", "Minimalna kvota", "Минимален коефициент"], // 12/11 τελική ★
+  "Others": ["Υπόλοιπα", "Otras", "Outras", "Autres", "Andere", "Altele", "Ostali", "Останали"], // 12/11 τελική ★
   "Add to My coupons": ["Βάλ' το στα κουπόνια μου", "Añadir a Mis cupones", "Adicionar a Meus bilhetes", "Ajouter à Mes paris", "Zu meinen Scheinen hinzufügen", "Adaugă la Biletele mele", "Dodaj u Moje tikete", "Добави в Моите фишове"], // 11/11 Owner (πριν: «I played it elsewhere · save to My coupons»)
   "Saved in My coupons · our partner bookmaker is coming soon": ["Μπήκε στα κουπόνια σου · ο bookmaker-συνεργάτης μας έρχεται σύντομα", "Guardado en tus cupones · nuestra casa asociada llega pronto", "Salvo nos seus bilhetes · nossa casa parceira chega em breve", "Enregistré dans Mes paris · notre bookmaker partenaire arrive bientôt", "In deinen Scheinen gespeichert · unser Partner-Buchmacher kommt bald", "Salvat în Biletele mele · casa parteneră vine curând", "Sačuvano u Mojim tiketima · partnerska kladionica stiže uskoro", "Запазено във фишовете ти · партньорът ни идва скоро"],
   "Saved in My coupons": ["Μπήκε στα κουπόνια σου", "Guardado en tus cupones", "Salvo nos seus bilhetes", "Enregistré dans Mes paris", "In deinen Scheinen gespeichert", "Salvat în Biletele mele", "Sačuvano u Mojim tiketima", "Запазено във фишовете ти"],
@@ -498,7 +508,7 @@ export const UI = {
   "Play a slip, take one of our parlays or tap ☆ on a match, and your games show here live.": ["Παίξε ένα δελτίο, πάρε ένα από τα παρολί μας ή πάτα ☆ σε έναν αγώνα, και τα παιχνίδια σου θα φαίνονται εδώ ζωντανά.", "Juega un boleto, elige una de nuestras combinadas o toca ☆ en un partido, y tus partidos aparecerán aquí en vivo.", "Jogue um bilhete, pegue uma das nossas múltiplas ou toque ☆ num jogo, e seus jogos aparecem aqui ao vivo.", "Joue un ticket, prends un de nos combinés ou touche ☆ sur un match, et tes matchs s'affichent ici en direct.", "Spiel einen Schein, nimm eine unserer Kombis oder tippe ☆ bei einem Spiel, dann siehst du deine Spiele hier live.", "Joacă un bilet, ia unul dintre biletele noastre sau apasă ☆ la un meci, și meciurile tale apar aici live.", "Odigraj tiket, uzmi jedan od naših tiketa ili dodirni ☆ na utakmici, i tvoje utakmice se pojavljuju ovde uživo.", "Изиграй фиш, вземи някоя от нашите комбинации или натисни ☆ на мач, и мачовете ти ще се виждат тук на живо."],
   "None of your games is live right now.": ["Κανένα παιχνίδι σου δεν παίζεται αυτή τη στιγμή.", "Ninguno de tus partidos está en vivo ahora.", "Nenhum dos seus jogos está ao vivo agora.", "Aucun de tes matchs n'est en direct pour l'instant.", "Gerade läuft keines deiner Spiele.", "Niciun meci de-al tău nu este live acum.", "Nijedna tvoja utakmica trenutno nije uživo.", "В момента нито един твой мач не е на живо."],
   "Coming up": ["Ακολουθούν", "Próximos", "A seguir", "À venir", "Demnächst", "Urmează", "Uskoro", "Предстоящи"],
-  "Open all VIP tips, collect credits and keep your coupons. No password: we email you a 6-digit code.": ["Ανοίγεις όλα τα VIP tips, μαζεύεις credits και κρατάς τα κουπόνια σου. Χωρίς κωδικό πρόσβασης: σου στέλνουμε έναν 6ψήφιο κωδικό στο email.", "Abre todos los tips VIP, acumula créditos y guarda tus cupones. Sin contraseña: te enviamos un código de 6 cifras por email.", "Abra todos os palpites VIP, junte créditos e guarde seus bilhetes. Sem senha: enviamos um código de 6 dígitos por email.", "Débloque tous les tips VIP, gagne des crédits et garde tes tickets. Sans mot de passe : on t'envoie un code à 6 chiffres par email.", "Alle VIP-Tipps freischalten, Credits sammeln und deine Scheine behalten. Ohne Passwort: Wir schicken dir einen 6-stelligen Code per E-Mail.", "Deblochezi toate ponturile VIP, aduni credite și îți păstrezi biletele. Fără parolă: îți trimitem un cod de 6 cifre pe email.", "Otključaj sve VIP tipove, skupljaj kredite i čuvaj svoje tikete. Bez lozinke: šaljemo ti šestocifreni kod na email.", "Отключваш всички VIP прогнози, събираш кредити и пазиш фишовете си. Без парола: пращаме ти 6-цифрен код по имейл."],
+  "Open all strong picks (★), collect credits and keep your coupons. No password: we email you a 6-digit code.": ["Ανοίγεις όλες τις δυνατές επιλογές (★), μαζεύεις credits και κρατάς τα κουπόνια σου. Χωρίς κωδικό πρόσβασης: σου στέλνουμε έναν 6ψήφιο κωδικό στο email.", "Abre todas las selecciones fuertes (★), acumula créditos y guarda tus cupones. Sin contraseña: te enviamos un código de 6 cifras por email.", "Abra todas as escolhas fortes (★), junte créditos e guarde seus bilhetes. Sem senha: enviamos um código de 6 dígitos por email.", "Débloque tous les choix forts (★), gagne des crédits et garde tes tickets. Sans mot de passe : on t'envoie un code à 6 chiffres par email.", "Alle starken Tipps (★) freischalten, Credits sammeln und deine Scheine behalten. Ohne Passwort: Wir schicken dir einen 6-stelligen Code per E-Mail.", "Deblochezi toate alegerile puternice (★), aduni credite și îți păstrezi biletele. Fără parolă: îți trimitem un cod de 6 cifre pe email.", "Otključaj sve jake izbore (★), skupljaj kredite i čuvaj svoje tikete. Bez lozinke: šaljemo ti šestocifreni kod na email.", "Отключваш всички силни избори (★), събираш кредити и пазиш фишовете си. Без парола: пращаме ти 6-цифрен код по имейл."], // 12/11 τελική ★
   "Your email": ["Το email σου", "Tu email", "Seu email", "Ton email", "Deine E-Mail", "Emailul tău", "Tvoj email", "Твоят имейл"],
   "I am 18+ and I accept the terms.": ["Είμαι 18+ και αποδέχομαι τους όρους.", "Soy mayor de 18 años y acepto las condiciones.", "Tenho 18+ anos e aceito os termos.", "J'ai 18 ans ou plus et j'accepte les conditions.", "Ich bin 18+ und akzeptiere die Bedingungen.", "Am cel puțin 18 ani și accept termenii.", "Imam 18+ godina i prihvatam uslove.", "На 18+ години съм и приемам условията."],
   "Send me news from betizzi (optional).": ["Στείλτε μου νέα από το betizzi (προαιρετικό).", "Envíame novedades de betizzi (opcional).", "Envie-me novidades do betizzi (opcional).", "Envoie-moi les nouveautés de betizzi (facultatif).", "Schickt mir News von betizzi (optional).", "Trimiteți-mi noutăți de la betizzi (opțional).", "Šaljite mi novosti od betizzi (opciono).", "Изпращайте ми новини от betizzi (по желание)."],
