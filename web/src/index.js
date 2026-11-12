@@ -967,7 +967,7 @@ function recordPage(lang, d, mq = "", tq = "", fq = "", pq = 1, lastPar = null) 
   const q = (m, tt) => base + mPath(m) + (tt ? "?t=" + tt : "");
   const chip = (href, label, on) => `<a class="ch${on ? " on" : ""}" href="${href}">${esc(label)}</a>`;
   const chipsHtml = ALL.length ? `<div class="chips">${months.map((k) => chip(q(k, tq), mName(k), mo === k)).join("")}${chip(q("all", tq), r.allM, mo === "all")}</div>
-    <div class="chips">${chip(q(mo, ""), r.all, !tq)}${chip(q(mo, "free"), "TIP · Free", tq === "free")}${chip(q(mo, "vip"), "VIP", tq === "vip")}</div>` : "";
+    <div class="chips">${chip(q(mo, ""), r.all, !tq)}${chip(q(mo, "free"), "TIP · Free", tq === "free")}${chip(q(mo, "vip"), "★", tq === "vip")}</div>` : "";
   const delta = (a, b, unit) => { if (b == null) return ""; const v = a - b; return `<em class="${v >= 0 ? "pos" : "neg"}">${v >= 0 ? "▲" : "▼"} ${Math.abs(v).toFixed(unit === "%" ? 0 : 2)}${unit}</em>`; };
   const kpi = S.length ? `<div class="kpi">
     <div><small>${esc(r.tips)}</small><b>${ms.n}</b></div>
@@ -1059,7 +1059,7 @@ ${tq || fq || pq > 1 ? '<meta name="robots" content="noindex,follow">' : alt}
 <h1>${esc(r.h1)}</h1>
 <p class="ans">${esc(answer)}</p>
 ${chipsHtml}
-${S.length ? `<h2 class="rep">${esc(repTitle)}${tq ? ` · ${tq === "vip" ? "VIP" : "TIP"}` : ""}</h2>` : ""}
+${S.length ? `<h2 class="rep">${esc(repTitle)}${tq ? ` · ${tq === "vip" ? "★" : "TIP"}` : ""}</h2>` : ""}
 ${kpi}
 ${ALL.length && ALL.length < 200 ? `<p class="note">${esc(r.small)}</p>` : ""}
 ${d.pending ? `<p class="note">${esc(r.pending.replace("{n}", d.pending))}</p>` : ""}
