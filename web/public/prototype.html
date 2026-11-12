@@ -820,7 +820,7 @@ header{position:relative}
 .pc-r.w{background:#4dff8a;color:#06210f;box-shadow:0 0 0 3px rgba(77,255,138,.22),0 0 12px rgba(77,255,138,.55);font-size:.78rem}.pc-r.l{background:var(--bad)}.pc-r.v{background:var(--line);color:var(--fg)}.pc-o s{opacity:.5;font-size:.7em}.pc-was{opacity:.5;font-size:.42em;display:block;text-align:right}
 .vipt{color:#e8b931;font-weight:800;font-size:.62rem;margin-left:4px}
 /* 12/11 ΑΣΤΕΡΙΑ: ένα αστέρι με αριθμό — ③ χρυσό, ②/① ουδέτερα */
-.st{display:inline-grid;place-items:center;width:20px;height:20px;padding-top:3px;box-sizing:border-box;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);font:800 9px/1 var(--f-body);vertical-align:-5px;flex:0 0 auto}.st3{background:#e8b931;color:#0c0f0d}.st2{background:#cfd6d1;color:#0c0f0d}.st1{background:#6b766f;color:#fff}
+.st{display:inline-grid;place-items:center;width:24px;height:24px;padding-top:4px;box-sizing:border-box;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);font:800 11px/1 var(--f-body);vertical-align:-6px;flex:0 0 auto}.st3{background:#e8b931;color:#0c0f0d}.st2{background:#cfd6d1;color:#0c0f0d}.st1{background:#6b766f;color:#fff}
 .r-pick .st,.n3t .st{margin-right:4px}.n3t.vip .st3,.r-pick.vip[aria-pressed="true"] .st3{background:#0c0f0d;color:#e8b931}
 .stleg{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:.78rem;color:var(--muted);margin:2px 0 10px}.stleg .sti{display:inline-flex;align-items:center;gap:5px}.stleg small{flex-basis:100%;font-size:.72rem}
 .cm{margin-top:12px;background:var(--panel-2);border-radius:12px;padding:10px 12px}
@@ -2388,7 +2388,7 @@ function singleHTML(m,x){
     +'<span>'+(ip?'<span>Issued at</span> <b class="mono">'+ip.toFixed(2)+'</b>'+(x.at?' · '+esc(x.at):''):'')+'</span>'
     +(x.min&&x.odds&&x.odds<x.min?belowTxt(x.odds):'')+'</div>';
   return '<article class="sg sg2" data-sg="'+esc(k)+'">'+meta
-    +'<div class="sg-pl"><span class="sg-pick">'+pick+(starOf(x)?' '+starB(starOf(x)):'')+'</span><span class="sg-sep" aria-hidden="true"></span><span class="sg-odd">'+oddTxt(x)+'</span></div>'+btn
+    +'<div class="sg-pl"><span class="sg-pick">'+(starOf(x)?starB(starOf(x))+' ':'')+pick+'</span><span class="sg-sep" aria-hidden="true"></span><span class="sg-odd">'+oddTxt(x)+'</span></div>'+btn
     +(x.why?'<p class="sg-why"><small>Why this pick</small> '+esc(x.why)+'</p>':'')+foot+'</article>';}
 Array.prototype.forEach.call(document.querySelectorAll("[data-op]"),function(b){b.addEventListener("click",function(){opView=b.dataset.op;opAlt=0;store("ko-op",opView);renderPicks();});});
 function setVip(v){vipMember=v;$("vipMember").checked=v;renderTips();renderMatches();renderBuilder();try{renderPicks();renderSide();}catch(e){}}
