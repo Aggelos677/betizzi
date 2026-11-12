@@ -27,7 +27,7 @@ export const PG = {
       en: `betizzi is a free football tips site for people who bet for fun. We look at the day's matches, filter them, and give a tip only where our model sees a clear signal — not on every game.
 
 ## What you get
-- Free tips and VIP tips, each with a short reason and the price when we published it.
+- Free tips — the strongest marked ★ Strong pick — each with a short reason and the price when we published it.
 - A public record of every tip, wins and losses. We never promise a win.
 - Odds from several bookmakers, so you can see where the price is best.
 - Ready-made parlays every day, your own slip and live scores to follow your games.
@@ -43,7 +43,7 @@ We are not a bookmaker and we do not take bets. We may earn a commission from bo
       el: `Το betizzi είναι δωρεάν site με tips ποδοσφαίρου για όσους παίζουν για διασκέδαση. Κοιτάμε τους αγώνες της ημέρας, τους φιλτράρουμε και δίνουμε tip μόνο όπου το μοντέλο μας βλέπει καθαρό σήμα — όχι σε κάθε αγώνα.
 
 ## Τι βρίσκεις εδώ
-- Free και VIP tips, το καθένα με σύντομη αιτιολόγηση και την απόδοση τη στιγμή που το δημοσιεύσαμε.
+- Δωρεάν tips — τα πιο δυνατά με σήμα ★ Δυνατή επιλογή — το καθένα με σύντομη αιτιολόγηση και την απόδοση τη στιγμή που το δημοσιεύσαμε.
 - Δημόσιο ιστορικό κάθε tip, με νίκες και ήττες. Δεν υποσχόμαστε ποτέ κέρδος.
 - Αποδόσεις από πολλούς bookmakers, για να βλέπεις πού είναι καλύτερη η τιμή.
 - Έτοιμα παρολί κάθε μέρα, το δικό σου δελτίο και live σκορ για να παρακολουθείς τα παιχνίδια σου.
@@ -59,7 +59,7 @@ We are not a bookmaker and we do not take bets. We may earn a commission from bo
       es: `betizzi es una web gratuita de pronósticos de fútbol para quienes apuestan por diversión. Revisamos los partidos del día, los filtramos y damos un tip solo donde nuestro modelo ve una señal clara, no en todos los partidos.
 
 ## Qué encontrarás
-- Tips gratis y VIP, cada uno con un breve motivo y la cuota en el momento de publicarlo.
+- Tips gratis — los más fuertes marcados ★ Selección fuerte — cada uno con un breve motivo y la cuota en el momento de publicarlo.
 - Un historial público de cada tip, con aciertos y fallos. Nunca prometemos ganar.
 - Cuotas de varias casas, para ver dónde está el mejor precio.
 - Combinadas listas cada día, tu propio boleto y resultados en directo.
@@ -75,7 +75,7 @@ No somos una casa de apuestas y no aceptamos apuestas. Podemos recibir una comis
       pt: `O betizzi é um site gratuito de palpites de futebol para quem aposta por diversão. Olhamos os jogos do dia, filtramos e damos palpite só onde o nosso modelo vê um sinal claro, não em todos os jogos.
 
 ## O que você encontra
-- Palpites grátis e VIP, cada um com um motivo curto e a odd no momento da publicação.
+- Palpites grátis — os mais fortes marcados ★ Escolha forte — cada um com um motivo curto e a odd no momento da publicação.
 - Um histórico público de cada palpite, com acertos e erros. Nunca prometemos ganhos.
 - Odds de várias casas, para ver onde o preço está melhor.
 - Múltiplas prontas todos os dias, seu próprio bilhete e placares ao vivo.
@@ -91,7 +91,7 @@ Não somos casa de apostas e não aceitamos apostas. Podemos receber comissão d
       fr: `betizzi est un site gratuit de pronostics foot pour ceux qui parient pour le plaisir. Nous passons en revue les matchs du jour, nous les filtrons et ne donnons un tip que là où notre modèle voit un signal clair, pas sur chaque match.
 
 ## Ce que tu trouves ici
-- Des tips gratuits et VIP, chacun avec une courte explication et la cote au moment de la publication.
+- Des tips gratuits — les plus forts marqués ★ Choix fort — chacun avec une courte explication et la cote au moment de la publication.
 - Un historique public de chaque tip, gagnés et perdus. Nous ne promettons jamais de gain.
 - Les cotes de plusieurs bookmakers, pour voir où la cote est meilleure.
 - Des combinés prêts chaque jour, ton propre ticket et des scores en direct pour suivre tes matchs.
@@ -107,7 +107,7 @@ Nous ne sommes pas un bookmaker et nous ne prenons pas de paris. Nous pouvons to
       de: `betizzi ist eine kostenlose Fußball-Tipps-Seite für alle, die aus Spaß wetten. Wir sehen uns die Spiele des Tages an, filtern sie und geben nur dort einen Tipp, wo unser Modell ein klares Signal sieht – nicht bei jedem Spiel.
 
 ## Was du hier findest
-- Gratis- und VIP-Tipps, jeweils mit kurzer Begründung und der Quote zum Zeitpunkt der Veröffentlichung.
+- Gratis-Tipps — die stärksten mit ★ Starker Tipp — jeweils mit kurzer Begründung und der Quote zum Zeitpunkt der Veröffentlichung.
 - Eine öffentliche Bilanz jedes Tipps, mit Treffern und Niederlagen. Wir versprechen nie einen Gewinn.
 - Quoten mehrerer Buchmacher, damit du siehst, wo die Quote besser ist.
 - Fertige Kombis jeden Tag, dein eigener Wettschein und Live-Ergebnisse.
@@ -123,7 +123,7 @@ Wir sind kein Buchmacher und nehmen keine Wetten an. Wir können Provisionen von
       ro: `betizzi este un site gratuit de ponturi la fotbal pentru cei care pariază din plăcere. Ne uităm la meciurile zilei, le filtrăm și dăm pont doar acolo unde modelul nostru vede un semnal clar, nu la fiecare meci.
 
 ## Ce găsești aici
-- Ponturi gratuite și VIP, fiecare cu o scurtă explicație și cota din momentul publicării.
+- Ponturi gratuite — cele mai puternice marcate ★ Alegere puternică — fiecare cu o scurtă explicație și cota din momentul publicării.
 - Un istoric public al fiecărui pont, cu câștiguri și pierderi. Nu promitem niciodată câștig.
 - Cote de la mai multe case de pariuri, ca să vezi unde e prețul mai bun.
 - Bilete gata făcute în fiecare zi, biletul tău și scoruri live.
@@ -139,7 +139,7 @@ Nu suntem casă de pariuri și nu acceptăm pariuri. Putem primi comision de la 
       sr: `betizzi je besplatan sajt sa fudbalskim tipovima za one koji se klade iz zabave. Gledamo utakmice dana, filtriramo ih i dajemo tip samo tamo gde naš model vidi jasan signal, ne na svakoj utakmici.
 
 ## Šta ovde nalaziš
-- Besplatne i VIP tipove, svaki sa kratkim obrazloženjem i kvotom u trenutku objave.
+- Besplatne tipove — najjače označene ★ Jak izbor — svaki sa kratkim obrazloženjem i kvotom u trenutku objave.
 - Javnu istoriju svakog tipa, sa pogocima i promašajima. Nikad ne obećavamo dobitak.
 - Kvote više kladionica, da vidiš gde je cena bolja.
 - Gotove tikete svaki dan, svoj tiket i rezultate uživo.
@@ -155,7 +155,7 @@ Nismo kladionica i ne primamo opklade. Možemo dobiti proviziju od kladionica: p
       bg: `betizzi е безплатен сайт с футболни прогнози за хора, които залагат за удоволствие. Преглеждаме мачовете за деня, филтрираме ги и даваме прогноза само там, където моделът ни вижда ясен сигнал, не за всеки мач.
 
 ## Какво ще намериш тук
-- Безплатни и VIP прогнози, всяка с кратко обяснение и коефициента в момента на публикуване.
+- Безплатни прогнози — най-силните с ★ Силен избор — всяка с кратко обяснение и коефициента в момента на публикуване.
 - Публична история на всяка прогноза, с печалби и загуби. Никога не обещаваме печалба.
 - Коефициенти от няколко букмейкъра, за да видиш къде цената е по-добра.
 - Готови комбинации всеки ден, твоят собствен фиш и резултати на живо.
@@ -836,10 +836,10 @@ PG.how = {
 - **Draw:** rarely, only when draws keep repeating.
 - Injuries, news and market moves are not part of the decision.
 
-## Free and VIP
-- Free tips are open to everyone.
-- VIP tips are our strongest. They open with a free sign-up (a code by email, no password), and for everyone 10 minutes after kick-off.
-- Inside our ready-made parlays, VIP picks are open to everyone.
+## Strong picks (★)
+- All tips are free. Most are open to everyone.
+- Strong picks (★) are our strongest. They open with a free sign-up (a code by email, no password), and for everyone 10 minutes after kick-off.
+- Inside our ready-made parlays, strong picks (★) are open to everyone.
 
 ## The price
 - Every tip shows the price when we published it and the lowest price we still recommend.
@@ -865,10 +865,10 @@ Every tip since 2 November 2026 is counted, wins and losses. Nothing is deleted.
 - **Ισοπαλία:** σπάνια, μόνο όταν οι ισοπαλίες επαναλαμβάνονται.
 - Οι απουσίες, τα νέα και οι κινήσεις της αγοράς δεν παίζουν ρόλο στην απόφαση.
 
-## Free και VIP
-- Τα Free tips είναι ανοιχτά για όλους.
-- Τα VIP είναι τα πιο δυνατά μας. Ανοίγουν με δωρεάν εγγραφή (κωδικός στο email, χωρίς password) και για όλους 10 λεπτά μετά τη σέντρα.
-- Μέσα στα έτοιμα παρολί μας, οι VIP επιλογές είναι ανοιχτές για όλους.
+## Δυνατές επιλογές (★)
+- Όλα τα tips είναι δωρεάν. Τα περισσότερα είναι ανοιχτά για όλους.
+- Οι δυνατές επιλογές (★) είναι οι πιο δυνατές μας. Ανοίγουν με δωρεάν εγγραφή (κωδικός στο email, χωρίς password) και για όλους 10 λεπτά μετά τη σέντρα.
+- Μέσα στα έτοιμα παρολί μας, οι δυνατές επιλογές (★) είναι ανοιχτές για όλους.
 
 ## Η απόδοση
 - Κάθε tip δείχνει την απόδοση τη στιγμή που δημοσιεύτηκε και τη χαμηλότερη απόδοση που ακόμα προτείνουμε.
@@ -894,10 +894,10 @@ Every tip since 2 November 2026 is counted, wins and losses. Nothing is deleted.
 - **Empate:** pocas veces, solo cuando los empates se repiten.
 - Las bajas, las noticias y los movimientos del mercado no forman parte de la decisión.
 
-## Free y VIP
-- Los tips Free están abiertos para todos.
-- Los VIP son los más fuertes. Se abren con un registro gratuito (un código por email, sin contraseña) y para todos 10 minutos después del inicio.
-- Dentro de nuestras combinadas, las selecciones VIP están abiertas para todos.
+## Selecciones fuertes (★)
+- Todos los tips son gratis. La mayoría están abiertos para todos.
+- Las selecciones fuertes (★) son las más fuertes. Se abren con un registro gratuito (un código por email, sin contraseña) y para todos 10 minutos después del inicio.
+- Dentro de nuestras combinadas, las selecciones fuertes (★) están abiertas para todos.
 
 ## La cuota
 - Cada tip muestra la cuota cuando lo publicamos y la cuota mínima que aún recomendamos.
@@ -923,10 +923,10 @@ Contamos cada tip desde el 2 de noviembre de 2026, aciertos y fallos. No se borr
 - **Empate:** raramente, só quando os empates se repetem.
 - Lesões, notícias e movimentos do mercado não entram na decisão.
 
-## Free e VIP
-- Os palpites Free estão abertos a todos.
-- Os VIP são os mais fortes. Abrem com um registo gratuito (um código por email, sem palavra-passe) e para todos 10 minutos após o início.
-- Dentro das nossas múltiplas prontas, as seleções VIP estão abertas a todos.
+## Escolhas fortes (★)
+- Todos os palpites são grátis. A maioria está aberta a todos.
+- As escolhas fortes (★) são as mais fortes. Abrem com um registo gratuito (um código por email, sem palavra-passe) e para todos 10 minutos após o início.
+- Dentro das nossas múltiplas prontas, as escolhas fortes (★) estão abertas a todos.
 
 ## A odd
 - Cada palpite mostra a odd quando o publicámos e a odd mínima que ainda recomendamos.
@@ -952,10 +952,10 @@ Contamos cada palpite desde 2 de novembro de 2026, acertos e falhas. Nada é apa
 - **Nul :** rarement, seulement quand les nuls se répètent.
 - Les blessures, l'actualité et les mouvements du marché n'entrent pas dans la décision.
 
-## Free et VIP
-- Les tips Free sont ouverts à tous.
-- Les VIP sont nos plus forts. Ils s'ouvrent avec une inscription gratuite (un code par e-mail, sans mot de passe), et pour tous 10 minutes après le coup d'envoi.
-- Dans nos combinés prêts, les sélections VIP sont ouvertes à tous.
+## Choix forts (★)
+- Tous les tips sont gratuits. La plupart sont ouverts à tous.
+- Les choix forts (★) sont nos plus forts. Ils s'ouvrent avec une inscription gratuite (un code par e-mail, sans mot de passe), et pour tous 10 minutes après le coup d'envoi.
+- Dans nos combinés prêts, les choix forts (★) sont ouverts à tous.
 
 ## La cote
 - Chaque tip affiche la cote au moment de la publication et la cote minimale que nous recommandons encore.
@@ -981,10 +981,10 @@ Chaque tip depuis le 2 novembre 2026 est compté, gagnés et perdus. Rien n'est 
 - **Unentschieden:** selten, nur wenn sich Remis wiederholen.
 - Verletzungen, Nachrichten und Marktbewegungen fließen nicht in die Entscheidung ein.
 
-## Free und VIP
-- Free-Tipps sind für alle offen.
-- VIP-Tipps sind unsere stärksten. Sie öffnen sich mit einer kostenlosen Anmeldung (Code per E-Mail, ohne Passwort) und für alle 10 Minuten nach Anpfiff.
-- In unseren fertigen Kombis sind VIP-Tipps für alle offen.
+## Starke Tipps (★)
+- Alle Tipps sind kostenlos. Die meisten sind für alle offen.
+- Starke Tipps (★) sind unsere stärksten. Sie öffnen sich mit einer kostenlosen Anmeldung (Code per E-Mail, ohne Passwort) und für alle 10 Minuten nach Anpfiff.
+- In unseren fertigen Kombis sind starke Tipps (★) für alle offen.
 
 ## Die Quote
 - Jeder Tipp zeigt die Quote bei Veröffentlichung und die niedrigste Quote, die wir noch empfehlen.
@@ -1010,10 +1010,10 @@ Jeder Tipp seit dem 2. November 2026 wird gezählt, Gewinne und Verluste. Nichts
 - **Egal:** rar, doar când egalurile se repetă.
 - Absențele, știrile și mișcările pieței nu intră în decizie.
 
-## Free și VIP
-- Ponturile Free sunt deschise pentru toți.
-- Ponturile VIP sunt cele mai puternice. Se deschid cu o înregistrare gratuită (un cod pe email, fără parolă) și pentru toți la 10 minute după start.
-- În biletele noastre gata făcute, selecțiile VIP sunt deschise pentru toți.
+## Alegeri puternice (★)
+- Toate ponturile sunt gratuite. Cele mai multe sunt deschise pentru toți.
+- Alegerile puternice (★) sunt cele mai puternice. Se deschid cu o înregistrare gratuită (un cod pe email, fără parolă) și pentru toți la 10 minute după start.
+- În biletele noastre gata făcute, alegerile puternice (★) sunt deschise pentru toți.
 
 ## Cota
 - Fiecare pont arată cota din momentul publicării și cota minimă pe care încă o recomandăm.
@@ -1039,10 +1039,10 @@ Numărăm fiecare pont din 2 noiembrie 2026, câștigate și pierdute. Nu se șt
 - **Nerešeno:** retko, samo kada se nerešeni ishodi ponavljaju.
 - Povrede, vesti i kretanja tržišta nisu deo odluke.
 
-## Free i VIP
-- Free tipovi su otvoreni za sve.
-- VIP tipovi su naši najjači. Otvaraju se besplatnom registracijom (kod na email, bez lozinke), a za sve 10 minuta posle početka.
-- U našim gotovim tiketima VIP izbori su otvoreni za sve.
+## Jaki izbori (★)
+- Svi tipovi su besplatni. Većina je otvorena za sve.
+- Jaki izbori (★) su naši najjači. Otvaraju se besplatnom registracijom (kod na email, bez lozinke), a za sve 10 minuta posle početka.
+- U našim gotovim tiketima jaki izbori (★) su otvoreni za sve.
 
 ## Kvota
 - Svaki tip prikazuje kvotu u trenutku objave i najnižu kvotu koju još preporučujemo.
@@ -1068,10 +1068,10 @@ Brojimo svaki tip od 2. novembra 2026, dobitne i gubitne. Ništa se ne briše. P
 - **Равен:** рядко, само когато равенствата се повтарят.
 - Контузиите, новините и движенията на пазара не участват в решението.
 
-## Free и VIP
-- Free прогнозите са отворени за всички.
-- VIP прогнозите са най-силните ни. Отварят се с безплатна регистрация (код по имейл, без парола), а за всички — 10 минути след началото.
-- В готовите ни фишове VIP изборите са отворени за всички.
+## Силни избори (★)
+- Всички прогнози са безплатни. Повечето са отворени за всички.
+- Силните избори (★) са най-силните ни. Отварят се с безплатна регистрация (код по имейл, без парола), а за всички — 10 минути след началото.
+- В готовите ни фишове силните избори (★) са отворени за всички.
 
 ## Коефициентът
 - Всяка прогноза показва коефициента в момента на публикуване и най-ниския коефициент, който още препоръчваме.
@@ -1091,15 +1091,15 @@ Brojimo svaki tip od 2. novembra 2026, dobitne i gubitne. Ništa se ne briše. P
 - Залагай само толкова, колкото можеш да си позволиш да загубиш.`,
   },
   faq: {
-    en: [["Are betizzi tips free?", "Yes. Free tips are open to everyone. VIP tips only need a free sign-up with your email."], ["Is betizzi a bookmaker?", "No. We publish tips and compare prices. Bets are placed with licensed bookmakers."], ["Do you guarantee wins?", "No. A tip is an estimate from data. All results, including losses, are in our public record."], ["How many tips do you give?", "We aim for a Free tip in at least one in three matches with odds, and a VIP tip in about one in ten. Some days there are fewer."], ["When are tips published?", "During the day, always before kick-off. New tips are added every few hours."]],
-    el: [["Είναι δωρεάν τα tips του betizzi;", "Ναι. Τα Free είναι ανοιχτά για όλους. Τα VIP θέλουν μόνο δωρεάν εγγραφή με το email σου."], ["Είναι το betizzi bookmaker;", "Όχι. Δημοσιεύουμε tips και συγκρίνουμε αποδόσεις. Τα στοιχήματα γίνονται σε αδειοδοτημένους bookmakers."], ["Εγγυάστε κέρδη;", "Όχι. Ένα tip είναι εκτίμηση από δεδομένα. Όλα τα αποτελέσματα, και οι ήττες, είναι στο δημόσιο ιστορικό μας."], ["Πόσα tips δίνετε;", "Στόχος είναι Free tip σε τουλάχιστον έναν στους τρεις αγώνες με αποδόσεις και VIP σε περίπου έναν στους δέκα. Κάποιες μέρες είναι λιγότερα."], ["Πότε βγαίνουν τα tips;", "Μέσα στη μέρα, πάντα πριν από τη σέντρα. Νέα tips προστίθενται κάθε λίγες ώρες."]],
-    es: [["¿Los tips de betizzi son gratis?", "Sí. Los tips Free están abiertos para todos. Los VIP solo necesitan un registro gratuito con tu email."], ["¿betizzi es una casa de apuestas?", "No. Publicamos tips y comparamos cuotas. Las apuestas se hacen en casas con licencia."], ["¿Garantizáis ganancias?", "No. Un tip es una estimación a partir de datos. Todos los resultados, también los fallos, están en nuestro historial público."], ["¿Cuántos tips dais?", "Buscamos un tip Free en al menos uno de cada tres partidos con cuotas, y un VIP en uno de cada diez aprox. Algunos días hay menos."], ["¿Cuándo se publican los tips?", "Durante el día, siempre antes del inicio. Se añaden tips nuevos cada pocas horas."]],
-    pt: [["Os palpites do betizzi são grátis?", "Sim. Os Free estão abertos a todos. Os VIP só precisam de um registo gratuito com o teu email."], ["O betizzi é uma casa de apostas?", "Não. Publicamos palpites e comparamos odds. As apostas são feitas em casas licenciadas."], ["Garantem ganhos?", "Não. Um palpite é uma estimativa a partir de dados. Todos os resultados, incluindo as falhas, estão no nosso histórico público."], ["Quantos palpites dão?", "Procuramos um palpite Free em pelo menos um em cada três jogos com odds, e um VIP em cerca de um em cada dez. Há dias com menos."], ["Quando são publicados os palpites?", "Ao longo do dia, sempre antes do início. São acrescentados novos a cada poucas horas."]],
-    fr: [["Les tips betizzi sont-ils gratuits ?", "Oui. Les tips Free sont ouverts à tous. Les VIP demandent seulement une inscription gratuite avec votre e-mail."], ["betizzi est-il un bookmaker ?", "Non. Nous publions des tips et comparons les cotes. Les paris se font chez des bookmakers agréés."], ["Garantissez-vous des gains ?", "Non. Un tip est une estimation à partir de données. Tous les résultats, pertes comprises, sont dans notre historique public."], ["Combien de tips donnez-vous ?", "Nous visons un tip Free dans au moins un match sur trois avec cotes, et un VIP dans environ un sur dix. Certains jours, il y en a moins."], ["Quand les tips sont-ils publiés ?", "Pendant la journée, toujours avant le coup d'envoi. De nouveaux tips s'ajoutent toutes les quelques heures."]],
-    de: [["Sind die Tipps von betizzi kostenlos?", "Ja. Free-Tipps sind für alle offen. VIP-Tipps brauchen nur eine kostenlose Anmeldung mit deiner E-Mail."], ["Ist betizzi ein Buchmacher?", "Nein. Wir veröffentlichen Tipps und vergleichen Quoten. Wetten werden bei lizenzierten Buchmachern platziert."], ["Garantiert ihr Gewinne?", "Nein. Ein Tipp ist eine Schätzung aus Daten. Alle Ergebnisse, auch Verluste, stehen in unserer öffentlichen Bilanz."], ["Wie viele Tipps gebt ihr?", "Wir zielen auf einen Free-Tipp in mindestens jedem dritten Spiel mit Quoten und einen VIP-Tipp in etwa jedem zehnten. An manchen Tagen sind es weniger."], ["Wann erscheinen die Tipps?", "Im Laufe des Tages, immer vor Anpfiff. Alle paar Stunden kommen neue hinzu."]],
-    ro: [["Ponturile betizzi sunt gratuite?", "Da. Ponturile Free sunt deschise pentru toți. Cele VIP cer doar o înregistrare gratuită cu emailul tău."], ["Este betizzi casă de pariuri?", "Nu. Publicăm ponturi și comparăm cote. Pariurile se fac la case licențiate."], ["Garantați câștiguri?", "Nu. Un pont este o estimare din date. Toate rezultatele, inclusiv cele pierdute, sunt în istoricul nostru public."], ["Câte ponturi dați?", "Ne propunem un pont Free la cel puțin unul din trei meciuri cu cote și un VIP la aproximativ unul din zece. În unele zile sunt mai puține."], ["Când apar ponturile?", "În timpul zilei, mereu înainte de start. Se adaugă ponturi noi la câteva ore."]],
-    sr: [["Da li su betizzi tipovi besplatni?", "Da. Free tipovi su otvoreni za sve. Za VIP je potrebna samo besplatna registracija emailom."], ["Da li je betizzi kladionica?", "Ne. Objavljujemo tipove i poredimo kvote. Opklade se uplaćuju kod licenciranih kladionica."], ["Da li garantujete dobitak?", "Ne. Tip je procena iz podataka. Svi rezultati, i gubitni, nalaze se u našoj javnoj istoriji."], ["Koliko tipova dajete?", "Cilj je Free tip na bar svakoj trećoj utakmici sa kvotama i VIP na otprilike svakoj desetoj. Nekih dana ih je manje."], ["Kada izlaze tipovi?", "Tokom dana, uvek pre početka. Novi tipovi se dodaju na svakih nekoliko sati."]],
-    bg: [["Безплатни ли са прогнозите на betizzi?", "Да. Free прогнозите са отворени за всички. За VIP е нужна само безплатна регистрация с имейл."], ["betizzi букмейкър ли е?", "Не. Публикуваме прогнози и сравняваме коефициенти. Залозите се правят при лицензирани букмейкъри."], ["Гарантирате ли печалба?", "Не. Прогнозата е оценка от данни. Всички резултати, включително загубите, са в публичната ни история."], ["Колко прогнози давате?", "Целим Free прогноза в поне един от три мача с коефициенти и VIP в около един от десет. В някои дни са по-малко."], ["Кога излизат прогнозите?", "През деня, винаги преди началото. Нови прогнози се добавят на всеки няколко часа."]],
+    en: [["Are betizzi tips free?", "Yes, all of them. Most are open to everyone; strong picks (★) only need a free sign-up with your email."], ["Is betizzi a bookmaker?", "No. We publish tips and compare prices. Bets are placed with licensed bookmakers."], ["Do you guarantee wins?", "No. A tip is an estimate from data. All results, including losses, are in our public record."], ["How many tips do you give?", "We aim for a Free tip in at least one in three matches with odds, and a strong pick (★) in about one in ten. Some days there are fewer."], ["When are tips published?", "During the day, always before kick-off. New tips are added every few hours."]],
+    el: [["Είναι δωρεάν τα tips του betizzi;", "Ναι, όλα. Τα περισσότερα είναι ανοιχτά για όλους· οι δυνατές επιλογές (★) θέλουν μόνο δωρεάν εγγραφή με το email σου."], ["Είναι το betizzi bookmaker;", "Όχι. Δημοσιεύουμε tips και συγκρίνουμε αποδόσεις. Τα στοιχήματα γίνονται σε αδειοδοτημένους bookmakers."], ["Εγγυάστε κέρδη;", "Όχι. Ένα tip είναι εκτίμηση από δεδομένα. Όλα τα αποτελέσματα, και οι ήττες, είναι στο δημόσιο ιστορικό μας."], ["Πόσα tips δίνετε;", "Στόχος είναι Free tip σε τουλάχιστον έναν στους τρεις αγώνες με αποδόσεις και δυνατή επιλογή (★) σε περίπου έναν στους δέκα. Κάποιες μέρες είναι λιγότερα."], ["Πότε βγαίνουν τα tips;", "Μέσα στη μέρα, πάντα πριν από τη σέντρα. Νέα tips προστίθενται κάθε λίγες ώρες."]],
+    es: [["¿Los tips de betizzi son gratis?", "Sí, todos. La mayoría están abiertos para todos; las selecciones fuertes (★) solo necesitan un registro gratuito con tu email."], ["¿betizzi es una casa de apuestas?", "No. Publicamos tips y comparamos cuotas. Las apuestas se hacen en casas con licencia."], ["¿Garantizáis ganancias?", "No. Un tip es una estimación a partir de datos. Todos los resultados, también los fallos, están en nuestro historial público."], ["¿Cuántos tips dais?", "Buscamos un tip Free en al menos uno de cada tres partidos con cuotas, y una selección fuerte (★) en uno de cada diez aprox. Algunos días hay menos."], ["¿Cuándo se publican los tips?", "Durante el día, siempre antes del inicio. Se añaden tips nuevos cada pocas horas."]],
+    pt: [["Os palpites do betizzi são grátis?", "Sim, todos. A maioria está aberta a todos; as escolhas fortes (★) só precisam de um registo gratuito com o teu email."], ["O betizzi é uma casa de apostas?", "Não. Publicamos palpites e comparamos odds. As apostas são feitas em casas licenciadas."], ["Garantem ganhos?", "Não. Um palpite é uma estimativa a partir de dados. Todos os resultados, incluindo as falhas, estão no nosso histórico público."], ["Quantos palpites dão?", "Procuramos um palpite Free em pelo menos um em cada três jogos com odds, e uma escolha forte (★) em cerca de um em cada dez. Há dias com menos."], ["Quando são publicados os palpites?", "Ao longo do dia, sempre antes do início. São acrescentados novos a cada poucas horas."]],
+    fr: [["Les tips betizzi sont-ils gratuits ?", "Oui, tous. La plupart sont ouverts à tous ; les choix forts (★) demandent seulement une inscription gratuite avec votre e-mail."], ["betizzi est-il un bookmaker ?", "Non. Nous publions des tips et comparons les cotes. Les paris se font chez des bookmakers agréés."], ["Garantissez-vous des gains ?", "Non. Un tip est une estimation à partir de données. Tous les résultats, pertes comprises, sont dans notre historique public."], ["Combien de tips donnez-vous ?", "Nous visons un tip Free dans au moins un match sur trois avec cotes, et un choix fort (★) dans environ un sur dix. Certains jours, il y en a moins."], ["Quand les tips sont-ils publiés ?", "Pendant la journée, toujours avant le coup d'envoi. De nouveaux tips s'ajoutent toutes les quelques heures."]],
+    de: [["Sind die Tipps von betizzi kostenlos?", "Ja, alle. Die meisten sind für alle offen; starke Tipps (★) brauchen nur eine kostenlose Anmeldung mit deiner E-Mail."], ["Ist betizzi ein Buchmacher?", "Nein. Wir veröffentlichen Tipps und vergleichen Quoten. Wetten werden bei lizenzierten Buchmachern platziert."], ["Garantiert ihr Gewinne?", "Nein. Ein Tipp ist eine Schätzung aus Daten. Alle Ergebnisse, auch Verluste, stehen in unserer öffentlichen Bilanz."], ["Wie viele Tipps gebt ihr?", "Wir zielen auf einen Free-Tipp in mindestens jedem dritten Spiel mit Quoten und einen starken Tipp (★) in etwa jedem zehnten. An manchen Tagen sind es weniger."], ["Wann erscheinen die Tipps?", "Im Laufe des Tages, immer vor Anpfiff. Alle paar Stunden kommen neue hinzu."]],
+    ro: [["Ponturile betizzi sunt gratuite?", "Da, toate. Cele mai multe sunt deschise pentru toți; alegerile puternice (★) cer doar o înregistrare gratuită cu emailul tău."], ["Este betizzi casă de pariuri?", "Nu. Publicăm ponturi și comparăm cote. Pariurile se fac la case licențiate."], ["Garantați câștiguri?", "Nu. Un pont este o estimare din date. Toate rezultatele, inclusiv cele pierdute, sunt în istoricul nostru public."], ["Câte ponturi dați?", "Ne propunem un pont Free la cel puțin unul din trei meciuri cu cote și o alegere puternică (★) la aproximativ unul din zece. În unele zile sunt mai puține."], ["Când apar ponturile?", "În timpul zilei, mereu înainte de start. Se adaugă ponturi noi la câteva ore."]],
+    sr: [["Da li su betizzi tipovi besplatni?", "Da, svi. Većina je otvorena za sve; za jake izbore (★) je potrebna samo besplatna registracija emailom."], ["Da li je betizzi kladionica?", "Ne. Objavljujemo tipove i poredimo kvote. Opklade se uplaćuju kod licenciranih kladionica."], ["Da li garantujete dobitak?", "Ne. Tip je procena iz podataka. Svi rezultati, i gubitni, nalaze se u našoj javnoj istoriji."], ["Koliko tipova dajete?", "Cilj je Free tip na bar svakoj trećoj utakmici sa kvotama i jak izbor (★) na otprilike svakoj desetoj. Nekih dana ih je manje."], ["Kada izlaze tipovi?", "Tokom dana, uvek pre početka. Novi tipovi se dodaju na svakih nekoliko sati."]],
+    bg: [["Безплатни ли са прогнозите на betizzi?", "Да, всички. Повечето са отворени за всички; за силните избори (★) е нужна само безплатна регистрация с имейл."], ["betizzi букмейкър ли е?", "Не. Публикуваме прогнози и сравняваме коефициенти. Залозите се правят при лицензирани букмейкъри."], ["Гарантирате ли печалба?", "Не. Прогнозата е оценка от данни. Всички резултати, включително загубите, са в публичната ни история."], ["Колко прогнози давате?", "Целим Free прогноза в поне един от три мача с коефициенти и силен избор (★) в около един от десет. В някои дни са по-малко."], ["Кога излизат прогнозите?", "През деня, винаги преди началото. Нови прогнози се добавят на всеки няколко часа."]],
   },
   faqH: { en: "Questions", el: "Ερωτήσεις", es: "Preguntas", pt: "Perguntas", fr: "Questions", de: "Fragen", ro: "Întrebări", sr: "Pitanja", bg: "Въпроси" },
 };
@@ -1807,7 +1807,7 @@ export const PAR = {
     ans: (d, n, lo, hi) => `On ${d} betizzi has ${n} ready-made football accumulators, with total odds from x${lo} to x${hi}. Every selection comes from our own model-based tips, and a published ticket is never changed.`,
     none: "No accumulators yet today. They are published in the morning (Greek time) and topped up during the day.",
     zone: "Odds", v: { wins: "Wins", goals: "Goals", mix: "Mixed" }, st: { w: "Won", l: "Lost", lv: "In play", o: "Open" }, total: "Total odds", upd: "Updated",
-    howH: "How we build them", how: ["Only from our tips: every selection is a betizzi Free or VIP tip, based on each team's last 10 games and the bookmaker price.", "Four odds bands: x3–5, x8–12, x20–30 and the mega parlay of the day (x30–50). Each tip goes into one ticket only (the mega may reuse up to half).", "Nothing is deleted: winning and losing tickets stay in our record."],
+    howH: "How we build them", how: ["Only from our tips: every selection is a betizzi tip, based on each team's last 10 games and the bookmaker price.", "Four odds bands: x3–5, x8–12, x20–30 and the mega parlay of the day (x30–50). Each tip goes into one ticket only (the mega may reuse up to half).", "Nothing is deleted: winning and losing tickets stay in our record."],
     big: "Big accumulators win rarely. Bet only what you can afford to lose.", last: (o, d) => `Our last winning accumulator: x${o} on ${d}.`, app: "Open them in the app →",
     faqH: "Questions", faq: [["What is an accumulator?", "One bet with several selections. The odds multiply, but every selection has to win."],
       ["How are betizzi accumulators made?", "Our engine picks them every morning from that day's tips, in four odds bands, and adds new ones during the day when new tips appear."],
@@ -1817,7 +1817,7 @@ export const PAR = {
     ans: (d, n, lo, hi) => `Στις ${d} το betizzi έχει ${n} έτοιμα παρολί ποδοσφαίρου, με συνολική απόδοση από x${lo} έως x${hi}. Κάθε επιλογή είναι από τα δικά μας tips, και ένα παρολί που δημοσιεύτηκε δεν αλλάζει ποτέ.`,
     none: "Δεν έχουν βγει ακόμα παρολί σήμερα. Βγαίνουν το πρωί (ώρα Ελλάδας) και συμπληρώνονται μέσα στη μέρα.",
     zone: "Απόδοση", v: { wins: "Νίκες", goals: "Γκολ", mix: "Μικτό" }, st: { w: "Κέρδισε", l: "Χάθηκε", lv: "Σε εξέλιξη", o: "Ανοιχτό" }, total: "Συνολική απόδοση", upd: "Ενημέρωση",
-    howH: "Πώς τα φτιάχνουμε", how: ["Μόνο από τα tips μας: κάθε επιλογή είναι Free ή VIP tip του betizzi, από τους 10 τελευταίους αγώνες κάθε ομάδας και την απόδοση των bookmakers.", "Τέσσερις ζώνες: x3–5, x8–12, x20–30 και το μεγάλο παρολί της ημέρας (x30–50). Κάθε tip μπαίνει σε ένα μόνο παρολί (το μεγάλο μπορεί να ξαναπάρει έως τα μισά).", "Δεν σβήνεται τίποτα: τα παρολί που κέρδισαν και που χάθηκαν μένουν στο ιστορικό μας."],
+    howH: "Πώς τα φτιάχνουμε", how: ["Μόνο από τα tips μας: κάθε επιλογή είναι tip του betizzi, από τους 10 τελευταίους αγώνες κάθε ομάδας και την απόδοση των bookmakers.", "Τέσσερις ζώνες: x3–5, x8–12, x20–30 και το μεγάλο παρολί της ημέρας (x30–50). Κάθε tip μπαίνει σε ένα μόνο παρολί (το μεγάλο μπορεί να ξαναπάρει έως τα μισά).", "Δεν σβήνεται τίποτα: τα παρολί που κέρδισαν και που χάθηκαν μένουν στο ιστορικό μας."],
     big: "Τα μεγάλα παρολί κερδίζουν σπάνια. Παίξε μόνο όσα αντέχεις να χάσεις.", last: (o, d) => `Το τελευταίο παρολί μας που κέρδισε: x${o}, ${d}.`, app: "Δες τα στην εφαρμογή →",
     faqH: "Ερωτήσεις", faq: [["Τι είναι το παρολί;", "Ένα στοίχημα με πολλές επιλογές μαζί. Οι αποδόσεις πολλαπλασιάζονται, αλλά πρέπει να κερδίσουν όλες οι επιλογές."],
       ["Πώς φτιάχνονται τα παρολί του betizzi;", "Η μηχανή μας τα βγάζει κάθε πρωί από τα tips της ημέρας, σε τέσσερις ζώνες απόδοσης, και προσθέτει νέα μέσα στη μέρα όταν βγαίνουν νέα tips."],
@@ -1827,7 +1827,7 @@ export const PAR = {
     ans: (d, n, lo, hi) => `El ${d} betizzi tiene ${n} combinadas de fútbol listas, con cuota total de x${lo} a x${hi}. Cada selección sale de nuestros propios tips, y una combinada publicada no se cambia nunca.`,
     none: "Todavía no hay combinadas hoy. Se publican por la mañana (hora de Grecia) y se completan durante el día.",
     zone: "Cuota", v: { wins: "Victorias", goals: "Goles", mix: "Mixta" }, st: { w: "Ganada", l: "Perdida", lv: "En juego", o: "Abierta" }, total: "Cuota total", upd: "Actualizado",
-    howH: "Cómo las hacemos", how: ["Solo con nuestros tips: cada selección es un tip Free o VIP de betizzi, basado en los últimos 10 partidos de cada equipo y la cuota de las casas.", "Cuatro franjas: x3–5, x8–12, x20–30 y la combinada mega del día (x30–50). Cada tip va a una sola combinada (la mega puede repetir hasta la mitad).", "No se borra nada: las combinadas ganadas y perdidas quedan en nuestro historial."],
+    howH: "Cómo las hacemos", how: ["Solo con nuestros tips: cada selección es un tip de betizzi, basado en los últimos 10 partidos de cada equipo y la cuota de las casas.", "Cuatro franjas: x3–5, x8–12, x20–30 y la combinada mega del día (x30–50). Cada tip va a una sola combinada (la mega puede repetir hasta la mitad).", "No se borra nada: las combinadas ganadas y perdidas quedan en nuestro historial."],
     big: "Las combinadas grandes ganan pocas veces. Apuesta solo lo que puedas permitirte perder.", last: (o, d) => `Nuestra última combinada ganada: x${o}, ${d}.`, app: "Ábrelas en la app →",
     faqH: "Preguntas", faq: [["¿Qué es una combinada?", "Una sola apuesta con varias selecciones. Las cuotas se multiplican, pero todas las selecciones tienen que acertar."],
       ["¿Cómo se hacen las combinadas de betizzi?", "Nuestro motor las prepara cada mañana con los tips del día, en cuatro franjas de cuota, y añade nuevas durante el día cuando salen nuevos tips."],
@@ -1837,7 +1837,7 @@ export const PAR = {
     ans: (d, n, lo, hi) => `Em ${d}, o betizzi tem ${n} apostas múltiplas de futebol prontas, com odd total de x${lo} a x${hi}. Cada seleção vem dos nossos próprios tips, e uma múltipla publicada nunca é alterada.`,
     none: "Ainda não há múltiplas hoje. São publicadas de manhã (hora da Grécia) e completadas ao longo do dia.",
     zone: "Odd", v: { wins: "Vitórias", goals: "Golos", mix: "Mista" }, st: { w: "Ganha", l: "Perdida", lv: "Em jogo", o: "Aberta" }, total: "Odd total", upd: "Atualizado",
-    howH: "Como as fazemos", how: ["Só com os nossos tips: cada seleção é um tip Free ou VIP do betizzi, com base nos últimos 10 jogos de cada equipa e na odd das casas de apostas.", "Quatro faixas: x3–5, x8–12, x20–30 e a múltipla mega do dia (x30–50). Cada tip entra numa só múltipla (a mega pode repetir até metade).", "Nada é apagado: as múltiplas ganhas e perdidas ficam no nosso histórico."],
+    howH: "Como as fazemos", how: ["Só com os nossos tips: cada seleção é um tip do betizzi, com base nos últimos 10 jogos de cada equipa e na odd das casas de apostas.", "Quatro faixas: x3–5, x8–12, x20–30 e a múltipla mega do dia (x30–50). Cada tip entra numa só múltipla (a mega pode repetir até metade).", "Nada é apagado: as múltiplas ganhas e perdidas ficam no nosso histórico."],
     big: "As múltiplas grandes ganham raramente. Aposta só o que podes perder.", last: (o, d) => `A nossa última múltipla ganha: x${o}, ${d}.`, app: "Abre-as na app →",
     faqH: "Perguntas", faq: [["O que é uma aposta múltipla?", "Uma só aposta com várias seleções. As odds multiplicam-se, mas todas as seleções têm de ganhar."],
       ["Como são feitas as múltiplas do betizzi?", "O nosso motor prepara-as todas as manhãs com os tips do dia, em quatro faixas de odd, e junta novas ao longo do dia quando saem novos tips."],
@@ -1847,7 +1847,7 @@ export const PAR = {
     ans: (d, n, lo, hi) => `Le ${d}, betizzi propose ${n} combinés foot prêts, avec une cote totale de x${lo} à x${hi}. Chaque sélection vient de nos propres tips, et un combiné publié n'est jamais modifié.`,
     none: "Pas encore de combinés aujourd'hui. Ils sont publiés le matin (heure grecque) et complétés pendant la journée.",
     zone: "Cote", v: { wins: "Victoires", goals: "Buts", mix: "Mixte" }, st: { w: "Gagné", l: "Perdu", lv: "En cours", o: "Ouvert" }, total: "Cote totale", upd: "Mis à jour",
-    howH: "Comment on les construit", how: ["Uniquement avec nos tips : chaque sélection est un tip Free ou VIP de betizzi, basé sur les 10 derniers matchs de chaque équipe et la cote des bookmakers.", "Quatre tranches : x3–5, x8–12, x20–30 et le méga combiné du jour (x30–50). Chaque tip va dans un seul combiné (le méga peut en reprendre jusqu'à la moitié).", "Rien n'est effacé : les combinés gagnés et perdus restent dans notre historique."],
+    howH: "Comment on les construit", how: ["Uniquement avec nos tips : chaque sélection est un tip de betizzi, basé sur les 10 derniers matchs de chaque équipe et la cote des bookmakers.", "Quatre tranches : x3–5, x8–12, x20–30 et le méga combiné du jour (x30–50). Chaque tip va dans un seul combiné (le méga peut en reprendre jusqu'à la moitié).", "Rien n'est effacé : les combinés gagnés et perdus restent dans notre historique."],
     big: "Les gros combinés gagnent rarement. Ne mise que ce que tu peux te permettre de perdre.", last: (o, d) => `Notre dernier combiné gagnant : x${o}, ${d}.`, app: "Les ouvrir dans l'app →",
     faqH: "Questions", faq: [["Qu'est-ce qu'un combiné ?", "Un seul pari avec plusieurs sélections. Les cotes se multiplient, mais toutes les sélections doivent gagner."],
       ["Comment sont faits les combinés de betizzi ?", "Notre moteur les prépare chaque matin avec les tips du jour, en quatre tranches de cote, et en ajoute pendant la journée quand de nouveaux tips sortent."],
@@ -1857,7 +1857,7 @@ export const PAR = {
     ans: (d, n, lo, hi) => `Am ${d} hat betizzi ${n} fertige Fußball-Kombiwetten mit Gesamtquoten von x${lo} bis x${hi}. Jede Auswahl stammt aus unseren eigenen Tipps, und ein veröffentlichter Schein wird nie geändert.`,
     none: "Heute noch keine Kombiwetten. Sie erscheinen morgens (griechische Zeit) und werden im Lauf des Tages ergänzt.",
     zone: "Quote", v: { wins: "Siege", goals: "Tore", mix: "Gemischt" }, st: { w: "Gewonnen", l: "Verloren", lv: "Läuft", o: "Offen" }, total: "Gesamtquote", upd: "Aktualisiert",
-    howH: "So entstehen sie", how: ["Nur aus unseren Tipps: Jede Auswahl ist ein Free- oder VIP-Tipp von betizzi, basierend auf den letzten 10 Spielen jedes Teams und der Buchmacherquote.", "Vier Quotenbereiche: x3–5, x8–12, x20–30 und die Mega-Kombi des Tages (x30–50). Jeder Tipp kommt nur in einen Schein (die Mega-Kombi darf bis zur Hälfte wiederverwenden).", "Nichts wird gelöscht: gewonnene und verlorene Scheine bleiben in unserer Bilanz."],
+    howH: "So entstehen sie", how: ["Nur aus unseren Tipps: Jede Auswahl ist ein Tipp von betizzi, basierend auf den letzten 10 Spielen jedes Teams und der Buchmacherquote.", "Vier Quotenbereiche: x3–5, x8–12, x20–30 und die Mega-Kombi des Tages (x30–50). Jeder Tipp kommt nur in einen Schein (die Mega-Kombi darf bis zur Hälfte wiederverwenden).", "Nichts wird gelöscht: gewonnene und verlorene Scheine bleiben in unserer Bilanz."],
     big: "Große Kombiwetten gewinnen selten. Setze nur, was du verlieren kannst.", last: (o, d) => `Unsere letzte gewonnene Kombiwette: x${o}, ${d}.`, app: "In der App öffnen →",
     faqH: "Fragen", faq: [["Was ist eine Kombiwette?", "Eine Wette mit mehreren Auswahlen. Die Quoten werden multipliziert, aber jede Auswahl muss gewinnen."],
       ["Wie entstehen die Kombiwetten von betizzi?", "Unsere Engine stellt sie jeden Morgen aus den Tipps des Tages zusammen, in vier Quotenbereichen, und ergänzt neue, wenn neue Tipps erscheinen."],
@@ -1867,7 +1867,7 @@ export const PAR = {
     ans: (d, n, lo, hi) => `Pe ${d}, betizzi are ${n} bilete de fotbal gata făcute, cu cotă totală între ${lo} și ${hi}. Fiecare selecție vine din ponturile noastre, iar un bilet publicat nu se schimbă niciodată.`,
     none: "Încă nu sunt bilete azi. Se publică dimineața (ora Greciei) și se completează în timpul zilei.",
     zone: "Bilet cota", v: { wins: "Victorii", goals: "Goluri", mix: "Mixt" }, st: { w: "Câștigat", l: "Pierdut", lv: "În desfășurare", o: "Deschis" }, total: "Cotă totală", upd: "Actualizat",
-    howH: "Cum le facem", how: ["Doar din ponturile noastre: fiecare selecție este un pont Free sau VIP betizzi, din ultimele 10 meciuri ale fiecărei echipe și cota caselor de pariuri.", "Patru niveluri: cota 3–5, cota 8–12 (biletul de cota 10), cota 20–30 și biletul mare al zilei (cota 30–50). Fiecare pont intră pe un singur bilet (biletul mare poate relua până la jumătate).", "Nu se șterge nimic: biletele câștigate și pierdute rămân în istoricul nostru."],
+    howH: "Cum le facem", how: ["Doar din ponturile noastre: fiecare selecție este un pont betizzi, din ultimele 10 meciuri ale fiecărei echipe și cota caselor de pariuri.", "Patru niveluri: cota 3–5, cota 8–12 (biletul de cota 10), cota 20–30 și biletul mare al zilei (cota 30–50). Fiecare pont intră pe un singur bilet (biletul mare poate relua până la jumătate).", "Nu se șterge nimic: biletele câștigate și pierdute rămân în istoricul nostru."],
     big: "Biletele mari câștigă rar. Pariază doar cât îți permiți să pierzi.", last: (o, d) => `Ultimul nostru bilet câștigător: cota ${o}, ${d}.`, app: "Deschide-le în aplicație →",
     faqH: "Întrebări", faq: [["Ce este un bilet combinat?", "Un singur pariu cu mai multe selecții. Cotele se înmulțesc, dar toate selecțiile trebuie să iasă."],
       ["Cum se fac biletele betizzi?", "Motorul nostru le alcătuiește în fiecare dimineață din ponturile zilei, pe patru niveluri de cotă, și adaugă altele noi în timpul zilei când apar ponturi noi."],
@@ -1877,7 +1877,7 @@ export const PAR = {
     ans: (d, n, lo, hi) => `Za ${d} betizzi ima ${n} gotovih fudbalskih tiketa, sa ukupnom kvotom od ${lo} do ${hi}. Svaki izbor je iz naših tipova, a objavljen tiket se nikad ne menja.`,
     none: "Danas još nema tiketa. Objavljuju se ujutru (grčko vreme) i dopunjuju tokom dana.",
     zone: "Kvota", v: { wins: "Pobede", goals: "Golovi", mix: "Mešoviti" }, st: { w: "Dobitan", l: "Izgubljen", lv: "U toku", o: "Otvoren" }, total: "Ukupna kvota", upd: "Ažurirano",
-    howH: "Kako ih pravimo", how: ["Samo od naših tipova: svaki izbor je betizzi Free ili VIP tip, na osnovu poslednjih 10 utakmica svakog tima i kvote kladionica.", "Četiri nivoa: kvota 3–5, 8–12, 20–30 i veliki tiket dana (kvota 30–50). Svaki tip ide na samo jedan tiket (veliki tiket može ponoviti do polovine).", "Ništa se ne briše: dobitni i izgubljeni tiketi ostaju u našoj istoriji."],
+    howH: "Kako ih pravimo", how: ["Samo od naših tipova: svaki izbor je betizzi tip, na osnovu poslednjih 10 utakmica svakog tima i kvote kladionica.", "Četiri nivoa: kvota 3–5, 8–12, 20–30 i veliki tiket dana (kvota 30–50). Svaki tip ide na samo jedan tiket (veliki tiket može ponoviti do polovine).", "Ništa se ne briše: dobitni i izgubljeni tiketi ostaju u našoj istoriji."],
     big: "Veliki tiketi retko prolaze. Igraj samo koliko možeš da izgubiš.", last: (o, d) => `Naš poslednji dobitni tiket: kvota ${o}, ${d}.`, app: "Otvori ih u aplikaciji →",
     faqH: "Pitanja", faq: [["Šta je tiket sa više parova?", "Jedna opklada sa više izbora. Kvote se množe, ali svi izbori moraju da prođu."],
       ["Kako nastaju betizzi tiketi?", "Naš sistem ih sastavlja svakog jutra od tipova tog dana, u četiri nivoa kvote, i dodaje nove tokom dana kada stignu novi tipovi."],
@@ -1887,7 +1887,7 @@ export const PAR = {
     ans: (d, n, lo, hi) => `На ${d} betizzi има ${n} готови футболни фиша с общ коефициент от ${lo} до ${hi}. Всеки избор е от нашите прогнози, а публикуван фиш никога не се променя.`,
     none: "Днес още няма фишове. Публикуват се сутрин (гръцко време) и се допълват през деня.",
     zone: "Коефициент", v: { wins: "Победи", goals: "Голове", mix: "Смесен" }, st: { w: "Печеливш", l: "Загубен", lv: "В игра", o: "Отворен" }, total: "Общ коефициент", upd: "Обновено",
-    howH: "Как ги правим", how: ["Само от нашите прогнози: всеки избор е Free или VIP прогноза на betizzi, от последните 10 мача на всеки отбор и коефициента на букмейкърите.", "Четири нива: коефициент 3–5, 8–12, 20–30 и голям фиш на деня (коефициент 30–50). Всяка прогноза влиза само в един фиш (големият може да повтори до половината).", "Нищо не се изтрива: печелившите и загубените фишове остават в нашата история."],
+    howH: "Как ги правим", how: ["Само от нашите прогнози: всеки избор е прогноза на betizzi, от последните 10 мача на всеки отбор и коефициента на букмейкърите.", "Четири нива: коефициент 3–5, 8–12, 20–30 и голям фиш на деня (коефициент 30–50). Всяка прогноза влиза само в един фиш (големият може да повтори до половината).", "Нищо не се изтрива: печелившите и загубените фишове остават в нашата история."],
     big: "Големите фишове печелят рядко. Залагай само колкото можеш да загубиш.", last: (o, d) => `Последният ни печеливш фиш: коефициент ${o}, ${d}.`, app: "Отвори ги в приложението →",
     faqH: "Въпроси", faq: [["Какво е комбиниран фиш?", "Един залог с няколко избора. Коефициентите се умножават, но всички избори трябва да познаят."],
       ["Как се правят фишовете на betizzi?", "Нашата система ги подготвя всяка сутрин от прогнозите за деня, в четири нива на коефициент, и добавя нови през деня, когато излязат нови прогнози."],

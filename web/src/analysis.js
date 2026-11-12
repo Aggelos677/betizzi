@@ -33,7 +33,7 @@ const A = {
     ng: "{H} kept a clean sheet or failed to score in {X} of its last 5 and {A} in {Y}.",
     side: "{T} is in better form ({P} points to {Q} in the last 5).",
     draw: "The two sides are close in form ({P} and {Q} points in the last 5).",
-    gen: "Our pick is {SEL} at {O}.", vip: "We have a VIP tip on this match.", none: "No tip from us here: we did not find a clear pick.",
+    gen: "Our pick is {SEL} at {O}.", vip: "We have a strong pick (★) on this match.", none: "No tip from us here: we did not find a clear pick.",
   },
   el: {
     evGG: "γκολ και από τις δύο ομάδες",
@@ -56,7 +56,7 @@ const A = {
     ng: "Από τα 5 τελευταία τους, {X} ({H}) και {Y} ({A}) έληξαν με τουλάχιστον μία ομάδα στο μηδέν.",
     side: "Καλύτερη φόρμα: {T} ({P} βαθμοί έναντι {Q} στα 5 τελευταία).",
     draw: "Οι δύο ομάδες είναι κοντά σε φόρμα ({P} και {Q} βαθμοί στους 5 τελευταίους).",
-    gen: "Προτείνουμε {SEL} στο {O}.", vip: "Σε αυτόν τον αγώνα έχουμε VIP tip.", none: "Εδώ δεν βάζουμε tip: δεν βρήκαμε καθαρή επιλογή.",
+    gen: "Προτείνουμε {SEL} στο {O}.", vip: "Σε αυτόν τον αγώνα έχουμε δυνατή επιλογή (★).", none: "Εδώ δεν βάζουμε tip: δεν βρήκαμε καθαρή επιλογή.",
   },
   es: {
     evGG: "goles de los dos equipos",
@@ -79,7 +79,7 @@ const A = {
     ng: "{H} dejó la portería a cero o no marcó en {X} de sus últimos 5 y {A} en {Y}.",
     side: "{T} llega en mejor forma ({P} puntos frente a {Q} en los últimos 5).",
     draw: "Los dos equipos están parejos ({P} y {Q} puntos en los últimos 5).",
-    gen: "Elegimos {SEL} a {O}.", vip: "En este partido tenemos un tip VIP.", none: "Aquí no damos tip: no vimos una opción clara.",
+    gen: "Elegimos {SEL} a {O}.", vip: "En este partido tenemos una selección fuerte (★).", none: "Aquí no damos tip: no vimos una opción clara.",
   },
   pt: {
     evGG: "gols dos dois times",
@@ -102,7 +102,7 @@ const A = {
     ng: "{H} não sofreu gol ou não marcou em {X} dos últimos 5 e {A} em {Y}.",
     side: "{T} está em melhor fase ({P} pontos contra {Q} nos últimos 5).",
     draw: "Os dois times estão parecidos ({P} e {Q} pontos nos últimos 5).",
-    gen: "Nossa escolha é {SEL} com odd {O}.", vip: "Neste jogo temos um palpite VIP.", none: "Aqui não damos palpite: não vimos uma escolha clara.",
+    gen: "Nossa escolha é {SEL} com odd {O}.", vip: "Neste jogo temos uma escolha forte (★).", none: "Aqui não damos palpite: não vimos uma escolha clara.",
   },
   fr: {
     evGG: "des buts des deux côtés",
@@ -125,7 +125,7 @@ const A = {
     ng: "{H} n'a pas encaissé ou n'a pas marqué lors de {X} de ses 5 derniers matchs et {A} lors de {Y}.",
     side: "{T} est en meilleure forme ({P} points contre {Q} sur les 5 derniers).",
     draw: "Les deux équipes ont une forme proche ({P} et {Q} points sur les 5 derniers).",
-    gen: "Notre choix : {SEL} à {O}.", vip: "Nous avons un tip VIP sur ce match.", none: "Pas de tip ici : nous n'avons pas trouvé de choix clair.",
+    gen: "Notre choix : {SEL} à {O}.", vip: "Nous avons un choix fort (★) sur ce match.", none: "Pas de tip ici : nous n'avons pas trouvé de choix clair.",
   },
   de: {
     evGG: "Tore auf beiden Seiten",
@@ -148,7 +148,7 @@ const A = {
     ng: "{H} blieb in {X} der letzten 5 Spiele ohne Gegentor oder ohne eigenes Tor, {A} in {Y}.",
     side: "{T} ist besser in Form ({P} zu {Q} Punkten aus den letzten 5).",
     draw: "Beide Teams sind ähnlich in Form ({P} und {Q} Punkte aus den letzten 5).",
-    gen: "Wir wählen {SEL} zu {O}.", vip: "Für dieses Spiel haben wir einen VIP-Tipp.", none: "Hier kein Tipp von uns: Wir haben keine klare Wahl gefunden.",
+    gen: "Wir wählen {SEL} zu {O}.", vip: "Für dieses Spiel haben wir einen starken Tipp (★).", none: "Hier kein Tipp von uns: Wir haben keine klare Wahl gefunden.",
   },
   ro: {
     evGG: "goluri de ambele părți",
@@ -171,7 +171,7 @@ const A = {
     ng: "{H} nu a primit gol sau nu a marcat în {X} din ultimele 5 meciuri, iar {A} în {Y}.",
     side: "{T} este într-o formă mai bună ({P} puncte față de {Q} în ultimele 5).",
     draw: "Cele două echipe sunt apropiate ca formă ({P} și {Q} puncte în ultimele 5).",
-    gen: "Alegem {SEL} la {O}.", vip: "La acest meci avem un pont VIP.", none: "Aici nu dăm pont: nu am găsit o alegere clară.",
+    gen: "Alegem {SEL} la {O}.", vip: "La acest meci avem o alegere puternică (★).", none: "Aici nu dăm pont: nu am găsit o alegere clară.",
   },
   sr: {
     evGG: "golove obe ekipe",
@@ -194,7 +194,7 @@ const A = {
     ng: "{H}: bez primljenog ili datog gola u {X} od poslednjih 5, {A}: u {Y}.",
     side: "{T} je u boljoj formi ({P} bodova naspram {Q} u poslednjih 5).",
     draw: "Dve ekipe su slične forme ({P} i {Q} bodova u poslednjih 5).",
-    gen: "Biramo {SEL} po kvoti {O}.", vip: "Za ovu utakmicu imamo VIP tip.", none: "Ovde nemamo tip: nismo našli jasan izbor.",
+    gen: "Biramo {SEL} po kvoti {O}.", vip: "Za ovu utakmicu imamo jak izbor (★).", none: "Ovde nemamo tip: nismo našli jasan izbor.",
   },
   bg: {
     evGG: "голове и за двата отбора",
@@ -217,7 +217,7 @@ const A = {
     ng: "{H} не допусна или не вкара гол в {X} от последните 5 мача, а {A} в {Y}.",
     side: "{T} е в по-добра форма ({P} точки срещу {Q} в последните 5).",
     draw: "Двата отбора са близки по форма ({P} и {Q} точки в последните 5).",
-    gen: "Избираме {SEL} при {O}.", vip: "За този мач имаме VIP прогноза.", none: "Тук нямаме прогноза: не намерихме ясен избор.",
+    gen: "Избираме {SEL} при {O}.", vip: "За този мач имаме силен избор (★).", none: "Тук нямаме прогноза: не намерихме ясен избор.",
   },
 };
 

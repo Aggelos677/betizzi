@@ -903,7 +903,7 @@ header{position:relative}
   <button type="button" class="authx" id="authX" aria-label="Close">✕</button>
   <div id="authS1">
     <h2 id="authH"><span>Sign up free</span></h2>
-    <p class="authp"><span>Open all strong picks (★), collect credits and keep your coupons. No password: we email you a 6-digit code.</span></p>
+    <p class="authp"><span>Open all strong picks (★) and keep your coupons. No password: we email you a 6-digit code.</span></p>
     <input type="email" id="authEmail" autocomplete="email" inputmode="email" placeholder="Your email">
     <label class="authc"><input type="checkbox" id="authAdult"> <span>I am 18+ and I accept the terms.</span></label>
     <label class="authc"><input type="checkbox" id="authNews"> <span>Send me news from betizzi (optional).</span></label>
@@ -941,7 +941,7 @@ header{position:relative}
       <label class="authc"><input type="checkbox" id="sndAll"> <span>Soft sound: every other goal</span></label>
     </div>
   </header>
-  <div class="appbar" id="appBar" hidden><span class="ab-ic" aria-hidden="true">📲</span><span class="ab-t"><b id="abTxt">Put betizzi on your phone</b><span class="ab-gift">🎁 <b class="mono">+500</b> <span>credits</span></span></span><button type="button" class="btn" id="abGo">Install</button><button type="button" class="ab-x" id="abX" aria-label="Close">✕</button><ol class="ab-how" id="abHow" hidden></ol></div>
+  <div class="appbar" id="appBar" hidden><span class="ab-ic" aria-hidden="true">📲</span><span class="ab-t"><b id="abTxt">Put betizzi on your phone</b></span><button type="button" class="btn" id="abGo">Install</button><button type="button" class="ab-x" id="abX" aria-label="Close">✕</button><ol class="ab-how" id="abHow" hidden></ol></div>
 <script>/* 10/11 (Owner: ταχύτητα): η μπάρα εγκατάστασης ανοίγει ΕΔΩ, όσο φορτώνει η σελίδα, με τους ίδιους όρους όπως πριν (iPhone/Android, όχι ήδη εγκατεστημένη, όχι κλεισμένη τις τελευταίες 7 μέρες, κινητό). Πριν έμπαινε 1–3΄΄ αργότερα και έσπρωχνε όλη τη σελίδα 230px κάτω (Lighthouse CLS 0.24). Ίδια μπάρα, ίδιο κείμενο. */(function(){try{var u=navigator.userAgent,b=document.getElementById("appBar");if((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true||window.innerWidth>=900)return;if(!(/iphone|ipad|ipod|android/i.test(u)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)))return;if(Date.now()-(+localStorage.getItem("bz-ab-x")||0)<7*864e5)return;b.hidden=false;}catch(e){}})();</script>
 
   <nav class="tabs" role="tablist" aria-label="Sections">

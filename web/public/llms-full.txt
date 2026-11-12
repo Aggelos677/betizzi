@@ -3,13 +3,13 @@
 > betizzi (https://betizzi.com) is a free football (soccer) tips site in 9 languages (English, Greek, Spanish, Portuguese (Brazil), French, German, Romanian, Serbian (Latin), Bulgarian). It is not a livescore and not a bookmaker. It filters each day's matches, publishes tips only where its statistics-based model finds a reason, builds ready parlays from those tips, and keeps a public, unedited track record of every tip since 2 November 2026, including losses. Tips are not a guarantee and betizzi does not promise profit. Gambling is for adults only: 18+ (21+ in Greece).
 
 ## Who it is for
-People who bet on football for fun and want an honest, data-based second opinion instead of bookmaker marketing. Free to use; a free account (email code, no password) unlocks VIP tips.
+People who bet on football for fun and want an honest, data-based second opinion instead of bookmaker marketing. Free to use; a free account (email code, no password) unlocks the strong picks (★).
 
 ## How tips are made
 - Data: fixtures, results, league standings, team form (recent matches), goals scored and conceded, and pre-match odds from several bookmakers.
 - A tip is published only when recent form, goals and standings point clearly in one direction (for example a team in much better form for a win, or matches with many goals for Over 2.5 / both teams to score).
 - Markets: match result (1X2), Over/Under 2.5 goals, both teams to score (GG/NG).
-- Two tiers: Free and VIP (VIP = stronger signal at a fair price). At most 2 tips per match, in different markets.
+- All tips are free. The strongest are marked ★ Strong pick (stronger signal at a fair price) and open with a free account. At most 2 tips per match, in different markets.
 - Every tip shows the odds at publication and the lowest price at which betizzi still recommends it.
 - New tips are added during the day; a published tip is never edited or withdrawn (rule since 2 November 2026; a few tips withdrawn before that rule stay listed in the Record). If the price falls below betizzi's limit, the tip stays with a warning.
 
