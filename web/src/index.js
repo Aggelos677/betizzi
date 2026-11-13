@@ -62,7 +62,7 @@ table{width:100%;border-collapse:collapse;font:500 14px "JetBrains Mono",monospa
 .fl a{margin:0 6px;white-space:nowrap}
 .doc h2{margin-top:22px}.doc p,.doc li{color:#cfd8d1;line-height:1.6}.doc ul{list-style:disc;padding-left:20px}.doc li{margin:4px 0}.doc a{color:var(--lime)}
 .recl{text-align:center;margin:10px 0}.recl a{color:var(--lime);font-weight:700;text-decoration:none}
-.frow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;flex-wrap:wrap}.frow .tm{min-width:0;font-weight:600}
+.frow{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:6px 0}.frow .tm{min-width:0;font-weight:600} /* 13/11 Owner: κουτάκια πάντα κάτω από το όνομα, για να συγκρίνονται οι δύο ομάδες */
 `;
 
 // Απόφαση Owner 04/11 (Α): η «μέρα» αλλάζει για ΟΛΕΣ τις γλώσσες στα μεσάνυχτα ώρας Ελλάδας (ίδιοι αγώνες, ίδιο «χθες», ίδιο Record).
