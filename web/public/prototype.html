@@ -904,6 +904,7 @@ header{position:relative}
 .r-score.done:not(.hit){display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;font-weight:600;font-size:1rem;color:#e6ebe7}
 .r-score.done .est{display:block;font:600 .56rem var(--f-body,inherit);color:var(--muted);letter-spacing:.02em;white-space:nowrap;margin-top:2px}
 .r-score.done .est i{display:block;font-style:normal;letter-spacing:0}
+@media (max-width:389px){.r-teams .fb i:nth-child(-n+2){display:none}} /* 13/11 Owner: 5 τελευταίοι αγώνες όπου χωράνε (≥390px, π.χ. iPhone)· 3 μόνο στα πολύ στενά κινητά */
 /* 13/11 Owner: σημαίες λιγκών · κινητό: περισσότερος χώρος για τα ονόματα (στενότερη στήλη tip, «Δες ανάλυση» σε 2 γραμμές, φόρμα 3 τελευταίοι αγώνες) */
 .lghead b{display:flex;align-items:center;gap:7px;min-width:0}
 .flg{flex:none;width:16px;height:12px;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
@@ -914,7 +915,6 @@ header{position:relative}
 .r-pick span{font-size:.66rem;white-space:normal;text-overflow:clip;text-align:right;line-height:1.1}
 .r-pick.none.an{white-space:normal;text-align:center;line-height:1.15;font-size:.68rem}
 .r-pick.none.an{font-size:0}.r-pick.none.an span{display:block;white-space:normal;text-align:center;font-size:.68rem} /* κινητό: «Δες / ανάλυση» σε 2 γραμμές, χωρίς ▾ */
-.r-teams .fb i:nth-child(-n+2){display:none}
 }
 </style>
 </head>
