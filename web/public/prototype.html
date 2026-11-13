@@ -895,6 +895,15 @@ header{position:relative}
 .cp-live .cp-st,.l-live .cp-sc{color:var(--win)}
 .l-live .cp-ic{color:var(--win);border-color:var(--win)}
 .mlv-min{color:var(--win)}
+/* 13/11 Owner: σκορ όπως τα livescores — live σε κόκκινο με τελεία που αναβοσβήνει· τελικό λευκό, ένα σκαλί μικρότερο και λιγότερο έντονο, με «FT»· από κάτω μικρή η εκτίμησή μας· 🎯 όπως πριν */
+.r-score.live{color:var(--bad);border-color:rgba(255,107,107,.6);background:rgba(255,107,107,.08);animation:livepulseR 2.4s ease-in-out infinite}
+@keyframes livepulseR{0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}50%{box-shadow:0 0 0 2px rgba(255,107,107,.15)}}
+.r-time b.lv{color:var(--bad);display:flex;align-items:center;gap:4px}
+.r-time .ldot{width:6px;height:6px;border-radius:50%;background:var(--bad);flex:none;animation:lvp 1.2s ease-in-out infinite}
+.r-time .lmin{color:var(--bad)}
+.r-score.done:not(.hit){display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;font-weight:600;font-size:1rem;color:#e6ebe7}
+.r-score.done .est{display:block;font:600 .52rem var(--f-body,inherit);color:var(--muted);letter-spacing:.02em;white-space:nowrap;margin-top:2px}
+.r-score.done .est i{font-style:normal;text-transform:uppercase;letter-spacing:.04em}
 </style>
 </head>
 <body>
@@ -1790,8 +1799,8 @@ function pickBtn(m){
   return '<button type="button" class="r-pick'+(t.tier==="vip"?' vip':'')+'" data-key="'+esc(t.key)+'" aria-pressed="false" aria-label="'+esc(t.sel+" "+t.odds)+'"><span>'+(STRONG_IDS[t.key]?'⚡ ':'')+(starOf(t)===3?starB(3)+' ':'')+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></button>';
 }
 function rowHTML(m){
-  var sc = (m.live||m.done) ? '<span class="r-score'+(m.live?' live':'')+(m.hit?' hit':'')+'"'+(m.hit?' title="We called this score"':'')+'>'+esc(m.score||"–")+(m.hit?'<em>🎯</em>':'')+'</span>' : (m.type==="postponed"||m.type==="cancelled"?'<span class="r-score empty pst" aria-hidden="true">⏸</span>':(m.bz?'<span class="r-score pred" title="Our score"><small>likely</small>'+m.bz+'</span>':'<span class="r-score empty">v</span>'));
-  var mn=m.min||"";var time = m.live?'<b style="color:var(--win)">LIVE</b><span class="lmin">'+(mn==="HT"?"HT":mn+'<i>\'</i>')+'</span>':m.done?'<b>FT</b><span>'+m.time+'</span>':'<b>'+m.time+'</b>';
+  var sc = (m.live||m.done) ? '<span class="r-score'+(m.live?' live':' done')+(m.hit?' hit':'')+'"'+(m.hit?' title="We called this score"':'')+'>'+esc(m.score||"–")+(m.hit?'<em>🎯</em>':(m.done&&m.bz?'<small class="est"><i>likely</i> '+esc(m.bz)+'</small>':''))+'</span>' : (m.type==="postponed"||m.type==="cancelled"?'<span class="r-score empty pst" aria-hidden="true">⏸</span>':(m.bz?'<span class="r-score pred" title="Our score"><small>likely</small>'+m.bz+'</span>':'<span class="r-score empty">v</span>'));
+  var mn=m.min||"";var time = m.live?'<b class="lv"><i class="ldot"></i>LIVE</b><span class="lmin">'+(mn==="HT"?"HT":mn+'<i>\'</i>')+'</span>':m.done?'<b>FT</b><span>'+m.time+'</span>':'<b>'+m.time+'</b>';
   return '<details class="mrow'+(m.hit?' hitrow':'')+'" data-mid="'+m.id+'"><summary><span class="r-time">'+time+'<button type="button" class="fav'+(FAV.has(String(m.id))?' on':'')+'" data-fav="'+m.id+'" aria-label="Follow this match">'+(FAV.has(String(m.id))?'★':'☆')+'</button></span>'
     +'<span class="r-teams"><span class="tl">'+(m.hr?'<span class="rk">'+m.hr+'</span>':'')+'<span class="nm">'+esc(m.home)+'</span>'+fbars(m.hf,m.home)+'</span>'
     +'<span class="tl">'+(m.ar?'<span class="rk">'+m.ar+'</span>':'')+'<span class="nm">'+esc(m.away)+'</span>'+fbars(m.af,m.away)+'</span></span>'

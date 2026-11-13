@@ -39,7 +39,7 @@ details.lg summary{list-style:none;cursor:pointer}details.lg summary::-webkit-de
 ul{list-style:none;margin:0;padding:0}
 .m{display:grid;grid-template-columns:54px 1fr auto;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid var(--ln);min-height:52px}
 .t{display:flex;flex-direction:column;align-items:center;font:500 13px "JetBrains Mono",monospace;color:var(--mu)}
-.sc{color:#fff;font-weight:700}.sc.lv{color:var(--lime)}.min{font-size:11px;color:var(--lime)}
+.sc{color:#fff;font-weight:600}.sc.lv{color:#ff6b6b}.min{font-size:11px;color:#ff6b6b}
 .teams{text-decoration:none;display:flex;flex-direction:column;gap:3px;min-width:0}.tm{display:flex;gap:6px;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm img{flex:none;border-radius:3px}
 .tips{display:flex;gap:4px;align-items:center}.more{font:700 11px "JetBrains Mono",monospace;color:var(--lime);border:1px solid var(--ln);border-radius:6px;padding:3px 5px}
 .tip{display:inline-block;margin-bottom:6px;font:700 12px "JetBrains Mono",monospace;padding:6px 8px;border-radius:8px;white-space:nowrap}.tip.free{background:var(--lime);color:#0c0f0d}.tip.vip{background:var(--gold);color:#0c0f0d}.tip i{font-style:normal;opacity:.75}
