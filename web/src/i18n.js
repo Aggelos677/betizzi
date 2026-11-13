@@ -539,7 +539,7 @@ export const UI = {
   "our tip": ["tip μας", "nuestro tip", "nosso palpite", "notre tip", "unser Tipp", "pontul nostru", "naš tip", "наша прогноза"],
   "Bet only what you can afford to lose.": ["Πόνταρε μόνο όσα αντέχεις να χάσεις.", "Apuesta solo lo que puedas permitirte perder.", "Aposte só o que pode perder.", "Ne mise que ce que tu peux te permettre de perdre.", "Setze nur, was du verlieren kannst.", "Pariază doar cât îți permiți să pierzi.", "Igraj samo koliko možeš da izgubiš.", "Залагай само колкото можеш да си позволиш да загубиш."],
   "likely": ["πιθανό", "probable", "provável", "probable", "wahrsch.", "probabil", "verovatno", "вероятно"],
-  "Likely score": ["Πιθ. σκορ", "Res. prob.", "Res. prov.", "Score prob.", "Tipp", "Scor prob.", "Ver. rez.", "Вер. рез."], /* 13/11 Owner: κάτω από το τελικό σκορ */
+  "Likely": ["Πιθ. σκορ", "Res. prob.", "Res. prov.", "Probable", "Tipp", "Probabil", "Ver. rez.", "Вер. рез."], /* 13/11 Owner: κάτω από το τελικό σκορ· έως ~42px για να χωράει στο κουτάκι */
   "Our score": ["Το σκορ μας", "Nuestro marcador", "Nosso placar", "Notre score", "Unser Ergebnis", "Scorul nostru", "Naš rezultat", "Нашият резултат"],
   "Most likely": ["Πιθανότερο", "Lo más probable", "Mais provável", "Le plus probable", "Am wahrscheinlichsten", "Cel mai probabil", "Najverovatnije", "Най-вероятно"],
   "Result": ["Αποτέλεσμα", "Resultado", "Resultado", "Résultat", "Ergebnis", "Rezultat", "Rezultat", "Резултат"],
