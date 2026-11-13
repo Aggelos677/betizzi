@@ -1194,7 +1194,7 @@ const SCSS = `
 .gs .g:hover::before,.gs .g:focus::before{content:attr(aria-label);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#1b231e;color:#e9f2ec;border:1px solid #2a352e;border-radius:6px;padding:4px 8px;font:600 12px Manrope,sans-serif;z-index:5;pointer-events:none}
 .gs .g:focus{outline:none}.gs .g:first-child::before{left:0;transform:none}.gs .g:last-child::before{left:auto;right:0;transform:none}
 .full{display:inline-block;margin:6px 0 0;color:var(--mu)!important;font-size:12px;text-decoration:none;min-height:32px;line-height:32px}.mzb:empty{display:none}.mzb .ld{display:block;color:var(--mu);font-size:13px;padding:12px 0}
-@media (max-width:600px){.gs .g{min-width:26px;padding:0}.gs .g i{display:none}.gs .g u{display:inline}}
+@media (max-width:600px){.gs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.gs .g{min-width:0;height:30px;padding:0;font-size:13px;border-radius:7px}} /* 13/11 Owner: και στο κινητό σκορ (όχι γράμμα), πράσινο ό,τι ταιριάζει στην κατηγορία· 10 αγώνες = 2 γραμμές των 5 */
 @media (min-width:601px){.sr b{font-size:19px}.gxt{font-size:16px;margin:20px 0 10px}.gxt small{font-size:13px}.gs{gap:6px}.gs .g{min-width:52px;height:32px;border-radius:8px;font-size:15px}} /* 08/11 Owner: μόνο PC, όπως η εικόνα του (κύριο όνομα 19 > ονόματα κουτακιών 16) */
 `;
 // CSS μόνο μέσα σε ένα κουτί (π.χ. ".izz", ".mz")
