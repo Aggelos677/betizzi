@@ -896,7 +896,7 @@ header{position:relative}
 .l-live .cp-ic{color:var(--win);border-color:var(--win)}
 .mlv-min{color:var(--win)}
 /* 13/11 Owner: σκορ όπως τα livescores — live σε κόκκινο με τελεία που αναβοσβήνει· τελικό λευκό, ένα σκαλί μικρότερο και λιγότερο έντονο, με «FT»· από κάτω μικρή η εκτίμησή μας· 🎯 όπως πριν */
-.r-score.live{color:var(--bad);border-color:rgba(255,107,107,.6);background:rgba(255,107,107,.08);animation:livepulseR 2.4s ease-in-out infinite}
+.r-score.live{color:var(--bad);border-color:transparent;background:none;box-shadow:none;animation:none} /* 13/11 Owner: live μόνο κόκκινο, χωρίς πλαίσιο */
 @keyframes livepulseR{0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}50%{box-shadow:0 0 0 2px rgba(255,107,107,.15)}}
 .r-time b.lv{color:var(--bad);display:flex;align-items:center;gap:4px}
 .r-time .ldot{width:6px;height:6px;border-radius:50%;background:var(--bad);flex:none;animation:lvp 1.2s ease-in-out infinite}
