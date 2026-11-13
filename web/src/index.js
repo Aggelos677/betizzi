@@ -62,7 +62,7 @@ table{width:100%;border-collapse:collapse;font:500 14px "JetBrains Mono",monospa
 .fl a{margin:0 6px;white-space:nowrap}
 .doc h2{margin-top:22px}.doc p,.doc li{color:#cfd8d1;line-height:1.6}.doc ul{list-style:disc;padding-left:20px}.doc li{margin:4px 0}.doc a{color:var(--lime)}
 .recl{text-align:center;margin:10px 0}.recl a{color:var(--lime);font-weight:700;text-decoration:none}
-.frow{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:6px 0}.frow .tm{min-width:0;font-weight:600} /* 13/11 Owner: κουτάκια πάντα κάτω από το όνομα, για να συγκρίνονται οι δύο ομάδες */
+.frow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;flex-wrap:nowrap}.frow .tm{min-width:0;font-weight:600}.fst .frow{flex-direction:column;align-items:flex-start;gap:6px} /* 13/11 Owner: αν το όνομα και τα κουτάκια χωράνε, στην ίδια γραμμή· αν έστω μία ομάδα δεν χωράει, και οι δύο από κάτω (FIT_JS) */
 `;
 
 // Απόφαση Owner 04/11 (Α): η «μέρα» αλλάζει για ΟΛΕΣ τις γλώσσες στα μεσάνυχτα ώρας Ελλάδας (ίδιοι αγώνες, ίδιο «χθες», ίδιο Record).
@@ -869,11 +869,12 @@ ${off ? `<p class="ans"><b>${esc(off)}</b> · <span>${esc(ui("Our tips for this 
 ${anTxt ? `<h2>${esc(t.anH)}</h2><p class="an">${esc(anTxt)}</p>` : ""}
 <h2>${esc(t.tips)}</h2><div class="card">${tipsHtml}</div>
 ${md ? `<h2>${esc(t.model)}</h2><div class="card">${modelHtml}</div>` : ""}
-<h2>${esc(t.form)}</h2><div class="card">${formRow(x.home)}${formRow(x.away)}<p class="fleg">${esc(ui("Underlined = home game"))}</p></div>
+<h2>${esc(t.form)}</h2><div class="card fpair">${formRow(x.home)}${formRow(x.away)}<p class="fleg">${esc(ui("Underlined = home game"))}</p></div>
 ${oddsHtml ? `<h2>${esc(t.odds)}</h2><div class="card">${oddsHtml}</div>` : ""}
 <p><a href="/${lang}/">← ${esc(t.back)}</a></p>
 </main>
 <footer><p>${esc(t.rg)}</p><p class="fl">${footLinks(lang)}</p><p>© betizzi · <time datetime="${nowIso}">${esc(dLong)}</time></p></footer>
+<script>${FIT_JS}</script>
 <script>/* απόφαση Owner 04/11: η ώρα σέντρας στην ώρα της συσκευής του επισκέπτη */(function(){try{var e=document.querySelector(".mid[data-ts]");if(!e)return;var d=new Date(e.dataset.ts*1000),L=document.documentElement.lang||"en",y=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 e.firstChild.nodeValue=(y!==e.dataset.d?new Intl.DateTimeFormat(L,{weekday:"short"}).format(d)+" ":"")+new Intl.DateTimeFormat(L,{hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(d);}catch(x){}})();</script>
 </body>
@@ -1260,7 +1261,7 @@ function izzClient() {
     var dy = d.getBoundingClientRect().top - y0; if (dy) window.scrollBy(0, dy);
     if (G) squares(d); else { var p = data(); if (p) p.then(function () { squares(d); }); }
     var b = d.querySelector(".mzb"); if (!b || b.dataset.l) return; b.dataset.l = 1; b.innerHTML = '<span class="ld">…</span>';
-    frag(b).then(function (h) { if (!h) { b.dataset.l = ""; b.innerHTML = ""; return; } if (document.getElementById("mzcss")) h = h.replace(/<style id="mzcss">[\s\S]*?<\/style>/, ""); b.innerHTML = h; }); }, true);
+    frag(b).then(function (h) { if (!h) { b.dataset.l = ""; b.innerHTML = ""; return; } if (document.getElementById("mzcss")) h = h.replace(/<style id="mzcss">[\s\S]*?<\/style>/, ""); b.innerHTML = h; if (window.__bzFit) window.__bzFit(b); }); }, true);
   // 08/11 (Owner): PC → tabs (μία κατηγορία τη φορά)· κινητό → κοινό scroll με τις 5 πρώτες και «Δες όλες»
   function tabs() { Array.prototype.forEach.call(document.querySelectorAll("#cats"), function (nav) { var root = nav.parentNode; if (root.classList.contains("izt")) return;
     root.classList.add("izt"); var a = nav.querySelector("a"); if (a) show(root, a.getAttribute("href").slice(1)); }); }
@@ -1275,7 +1276,9 @@ function izzClient() {
   if (document.readyState === "complete") setTimeout(data, 300); else window.addEventListener("load", function () { setTimeout(data, 300); });
 }
 // 08/11: το build του Cloudflare (esbuild, keepNames) βάζει μέσα στη συνάρτηση κλήσεις __name(...)· στον browser δεν υπάρχει → μικρό shim
-const IZZ_JS = LT_JS + "(function(){var __name=function(f){return f;};(" + izzClient.toString() + ")();})();";
+// 13/11 (Owner): φόρμα στη σελίδα αγώνα — αν το όνομα + τα κουτάκια δεν χωράνε σε μία γραμμή για έστω μία ομάδα, πάνε ΚΑΙ οι δύο από κάτω
+const FIT_JS = "(function(){function f(r){Array.prototype.forEach.call((r||document).querySelectorAll('.fpair'),function(c){c.classList.remove('fst');var bad=Array.prototype.some.call(c.querySelectorAll('.frow'),function(w){var a=w.querySelector('.tm'),b=w.querySelector('.fm');return a&&b&&a.scrollWidth+b.scrollWidth+8>w.clientWidth;});if(bad)c.classList.add('fst');});}window.__bzFit=f;f(document);var t;addEventListener('resize',function(){clearTimeout(t);t=setTimeout(function(){f(document);},150);});})();";
+const IZZ_JS = FIT_JS + LT_JS + "(function(){var __name=function(f){return f;};(" + izzClient.toString() + ")();})();";
 async function streaksPage(env, lang) {
   const S = STK[lang], t = T[lang], tz = TZ[lang], today = ymdIn(DAYTZ);
   const data = await getStreaks(env);
