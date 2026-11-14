@@ -1256,7 +1256,7 @@ function izzClient() {
   function tfApply(h) { var now = Date.now() / 1000, end = h === "a" ? Infinity : h === "d" ? new Date().setHours(24, 0, 0, 0) / 1000 : now + (+h) * 3600;
     Array.prototype.forEach.call(document.querySelectorAll(".tf button"), function (b) { var on = b.getAttribute("data-h") === h; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); });
     Array.prototype.forEach.call(document.querySelectorAll("section.st"), function (sc) { var n = 0, lis = sc.querySelectorAll(".sl > li"); if (!lis.length) return;
-      Array.prototype.forEach.call(lis, function (li) { var ts = +li.getAttribute("data-ts") || 0, ok = ts <= end; li.classList.toggle("tfh", !ok); if (ok) n++; });
+      Array.prototype.forEach.call(lis, function (li) { var ts = +li.getAttribute("data-ts") || 0, ok = h === "a" || (ts >= now - 60 && ts <= end); li.classList.toggle("tfh", !ok); if (ok) n++; });
       sc.classList.toggle("tfon", h !== "a"); var nn = sc.querySelector(".tfn"); if (nn) nn.hidden = n > 0; }); }
   document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest(".tf button"); if (!b) return; var h = b.getAttribute("data-h"); try { localStorage.setItem("bz_tf", h); } catch (x) {} tfApply(h); });
   window.__bzTf = function () { var h = "a"; try { h = localStorage.getItem("bz_tf") || "a"; } catch (x) {} if (h !== "a" && document.querySelector(".tf")) tfApply(h); };
