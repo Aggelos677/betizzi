@@ -1182,6 +1182,7 @@ const SCSS = `
 .lk .nx .od{background:var(--lime);border-color:var(--lime);color:#0c0f0d}.lk .nx .od small{color:#2b3a0c!important}
 .lkt{display:none}.lk .lkt{display:block;order:3;flex-basis:100%;color:var(--lime);font-size:12px;font-weight:700}.lk .nx{flex-wrap:wrap}
 .soon{color:var(--mu);font-size:13px;margin:18px 0 0}
+.tf{display:flex;align-items:center;gap:6px;margin:10px 0 2px;flex-wrap:wrap}.tf>span{font-size:12px;color:var(--mu);margin-right:2px}.tf button{flex:1 1 auto;min-height:38px;padding:0 10px;border:1px solid var(--ln);border-radius:20px;background:var(--c2);color:var(--mu);font:700 13px Manrope,sans-serif;white-space:nowrap;cursor:pointer}.tf button.on{border-color:#e9f2ec;background:rgba(233,242,236,.12);color:#fff}.sl li.tfh{display:none!important}.st.tfon .sl li.x{display:block}.st.tfon .mo{display:none} /* 14/11 Owner: φίλτρο ώρας έναρξης */
 .mo{display:block;width:100%;margin:10px 0 0;min-height:44px;border:1px solid var(--ln);border-radius:12px;background:var(--c2);color:var(--tx);font:700 14px Manrope,sans-serif;cursor:pointer}
 @media (max-width:767px){.sl li.x{display:none}.st.all .sl li.x{display:block}.st.all .mo{display:none}.st h2{position:sticky;top:var(--stt,51px);z-index:1;background:var(--c2);border:1px solid var(--ln);border-radius:10px;padding:9px 12px;margin:28px 0 6px;font-size:18px;box-shadow:0 6px 12px rgba(0,0,0,.35)}.st .sub{padding:0 2px}} /* 08/11 Owner: κινητό, 5 πρώτες ανοιχτές */
 @media (min-width:768px){.mo{display:none}.izt .st{display:none}.izt .st.on{display:block}.izt .grid9 a.on{border-color:#e9f2ec!important;background:rgba(233,242,236,.12);color:#fff!important}.izt .up{display:none}} /* 08/11 Owner: PC, tabs */
@@ -1251,6 +1252,15 @@ function izzClient() {
       return '<p class="gxt' + (rw[3] ? " me" : "") + '"><b>' + (rw[2] ? '<span class="rkp">' + rw[2] + '</span> ' : "") + esc(rw[0]) + '</b> <small>' + esc((innerWidth < 600 ? T.lastS : T.lastG).replace("{n}", gm.length)) + '</small></p><div class="gs">' + gm.slice().reverse().map(function (g) {
         var m = mark(k, g), ha = g[2] ? T.h : T.a, tip = [g[0] + "-" + g[1], g[3] ? g[3] + " (" + ha + ")" : ha, g[4] ? new Date(g[4] * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "numeric" }) : ""].filter(Boolean).join(" · ");
         return '<span class="g ' + m[1] + (g[2] ? " h" : "") + '" tabindex="0" aria-label="' + esc(m[0] + " · " + tip) + '"><i>' + g[0] + "-" + g[1] + "</i><u>" + esc(m[0]) + "</u></span>"; }).join("") + "</div>"; }).join("") + leg; }
+  // 14/11 (Owner): φίλτρο «ξεκινά σε 1 ώρα / 6 ώρες / σήμερα / όλα» — κρύβει τις γραμμές που ξεκινούν αργότερα, κρατά τη σειρά (δύναμη)
+  function tfApply(h) { var now = Date.now() / 1000, end = h === "a" ? Infinity : h === "d" ? new Date().setHours(24, 0, 0, 0) / 1000 : now + (+h) * 3600;
+    Array.prototype.forEach.call(document.querySelectorAll(".tf button"), function (b) { var on = b.getAttribute("data-h") === h; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); });
+    Array.prototype.forEach.call(document.querySelectorAll("section.st"), function (sc) { var n = 0, lis = sc.querySelectorAll(".sl > li"); if (!lis.length) return;
+      Array.prototype.forEach.call(lis, function (li) { var ts = +li.getAttribute("data-ts") || 0, ok = ts <= end; li.classList.toggle("tfh", !ok); if (ok) n++; });
+      sc.classList.toggle("tfon", h !== "a"); var nn = sc.querySelector(".tfn"); if (nn) nn.hidden = n > 0; }); }
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest(".tf button"); if (!b) return; var h = b.getAttribute("data-h"); try { localStorage.setItem("bz_tf", h); } catch (x) {} tfApply(h); });
+  window.__bzTf = function () { var h = "a"; try { h = localStorage.getItem("bz_tf") || "a"; } catch (x) {} if (h !== "a" && document.querySelector(".tf")) tfApply(h); };
+  window.__bzTf();
   function frag(b) { if (!b._p) b._p = fetch(b.dataset.u + "?frag=1").then(function (r) { if (!r.ok) throw 0; return r.text(); }).catch(function () { b._p = null; return ""; }); return b._p; }
   function pre(e) { var d = e.target.closest && e.target.closest("details[data-k]"); if (!d) return; data(); var b = d.querySelector(".mzb"); if (b) frag(b); }
   document.addEventListener("pointerdown", pre, true); document.addEventListener("mouseover", pre, true);
@@ -1314,14 +1324,14 @@ async function streaksPage(env, lang) {
       const [rT, rO] = r.home ? [r.fixture.hr, r.fixture.ar] : [r.fixture.ar, r.fixture.hr]; // θέσεις (BTFStats), «9 Brighton»
       if ((r.games || []).length) D.r[dk] = r.home ? [[r.team, r.games, rT, 1], [opp, r.oppGames || [], rO, 0]] : [[opp, r.oppGames || [], rO, 0], [r.team, r.games, rT, 1]]; // [όνομα, παιχνίδια, θέση, ομάδα της κάρτας]
       const sq = `<div class="gx"></div>`;
-      return `<li class="${look ? "lk" : ""}${i >= 5 ? " x" : ""}"><details data-k="${dk}"><summary><div class="sr"><div><b>${(r.home ? r.fixture.hr : r.fixture.ar) ? `<span class="rkp">${r.home ? r.fixture.hr : r.fixture.ar}</span> ` : ""}${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
+      return `<li class="${look ? "lk" : ""}${i >= 5 ? " x" : ""}" data-ts="${r.fixture.ts}"><details data-k="${dk}"><summary><div class="sr"><div><b>${(r.home ? r.fixture.hr : r.fixture.ar) ? `<span class="rkp">${r.home ? r.fixture.hr : r.fixture.ar}</span> ` : ""}${esc(r.team)}</b>${run}<small>${esc(r.country ? r.country + " · " : "")}${esc(r.league)}${fm}</small></div>`
         + `<div class="mt"><span class="bg">${esc(big)}</span>${unit ? `<em>${esc(unit)}</em>` : ""}</div></div>`
         + `<div class="nx"><span><i>${esc(S.nx)} · <time class="lt" data-f="w" data-l="${LOCALE[lang]}" data-ts="${r.fixture.ts}" datetime="${new Date(r.fixture.ts * 1000).toISOString()}">${esc(when(r.fixture.ts))}</time></i><b class="tms"><span${r.home ? ' class="me"' : ""}>${r.fixture.hr ? `<span class="rkp">${r.fixture.hr}</span>` : ""}${esc(r.fixture.home)}</span><em> – </em><span${r.home ? "" : ' class="me"'}>${r.fixture.ar ? `<span class="rkp">${r.fixture.ar}</span>` : ""}${esc(r.fixture.away)}</span></b></span>`
         + (look ? `<span class="lkt" title="${esc(S.look)}">${esc(S.look.split(":")[0].trim())}</span>` : "") + (r.price ? `<span class="od"><small style="color:var(--mu);font-weight:500">${esc(SL(r))}</small> ${Number(r.price).toFixed(2)}</span>` : "") + `<span class="cv" aria-hidden="true">▾</span></div></summary>`
         + sq + `<div class="mzb" data-u="${href}"></div><a class="full" href="${href}">${esc(S.full)}</a></details></li>`;
     }).join("");
     return `<section class="st" id="${k}"><h2>${esc(S.cats[k])} <a class="up" href="#cats" aria-label="${esc(S.catH)}">↑</a></h2><p class="sub">${esc(S.sub[k])}</p>`
-      + (rows ? `<ul class="sl">${rows}</ul>` + (L.length > 5 ? `<button type="button" class="mo" data-n="${L.length}">${esc(S.more.replace("{n}", L.length))} ▾</button>` : "") : `<p class="note">${esc(S.none)}</p>`) + `</section>`;
+      + (rows ? `<ul class="sl">${rows}</ul><p class="note tfn" hidden>${esc(S.tfNone)}</p>` + (L.length > 5 ? `<button type="button" class="mo" data-n="${L.length}">${esc(S.more.replace("{n}", L.length))} ▾</button>` : "") : `<p class="note">${esc(S.none)}</p>`) + `</section>`;
   };
   const secsHtml = KEYS.map(sec).join("");
   STKD[lang] = JSON.stringify(D);
@@ -1360,6 +1370,7 @@ ${any ? "" : '<meta name="robots" content="noindex,follow">'}
 <h1>${esc(S.h1)}</h1>
 <p class="ans">${esc(ans)}</p>
 <nav class="grid9" id="cats" aria-label="${esc(S.catH)}">${KEYS.map((k) => `<a href="#${k}">${esc(S.cats[k])}</a>`).join("")}</nav>
+<div class="tf" role="group" aria-label="${esc(S.tfL)}"><span>${esc(S.tfL)}</span>${["1", "6", "d", "a"].map((h, i) => `<button type="button" data-h="${h}"${h === "a" ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"'}>${esc(S.tf[i])}</button>`).join("")}</div>
 ${secsHtml}
 <p class="soon">${esc(S.soon)}</p>
 <p class="how" style="font-size:13px">${esc(S.note)}</p>
