@@ -65,7 +65,7 @@ export function toBk(mk) {
     for (const [name, price] of sels || []) {
       if (!(price > 1)) continue;
       let market = null, sel = null;
-      if (type === "MRES" && ["1", "X", "2"].includes(name)) { market = "1X2"; sel = name; }
+      if ((type === "MRES" || type === "MR12") /* 18/11: κάποιοι αγώνες έρχονται ως MR12 */ && ["1", "X", "2"].includes(name)) { market = "1X2"; sel = name; }
       else if (type === "DBLC" && ["1X", "X2", "12"].includes(name)) { market = "DC"; sel = name; }
       else if (type === "BTSC") { market = "BTTS"; sel = /GG/.test(name) ? "GG" : /NG/.test(name) ? "NG" : null; }
       else if (type === "HCTG") {

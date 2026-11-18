@@ -94,6 +94,7 @@ const PROD_HOST = "betizzi.com";
 const NOINDEX_LANGS = [];
 // 10/11 (απόφαση Owner): χώρες όπου η σελίδα δεν δείχνει ονόματα bookmakers (η εφαρμογή διαβάζει window.__NOBK)
 const NOBK_COUNTRIES = new Set(["BR"]);
+const STX_COUNTRIES = new Set(["GR", "CY"]); // 18/11: Stoiximan έχει άδεια μόνο εδώ
 function isPrivate(url) {
   const p = url.pathname;
   return p === "/admin" || p.startsWith("/admin/") || p.startsWith("/auth/") || p === "/me.json" || p === "/vip.json" || p === "/h" || url.searchParams.has("demo")
@@ -107,6 +108,9 @@ export default {
     let res0 = await handle(req, env, ctx);
     if (NOBK_COUNTRIES.has(req.cf?.country) && (res0.headers.get("content-type") || "").startsWith("text/html"))
       res0 = new HTMLRewriter().on("head", { element(e) { e.prepend("<script>window.__NOBK=1</script>", { html: true }); } }).transform(res0);
+    // 18/11 (απόφαση Owner): Stoiximan μόνο για επισκέπτες από χώρες με άδεια (GR, CY)· η εφαρμογή διαβάζει window.__STX
+    if (STX_COUNTRIES.has(req.cf?.country) && (res0.headers.get("content-type") || "").startsWith("text/html"))
+      res0 = new HTMLRewriter().on("head", { element(e) { e.prepend("<script>window.__STX=1</script>", { html: true }); } }).transform(res0);
     let res = res0;
     if (url.hostname === PROD_HOST) { res = new Response(res0.body, res0); res.headers.set("strict-transport-security", "max-age=31536000"); }
     if (url.hostname === PROD_HOST && !isPrivate(url)) return res;
