@@ -712,7 +712,7 @@ async function template(env, url) {
 }
 
 // Μία γραμμή στη μορφή που διαβάζει η εφαρμογή (ίδια με το πρωτότυπο).
-const BOOKS = ["Bet365", "Betano", "Pinnacle", "1xBet", "William Hill"];
+const BOOKS = ["Bet365", "Betano", "Pinnacle", "1xBet", "William Hill", "Stoiximan"]; // 18/11: + Stoiximan (μόνο εμφάνιση, απόφαση Owner Α)
 const SELNAME = { "1": "Home", "2": "Away", X: "Draw", O25: "Over 2.5", U25: "Under 2.5", O15: "Over 1.5", O35: "Over 3.5", U35: "Under 3.5", GG: "GG", NG: "NG", "1X": "1X", X2: "X2", "12": "12" };
 function rawRow(x, hm, lang) {
   const type = LIVE.has(x.status) ? "inprogress" : DONE.has(x.status) ? "finished" : x.status === "PST" ? "postponed" : ["CANC", "ABD", "AWD", "WO"].includes(x.status) ? "cancelled" : "notstarted";

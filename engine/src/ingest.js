@@ -2,6 +2,7 @@
 // Ο scraper στον PC του Owner στέλνει κάθε 2΄ POST /ingest/stoiximan με header X-Ingest-Key.
 // Κλειδί: Cloudflare Secret INGEST_KEY στο betizzi-engine (ποτέ στον κώδικα / στο Sheet).
 // Κόστος D1: γράφουμε ΜΟΝΟ αγώνες που άλλαξαν (hash), όχι όλο το JSON κάθε 2΄.
+import { bestFixture, toBk } from "./stoix-match.js";
 const MAX_BYTES = 3 * 1024 * 1024; // ~130 KB σήμερα· όριο ασφαλείας
 const MAX_EVENTS = 5000;
 const SOURCES = new Set(["stoiximan.com.cy"]);
@@ -94,7 +95,50 @@ export async function ingestStoiximan(req, env, json) {
   }
   for (let i = 0; i < st.length; i += 90) await env.DB.batch(st.slice(i, i + 90));
 
-  const info = { source: body.source, scraped_at_utc: scraped, received: t, events: evs.length, changed: st.length, skipped };
+  const changedIds = new Set(evs.filter((e) => old[e.id] !== e.h).map((e) => e.id));
+  const m = await mapAndPrice(env, evs, changedIds, t);
+
+  const info = { source: body.source, scraped_at_utc: scraped, received: t, events: evs.length, changed: st.length, skipped, matched: m.matched, newly: m.newly, bk_rows: m.rows };
   await env.DB.prepare("INSERT OR REPLACE INTO kv(k,v) VALUES('stoix_last', ?)").bind(JSON.stringify(info)).run();
   return json({ ok: true, ...info });
+}
+
+// Αντιστοίχιση με τους δικούς μας αγώνες + τιμές Stoiximan στο odds_bk (μόνο εμφάνιση· απόφαση Owner 18/11, Α).
+// Το odds_bk ΔΕΝ το διαβάζουν τα tips (αυτά διαβάζουν τον πίνακα odds) — η «καλύτερη τιμή» των tips δεν αλλάζει.
+async function mapAndPrice(env, evs, changedIds, t) {
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS stoix_map(sid TEXT PRIMARY KEY, fixture_id INTEGER, score REAL, at INTEGER)").run();
+  const map = {}, used = new Set();
+  const ids = evs.map((e) => e.id);
+  for (let i = 0; i < ids.length; i += 90) {
+    const part = ids.slice(i, i + 90);
+    for (const r of (await env.DB.prepare(`SELECT sid, fixture_id FROM stoix_map WHERE sid IN (${part.map(() => "?").join(",")})`).bind(...part).all()).results) {
+      map[r.sid] = r.fixture_id; used.add(r.fixture_id);
+    }
+  }
+  const todo = evs.filter((e) => map[e.id] == null);
+  let newly = 0;
+  if (todo.length) {
+    const ts = todo.map((e) => Date.parse(e.start.replace(" ", "T") + ":00Z") / 1000).filter((x) => x > 0);
+    const fx = ts.length ? (await env.DB.prepare(`SELECT f.id, f.ts, h.name home, a.name away FROM fixtures f JOIN teams h ON h.id=f.home_id JOIN teams a ON a.id=f.away_id
+      WHERE f.ts BETWEEN ? AND ?`).bind(Math.min(...ts) - 900, Math.max(...ts) + 900).all()).results : [];
+    for (const r of (await env.DB.prepare("SELECT fixture_id FROM stoix_map").all()).results) used.add(r.fixture_id);
+    const ins = [];
+    // πρώτα οι αγώνες με Sportradar id (η Stoiximan έχει κάποιες φορές διπλή εγγραφή χωρίς id)
+    for (const e of todo.sort((a, b) => (b.br != null) - (a.br != null))) {
+      const b = bestFixture(e, fx.filter((f) => !used.has(f.id)));
+      if (!b) continue;
+      map[e.id] = b.fixture_id; used.add(b.fixture_id); changedIds.add(e.id); newly++;
+      ins.push(env.DB.prepare("INSERT OR IGNORE INTO stoix_map(sid,fixture_id,score,at) VALUES(?,?,?,?)").bind(e.id, b.fixture_id, b.score, t));
+    }
+    for (let i = 0; i < ins.length; i += 90) await env.DB.batch(ins.slice(i, i + 90));
+  }
+  const st = [];
+  for (const e of evs) {
+    if (map[e.id] == null || !changedIds.has(e.id)) continue; // γράφουμε μόνο όταν άλλαξε κάτι
+    for (const o of toBk(e.mk))
+      st.push(env.DB.prepare("INSERT OR REPLACE INTO odds_bk(fixture_id,bk,market,sel,price,updated) VALUES(?,?,?,?,?,?)")
+        .bind(map[e.id], "Stoiximan", o.market, o.sel, o.price, t));
+  }
+  for (let i = 0; i < st.length; i += 90) await env.DB.batch(st.slice(i, i + 90));
+  return { matched: Object.keys(map).length, newly, rows: st.length };
 }

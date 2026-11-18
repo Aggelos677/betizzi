@@ -1127,7 +1127,7 @@ MATCHES.forEach(function(m){
 });
 
 /* ---------- ο bookmaker μου: τιμές ενός bookmaker, σύγκριση με Pinnacle, καλύτερο σύνολο παρολί ---------- */
-var BOOKS=["Bet365","Betano","Pinnacle","1xBet","William Hill"],BKC=["1","X","2","O25","U25","GG","NG"],LOWBK=0.94;
+var BOOKS=["Bet365","Betano","Pinnacle","1xBet","William Hill","Stoiximan"],BKC=["1","X","2","O25","U25","GG","NG"],LOWBK=0.94;
 var NOBK=!!window.__NOBK; /* 10/11 (απόφαση Owner): Βραζιλία → κανένα όνομα bookmaker, μόνο η καλύτερη τιμή */
 var myBook=NOBK?"best":load("ko-book","best");if(myBook!=="best"&&BOOKS.indexOf(myBook)<0)myBook="best";
 /* απόφαση Owner 04/11: ο παίκτης διαλέγει σε ποιους bookmakers παίζει (⚙). Μονό: η καλύτερη τιμή από αυτούς.
