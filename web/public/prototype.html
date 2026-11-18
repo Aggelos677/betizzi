@@ -1127,14 +1127,14 @@ MATCHES.forEach(function(m){
 });
 
 /* ---------- ο bookmaker μου: τιμές ενός bookmaker, σύγκριση με Pinnacle, καλύτερο σύνολο παρολί ---------- */
-var BOOKS=["Bet365","Betano","Pinnacle","1xBet","William Hill"],BKC=["1","X","2","O25","U25","GG","NG"],LOWBK=0.94;
+/* BKDATA = σειρά των τιμών στα δεδομένα (ίδια με BOOKS στο web/src/index.js)· BOOKS = σειρά εμφάνισης (18/11, Owner: Stoiximan 2η μετά τη Bet365) */ var BKDATA=["Bet365","Betano","Pinnacle","1xBet","William Hill","Stoiximan"],BOOKS=["Bet365","Stoiximan","Betano","Pinnacle","1xBet","William Hill"],BKC=["1","X","2","O25","U25","GG","NG"],LOWBK=0.94; /* 18/11: Stoiximan μόνο GR/CY (window.__STX) */ if(!window.__STX)BOOKS=BOOKS.filter(function(b){return b!=="Stoiximan";});
 var NOBK=!!window.__NOBK; /* 10/11 (απόφαση Owner): Βραζιλία → κανένα όνομα bookmaker, μόνο η καλύτερη τιμή */
 var myBook=NOBK?"best":load("ko-book","best");if(myBook!=="best"&&BOOKS.indexOf(myBook)<0)myBook="best";
 /* απόφαση Owner 04/11: ο παίκτης διαλέγει σε ποιους bookmakers παίζει (⚙). Μονό: η καλύτερη τιμή από αυτούς.
    Παρολί: ο bookmaker με το καλύτερο ΣΥΝΟΛΟ (ένα παρολί παίζεται σε έναν bookmaker), όχι η καλύτερη τιμή από τον καθένα. */
 var ENBK=(load("ko-bks",null)||BOOKS.slice()).filter(function(b){return BOOKS.indexOf(b)>=0;});if(!ENBK.length)ENBK=BOOKS.slice();
 if(myBook!=="best"&&ENBK.indexOf(myBook)<0)myBook="best";
-function bkP(m,code,b){var i=BKC.indexOf(code),bi=BOOKS.indexOf(b);if(i<0||bi<0||!m.bk||!m.bk[bi])return 0;return m.bk[bi][i]||0;}
+function bkP(m,code,b){var i=BKC.indexOf(code),bi=BKDATA.indexOf(b);if(i<0||bi<0||!m.bk||!m.bk[bi])return 0;return m.bk[bi][i]||0;}
 function applyBook(){
   Object.keys(SEL).forEach(function(k){var s=SEL[k];if(s.best==null)s.best=s.odd;var c=k.split(":")[1],my=myBook!=="best";
     var p=my?bkP(s.m,c,myBook):0,pin=bkP(s.m,c,"Pinnacle"),anyBk=BOOKS.some(function(b){return bkP(s.m,c,b)>0;});
