@@ -391,10 +391,12 @@ details.mrow.hitrow>summary{background:linear-gradient(90deg,rgba(182,242,58,.16
 .livebdg{position:absolute;top:-8px;right:6px;background:var(--bad);color:#fff;font:800 .62rem var(--f-body);letter-spacing:.04em;text-transform:none;padding:2px 7px 2px 14px;border-radius:999px}
 .livebdg::before{content:"";position:absolute;left:6px;top:50%;width:5px;height:5px;margin-top:-2.5px;border-radius:50%;background:#fff;animation:lvp 1.2s ease-in-out infinite}
 @keyframes lvp{50%{opacity:.25}}
-.r-pick.paid{background:rgba(60,207,110,.16);border-color:#3ccf6e;color:#3ccf6e;transform:translateY(-3px);box-shadow:0 6px 16px rgba(60,207,110,.3);cursor:default}
-.r-pick.paid span{color:#3ccf6e}
-.r-pick.paid b{font:800 .68rem/1.1 var(--f-body);white-space:nowrap;letter-spacing:-.01em}
-.r-pick.paid{padding:5px 5px;align-items:center;text-align:center}
+.r-pick.paid{background:#1e3a26;border:1.5px solid #3ccf6e;color:var(--fg);transform:translateY(-3px);box-shadow:0 6px 16px rgba(60,207,110,.3);cursor:default}
+.r-pick.paid span{color:var(--fg)}
+.r-pick.paid b{font:700 .95rem var(--f-mono);color:var(--fg)} /* 19/11 Owner (επιλογή Γ): σκούρο πράσινο κουτί, ίδιο μέγεθος, ✓ σε lime αριστερά σε όλο το ύψος */
+.r-pick.paid{flex-direction:row;align-items:stretch;justify-content:flex-start;gap:0;padding:0;overflow:hidden}
+.r-pick.paid .rp-ck{font:800 .95rem/1 var(--f-body);font-style:normal;background:#b6f23a;color:#14200a;flex:none;width:18px;display:flex;align-items:center;justify-content:center}
+.r-pick.paid .rp-col{flex:1;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;line-height:1.15;min-width:0;font-size:inherit;padding:5px 7px}
 .r-pick.pop{animation:paypop .9s cubic-bezier(.2,1.6,.4,1)}
 @keyframes paypop{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-10px) scale(1.12) rotate(-3deg)}65%{transform:translateY(-2px) scale(.98) rotate(1deg)}100%{transform:translateY(-3px) scale(1)}}
 .r-pick.lost{opacity:.5;cursor:default;border-color:var(--line);background:transparent}
@@ -1809,7 +1811,7 @@ function pickBtn(m){
   if(locked) return '<button type="button" class="r-pick vip locked" data-unlock="1" aria-label="Strong pick, free with sign-up"><span class="rp-st">'+starB(3)+' 🔒</span><small class="rp-lk">Free with sign-up</small></button>';
   if(m.type==="postponed"||m.type==="cancelled") return '<span class="r-pick none"><span>'+offT+'</span><small style="white-space:nowrap">'+esc(t.sel)+' · <span>Void</span></small></span>'; /* 03/11: αναβολή/ακύρωση = άκυρο, χωρίς κουμπί */
   var st=m._hold?null:tipState(t,m);
-  if(st==="won") return '<span class="r-pick paid'+(m._justPaid?' pop':'')+'" role="status" aria-label="'+esc(t.sel)+' landed"><span>✓ '+esc(t.sel)+'</span><b class="mono">'+(t.odds?(+t.odds).toFixed(2):'')+'</b></span>';
+  if(st==="won") return '<span class="r-pick paid'+(m._justPaid?' pop':'')+'" role="status" aria-label="'+esc(t.sel)+' landed"><i class="rp-ck" aria-hidden="true">✓</i><span class="rp-col"><span>'+esc(t.sel)+'</span><b class="mono">'+(t.odds?(+t.odds).toFixed(2):'')+'</b></span></span>';
   if(st==="lost") return '<span class="r-pick lost"><span>✗ '+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></span>';
   return '<button type="button" class="r-pick'+(t.tier==="vip"?' vip':'')+'" data-key="'+esc(t.key)+'" aria-pressed="false" aria-label="'+esc(t.sel+" "+t.odds)+'"><span>'+(STRONG_IDS[t.key]?'⚡ ':'')+(starOf(t)===3?starB(3)+' ':'')+esc(t.sel)+'</span><b>'+oddTxt(t)+'</b></button>';
 }
