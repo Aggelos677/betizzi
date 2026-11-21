@@ -2303,7 +2303,7 @@ function renderStrong(){var box=$("strongBox");if(!box)return;
       +(c.why?'<p class="stb-why">'+esc(c.why)+'</p>':'')+(c.url?'<a class="m-url" href="'+esc(c.url)+'"><span>All about this match</span> →</a>':'')
       +'<div class="stb-ft">'+btn+'</div></article>';};
   /* απόφαση Owner 05/11: μέχρι να βγουν τα νέα, τα χθεσινά δυνατά (όταν κέρδισαν 2+ ή η τριάδα) με την ένδειξη «Χθες» */
-  var tr=BZS.treble,h='<div class="stb-h"><b>⚡ <span>'+(BZS.yday?'Yesterday\'s strongest':'Today\'s strongest')+'</span></b>'+(BZS.yday?'<small class="stb-nx"><span>New picks come out in the morning.</span></small>':'')+'</div><div class="stb-g">'+card(BZS.win,'Win')+card(BZS.goals,'Goals');
+  var tr=BZS.treble,h='<div class="stb-h"><b>⚡ <span>'+(BZS.yday?'Yesterday\'s strongest':'Today\'s strongest')+'</span></b>'+(BZS.yday?'<small class="stb-nx"><span>New picks come out in the morning.</span></small>':'')+'</div><div class="stb-g">'+card(BZS.win,BZS.win&&BZS.win.sel!=="1"&&BZS.win.sel!=="2"&&BZS.win.sel!=="X"?'Goals':'Win')+card(BZS.goals,'Goals'); /* 21/11: επιλογή Owner GG στην 1η κάρτα → «Goals», όχι «Win» */
   if(tr){var keys=tr.legs.map(function(c){return c.id+":"+c.sel;}).filter(function(k){return SEL[k];});
     var Ls=tr.legs.map(lvOf),anyLv=Ls.some(function(L){return L.lv;}),allDn=Ls.every(function(L){return L.dn;});
     var rs=tr.legs.map(function(c,i){return stOf(c,Ls[i]);}),tres=tr.result!=null?tr.result:rs.some(function(x){return x===0;})?0:rs.every(function(x){return x===1||x===2;})?1:null;
@@ -2382,7 +2382,8 @@ function renderPicks(){
   Array.prototype.forEach.call($("zMain").querySelectorAll("[data-bzsh]"),function(b){b.addEventListener("click",function(){var c=L.filter(function(x){return String(x.n)===b.dataset.bzsh;})[0];if(!c)return;
     shareParlay(c);});});
   /* μονά */
-  var all=[];MATCHES.forEach(function(m){m.tips.forEach(function(x){all.push({m:m,t:x});});});
+  /* 21/11 (Owner): τα χαμένα tips φεύγουν από το Our picks· μένουν στο Record */
+  var all=[];MATCHES.forEach(function(m){m.tips.forEach(function(x){if(x.r===0)return;all.push({m:m,t:x});});});
   var ord=function(x){return x.m.open?0:x.m.live?1:2;};
   all.sort(function(a,b){return ord(a)-ord(b)||((a.m.ts&&b.m.ts)?a.m.ts-b.m.ts:a.m.time.localeCompare(b.m.time));});
   $("sgN").textContent=all.length?"· "+all.length:"";
