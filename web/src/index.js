@@ -565,7 +565,7 @@ async function todayPage(env, lang, url) {
   const topTip = (tips) => {
     if (!tips.length) return "";
     const s = [...tips].sort((a, b) => (b.prob || 0) - (a.prob || 0));
-    return tipHtml(s[0]) + (s.length > 1 ? `<span class="more">+${s.length - 1}</span>` : "");
+    return tipHtml(s[0]) + (s.length > 1 ? `<span class="more">+${s.length - 1} tip</span>` : "");
   };
   const row = (x) => {
     const live = LIVE.has(x.status), done = DONE.has(x.status);
