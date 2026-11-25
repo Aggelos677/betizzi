@@ -1129,7 +1129,7 @@ MATCHES.forEach(function(m){
 });
 
 /* ---------- ο bookmaker μου: τιμές ενός bookmaker, σύγκριση με Pinnacle, καλύτερο σύνολο παρολί ---------- */
-/* BKDATA = σειρά των τιμών στα δεδομένα (ίδια με BOOKS στο web/src/index.js)· BOOKS = σειρά εμφάνισης (18/11, Owner: Stoiximan 2η μετά τη Bet365) */ var BKDATA=["Bet365","Betano","Pinnacle","1xBet","William Hill","Stoiximan"],BOOKS=["Bet365","Stoiximan","Betano","Pinnacle","1xBet","William Hill"],BKC=["1","X","2","O25","U25","GG","NG"],LOWBK=0.94; /* 18/11: Stoiximan μόνο GR/CY (window.__STX) */ if(!window.__STX)BOOKS=BOOKS.filter(function(b){return b!=="Stoiximan";});
+/* BKDATA = σειρά των τιμών στα δεδομένα (ίδια με BOOKS στο web/src/index.js)· BOOKS = σειρά εμφάνισης (18/11, Owner: Stoiximan 2η μετά τη Bet365) */ var BKDATA=["Bet365","Betano","Pinnacle","1xBet","William Hill","Stoiximan","Mozzart"],BOOKS=["Mozzart","Bet365","Stoiximan","Betano","Pinnacle","1xBet","William Hill"],BKC=["1","X","2","O25","U25","GG","NG"],LOWBK=0.94; /* 18/11: Stoiximan μόνο GR/CY (window.__STX) */ if(!window.__STX)BOOKS=BOOKS.filter(function(b){return b!=="Stoiximan";}); /* 25/11: Mozzart μόνο RS (window.__MOZ), πρώτη στη λίστα· μόνο 1X2 */ if(!window.__MOZ)BOOKS=BOOKS.filter(function(b){return b!=="Mozzart";});
 var NOBK=!!window.__NOBK; /* 10/11 (απόφαση Owner): Βραζιλία → κανένα όνομα bookmaker, μόνο η καλύτερη τιμή */
 var myBook=NOBK?"best":load("ko-book","best");if(myBook!=="best"&&BOOKS.indexOf(myBook)<0)myBook="best";
 /* απόφαση Owner 04/11: ο παίκτης διαλέγει σε ποιους bookmakers παίζει (⚙). Μονό: η καλύτερη τιμή από αυτούς.
@@ -1373,7 +1373,7 @@ function renderMySlip(target){
     else{var k=slip[0];saveCoupon([k],sStk[k]==null?(+stake||10):(+sStk[k]||+stake||10));}
     slip=[];sStk={};store("ko-sstk",sStk);afterSlip();closeSheet();
     toast(viaSponsor?"Saved in My coupons · our partner bookmaker is coming soon":"Saved in My coupons");};
-  if($("playSlip"))$("playSlip").addEventListener("click",function(e){e.preventDefault();e.stopPropagation();place(true);});
+  if($("playSlip"))$("playSlip").addEventListener("click",function(e){e.preventDefault();e.stopPropagation();/* 25/11: υπάρχει συνεργάτης (Mozzart, RS) → ανοίγει η σελίδα του */if(window.SPONSOR&&SPONSOR.url&&SPONSOR.url!=="#"){bzHit("bk",SPONSOR.name);window.open(SPONSOR.url,"_blank","noopener");place(false);}else place(true);});
   $("playElse").addEventListener("click",function(){place(false);});
   $("copySlip").addEventListener("click",function(){
     var txt="betizzi slip\n"+slip.map(function(k){var s=SEL[k];return s.m.home+" v "+s.m.away+" | "+s.label+" @ "+s.odd.toFixed(2);}).join("\n")+"\nTotal: "+totals().odds.toFixed(2);

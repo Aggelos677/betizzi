@@ -95,6 +95,9 @@ const NOINDEX_LANGS = [];
 // 10/11 (απόφαση Owner): χώρες όπου η σελίδα δεν δείχνει ονόματα bookmakers (η εφαρμογή διαβάζει window.__NOBK)
 const NOBK_COUNTRIES = new Set(["BR"]);
 const STX_COUNTRIES = new Set(["GR", "CY"]); // 18/11: Stoiximan έχει άδεια μόνο εδώ
+// 25/11 (Owner): Mozzart μόνο Σερβία (άδεια)· τιμές 1X2 + κουμπί «Παίξ' το στη Mozzart» με το affiliate link (Serbia - Registration)
+const MOZ_COUNTRIES = new Set(["RS"]);
+const MOZ_URL = "https://record.mozzartaffiliates.com/_gb2Z7RgTpDWuqxJ1W5ErsWNd7ZgqdRLk/1/";
 function isPrivate(url) {
   const p = url.pathname;
   return p === "/admin" || p.startsWith("/admin/") || p.startsWith("/auth/") || p === "/me.json" || p === "/vip.json" || p === "/h" || url.searchParams.has("demo")
@@ -111,6 +114,10 @@ export default {
     // 18/11 (απόφαση Owner): Stoiximan μόνο για επισκέπτες από χώρες με άδεια (GR, CY)· η εφαρμογή διαβάζει window.__STX
     if (STX_COUNTRIES.has(req.cf?.country) && (res0.headers.get("content-type") || "").startsWith("text/html"))
       res0 = new HTMLRewriter().on("head", { element(e) { e.prepend("<script>window.__STX=1</script>", { html: true }); } }).transform(res0);
+    // 25/11: Mozzart μόνο για RS· στο test link και με ?moz=1 για έλεγχο
+    const mozOn = MOZ_COUNTRIES.has(req.cf?.country) || (url.hostname !== PROD_HOST && url.searchParams.has("moz"));
+    if (mozOn && (res0.headers.get("content-type") || "").startsWith("text/html"))
+      res0 = new HTMLRewriter().on("head", { element(e) { e.prepend(`<script>window.__MOZ=1;window.SPONSOR={name:"Mozzart",url:${JSON.stringify(MOZ_URL)}}</script>`, { html: true }); } }).transform(res0);
     let res = res0;
     if (url.hostname === PROD_HOST) { res = new Response(res0.body, res0); res.headers.set("strict-transport-security", "max-age=31536000"); }
     if (url.hostname === PROD_HOST && !isPrivate(url)) return res;
@@ -716,7 +723,7 @@ async function template(env, url) {
 }
 
 // Μία γραμμή στη μορφή που διαβάζει η εφαρμογή (ίδια με το πρωτότυπο).
-const BOOKS = ["Bet365", "Betano", "Pinnacle", "1xBet", "William Hill", "Stoiximan"]; // 18/11: + Stoiximan (μόνο εμφάνιση, απόφαση Owner Α)
+const BOOKS = ["Bet365", "Betano", "Pinnacle", "1xBet", "William Hill", "Stoiximan", "Mozzart"]; // 25/11: + Mozzart (μόνο 1X2, μόνο RS) // 18/11: + Stoiximan (μόνο εμφάνιση, απόφαση Owner Α)
 const SELNAME = { "1": "Home", "2": "Away", X: "Draw", O25: "Over 2.5", U25: "Under 2.5", O15: "Over 1.5", O35: "Over 3.5", U35: "Under 3.5", GG: "GG", NG: "NG", "1X": "1X", X2: "X2", "12": "12" };
 function rawRow(x, hm, lang) {
   const type = LIVE.has(x.status) ? "inprogress" : DONE.has(x.status) ? "finished" : x.status === "PST" ? "postponed" : ["CANC", "ABD", "AWD", "WO"].includes(x.status) ? "cancelled" : "notstarted";
