@@ -15,6 +15,7 @@ import { apifStats } from "./adapters/stats-apif.js";
 import { apifOdds } from "./adapters/odds-apif.js";
 import { makeTips } from "./tips.js";
 import { ingestStoiximan } from "./ingest.js";
+import { syncMozzart } from "./mozzart.js";
 
 // Ενεργές λίγκες: από τη βάση (leagues.enabled), ώστε ο Owner να τις αλλάζει από το backoffice (απόφαση 02/11).
 // Πρώτη φορά: η βάση παίρνει τη λίστα του data/leagues.json (179). Cache 60΄΄.
@@ -408,6 +409,7 @@ export default {
     const u = new URL(req.url);
     try {
       if (u.pathname === "/" || u.pathname === "/status") return json(await status(env));
+      if (u.pathname === "/mozzart/status") return json(JSON.parse((await env.DB.prepare("SELECT v FROM kv WHERE k='moz_last'").first("v").catch(() => null)) || "null"));
       if (u.pathname === "/ingest/stoiximan") return await ingestStoiximan(req, env, json); // αποδόσεις Stoiximan από τον scraper του Owner (18/11)
       if (u.pathname === "/api/live") {
         const r = await env.DB.prepare("SELECT id, status, elapsed, gh, ga FROM fixtures WHERE ts BETWEEN ? AND ? AND status NOT IN ('NS','TBD')").bind(now() - 30 * 3600, now() + 600).all();
@@ -524,6 +526,7 @@ export default {
     if (h >= 7 && h < 21 && m % 10 === 5) tasks.push(makeCoupons(env)); // συμπληρώνει όσα παρολί λείπουν (νέα tips)
     if (m % 10 === 8) tasks.push(ensureCoupons(env)); // 06/11: πάντα το ελάχιστο ενεργών παρολί (αλλιώς τα πρώτα της αύριο)
     if (h >= 5 && h < 14 && m % 5 === 0) tasks.push(makeStrong(env)); // 05/11: η ίδια περιμένει την ώρα του (releaseMin)
+    if (m % 5 === 1) tasks.push(syncMozzart(env)); // 25/11 (Owner): αποδόσεις Mozzart κάθε 5΄, μόνο 1X2, μόνο εμφάνιση (odds_bk)
     if (env.TG_BOT_TOKEN) {
       tasks.push(tgPoll(env)); // Telegram: νέα μέλη / κανάλια (1 κλήση/λεπτό στο Telegram, όχι στο API-Football)
       if (m === 30) tasks.push(tgExpire(env)); // κάθε ώρα: όσοι έληξαν βγαίνουν
