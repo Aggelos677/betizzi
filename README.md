@@ -33,6 +33,7 @@
 - Μυστικά (API keys) μόνο ως Cloudflare Secrets, ποτέ στον κώδικα.
 
 ## Ιστορικό
+- 25/11 (web/main, «ok» Owner 15:31): **Mozzart στη σελίδα, μόνο RS** (MOZ_COUNTRIES → window.__MOZ + window.SPONSOR): πρώτη στη λίστα bookmakers του δελτίου (μόνο 1X2), κουμπί «Play it at Mozzart →» με affiliate link (Serbia - Registration) που ανοίγει τη Mozzart και κρατά το δελτίο στα Κουπόνια μου. Test: ?moz=1 μόνο εκτός betizzi.com.
 - 25/11 (engine/main, ok Owner «κάθε 5 λεπτά»): **Αποδόσεις Mozzart → odds_bk (μόνο αποθήκευση).** engine/src/mozzart.js: κάθε 5΄ (λεπτό %5==1) διαβάζει το δημόσιο feed της Mozzart (daily-range σήμερα+αύριο, χωρίς κλειδί), κρατά μόνο ποδόσφαιρο 1X2 (το feed δεν δίνει Over/GG — επιβεβαίωση Mozzart 25/11), ταιριάζει αγώνες με τον κανόνα της Stoiximan (stoix-match.js) + λίγες συντομογραφίες, γράφει μόνο ό,τι άλλαξε. Πίνακες moz_map, moz_h· κατάσταση /mozzart/status. Δεν αλλάζει τα tips ούτε την «καλύτερη τιμή». Η σελίδα δεν τη δείχνει ακόμα (θέλει web, μόνο RS).
 - 25/11 (web/main, εντολή Owner): εικόνα banner Mozzart 250x250 στο web/public/ads/mozzart-250x250.jpg, μόνο για φιλοξενία (τη χρησιμοποιεί το btfodds.com). Δεν εμφανίζεται πουθενά στο betizzi.
 - 21/11 (web/main, εντολή Owner): στη λίστα αγώνων του server (HTML για Google/χωρίς JS) το σήμα «+1» γράφει «+1 tip» (ο όρος Tip μένει ίδιος σε όλες τις γλώσσες). Mechelen–Brugge: δεν είναι λάθος, ο αγώνας δεν έχει tip.
